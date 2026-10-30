@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="feather" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d8a670"/>
+      <stop offset="1" stop-color="#a87444"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M100 226 L86 250 M106 228 L106 252 M112 226 L126 250 M150 226 L140 250 M156 228 L158 252 M162 226 L176 250" stroke-width="11"/>
+    <path d="M100 226 L86 250 M106 228 L106 252 M112 226 L126 250 M150 226 L140 250 M156 228 L158 252 M162 226 L176 250" stroke="#ec9e90" stroke-width="5"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M176 196 L238 214 L228 194 L246 182 L226 174 L232 158 L180 172 Z" fill="#8e6036"/>
+    <ellipse cx="134" cy="182" rx="68" ry="56" fill="url(#feather)"/>
+    <path d="M144 146 C186 146 214 178 204 216 C182 226 150 210 138 184 C134 168 134 154 144 146 Z" fill="#8e6036"/>
+    <path d="M94 54 C88 30 104 14 120 20 C110 30 110 42 114 54 Z" fill="#8e6036"/>
+    <path d="M108 54 C110 28 132 18 144 28 C130 36 126 46 126 58 Z" fill="#a87444"/>
+    <ellipse cx="108" cy="98" rx="54" ry="50" fill="url(#feather)"/>
+    <path d="M60 104 L28 116 L60 126 Z" fill="#9a7a84"/>
+  </g>
+  <ellipse cx="118" cy="200" rx="42" ry="34" fill="#f6e2bc"/>
+  <path d="M62 112 C68 90 92 84 108 94 C114 122 102 144 78 142 C66 136 60 124 62 112 Z" fill="#f6e2bc"/>
+  <path d="M160 166 C180 176 192 194 194 212 M150 176 C166 186 176 200 178 214" fill="none" stroke="#c89060" stroke-width="4" stroke-linecap="round"/>
+  <path d="M62 82 C78 72 104 74 122 88 C104 94 82 94 62 82 Z" fill="#2b2433"/>
+  <circle cx="90" cy="96" r="11" fill="#fff" stroke="#2b2433" stroke-width="3"/>
+  <circle cx="89" cy="97" r="7" fill="#1a1418"/>
+  <circle cx="92" cy="93" r="3" fill="#fff"/>
+  <path d="M30 116 L60 116" stroke="#2b2433" stroke-width="3"/>
+  <ellipse cx="96" cy="64" rx="20" ry="8" fill="#fff" opacity="0.35" transform="rotate(-20 96 64)"/>
+</svg>

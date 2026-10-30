@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="fur" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe470"/>
+      <stop offset="1" stop-color="#f0bc20"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M158 192 L178 168 L168 160 L196 130 L184 122 L222 82 L240 98 L212 126 L224 132 L196 162 L206 170 L176 204 Z" fill="url(#fur)"/>
+    <path d="M158 192 L178 168 L192 180 L176 204 Z" fill="#8a5a28"/>
+    <path d="M84 72 C62 42 48 18 40 2 C68 12 98 36 110 62 Z" fill="url(#fur)"/>
+    <path d="M172 72 C194 42 208 18 216 2 C188 12 158 36 146 62 Z" fill="#f0bc20"/>
+    <ellipse cx="98" cy="243" rx="24" ry="10" fill="#f0bc20"/>
+    <ellipse cx="158" cy="243" rx="24" ry="10" fill="#f0bc20"/>
+    <path d="M84 148 C68 190 80 240 128 242 C176 240 188 190 172 148 C160 128 96 128 84 148 Z" fill="url(#fur)"/>
+    <path d="M92 166 C78 174 74 190 82 196 C90 199 100 188 106 178 Z" fill="#ffe470"/>
+    <path d="M164 166 C178 174 182 190 174 196 C166 199 156 188 150 178 Z" fill="#f0bc20"/>
+    <ellipse cx="128" cy="102" rx="68" ry="58" fill="url(#fur)"/>
+  </g>
+  <path d="M40 2 C52 6 62 14 70 24 C62 24 54 22 50 18 C46 14 43 8 40 2 Z" fill="#2b2433"/>
+  <path d="M216 2 C204 6 194 14 186 24 C194 24 202 22 206 18 C210 14 213 8 216 2 Z" fill="#2b2433"/>
+  <path d="M176 66 C196 90 194 128 172 146 C156 158 136 160 120 158 C156 144 180 112 176 66 Z" fill="#e0a818" opacity="0.5"/>
+  <ellipse cx="96" cy="66" rx="24" ry="10" fill="#fff" opacity="0.45" transform="rotate(-20 96 66)"/>
+  <circle cx="78" cy="122" r="16" fill="#e84838" stroke="#2b2433" stroke-width="3"/>
+  <circle cx="178" cy="122" r="16" fill="#e84838" stroke="#2b2433" stroke-width="3"/>
+  <circle cx="100" cy="96" r="12" fill="#2b2433"/>
+  <circle cx="156" cy="96" r="12" fill="#2b2433"/>
+  <circle cx="104" cy="91" r="5" fill="#fff"/>
+  <circle cx="160" cy="91" r="5" fill="#fff"/>
+  <ellipse cx="128" cy="110" rx="4" ry="3" fill="#2b2433"/>
+  <path d="M112 122 Q120 132 128 122 Q136 132 144 122" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
