@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7cc8f0"/>
+      <stop offset="1" stop-color="#3e94c8"/>
+    </linearGradient>
+    <linearGradient id="frill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbf8e4"/>
+      <stop offset="1" stop-color="#e0dab4"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- fish tail -->
+    <path d="M150 216 C196 222 228 198 222 152" fill="none" stroke-width="32"/>
+    <path d="M150 216 C196 222 228 198 222 152" fill="none" stroke="#58b0e0" stroke-width="22"/>
+    <path d="M222 160 C194 144 186 110 200 84 C208 100 218 108 230 110 C234 92 242 80 254 74 C256 112 248 142 222 160 Z" fill="#2c5c9c"/>
+    <!-- hind paws -->
+    <ellipse cx="74" cy="238" rx="22" ry="11" fill="#3e94c8"/>
+    <ellipse cx="182" cy="238" rx="22" ry="11" fill="#3e94c8"/>
+    <!-- body -->
+    <ellipse cx="128" cy="198" rx="58" ry="42" fill="url(#skin)"/>
+    <!-- front legs -->
+    <path d="M92 196 C88 218 88 236 92 247 L118 247 C120 232 120 214 116 196 Z" fill="url(#skin)"/>
+    <path d="M164 196 C168 218 168 236 164 247 L138 247 C136 232 136 214 140 196 Z" fill="#4aa0d4"/>
+    <!-- neck frill -->
+    <path d="M60 144 C54 168 66 186 80 188 L86 204 L100 192 L112 210 L122 194 L128 214 L134 194 L144 210 L156 192 L170 204 L176 188 C190 186 202 168 196 144 Z" fill="url(#frill)"/>
+    <!-- ear fins -->
+    <path d="M82 98 C50 90 24 62 16 26 C52 30 84 54 98 82 Z" fill="url(#frill)"/>
+    <path d="M174 98 C206 90 232 62 240 26 C204 30 172 54 158 82 Z" fill="url(#frill)"/>
+    <!-- head -->
+    <path d="M72 116 C70 82 96 66 128 66 C160 66 186 82 184 116 C182 146 158 162 128 162 C98 162 74 146 72 116 Z" fill="url(#skin)"/>
+    <!-- crest fin -->
+    <path d="M102 74 C104 46 118 26 128 14 C138 26 152 46 154 74 C146 68 138 66 128 66 C118 66 110 68 102 74 Z" fill="url(#frill)"/>
+  </g>
+  <path d="M30 36 C54 44 74 60 86 80 M226 36 C202 44 182 60 170 80" fill="none" stroke="#2c5c9c" stroke-width="5" stroke-linecap="round"/>
+  <path d="M120 34 L128 22 L136 34" fill="none" stroke="#2c5c9c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M206 98 C214 112 226 118 238 116" fill="none" stroke="#5a8ad0" stroke-width="4" stroke-linecap="round"/>
+  <path d="M160 76 C184 92 188 122 174 140 C164 152 150 158 134 160 C162 144 174 110 160 76 Z" fill="#2c5c9c" opacity="0.35"/>
+  <ellipse cx="102" cy="84" rx="20" ry="8" fill="#fff" opacity="0.4" transform="rotate(-15 102 84)"/>
+  <g stroke="#2b2433" stroke-width="4">
+    <ellipse cx="102" cy="114" rx="13" ry="17" fill="#1e2238"/>
+    <ellipse cx="154" cy="114" rx="13" ry="17" fill="#1e2238"/>
+  </g>
+  <ellipse cx="102" cy="122" rx="7" ry="7" fill="#3a4c80"/>
+  <ellipse cx="154" cy="122" rx="7" ry="7" fill="#3a4c80"/>
+  <ellipse cx="106" cy="106" rx="5" ry="7" fill="#fff"/>
+  <ellipse cx="158" cy="106" rx="5" ry="7" fill="#fff"/>
+  <path d="M114 140 Q128 150 142 140" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+  <path d="M84 247 l4 -7 l4 7 M96 247 l4 -7 l4 7 M152 247 l4 -7 l4 7 M164 247 l4 -7 l4 7" fill="none" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+</svg>

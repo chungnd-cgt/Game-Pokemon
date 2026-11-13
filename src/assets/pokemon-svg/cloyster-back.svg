@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="shell" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#9886c4"/><stop offset="0.55" stop-color="#6a5898"/><stop offset="1" stop-color="#463870"/></radialGradient>
+    <radialGradient id="pearl" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#f6f2ee"/><stop offset="0.6" stop-color="#d4cec8"/><stop offset="1" stop-color="#aaa39c"/></radialGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M110.6 84.6 L128 18.4 L145.4 84.6 Z" fill="url(#shell)"/>
+    <path d="M71.6 112.3 L43.7 56.6 L97.5 89.5 Z" fill="url(#shell)"/>
+    <path d="M158.5 89.5 L212.3 56.6 L184.4 112.3 Z" fill="url(#shell)"/>
+    <path d="M60.9 151.4 L9.7 123.4 L68.1 118.2 Z" fill="url(#shell)"/>
+    <path d="M187.9 118.2 L246.3 123.4 L195.1 151.4 Z" fill="url(#shell)"/>
+    <path d="M74.3 187.5 L19 191 L61.3 156 Z" fill="url(#shell)"/>
+    <path d="M194.7 156 L237 191 L181.7 187.5 Z" fill="url(#shell)"/>
+    <path d="M109.5 211.1 L71 237 L78.1 191.9 Z" fill="url(#shell)"/>
+    <path d="M177.9 191.9 L185 237 L146.5 211.1 Z" fill="url(#shell)"/>
+    <ellipse cx="128" cy="148" rx="84" ry="82" fill="url(#shell)"/>
+  </g>
+  <path d="M46 152 Q128 176 210 152" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+  <path d="M128 162 L70 104 M128 162 L100 78 M128 162 L128 72 M128 162 L156 78 M128 162 L186 104 M128 168 L86 214 M128 168 L128 226 M128 168 L170 214" stroke="#463870" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  <ellipse cx="128" cy="164" rx="16" ry="9" fill="#463870" stroke="#2b2433" stroke-width="4"/>
+  <path d="M72 100 C86 82 106 74 128 72" fill="none" stroke="#c0b4e0" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+</svg>

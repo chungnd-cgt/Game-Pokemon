@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="shell" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#9886c4"/><stop offset="0.55" stop-color="#6a5898"/><stop offset="1" stop-color="#463870"/></radialGradient>
+    <radialGradient id="pearl" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#f6f2ee"/><stop offset="0.6" stop-color="#d4cec8"/><stop offset="1" stop-color="#aaa39c"/></radialGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M110.6 84.6 L128 18.4 L145.4 84.6 Z" fill="url(#shell)"/>
+    <path d="M71.6 112.3 L43.7 56.6 L97.5 89.5 Z" fill="url(#shell)"/>
+    <path d="M158.5 89.5 L212.3 56.6 L184.4 112.3 Z" fill="url(#shell)"/>
+    <path d="M60.9 151.4 L9.7 123.4 L68.1 118.2 Z" fill="url(#shell)"/>
+    <path d="M187.9 118.2 L246.3 123.4 L195.1 151.4 Z" fill="url(#shell)"/>
+    <path d="M74.3 187.5 L19 191 L61.3 156 Z" fill="url(#shell)"/>
+    <path d="M194.7 156 L237 191 L181.7 187.5 Z" fill="url(#shell)"/>
+    <path d="M109.5 211.1 L71 237 L78.1 191.9 Z" fill="url(#shell)"/>
+    <path d="M177.9 191.9 L185 237 L146.5 211.1 Z" fill="url(#shell)"/>
+    <ellipse cx="128" cy="148" rx="84" ry="82" fill="url(#shell)"/>
+    <ellipse cx="128" cy="154" rx="64" ry="54" fill="#a898c8"/>
+    <ellipse cx="128" cy="154" rx="54" ry="44" fill="#241c30"/>
+    <path d="M117 134 C117 118 122 104 128 92 C134 104 139 118 139 134 Z" fill="url(#pearl)"/>
+    <circle cx="128" cy="162" r="34" fill="url(#pearl)"/>
+  </g>
+  <path d="M72 100 C86 82 106 74 128 72" fill="none" stroke="#c0b4e0" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  <path d="M200 176 C194 202 176 218 150 226" fill="none" stroke="#463870" stroke-width="6" stroke-linecap="round" opacity="0.6"/>
+  <ellipse cx="114" cy="146" rx="10" ry="5" fill="#fff" opacity="0.8" transform="rotate(-25 114 146)"/>
+  <path d="M104 156 L121 162 L119 171 Q106 171 104 156 Z M152 156 L135 162 L137 171 Q150 171 152 156 Z" fill="#2b2433" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M118 182 Q128 187 138 182" fill="none" stroke="#2b2433" stroke-width="3.5" stroke-linecap="round"/>
+</svg>

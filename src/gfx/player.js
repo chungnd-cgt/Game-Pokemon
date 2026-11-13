@@ -1,148 +1,97 @@
-import { addSheetTexture, drawGrid, makeCanvas } from './pixel.js';
+import { WORLD_SCALE } from '../config.js';
+import { LOOKS, PLAYER_BASE_LOOKS } from '../data/characterLooks.js';
+import { currentLook, resolveLook } from '../data/playerCustom.js';
+import { addSheetTexture, makeCanvas } from './pixel.js';
+import { DIRS, LH, PLAYER_FRAMES, bikerPixels, characterPixels } from './playerArt.js';
 
-// Nhân vật 16x24 pixel, phong cách GBA. Mỗi hướng có 3 frame: đứng, bước chân trái, bước chân phải.
-const PALETTE = {
-  o: '#282030', // viền
-  r: '#e04040', // mũ, giày
-  R: '#a82828',
-  W: '#f8f8f8',
-  k: '#3a2a28', // tóc
-  p: '#f8c8a0', // da
-  q: '#e0a078',
-  B: '#3870d8', // áo
-  C: '#2850a8',
-  n: '#404860', // quần
-  N: '#2c3244',
-  Y: '#f0c040', // balo
-  Z: '#c09020',
-};
+// Texture nhân vật pixel art: hình vẽ trên lưới logic 16x24 (gfx/playerArt.js), phóng to x3 (nearest) thành frame 48x72 để
+// 1 pixel nhân vật = 1 pixel ô bản đồ (ô 16px hiển thị x3). Mỗi nhân vật có 3 hướng (down/up/side, side = nhìn sang trái) x 3 frame.
 
-const DOWN = [
-  '................',
-  '.....oooooo.....',
-  '....orrrrrro....',
-  '...orrrrrrrro...',
-  '...orrWWWWrro...',
-  '..orrrrrrrrrro..',
-  '..oRRRRRRRRRRo..',
-  '..okkkkkkkkkko..',
-  '..okkppppppkko..',
-  '..okpoppppopko..',
-  '..okpoppppopko..',
-  '...oppppppppo...',
-  '....oqppppqo....',
-  '...oWWBBBBWWo...',
-  '..oBBBBBBBBBBo..',
-  '.opBBBBBBBBBBpo.',
-  '.opCBBBBBBBBCpo.',
-  '..ooCCCCCCCCoo..',
-  '...onnnnnnnno...',
-  '...onnnoonnno...',
-];
+export { PLAYER_FRAMES };
+const PIX = WORLD_SCALE; // mỗi pixel logic = PIX pixel trên texture
+// Texture đã phóng to sẵn nên trên bản đồ hiển thị x1 (nhiều chỗ nhân với hằng số này)
+export const CHAR_SCALE = 1;
+export const CHAR_HEIGHT = LH * PIX * CHAR_SCALE;
+// Trong trận đấu: frame 48x72 x 8/3 = 128x192 (mỗi pixel logic thành đúng 8px)
+export const BATTLE_CHAR_SCALE = 2; // 1 điểm ảnh nhân vật = 6 điểm ảnh màn hình trong trận
 
-const UP = [
-  '................',
-  '.....oooooo.....',
-  '....orrrrrro....',
-  '...orrrrrrrro...',
-  '...orrrrrrrro...',
-  '..orrrrrrrrrro..',
-  '..oRRRRRRRRRRo..',
-  '..okkkkkkkkkko..',
-  '..okkkkkkkkkko..',
-  '..okkkkkkkkkko..',
-  '..okkkkkkkkkko..',
-  '...okkkkkkkko...',
-  '....oqppppqo....',
-  '...oBYYYYYYBo...',
-  '..oBYYYYYYYYBo..',
-  '.opBYYYYYYYYBpo.',
-  '.opCYZZZZZZYCpo.',
-  '..ooCCCCCCCCoo..',
-  '...onnnnnnnno...',
-  '...onnnoonnno...',
-];
-
-// Nhìn sang trái (lật ngang để nhìn sang phải)
-const SIDE = [
-  '................',
-  '.....oooooo.....',
-  '....orrrrrro....',
-  '...orrrrrrrro...',
-  '...oWWrrrrrro...',
-  '.oorrrrrrrrrro..',
-  '.oRRRRRRRRkkko..',
-  '...okkkkkkkkko..',
-  '...oppppkkkkko..',
-  '..oppoppkkkko...',
-  '..opppppkkkko...',
-  '...oppppppko....',
-  '....oqqppppo....',
-  '....oBBBBBYo....',
-  '...oBBBBBBYYo...',
-  '...opBBBBBYYo...',
-  '...oCCBBBBYZo...',
-  '....oCCCCCCo....',
-  '....onnnnnno....',
-  '....onnnnnno....',
-];
-
-const LEGS = {
-  front: {
-    stand: ['...onno..onno...', '...onno..onno...', '...orro..orro...', '....oo....oo....'],
-    left: ['...onno..onno...', '...onno..oRRo...', '...orro...oo....', '....oo..........'],
-    right: ['...onno..onno...', '...oRRo..onno...', '....oo...orro...', '..........oo....'],
-  },
-  side: {
-    stand: ['....onnnnno.....', '.....onnnno.....', '.....orrrro.....', '......oooo......'],
-    left: ['...onnno.onnno..', '..onno....onno..', '..orro....orro..', '...oo......oo...'],
-    right: ['....onnnnno.....', '....onnoonno....', '....orro.orro...', '.....oo...oo....'],
-  },
-};
-
-export const PLAYER_FRAMES = ['stand', 'left', 'right'];
-
-// Biến thể nhân vật: hat=false thì mũ thành tóc, backpack=false thì bỏ balo (thành áo)
-function variant(rows, { hat, backpack }) {
-  return rows.map((row, y) => {
-    let r = row;
-    if (!hat && y <= 6) r = r.replace(/[rRW]/g, 'k');
-    if (!backpack) r = r.replace(/Y/g, 'B').replace(/Z/g, 'C');
-    return r;
-  });
+// Phóng to lưới logic thành canvas (mỗi pixel thành ô PIX x PIX)
+function toScaledCanvas(p) {
+  const { canvas, ctx } = makeCanvas(p.w * PIX, p.h * PIX);
+  for (let y = 0; y < p.h; y++) {
+    for (let x = 0; x < p.w; x++) {
+      const c = p.data[y * p.w + x];
+      if (!c) continue;
+      ctx.fillStyle = c;
+      ctx.fillRect(x * PIX, y * PIX, PIX, PIX);
+    }
+  }
+  return canvas;
 }
 
-// Texture nhân vật với các frame: down-stand, down-left, ..., side-right
-export function makeCharacterTexture(scene, key, colors = {}, { hat = true, backpack = true } = {}) {
-  const palette = { ...PALETTE, ...colors };
+// Ghép các frame thành spritesheet. Texture đã có (cùng cỡ) thì vẽ lại ngay trên canvas cũ: sprite đang dùng texture đó
+// (người chơi trên bản đồ, hình xem trước) tự cập nhật, không bị trỏ vào texture đã xoá
+function setSheetTexture(scene, key, canvases, names) {
+  const old = scene.textures.exists(key) ? scene.textures.get(key) : null;
+  const { width: w, height: h } = canvases[0];
+  const ctx = old?.context;
+  if (ctx && old.width === w * canvases.length && old.height === h && names.every((n) => old.has(n))) {
+    ctx.clearRect(0, 0, old.width, old.height);
+    canvases.forEach((c, i) => ctx.drawImage(c, i * w, 0));
+    old.refresh();
+    return old;
+  }
+  return addSheetTexture(scene, key, canvases, names);
+}
+
+// Spritesheet 9 frame (`${dir}-${step}`) từ một hàm vẽ frame
+function makeSheet(scene, key, draw) {
   const canvases = [];
   const names = [];
-  for (const [dir, body, legs] of [['down', DOWN, LEGS.front], ['up', UP, LEGS.front], ['side', SIDE, LEGS.side]]) {
+  for (const dir of DIRS) {
     for (const step of PLAYER_FRAMES) {
-      const { canvas, ctx } = makeCanvas(16, 24);
-      drawGrid(ctx, [...variant(body, { hat, backpack }), ...legs[step]], palette);
-      canvases.push(canvas);
+      canvases.push(toScaledCanvas(draw(dir, step)));
       names.push(`${dir}-${step}`);
     }
   }
-  addSheetTexture(scene, key, canvases, names);
+  return setSheetTexture(scene, key, canvases, names);
 }
 
-// Bảng màu cho từng kiểu NPC
-const NPC_LOOKS = {
-  'npc-youngster': [{ r: '#3a70d8', R: '#2850a8', B: '#f0c040', C: '#c09020', n: '#4a5878' }, { backpack: false }],
-  'npc-lass': [{ k: '#c06030', B: '#f080a8', C: '#c85080', n: '#f080a8', N: '#c85080' }, { hat: false, backpack: false }],
-  'npc-camper': [{ r: '#3a9a4a', R: '#2a7038', B: '#c8a860', C: '#9a8040', n: '#6a5a3a' }, {}],
-  'npc-oldman': [{ k: '#d0d0d0', B: '#8a6040', C: '#6a4830', n: '#505868' }, { hat: false, backpack: false }],
-  'npc-girl': [{ k: '#4a2a20', B: '#50b070', C: '#3a8a50', n: '#3a4a7a' }, { hat: false, backpack: false }],
-  'npc-boy': [{ r: '#f08030', R: '#c06020', B: '#e04848', C: '#a83030', n: '#3a4a7a' }, { backpack: false }],
-  'npc-fisher': [{ r: '#e8e8e8', R: '#b8b8b8', W: '#3a70d8', B: '#5a7a90', C: '#3a5a70', n: '#3a4050' }, { backpack: false }],
-  'npc-joy': [{ r: '#f8f8f8', R: '#e8dce4', W: '#f04060', k: '#f890b0', B: '#f8c0d0', C: '#e890b0', n: '#f8f0f4', N: '#d8c8d0' }, { backpack: false }],
-  'npc-clerk': [{ k: '#3a2a20', B: '#4a7ad8', C: '#2f5cb8', W: '#f8f8f8', n: '#404860' }, { hat: false, backpack: false }],
-  'npc-woman': [{ k: '#8a4a2a', B: '#9a60c8', C: '#7040a0', n: '#9a60c8', N: '#7040a0' }, { hat: false, backpack: false }],
-};
+export function makeCharacterTexture(scene, key, look) {
+  return makeSheet(scene, key, (dir, step) => characterPixels(look, dir, step));
+}
+
+// ---------- Xe đạp ----------
+
+const BIKE_FRAME = { player: '#d83838', 'player-f': '#38a8d8' };
+
+export function makeBikeTexture(scene, key, look, frameColor = BIKE_FRAME.player) {
+  return makeSheet(scene, key, (dir, step) => bikerPixels(look, dir, step, frameColor));
+}
+
+// Texture người chơi theo giới tính ('male' | 'female') và có đang đạp xe không
+export function playerTextureKey(gender, bike = false) {
+  const base = gender === 'female' ? 'player-f' : 'player';
+  return bike ? `${base}-bike` : base;
+}
 
 export function makePlayerTexture(scene) {
-  makeCharacterTexture(scene, 'player');
-  for (const [key, [colors, opts]] of Object.entries(NPC_LOOKS)) makeCharacterTexture(scene, key, colors, opts);
+  for (const [key, look] of Object.entries(LOOKS)) makeCharacterTexture(scene, key, look);
+  for (const key of ['player', 'player-f']) makeBikeTexture(scene, `${key}-bike`, LOOKS[key], BIKE_FRAME[key]);
+}
+
+// Áp diện mạo người chơi tự chọn (data/playerCustom.js) vào nhân vật: vẽ lại texture đi bộ + đạp xe của giới tính đó
+// và cập nhật LOOKS (bản 3D dựng mô hình theo LOOKS). Giới tính còn lại trở về diện mạo có sẵn (PLAYER_BASE_LOOKS).
+// Gọi khi bắt đầu chơi mới, khi tải bản lưu và khi đổi diện mạo / giới tính trong game. player = { gender, look } (state.player);
+// chưa có look (bản lưu cũ) thì vẽ diện mạo cũ (data/playerCustom.js: LEGACY_CUSTOM)
+export function applyPlayerLook(scene, player) {
+  const female = player?.gender === 'female';
+  for (const [key, gender] of [['player', 'male'], ['player-f', 'female']]) {
+    const mine = Boolean(player) && (gender === 'female') === female;
+    const look = mine ? resolveLook(gender, currentLook(player)) : { ...PLAYER_BASE_LOOKS[gender] };
+    for (const k of Object.keys(LOOKS[key])) delete LOOKS[key][k];
+    Object.assign(LOOKS[key], look);
+    makeCharacterTexture(scene, key, look);
+    makeBikeTexture(scene, `${key}-bike`, look, BIKE_FRAME[key]);
+  }
 }

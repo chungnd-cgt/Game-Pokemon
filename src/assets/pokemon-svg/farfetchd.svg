@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="feather" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#cfa274"/>
+      <stop offset="1" stop-color="#946a42"/>
+    </linearGradient>
+    <linearGradient id="belly" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbf2de"/>
+      <stop offset="1" stop-color="#e8d8b8"/>
+    </linearGradient>
+    <linearGradient id="leek" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#92d062"/>
+      <stop offset="1" stop-color="#4e9a3a"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- đuôi lông sẫm -->
+    <path d="M178 194 L240 206 L226 188 L246 172 L218 168 L224 150 L182 170 Z" fill="#6e4a2c"/>
+    <!-- chân vịt vàng cam -->
+    <path d="M100 226 L98 240 L80 250 L120 250 L108 240 L108 226 Z" fill="#f0b040"/>
+    <path d="M156 226 L156 240 L140 250 L180 250 L166 240 L164 226 Z" fill="#e09c30"/>
+    <!-- thân -->
+    <ellipse cx="132" cy="178" rx="68" ry="58" fill="url(#feather)"/>
+    <!-- ngực kem -->
+    <path d="M96 160 C96 128 162 128 162 160 C168 200 154 230 128 232 C102 230 88 200 96 160 Z" fill="url(#belly)"/>
+    <!-- cánh phải xếp -->
+    <path d="M184 136 C210 150 218 186 204 214 C190 214 176 196 170 174 Z" fill="#a87a4e"/>
+    <!-- đầu -->
+    <ellipse cx="128" cy="90" rx="52" ry="48" fill="url(#feather)"/>
+    <!-- cọng hành: thân trắng, lá xanh -->
+    <path d="M70 202 L84 198 L62 110 L46 114 Z" fill="#f6f8ec"/>
+    <path d="M46 114 L62 110 L56 64 L40 68 Z" fill="url(#leek)"/>
+    <path d="M40 68 C26 54 18 36 16 14 C32 28 44 46 48 64 Z" fill="url(#leek)"/>
+    <path d="M56 64 C56 44 62 26 76 12 C78 32 72 50 60 66 Z" fill="#6cb44a"/>
+    <!-- cánh trái cầm hành -->
+    <path d="M90 140 C64 144 50 166 54 192 C66 200 84 192 92 176 Z" fill="url(#feather)"/>
+  </g>
+  <!-- đầu cánh sẫm -->
+  <path d="M56 186 C58 196 70 198 80 192 C72 190 64 188 56 186 Z" fill="#6e4a2c"/>
+  <path d="M196 206 C200 196 202 186 202 176 C208 190 206 204 198 212 Z" fill="#6e4a2c"/>
+  <path d="M68 116 L56 70" stroke="#c8d8b0" stroke-width="3" stroke-linecap="round"/>
+  <path d="M188 150 C196 166 198 184 194 200 M180 160 C186 172 188 186 186 198" fill="none" stroke="#7e5634" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M184 64 C200 92 190 124 160 136 C178 116 186 92 184 64 Z" fill="#7e5634" opacity="0.5"/>
+  <ellipse cx="104" cy="58" rx="20" ry="8" fill="#fff" opacity="0.35" transform="rotate(-20 104 58)"/>
+  <!-- vạch mày đen -->
+  <path d="M76 82 C88 70 108 70 120 82 C106 80 92 82 78 90 Z" fill="#2b2433"/>
+  <path d="M180 82 C168 70 148 70 136 82 C150 80 164 82 178 90 Z" fill="#2b2433"/>
+  <!-- mắt -->
+  <circle cx="102" cy="94" r="10" fill="#fff" stroke="#2b2433" stroke-width="3.5"/>
+  <circle cx="154" cy="94" r="10" fill="#fff" stroke="#2b2433" stroke-width="3.5"/>
+  <circle cx="104" cy="95" r="6" fill="#1a1418"/>
+  <circle cx="152" cy="95" r="6" fill="#1a1418"/>
+  <circle cx="106" cy="92" r="2.5" fill="#fff"/>
+  <circle cx="154" cy="92" r="2.5" fill="#fff"/>
+  <!-- mỏ vịt dẹt vàng -->
+  <path d="M100 112 C106 100 150 100 156 112 C158 126 146 134 128 134 C110 134 98 126 100 112 Z" fill="#f4c848" stroke="#2b2433" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M104 118 Q128 124 152 118" fill="none" stroke="#2b2433" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="116" cy="108" rx="8" ry="3" fill="#fff" opacity="0.6"/>
+</svg>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="body" cx="38%" cy="32%" r="80%">
+      <stop offset="0" stop-color="#ff9a6a"/>
+      <stop offset="0.55" stop-color="#f06a3a"/>
+      <stop offset="1" stop-color="#d84a28"/>
+    </radialGradient>
+  </defs>
+  <!-- whiskers poking out at the front -->
+  <g fill="none" stroke="#2b2433" stroke-width="9" stroke-linecap="round">
+    <path d="M58 128 C36 118 20 98 18 70"/>
+    <path d="M198 128 C220 118 236 98 238 70"/>
+  </g>
+  <g fill="none" stroke="#f8e070" stroke-width="5" stroke-linecap="round">
+    <path d="M58 128 C36 118 20 98 18 70"/>
+    <path d="M198 128 C220 118 236 98 238 70"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- crown dorsal fin -->
+    <path d="M90 66 L96 26 L110 50 L120 16 L130 46 L142 18 L150 50 L164 32 L166 72 Z" fill="#f4e6c8"/>
+    <!-- side fins -->
+    <path d="M62 150 C42 158 30 176 30 196 C48 192 64 180 72 164 Z" fill="#f4e6c8"/>
+    <path d="M194 150 C214 158 226 176 226 196 C208 192 192 180 184 164 Z" fill="#f4e6c8"/>
+    <!-- body seen from behind -->
+    <ellipse cx="128" cy="130" rx="70" ry="74" fill="url(#body)"/>
+    <!-- split tail fin facing the viewer -->
+    <path d="M128 172 C110 190 92 214 80 250 C100 244 116 236 128 222 C140 236 156 244 176 250 C164 214 146 190 128 172 Z" fill="#f4e6c8"/>
+  </g>
+  <path d="M68 168 C84 196 106 204 116 202 M188 168 C172 196 150 204 140 202" fill="none" stroke="#f8d8a0" stroke-width="10" stroke-linecap="round"/>
+  <g fill="none" stroke="#c84020" stroke-width="3.5" stroke-linecap="round">
+    <path d="M100 94 a14 14 0 0 0 0 28 M128 86 a14 14 0 0 0 0 28 M156 94 a14 14 0 0 0 0 28 M114 120 a14 14 0 0 0 0 28 M142 120 a14 14 0 0 0 0 28"/>
+  </g>
+  <path d="M128 196 L128 226" fill="none" stroke="#d8c8a0" stroke-width="4" stroke-linecap="round"/>
+  <path d="M166 76 C200 98 206 144 186 174 C176 188 160 198 144 202 C182 174 190 120 166 76 Z" fill="#c84020" opacity="0.35"/>
+  <ellipse cx="100" cy="80" rx="24" ry="10" fill="#fff" opacity="0.32" transform="rotate(-24 100 80)"/>
+</svg>

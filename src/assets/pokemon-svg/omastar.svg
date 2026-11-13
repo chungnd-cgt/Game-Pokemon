@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="shell" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff4cc"/><stop offset="1" stop-color="#d8b672"/></linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8ad2f6"/><stop offset="1" stop-color="#3c90d2"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- tentacles -->
+    <path d="M78 196 C54 206 40 222 46 240 M98 210 C86 226 84 240 96 248 M120 214 C116 230 118 242 128 250 M136 214 C140 230 138 242 128 250 M158 210 C170 226 172 240 160 248 M178 196 C202 206 216 222 210 240" fill="none" stroke-width="22"/>
+    <path d="M78 196 C54 206 40 222 46 240 M98 210 C86 226 84 240 96 248 M120 214 C116 230 118 242 128 250 M136 214 C140 230 138 242 128 250 M158 210 C170 226 172 240 160 248 M178 196 C202 206 216 222 210 240" fill="none" stroke="#56a8e2" stroke-width="12"/>
+    <!-- shell spikes -->
+    <path d="M58 92 L10 76 L50 62 Z M74 54 L36 20 L88 38 Z M110 34 L96 0 L134 28 Z M152 30 L172 0 L170 36 Z M186 46 L228 24 L204 66 Z M206 86 L250 82 L210 108 Z" fill="url(#shell)"/>
+    <!-- shell -->
+    <path d="M130 28 C178 28 216 62 216 106 C216 150 180 180 130 180 C80 180 42 150 44 106 C46 62 82 28 130 28 Z" fill="url(#shell)"/>
+    <!-- body -->
+    <path d="M60 182 C56 156 88 140 128 140 C168 140 200 156 196 182 C192 210 164 220 128 220 C92 220 64 210 60 182 Z" fill="url(#skin)"/>
+    <!-- beak -->
+    <path d="M110 176 C110 166 146 166 146 176 L136 206 C132 214 124 214 120 206 Z" fill="#fbe39a"/>
+  </g>
+  <!-- spiral -->
+  <path d="M128 100 A10 10 0 0 1 148 100 A20 20 0 0 1 108 100 A30 30 0 0 1 168 100 A40 40 0 0 1 88 100 A50 50 0 0 1 188 100" fill="none" stroke="#2b2433" stroke-width="5" stroke-linecap="round"/>
+  <path d="M60 120 L76 116 M196 120 L180 116" fill="none" stroke="#b89050" stroke-width="4" stroke-linecap="round"/>
+  <!-- beak details -->
+  <path d="M128 172 L128 206 M118 186 l6 6 l-6 3 M138 186 l-6 6 l6 3" fill="none" stroke="#2b2433" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- shading -->
+  <path d="M190 60 C212 94 208 142 176 164 C162 174 148 178 132 180 C178 156 198 110 190 60 Z" fill="#a8803e" opacity="0.4"/>
+  <ellipse cx="94" cy="52" rx="18" ry="7" fill="#fff" opacity="0.55" transform="rotate(-30 94 52)"/>
+  <path d="M176 156 C194 170 190 198 168 210 C156 216 142 220 130 220 C160 206 176 186 176 156 Z" fill="#2a6aa8" opacity="0.4"/>
+  <!-- eyes -->
+  <g stroke="#2b2433" stroke-width="4">
+    <circle cx="88" cy="174" r="17" fill="#f4e88a"/>
+    <circle cx="168" cy="174" r="17" fill="#f4e88a"/>
+  </g>
+  <ellipse cx="89" cy="175" rx="4" ry="11" fill="#1a1418"/>
+  <ellipse cx="167" cy="175" rx="4" ry="11" fill="#1a1418"/>
+  <circle cx="92" cy="170" r="2.4" fill="#fff"/>
+  <circle cx="170" cy="170" r="2.4" fill="#fff"/>
+</svg>

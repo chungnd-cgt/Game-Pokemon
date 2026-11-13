@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="vine" cx="38%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#8cb4f4"/>
+      <stop offset="0.5" stop-color="#5a86d8"/>
+      <stop offset="1" stop-color="#3458a8"/>
+    </radialGradient>
+    <radialGradient id="shoe" cx="35%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#ff8a7a"/>
+      <stop offset="0.5" stop-color="#e8443e"/>
+      <stop offset="1" stop-color="#b02a2c"/>
+    </radialGradient>
+    <clipPath id="ball">
+      <path d="M165.4 41.2 A27 27 0 0 1 199.6 64.1 A27 27 0 0 1 219.2 100.3 A27 27 0 0 1 219.8 141.5 A27 27 0 0 1 201.1 178.2 A27 27 0 0 1 167.6 202 A27 27 0 0 1 126.8 207.5 A27 27 0 0 1 88.1 193.4 A27 27 0 0 1 60.4 163 A27 27 0 0 1 50 123.2 A27 27 0 0 1 59.3 83.1 A27 27 0 0 1 86.2 51.9 A27 27 0 0 1 124.5 36.8 A27 27 0 0 1 165.4 41.2 Z"/>
+    </clipPath>
+  </defs>
+  <!-- giày đỏ, mũi hướng trái -->
+  <g stroke="#2b2433" stroke-width="5">
+    <ellipse cx="164" cy="234" rx="30" ry="13" fill="#b02a2c"/>
+    <ellipse cx="108" cy="236" rx="36" ry="14" fill="url(#shoe)"/>
+  </g>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M214 92 C234 86 248 70 238 58 C228 48 214 58 222 68 M206 176 C226 192 244 190 248 176 C252 164 236 160 232 170 M62 76 C46 60 28 58 22 70 C18 82 32 88 38 80 M136 40 C138 22 128 10 116 14 M222 134 C240 136 252 124 248 112" stroke="#2b2433" stroke-width="15"/>
+    <path d="M214 92 C234 86 248 70 238 58 C228 48 214 58 222 68 M206 176 C226 192 244 190 248 176 C252 164 236 160 232 170 M62 76 C46 60 28 58 22 70 C18 82 32 88 38 80 M136 40 C138 22 128 10 116 14 M222 134 C240 136 252 124 248 112" stroke="#5a86d8" stroke-width="6"/>
+  </g>
+  <path d="M165.4 41.2 A27 27 0 0 1 199.6 64.1 A27 27 0 0 1 219.2 100.3 A27 27 0 0 1 219.8 141.5 A27 27 0 0 1 201.1 178.2 A27 27 0 0 1 167.6 202 A27 27 0 0 1 126.8 207.5 A27 27 0 0 1 88.1 193.4 A27 27 0 0 1 60.4 163 A27 27 0 0 1 50 123.2 A27 27 0 0 1 59.3 83.1 A27 27 0 0 1 86.2 51.9 A27 27 0 0 1 124.5 36.8 A27 27 0 0 1 165.4 41.2 Z" fill="url(#vine)"/>
+  <g clip-path="url(#ball)" fill="none" stroke-linecap="round">
+    <ellipse cx="84" cy="128" rx="40" ry="22" fill="#1c2444"/>
+    <g stroke="#2c4a98" stroke-width="7">
+      <path d="M50 84 C100 64 160 104 230 74"/>
+      <path d="M56 172 C110 192 176 152 230 182"/>
+      <path d="M120 30 C108 90 140 160 112 220"/>
+      <path d="M180 30 C200 90 166 160 196 220"/>
+      <path d="M150 110 C170 100 190 120 210 110"/>
+      <path d="M140 150 C156 164 176 160 196 146"/>
+    </g>
+    <g stroke="#9cc0f6" stroke-width="4" opacity="0.9">
+      <path d="M86 66 C110 56 132 60 150 70"/>
+      <path d="M150 128 C166 136 184 136 200 126"/>
+      <path d="M160 50 C178 56 192 68 202 86"/>
+      <path d="M80 160 C92 176 110 182 128 180"/>
+    </g>
+    <path d="M150 170 C176 160 196 140 206 110 L230 120 L230 230 L120 230 Z" fill="#1e3a7a" opacity="0.3" stroke="none"/>
+  </g>
+  <path d="M165.4 41.2 A27 27 0 0 1 199.6 64.1 A27 27 0 0 1 219.2 100.3 A27 27 0 0 1 219.8 141.5 A27 27 0 0 1 201.1 178.2 A27 27 0 0 1 167.6 202 A27 27 0 0 1 126.8 207.5 A27 27 0 0 1 88.1 193.4 A27 27 0 0 1 60.4 163 A27 27 0 0 1 50 123.2 A27 27 0 0 1 59.3 83.1 A27 27 0 0 1 86.2 51.9 A27 27 0 0 1 124.5 36.8 A27 27 0 0 1 165.4 41.2 Z" fill="none" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+  <ellipse cx="96" cy="234" rx="12" ry="4" fill="#fff" opacity="0.5"/>
+  <!-- mắt nhìn sang trái -->
+  <g stroke="#2b2433" stroke-width="3">
+    <ellipse cx="72" cy="128" rx="11" ry="12" fill="#fff"/>
+    <ellipse cx="104" cy="128" rx="10" ry="11" fill="#fff"/>
+  </g>
+  <ellipse cx="68" cy="129" rx="5.5" ry="7" fill="#2b2433"/>
+  <ellipse cx="100" cy="129" rx="5" ry="6.5" fill="#2b2433"/>
+  <circle cx="70" cy="126" r="2" fill="#fff"/>
+  <circle cx="102" cy="126" r="1.8" fill="#fff"/>
+</svg>

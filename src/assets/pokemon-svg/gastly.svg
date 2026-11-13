@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="gas" gradientUnits="userSpaceOnUse" cx="128" cy="122" r="112">
+      <stop offset="0" stop-color="#d4b8f0"/>
+      <stop offset="0.6" stop-color="#b08ae0"/>
+      <stop offset="0.82" stop-color="#9a6ad0"/>
+      <stop offset="1" stop-color="#8456bc"/>
+    </radialGradient>
+    <radialGradient id="ball" cx="36%" cy="30%" r="76%">
+      <stop offset="0" stop-color="#4a4656"/>
+      <stop offset="0.55" stop-color="#2e2b36"/>
+      <stop offset="1" stop-color="#18161e"/>
+    </radialGradient>
+    <g id="puffs">
+      <circle cx="128" cy="122" r="82"/>
+      <circle cx="204" cy="118" r="30"/>
+      <circle cx="194" cy="162" r="28"/>
+      <circle cx="164" cy="192" r="30"/>
+      <circle cx="124" cy="202" r="28"/>
+      <circle cx="86" cy="190" r="30"/>
+      <circle cx="58" cy="158" r="28"/>
+      <circle cx="52" cy="116" r="30"/>
+      <circle cx="64" cy="74" r="28"/>
+      <circle cx="96" cy="48" r="30"/>
+      <circle cx="140" cy="40" r="28"/>
+      <circle cx="182" cy="58" r="30"/>
+      <circle cx="208" cy="84" r="22"/>
+      <circle cx="226" cy="200" r="13"/>
+      <circle cx="30" cy="208" r="11"/>
+      <circle cx="36" cy="38" r="10"/>
+    </g>
+  </defs>
+  <!-- khí ga tím -->
+  <use href="#puffs" fill="#5a3a8a" stroke="#5a3a8a" stroke-width="10"/>
+  <use href="#puffs" fill="url(#gas)"/>
+  <!-- quả cầu đen -->
+  <circle cx="128" cy="122" r="62" fill="url(#ball)" stroke="#2b2433" stroke-width="5"/>
+  <ellipse cx="100" cy="82" rx="20" ry="8" fill="#fff" opacity="0.22" transform="rotate(-30 100 82)"/>
+  <!-- mắt -->
+  <g stroke="#2b2433" stroke-width="3.5" stroke-linejoin="round">
+    <path d="M78 90 C92 82 114 92 120 110 C104 118 84 110 78 90 Z" fill="#fff"/>
+    <path d="M178 90 C164 82 142 92 136 110 C152 118 172 110 178 90 Z" fill="#fff"/>
+  </g>
+  <circle cx="107" cy="103" r="6" fill="#141018"/>
+  <circle cx="149" cy="103" r="6" fill="#141018"/>
+  <!-- miệng, răng nanh -->
+  <path d="M86 138 Q128 150 170 138 Q162 178 128 180 Q94 178 86 138 Z" fill="#7a2a48" stroke="#141018" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M98 142 L105 160 L113 145 Z M143 145 L151 160 L158 142 Z" fill="#fff" stroke="#141018" stroke-width="2.5" stroke-linejoin="round"/>
+</svg>

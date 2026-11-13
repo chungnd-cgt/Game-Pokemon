@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="shell" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d89a58"/><stop offset="1" stop-color="#8a5226"/></linearGradient>
+    <linearGradient id="blade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbfbfd"/><stop offset="1" stop-color="#aeaebe"/></linearGradient>
+    <linearGradient id="chest" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#cac6d2"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- tail -->
+    <path d="M146 186 C168 204 196 218 228 224" fill="none" stroke-width="18"/>
+    <path d="M146 186 C168 204 196 218 228 224" fill="none" stroke="#a46632" stroke-width="9"/>
+    <path d="M222 214 L252 228 L222 236 Z" fill="#8a5226"/>
+    <!-- far arm + scythe -->
+    <path d="M146 148 C158 154 164 162 166 172" fill="none" stroke-width="16"/>
+    <path d="M146 148 C158 154 164 162 166 172" fill="none" stroke="#8a5226" stroke-width="8"/>
+    <path d="M158 164 C194 168 214 192 220 232 C202 208 182 196 154 190 Z" fill="#c4c4d0"/>
+    <!-- far leg -->
+    <path d="M138 188 C148 204 154 216 150 230 L170 248 L136 248 L134 232 C132 218 128 206 126 194 Z" fill="#8a5226"/>
+    <!-- dorsal fins -->
+    <path d="M140 122 L196 98 L152 148 Z" fill="#b0743c"/>
+    <path d="M150 148 L204 138 L154 172 Z" fill="#8a5226"/>
+    <!-- torso leaning forward -->
+    <ellipse cx="128" cy="156" rx="28" ry="38" fill="url(#shell)" transform="rotate(-18 128 156)"/>
+    <path d="M106 128 C98 150 102 176 116 190 C112 170 112 148 118 130 Z" fill="url(#chest)" stroke-width="4"/>
+    <!-- near leg -->
+    <path d="M112 186 C102 200 94 214 98 228 L76 248 L112 248 L114 232 C116 218 122 204 126 192 Z" fill="url(#shell)"/>
+    <!-- neck -->
+    <path d="M78 106 L100 136 L118 126 L100 98 Z" fill="#a46632"/>
+    <!-- face below the crest -->
+    <path d="M30 104 C34 120 52 132 78 132 C96 132 108 122 112 106 Z" fill="url(#shell)"/>
+    <!-- head: sickle-shaped crest, front point hooks down over the face, long point sweeps back -->
+    <path d="M22 116 C18 90 34 64 66 54 C112 42 186 40 248 22 C226 54 186 80 136 94 C104 102 64 104 40 100 C34 104 28 110 22 116 Z" fill="url(#shell)"/>
+    <!-- near arm + scythe -->
+    <path d="M108 142 C96 148 88 154 82 164" fill="none" stroke-width="18"/>
+    <path d="M108 142 C96 148 88 154 82 164" fill="none" stroke="#c2844a" stroke-width="9"/>
+    <path d="M94 152 C56 152 28 176 16 222 C38 196 62 184 96 180 Z" fill="url(#blade)"/>
+  </g>
+  <!-- blade edge, chest ribs -->
+  <path d="M28 206 C42 188 62 176 90 170" fill="none" stroke="#8c8c9c" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <path d="M106 146 L114 146 M104 162 L112 162 M108 178 L114 178" stroke="#2b2433" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- shading and gloss -->
+  <path d="M148 130 C160 154 156 180 136 192 C130 194 124 194 118 194 C142 178 150 156 148 130 Z" fill="#5e3416" opacity="0.4"/>
+  <path d="M120 56 C160 52 206 44 240 30 C222 56 186 76 140 90 C142 76 136 64 120 56 Z" fill="#5e3416" opacity="0.4"/>
+  <path d="M34 82 C44 66 62 58 86 54" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
+  <!-- eye: white with black pupil -->
+  <path d="M46 108 L68 110 C68 120 62 124 56 123 C50 122 46 116 46 108 Z" fill="#fff" stroke="#2b2433" stroke-width="3.5" stroke-linejoin="round"/>
+  <ellipse cx="54" cy="115" rx="3.8" ry="4.8" fill="#2b2433"/>
+  <circle cx="53" cy="113" r="1.5" fill="#fff"/>
+</svg>

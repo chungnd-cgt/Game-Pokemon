@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a8d6fc"/>
+      <stop offset="0.5" stop-color="#6aa8ee"/>
+      <stop offset="1" stop-color="#4682d4"/>
+    </linearGradient>
+  </defs>
+  <!-- thân cuộn nhìn từ sau -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M128 128 C122 170 186 174 194 204 C202 234 134 242 86 232 C50 224 40 198 56 182" stroke="#2b2433" stroke-width="54"/>
+    <path d="M128 128 C122 170 186 174 194 204 C202 234 134 242 86 232 C50 224 40 198 56 182" stroke="url(#skin)" stroke-width="44"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- đuôi nhọn -->
+    <path d="M70 192 C72 168 60 146 36 128 C30 152 34 176 44 194 Z" fill="#6aa8ee"/>
+    <!-- vây tai trắng -->
+    <path d="M72 74 C56 62 36 56 16 60 C30 66 36 72 38 76 C26 78 16 86 12 96 C28 94 40 96 48 98 C40 104 36 112 36 120 C50 112 62 104 72 100 Z" fill="#f4f2fa"/>
+    <path d="M184 74 C200 62 220 56 240 60 C226 66 220 72 218 76 C230 78 240 86 244 96 C228 94 216 96 208 98 C216 104 220 112 220 120 C206 112 194 104 184 100 Z" fill="#f4f2fa"/>
+    <!-- gáy -->
+    <path d="M64 84 C62 48 92 22 128 22 C164 22 194 48 192 84 C190 120 162 142 128 142 C94 142 66 120 64 84 Z" fill="url(#skin)"/>
+  </g>
+  <path d="M176 50 C196 78 190 116 164 132 C150 140 136 142 124 141 C156 126 178 96 176 50 Z" fill="#4682d4" opacity="0.5"/>
+  <path d="M108 160 C112 176 140 186 164 194" fill="none" stroke="#4682d4" stroke-width="10" stroke-linecap="round" opacity="0.45"/>
+  <ellipse cx="96" cy="46" rx="22" ry="10" fill="#fff" opacity="0.4" transform="rotate(-25 96 46)"/>
+</svg>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="body" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#7a94e0"/><stop offset="0.6" stop-color="#4b68b8"/><stop offset="1" stop-color="#344c90"/></radialGradient>
+    <radialGradient id="petal" cx="50%" cy="30%" r="80%"><stop offset="0" stop-color="#f69060"/><stop offset="1" stop-color="#dc5e38"/></radialGradient>
+    <g id="pet">
+      <path d="M0 -6 C-50 -14 -58 -70 0 -86 C58 -70 50 -14 0 -6 Z" fill="url(#petal)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+      <ellipse cx="0" cy="-52" rx="18" ry="16" fill="#f8c890"/>
+    </g>
+  </defs>
+  <g transform="translate(140 92) scale(1.32 0.6)">
+    <use xlink:href="#pet" href="#pet" transform="rotate(-36)"/>
+    <use xlink:href="#pet" href="#pet" transform="rotate(36)"/>
+    <use xlink:href="#pet" href="#pet" transform="rotate(-104)"/>
+    <use xlink:href="#pet" href="#pet" transform="rotate(104)"/>
+    <use xlink:href="#pet" href="#pet" transform="rotate(180)"/>
+  </g>
+  <ellipse cx="140" cy="90" rx="26" ry="11" fill="#6a2a30" stroke="#2b2433" stroke-width="4"/>
+  <ellipse cx="134" cy="87" rx="10" ry="3.5" fill="#9a4a48"/>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round">
+    <ellipse cx="152" cy="238" rx="26" ry="12" fill="#2a3f78"/>
+    <ellipse cx="194" cy="190" rx="18" ry="13" fill="#344c90" transform="rotate(30 194 190)"/>
+    <ellipse cx="128" cy="180" rx="64" ry="60" fill="url(#body)"/>
+    <ellipse cx="106" cy="238" rx="28" ry="13" fill="#344c90"/>
+  </g>
+  <ellipse cx="102" cy="146" rx="18" ry="8" fill="#fff" opacity="0.3" transform="rotate(-25 102 146)"/>
+  <path d="M74 166 C76 154 98 152 100 166 C98 178 76 178 74 166 Z" fill="#e83c3c" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M72 164 C80 156 94 156 102 162" stroke="#2b2433" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="84" cy="168" r="3" fill="#fff"/>
+  <path d="M64 192 C70 186 88 188 92 194 C90 208 70 208 64 192 Z" fill="#8a2a3a" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M72 204 C74 214 72 224 78 228 C84 224 82 214 80 204 Z" fill="#f0b040" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+</svg>

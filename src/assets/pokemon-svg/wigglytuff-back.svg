@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd4e2"/><stop offset="1" stop-color="#ee9cbe"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- túm lông nhô trên đỉnh -->
+    <path d="M100 70 C90 50 104 32 124 36 C132 22 158 26 160 44 C176 48 176 70 160 74 Z" fill="#ee9cbe"/>
+    <!-- tai thỏ dài -->
+    <path d="M86 94 C64 74 46 42 42 4 C76 16 102 46 112 76 Z" fill="#fcc8da"/>
+    <path d="M170 94 C192 74 210 42 214 4 C180 16 154 46 144 76 Z" fill="#ee9cbe"/>
+    <!-- tay -->
+    <path d="M52 140 C32 138 20 150 22 164 C30 172 44 164 56 156 Z" fill="#fcc8da"/>
+    <path d="M204 140 C224 138 236 150 234 164 C226 172 212 164 200 156 Z" fill="#e48cb2"/>
+    <!-- chân -->
+    <ellipse cx="94" cy="240" rx="28" ry="12" fill="#ee9cbe"/>
+    <ellipse cx="162" cy="240" rx="28" ry="12" fill="#e48cb2"/>
+    <!-- lưng -->
+    <path d="M128 60 C180 60 212 104 212 156 C212 212 178 240 128 240 C78 240 44 212 44 156 C44 104 76 60 128 60 Z" fill="url(#skin)"/>
+    <!-- đuôi lông nhỏ -->
+    <ellipse cx="128" cy="214" rx="18" ry="14" fill="#fff6f8"/>
+  </g>
+  <path d="M196 104 C220 150 210 206 168 230 C190 196 200 154 196 104 Z" fill="#d87ca4" opacity="0.45"/>
+  <ellipse cx="84" cy="100" rx="22" ry="10" fill="#fff" opacity="0.55" transform="rotate(-40 84 100)"/>
+</svg>

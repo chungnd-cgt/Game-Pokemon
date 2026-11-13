@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffda6c"/><stop offset="1" stop-color="#e4a92c"/></linearGradient>
+    <linearGradient id="pants" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a06a40"/><stop offset="1" stop-color="#6c4226"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="96" cy="238" rx="28" ry="12" fill="#7e4c2c"/>
+    <ellipse cx="160" cy="238" rx="28" ry="12" fill="#6c4226"/>
+    <path d="M80 140 C60 150 48 170 52 190 C56 200 68 200 72 190 C72 176 80 164 92 156 Z" fill="url(#skin)"/>
+    <path d="M176 140 C196 150 208 170 204 190 C200 200 188 200 184 190 C184 176 176 164 164 156 Z" fill="#e8b23a"/>
+    <path d="M70 172 C70 134 96 118 128 118 C160 118 186 134 186 172 C186 206 166 230 128 230 C90 230 70 206 70 172 Z" fill="url(#skin)"/>
+    <path d="M71 166 C96 180 160 180 185 166 C190 204 168 230 128 230 C88 230 66 204 71 166 Z" fill="url(#pants)"/>
+    <path d="M82 52 C74 36 78 20 88 12 C102 20 110 34 108 46 Z" fill="url(#skin)"/>
+    <path d="M174 52 C182 36 178 20 168 12 C154 20 146 34 148 46 Z" fill="#e8b23a"/>
+    <ellipse cx="128" cy="80" rx="58" ry="48" fill="url(#skin)"/>
+  </g>
+  <path d="M170 50 C186 74 182 104 160 120 C150 126 140 128 132 128 C160 110 174 84 170 50 Z" fill="#cc9426" opacity="0.5"/>
+  <ellipse cx="104" cy="56" rx="24" ry="10" fill="#fff" opacity="0.45" transform="rotate(-18 104 56)"/>
+  <path d="M100 140 C116 146 140 146 156 140" fill="none" stroke="#cc9426" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+  <path d="M84 196 C92 212 108 222 124 224" fill="none" stroke="#b07a4c" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  <!-- trunk tip just visible below the chin on each side -->
+</svg>

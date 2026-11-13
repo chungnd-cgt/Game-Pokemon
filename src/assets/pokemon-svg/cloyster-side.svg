@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="shell" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#9886c4"/><stop offset="0.55" stop-color="#6a5898"/><stop offset="1" stop-color="#463870"/></radialGradient>
+    <radialGradient id="pearl" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#f6f2ee"/><stop offset="0.6" stop-color="#d4cec8"/><stop offset="1" stop-color="#aaa39c"/></radialGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M125.6 87.1 L133.1 22.4 L157.6 82.5 Z" fill="url(#shell)"/>
+    <path d="M92.6 121 L61.5 75.1 L112.4 94.9 Z" fill="url(#shell)"/>
+    <path d="M170.3 85.5 L215.4 46.5 L197.1 104 Z" fill="url(#shell)"/>
+    <path d="M204.6 115 L257.5 118.5 L212.4 147.1 Z" fill="url(#shell)"/>
+    <path d="M210.8 160.4 L243.7 197.1 L195.6 189.6 Z" fill="url(#shell)"/>
+    <path d="M188.4 196.4 L187.4 240.9 L156.5 209.6 Z" fill="url(#shell)"/>
+    <path d="M147.8 210 L120.1 240.3 L115.1 199.1 Z" fill="url(#shell)"/>
+    <path d="M109.1 194.3 L65.9 204.2 L91 166.8 Z" fill="url(#shell)"/>
+    <path d="M90 94 Q34 146 90 198 L140 146 Z" fill="#241c30"/>
+    <path d="M90 94 A78 80 0 1 1 90 198 L140 146 Z" fill="url(#shell)"/>
+    <path d="M90 94 L140 146 L90 198" fill="none" stroke="#a898c8" stroke-width="8"/>
+    <path d="M72 126 C60 112 54 98 54 84 C66 94 78 106 86 120 Z" fill="url(#pearl)"/>
+    <circle cx="86" cy="150" r="32" fill="url(#pearl)"/>
+  </g>
+  <path d="M118 86 C136 76 158 74 180 82" fill="none" stroke="#c0b4e0" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  <path d="M218 180 C208 204 190 218 166 224" fill="none" stroke="#463870" stroke-width="6" stroke-linecap="round" opacity="0.6"/>
+  <ellipse cx="80" cy="134" rx="10" ry="5" fill="#fff" opacity="0.8" transform="rotate(-25 80 134)"/>
+  <path d="M62 146 L78 152 L76 161 Q64 161 62 146 Z" fill="#2b2433" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M58 172 Q66 176 74 172" fill="none" stroke="#2b2433" stroke-width="3.5" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#72ace2"/><stop offset="1" stop-color="#3c74b8"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- tay hai bên -->
+    <path d="M60 120 C36 128 20 152 22 178 C24 190 38 194 46 184 C48 168 58 154 76 146 Z" fill="url(#skin)"/>
+    <path d="M196 120 C220 128 236 152 234 178 C232 190 218 194 210 184 C208 168 198 154 180 146 Z" fill="#3c74b8"/>
+    <!-- chân -->
+    <path d="M60 204 C48 220 48 240 56 248 L104 248 C110 236 108 218 100 208 Z" fill="url(#skin)"/>
+    <path d="M196 204 C208 220 208 240 200 248 L152 248 C146 236 148 218 156 208 Z" fill="#3c74b8"/>
+    <!-- lưng bè -->
+    <path d="M128 86 C180 86 212 126 212 172 C212 216 180 240 128 240 C76 240 44 216 44 172 C44 126 76 86 128 86 Z" fill="url(#skin)"/>
+    <!-- tai -->
+    <ellipse cx="72" cy="36" rx="30" ry="34" fill="url(#skin)" transform="rotate(-30 72 36)"/>
+    <ellipse cx="184" cy="36" rx="30" ry="34" fill="#3c74b8" transform="rotate(30 184 36)"/>
+    <!-- sau đầu -->
+    <path d="M128 24 C162 24 180 48 178 76 C176 102 154 116 128 116 C102 116 80 102 78 76 C76 48 94 24 128 24 Z" fill="url(#skin)"/>
+    <!-- các hàng gai trên lưng -->
+    <path d="M114 126 L128 98 L142 126 Z" fill="#9cc6ec"/>
+    <path d="M112 160 L128 130 L144 160 Z" fill="#9cc6ec"/>
+    <path d="M78 150 L76 120 L100 140 Z" fill="#7cb0e2"/>
+    <path d="M178 150 L180 120 L156 140 Z" fill="#7cb0e2"/>
+    <path d="M70 186 L62 156 L92 174 Z" fill="#6aa2d8"/>
+    <path d="M186 186 L194 156 L164 174 Z" fill="#6aa2d8"/>
+    <!-- đuôi to thò xuống -->
+    <path d="M100 196 C94 226 108 252 128 252 C148 252 162 226 156 196 C146 186 110 186 100 196 Z" fill="url(#skin)"/>
+  </g>
+  <path d="M198 128 C214 166 204 214 166 232 C178 210 196 176 198 128 Z" fill="#2c5c9c" opacity="0.45"/>
+  <ellipse cx="102" cy="44" rx="16" ry="7" fill="#fff" opacity="0.4" transform="rotate(-25 102 44)"/>
+  <ellipse cx="118" cy="210" rx="6" ry="14" fill="#fff" opacity="0.3"/>
+</svg>

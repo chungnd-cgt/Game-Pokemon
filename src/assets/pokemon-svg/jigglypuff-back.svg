@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="skin" cx="38%" cy="32%" r="78%"><stop offset="0" stop-color="#ffe0ea"/><stop offset="0.55" stop-color="#f8b8d0"/><stop offset="1" stop-color="#e48cb0"/></radialGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- lọn tóc nhô lên phía trước đỉnh đầu -->
+    <path d="M110 60 C104 40 118 26 134 32 C146 38 144 54 132 56 Z" fill="#f8b8d0"/>
+    <!-- tai nhìn từ sau -->
+    <path d="M62 92 L44 22 L114 62 Z" fill="#fbc8da"/>
+    <path d="M194 92 L212 22 L142 62 Z" fill="#f0a4c2"/>
+    <!-- tay -->
+    <path d="M38 150 C20 150 12 164 18 174 C28 178 38 170 44 164 Z" fill="#fbc8da"/>
+    <path d="M218 150 C236 150 244 164 238 174 C228 178 218 170 212 164 Z" fill="#e690b4"/>
+    <!-- chân -->
+    <ellipse cx="96" cy="238" rx="26" ry="12" fill="#f0a4c2"/>
+    <ellipse cx="160" cy="238" rx="26" ry="12" fill="#e690b4"/>
+    <!-- lưng tròn -->
+    <circle cx="128" cy="144" r="96" fill="url(#skin)"/>
+  </g>
+  <path d="M206 96 C232 146 218 208 170 232 C156 238 140 240 128 240 C180 218 210 160 206 96 Z" fill="#d87ca4" opacity="0.45"/>
+  <ellipse cx="80" cy="88" rx="24" ry="11" fill="#fff" opacity="0.55" transform="rotate(-35 80 88)"/>
+</svg>

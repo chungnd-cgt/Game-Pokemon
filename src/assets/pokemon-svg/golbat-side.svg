@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6aa8e8"/><stop offset="0.5" stop-color="#4a86d0"/><stop offset="1" stop-color="#3462a8"/></linearGradient>
+    <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bc7ed2"/><stop offset="1" stop-color="#8e4ea8"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- cánh xa -->
+    <path d="M140 90 C150 58 172 30 204 8 C204 32 212 48 226 60 C210 68 204 82 206 100 C190 98 176 106 170 122 Z" fill="#8e4ea8"/>
+    <ellipse cx="146" cy="238" rx="18" ry="10" fill="#3462a8"/>
+    <!-- tai -->
+    <path d="M118 66 L112 12 L150 58 Z" fill="url(#skin)"/>
+    <!-- thân -->
+    <path d="M132 46 C176 46 194 96 192 146 C190 196 168 226 132 226 C96 226 68 196 66 146 C64 96 88 46 132 46 Z" fill="url(#skin)"/>
+    <ellipse cx="114" cy="240" rx="20" ry="10" fill="#3e78c4"/>
+  </g>
+  <path d="M122 60 L120 30 L140 56 Z" fill="#a868c0"/>
+  <ellipse cx="108" cy="66" rx="16" ry="7" fill="#fff" opacity="0.35" transform="rotate(-30 108 66)"/>
+  <!-- miệng há to về phía trước -->
+  <path d="M60 104 C80 104 118 116 142 140 C120 168 86 196 62 202 C48 178 46 130 60 104 Z" fill="#7a1a30" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M60 176 C80 164 104 160 124 160 C106 180 82 196 62 202 C58 194 58 184 60 176 Z" fill="#e07088"/>
+  <path d="M66 106 L80 108 L70 132 Z M68 198 L82 192 L72 174 Z M96 112 L106 116 L98 132 Z" fill="#fff" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+  <!-- mắt -->
+  <path d="M82 76 L106 88 L102 96 C92 96 86 90 82 76 Z" fill="#fff" stroke="#2b2433" stroke-width="3.5" stroke-linejoin="round"/>
+  <circle cx="96" cy="89" r="4" fill="#1a1418"/>
+  <path d="M78 72 L108 86" stroke="#2b2433" stroke-width="5" stroke-linecap="round"/>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- cánh gần -->
+    <path d="M158 116 C176 82 208 54 252 40 C240 66 240 92 248 118 C230 116 216 126 212 146 C196 140 182 148 176 166 C170 148 162 136 152 132 Z" fill="url(#wing)"/>
+  </g>
+  <g fill="none" stroke-linecap="round">
+    <path d="M158 116 C176 82 208 54 252 40" stroke="#2b2433" stroke-width="13"/>
+    <path d="M158 116 C176 82 208 54 252 40" stroke="#4a86d0" stroke-width="6"/>
+    <path d="M166 120 C196 106 222 106 244 116 M164 128 C184 128 200 134 210 144" stroke="#7a3e94" stroke-width="4"/>
+  </g>
+</svg>

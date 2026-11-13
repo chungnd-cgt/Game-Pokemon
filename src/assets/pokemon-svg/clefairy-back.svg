@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffdce2"/><stop offset="1" stop-color="#f4a6ba"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- tai nhìn từ sau -->
+    <path d="M84 98 C68 72 56 44 54 10 C80 26 102 52 112 82 Z" fill="url(#skin)"/>
+    <path d="M54 10 C66 18 76 28 84 40 C76 46 66 48 60 48 C56 36 54 22 54 10 Z" fill="#704020"/>
+    <path d="M172 98 C188 72 200 44 202 10 C176 26 154 52 144 82 Z" fill="#f4a6ba"/>
+    <path d="M202 10 C190 18 180 28 172 40 C180 46 190 48 196 48 C200 36 202 22 202 10 Z" fill="#704020"/>
+    <!-- tay -->
+    <path d="M54 156 C36 156 26 168 30 180 C38 186 50 178 58 170 Z" fill="#fde0e6"/>
+    <path d="M202 156 C220 156 230 168 226 180 C218 186 206 178 198 170 Z" fill="#ec98ae"/>
+    <!-- chân -->
+    <ellipse cx="96" cy="238" rx="28" ry="13" fill="#f4a6ba"/>
+    <ellipse cx="160" cy="238" rx="28" ry="13" fill="#ec98ae"/>
+    <!-- lưng tròn -->
+    <path d="M128 66 C182 66 214 108 212 158 C210 210 176 240 128 240 C80 240 46 210 44 158 C42 108 74 66 128 66 Z" fill="url(#skin)"/>
+    <!-- đôi cánh nhỏ nhọn trên lưng, mép dưới gợn -->
+    <path d="M122 120 C104 96 76 86 50 92 C62 102 64 112 60 124 C74 122 84 130 84 142 C98 138 112 132 122 120 Z" fill="#f6b4c6"/>
+    <path d="M134 120 C152 96 180 86 206 92 C194 102 192 112 196 124 C182 122 172 130 172 142 C158 138 144 132 134 120 Z" fill="#ee9cb4"/>
+  </g>
+  <path d="M116 118 C100 106 82 100 66 100 M140 118 C156 106 174 100 190 100" fill="none" stroke="#d87a98" stroke-width="3" stroke-linecap="round"/>
+  <!-- đuôi xoăn -->
+  <path d="M128 206 C112 214 110 234 126 238 C140 240 146 226 136 220 C130 216 124 222 128 226" fill="none" stroke="#2b2433" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 206 C112 214 110 234 126 238 C140 240 146 226 136 220 C130 216 124 222 128 226" fill="none" stroke="#f4a6ba" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M190 104 C214 146 206 204 162 228 C182 196 196 152 190 104 Z" fill="#e88aa4" opacity="0.5"/>
+  <ellipse cx="88" cy="94" rx="20" ry="9" fill="#fff" opacity="0.5" transform="rotate(-35 88 94)"/>
+</svg>

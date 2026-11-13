@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="body" cx="36%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#9a78d4"/>
+      <stop offset="0.6" stop-color="#7450b0"/>
+      <stop offset="1" stop-color="#4e3488"/>
+    </radialGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- chân -->
+    <ellipse cx="86" cy="236" rx="30" ry="13" fill="#7450b0"/>
+    <ellipse cx="170" cy="236" rx="30" ry="13" fill="#5e3e9a"/>
+    <!-- thân tròn, tai nhọn, gai hai bên -->
+    <path d="M128 56 C148 56 162 60 174 68 L198 20 L202 84 L234 92 L212 116 L240 132 L214 148 L232 172 L208 176 C200 206 170 224 128 224 C86 224 56 206 48 176 L24 172 L42 148 L16 132 L44 116 L22 92 L54 84 L58 20 L82 68 C94 60 108 56 128 56 Z" fill="url(#body)"/>
+  </g>
+  <path d="M190 90 C206 120 204 160 186 186 C170 208 148 218 124 220 C170 196 192 150 190 90 Z" fill="#4e3488" opacity="0.5"/>
+  <ellipse cx="96" cy="78" rx="24" ry="10" fill="#fff" opacity="0.3" transform="rotate(-20 96 78)"/>
+  <!-- tay ngắn có móng -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M78 164 Q62 176 54 196" stroke="#2b2433" stroke-width="32"/>
+    <path d="M78 164 Q62 176 54 196" stroke="#7450b0" stroke-width="22"/>
+    <path d="M178 164 Q194 176 202 196" stroke="#2b2433" stroke-width="32"/>
+    <path d="M178 164 Q194 176 202 196" stroke="#5e3e9a" stroke-width="22"/>
+  </g>
+  <path d="M40 200 l-6 12 l12 -4 Z M52 210 l0 12 l8 -10 Z M64 206 l8 10 l0 -12 Z M216 200 l6 12 l-12 -4 Z M204 210 l0 12 l-8 -10 Z M192 206 l-8 10 l0 -12 Z" fill="#5e3e9a" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+  <!-- mắt đỏ -->
+  <g stroke="#2b2433" stroke-width="4" stroke-linejoin="round">
+    <path d="M62 96 C82 98 106 108 120 120 C112 138 82 138 70 122 C64 114 62 106 62 96 Z" fill="#e8344a"/>
+    <path d="M194 96 C174 98 150 108 136 120 C144 138 174 138 186 122 C192 114 194 106 194 96 Z" fill="#e8344a"/>
+  </g>
+  <circle cx="100" cy="122" r="6" fill="#4a0a18"/>
+  <circle cx="156" cy="122" r="6" fill="#4a0a18"/>
+  <circle cx="102" cy="119" r="2.5" fill="#fff"/>
+  <circle cx="158" cy="119" r="2.5" fill="#fff"/>
+  <!-- nụ cười rộng -->
+  <path d="M56 146 Q128 214 200 146 Q128 170 56 146 Z" fill="#fff" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M64 152 Q128 192 192 152" fill="none" stroke="#2b2433" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M100 162 L100 176 M128 166 L128 182 M156 162 L156 176" fill="none" stroke="#2b2433" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

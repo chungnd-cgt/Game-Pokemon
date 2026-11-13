@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="shell" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff4cc"/><stop offset="1" stop-color="#d8b672"/></linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8ad2f6"/><stop offset="1" stop-color="#3c90d2"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- tentacles peeking out -->
+    <path d="M70 196 C48 208 36 224 44 242 M100 212 C90 228 90 240 102 248 M156 212 C166 228 166 240 154 248 M186 196 C208 208 220 224 212 242" fill="none" stroke-width="22"/>
+    <path d="M70 196 C48 208 36 224 44 242 M100 212 C90 228 90 240 102 248 M156 212 C166 228 166 240 154 248 M186 196 C208 208 220 224 212 242" fill="none" stroke="#56a8e2" stroke-width="12"/>
+    <ellipse cx="128" cy="204" rx="68" ry="24" fill="url(#skin)"/>
+    <!-- spikes -->
+    <path d="M52 118 L4 104 L46 86 Z M64 74 L22 44 L80 56 Z M100 46 L84 10 L124 36 Z M150 40 L172 6 L172 46 Z M186 54 L232 34 L206 76 Z M206 98 L252 96 L210 122 Z M206 150 L248 164 L196 172 Z M50 150 L8 164 L60 172 Z" fill="url(#shell)"/>
+    <!-- shell -->
+    <path d="M130 34 C178 34 216 70 216 118 C216 166 178 204 128 204 C78 204 40 166 42 118 C44 70 82 34 130 34 Z" fill="url(#shell)"/>
+  </g>
+  <!-- spiral -->
+  <path d="M128 118 A10 10 0 0 1 148 118 A20 20 0 0 1 108 118 A30 30 0 0 1 168 118 A40 40 0 0 1 88 118 A50 50 0 0 1 188 118 A60 60 0 0 1 68 118" fill="none" stroke="#2b2433" stroke-width="5" stroke-linecap="round"/>
+  <!-- shading -->
+  <path d="M188 70 C214 106 210 158 178 186 C164 198 148 204 130 204 C180 178 200 124 188 70 Z" fill="#a8803e" opacity="0.4"/>
+  <ellipse cx="88" cy="60" rx="18" ry="7" fill="#fff" opacity="0.55" transform="rotate(-30 88 60)"/>
+</svg>

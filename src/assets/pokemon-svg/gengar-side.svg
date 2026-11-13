@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="body" cx="36%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#9a78d4"/>
+      <stop offset="0.6" stop-color="#7450b0"/>
+      <stop offset="1" stop-color="#4e3488"/>
+    </radialGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="160" cy="236" rx="28" ry="12" fill="#5e3e9a"/>
+    <!-- đuôi -->
+    <path d="M196 194 C216 196 230 186 238 172 C236 198 220 214 196 214 Z" fill="#5e3e9a"/>
+    <path d="M120 58 C130 56 140 58 150 62 L166 18 L178 74 L210 70 L196 94 L230 104 L206 122 L236 136 L208 148 L230 168 L202 174 C192 206 160 224 122 224 C78 224 48 198 46 158 C44 120 60 94 82 78 L80 28 L108 62 C112 60 116 58 120 58 Z" fill="url(#body)"/>
+    <ellipse cx="94" cy="238" rx="32" ry="13" fill="#7450b0"/>
+  </g>
+  <path d="M180 92 C198 122 198 162 180 188 C164 208 144 218 120 220 C164 196 184 150 180 92 Z" fill="#4e3488" opacity="0.5"/>
+  <ellipse cx="94" cy="84" rx="22" ry="9" fill="#fff" opacity="0.3" transform="rotate(-25 94 84)"/>
+  <path d="M50 104 C66 106 84 114 96 124 C90 140 66 140 58 128 C52 120 50 112 50 104 Z" fill="#e8344a" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="76" cy="126" r="5.5" fill="#4a0a18"/>
+  <circle cx="78" cy="123" r="2.2" fill="#fff"/>
+  <path d="M46 150 C68 166 100 170 128 158 C120 186 88 196 64 186 C54 178 48 166 46 150 Z" fill="#fff" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M52 160 C72 174 100 176 122 166" fill="none" stroke="#2b2433" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M76 168 L76 182 M100 170 L100 184" fill="none" stroke="#2b2433" stroke-width="2.5" stroke-linecap="round"/>
+  <g stroke-linecap="round" fill="none">
+    <path d="M110 176 Q94 190 78 204" stroke="#2b2433" stroke-width="30"/>
+    <path d="M110 176 Q94 190 78 204" stroke="#7450b0" stroke-width="20"/>
+  </g>
+  <path d="M62 202 l-8 10 l12 -2 Z M70 214 l-2 12 l10 -8 Z M82 214 l6 10 l2 -12 Z" fill="#5e3e9a" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+</svg>

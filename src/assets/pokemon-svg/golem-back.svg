@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="shell" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bcbc98"/><stop offset="0.5" stop-color="#9a987a"/><stop offset="1" stop-color="#74725a"/></linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e0a878"/><stop offset="0.5" stop-color="#c8885a"/><stop offset="1" stop-color="#a86a40"/></linearGradient>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M54 150 C38 150 26 140 22 120 M202 150 C218 150 230 140 234 120" stroke="#2b2433" stroke-width="34"/>
+    <path d="M54 150 C38 150 26 140 22 120 M202 150 C218 150 230 140 234 120" stroke="#c8885a" stroke-width="24"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M8 112 L4 86 L18 104 Z M20 104 L22 78 L30 102 Z M32 108 L40 86 L40 112 Z" fill="#f0e8d8"/>
+    <path d="M248 112 L252 86 L238 104 Z M236 104 L234 78 L226 102 Z M224 108 L216 86 L216 112 Z" fill="#f0e8d8"/>
+    <ellipse cx="22" cy="118" rx="20" ry="16" fill="#b8784a"/>
+    <ellipse cx="234" cy="118" rx="20" ry="16" fill="#b8784a"/>
+    <ellipse cx="90" cy="234" rx="30" ry="16" fill="url(#skin)"/>
+    <ellipse cx="166" cy="234" rx="30" ry="16" fill="#b8784a"/>
+    <path d="M128 38 C164 34 198 54 212 86 C226 116 222 160 206 188 C188 216 158 228 128 228 C96 228 68 216 50 188 C34 160 30 116 44 86 C58 54 92 40 128 38 Z" fill="url(#shell)"/>
+  </g>
+  <path d="M60 84 L80 96 L104 88 L128 100 L152 88 L176 96 L196 84 M80 96 L84 124 L62 140 M176 96 L172 124 L194 140 M84 124 L110 136 L128 126 L146 136 L172 124 M110 136 L104 166 L128 178 L152 166 L146 136 M104 166 L78 180 M152 166 L178 180 M128 178 L128 206 M128 100 L128 126 M104 50 L104 88 M152 50 L152 88" fill="none" stroke="#5e5c46" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M196 94 C216 132 212 180 188 206 C170 224 146 228 124 228 C170 206 200 160 196 94 Z" fill="#74725a" opacity="0.5"/>
+  <ellipse cx="84" cy="68" rx="24" ry="10" fill="#fff" opacity="0.35" transform="rotate(-35 84 68)"/>
+</svg>

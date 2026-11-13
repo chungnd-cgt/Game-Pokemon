@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="fur" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#dcaa6c"/>
+      <stop offset="0.55" stop-color="#bd8650"/>
+      <stop offset="1" stop-color="#9a6234"/>
+    </linearGradient>
+    <linearGradient id="beak" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6dccc"/>
+      <stop offset="1" stop-color="#d4a08c"/>
+    </linearGradient>
+  </defs>
+  <!-- chân -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M108 206 L104 238 M150 206 L154 238" stroke="#2b2433" stroke-width="24"/>
+    <path d="M108 206 L104 238 M150 206 L154 238" stroke="#dcb8a8" stroke-width="14"/>
+    <path d="M104 238 L92 249 M104 238 L116 249 M154 238 L142 249 M154 238 L166 249" stroke="#2b2433" stroke-width="14"/>
+    <path d="M104 238 L92 249 M104 238 L116 249 M154 238 L142 249 M154 238 L166 249" stroke="#dcb8a8" stroke-width="6"/>
+  </g>
+  <!-- ba cổ đen -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M100 146 C88 124 72 112 58 96 M128 140 C128 112 128 86 128 64 M156 146 C168 124 184 112 198 96" stroke="#2b2433" stroke-width="31"/>
+    <path d="M100 146 C88 124 72 112 58 96 M128 140 C128 112 128 86 128 64 M156 146 C168 124 184 112 198 96" stroke="#57505a" stroke-width="21"/>
+    <path d="M94 136 C84 122 74 114 64 102 M122 128 C122 108 122 90 122 72" stroke="#7a727e" stroke-width="5" opacity="0.8"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="128" cy="174" rx="64" ry="46" fill="url(#fur)"/>
+    <path d="M66 184 C72 208 98 220 128 220 C158 220 184 208 190 184 C166 196 90 196 66 184 Z" fill="#4a434c" stroke-width="4"/>
+    <!-- mào -->
+    <path d="M58 62 L52 34 L66 54 L74 30 L78 60 Z" fill="#3e3840"/>
+    <path d="M122 26 L116 0 L130 18 L140 -2 L140 26 Z" fill="#3e3840"/>
+    <path d="M198 62 L204 34 L190 54 L182 30 L178 60 Z" fill="#3e3840"/>
+    <!-- mỏ chĩa ra -->
+    <path d="M36 74 C24 76 12 82 4 90 C14 94 26 96 38 94 Z" fill="url(#beak)"/>
+    <path d="M220 74 C232 76 244 82 252 90 C242 94 230 96 218 94 Z" fill="url(#beak)"/>
+    <circle cx="56" cy="82" r="25" fill="url(#fur)"/>
+    <circle cx="130" cy="46" r="25" fill="url(#fur)"/>
+    <circle cx="200" cy="82" r="25" fill="#b47c48"/>
+    <!-- quạt lông đuôi hồng dựng sau lưng -->
+    <path d="M128 200 L84 150 L104 156 L96 128 L116 146 L128 116 L140 146 L160 128 L152 156 L172 150 Z" fill="#ec94a2"/>
+  </g>
+  <path d="M128 196 L106 160 M128 194 L128 134 M128 196 L150 160" stroke="#c8606e" stroke-width="4" stroke-linecap="round"/>
+  <path d="M178 142 C194 168 186 206 150 218 C174 218 194 200 192 172 C192 160 188 150 178 142 Z" fill="#7e4e26" opacity="0.5"/>
+  <ellipse cx="88" cy="160" rx="16" ry="7" fill="#fff" opacity="0.35" transform="rotate(-25 88 160)"/>
+  <ellipse cx="122" cy="30" rx="10" ry="4.5" fill="#fff" opacity="0.4" transform="rotate(-20 122 30)"/>
+  <ellipse cx="48" cy="68" rx="10" ry="4.5" fill="#fff" opacity="0.4" transform="rotate(-25 48 68)"/>
+  <ellipse cx="192" cy="68" rx="10" ry="4.5" fill="#fff" opacity="0.3" transform="rotate(-25 192 68)"/>
+</svg>

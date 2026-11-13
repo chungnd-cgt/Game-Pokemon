@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="flame" cx="50%" cy="80%" r="75%">
+      <stop offset="0" stop-color="#fff7b0"/>
+      <stop offset="0.4" stop-color="#ffc63a"/>
+      <stop offset="1" stop-color="#f06a24"/>
+    </radialGradient>
+    <linearGradient id="coat" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fffaea"/>
+      <stop offset="1" stop-color="#ecdcb4"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- chân trước ló hai bên -->
+    <path d="M62 180 C58 204 58 222 60 234 L80 234 C80 218 82 200 86 184 Z" fill="#e2cfa0"/>
+    <path d="M194 180 C198 204 198 222 196 234 L176 234 C176 218 174 200 170 184 Z" fill="#e2cfa0"/>
+    <path d="M56 232 L82 232 L84 246 L54 246 Z M200 232 L174 232 L172 246 L202 246 Z" fill="#4a4250"/>
+    <!-- thân -->
+    <ellipse cx="128" cy="158" rx="70" ry="52" fill="url(#coat)"/>
+    <!-- chân sau to -->
+    <path d="M84 180 C78 204 80 222 84 236 L112 236 C112 218 114 200 116 186 Z" fill="url(#coat)"/>
+    <path d="M172 180 C178 204 176 222 172 236 L144 236 C144 218 142 200 140 186 Z" fill="#ecdcb4"/>
+    <path d="M80 232 L114 232 L116 248 L78 248 Z" fill="#5a5262"/>
+    <path d="M176 232 L142 232 L140 248 L178 248 Z" fill="#4a4250"/>
+    <!-- bờm lửa chạy dọc gáy -->
+    <path d="M128 140 C110 124 98 104 104 80 C108 90 114 92 118 88 C110 66 116 44 132 26 C130 42 138 50 146 50 C148 40 156 32 166 30 C160 44 162 56 166 66 C170 62 176 62 178 58 C180 82 166 104 154 116 C146 126 136 132 128 140 Z" fill="url(#flame)"/>
+    <!-- tai -->
+    <path d="M98 66 L84 30 L118 50 Z" fill="url(#coat)"/>
+    <path d="M158 66 L172 30 L138 50 Z" fill="#ecdcb4"/>
+    <!-- đầu từ sau -->
+    <path d="M92 82 C90 56 108 42 128 42 C148 42 166 56 164 82 C162 104 148 116 128 116 C108 116 94 104 92 82 Z" fill="url(#coat)"/>
+    <!-- đuôi lửa rủ trên mông -->
+    <path d="M128 156 C108 170 100 196 108 222 C114 212 120 210 124 212 C122 222 126 232 134 240 C138 228 142 220 150 218 C156 196 150 170 128 156 Z" fill="url(#flame)"/>
+  </g>
+  <path d="M188 136 C202 160 192 192 166 204 C182 186 190 162 188 136 Z" fill="#d9cbae"/>
+  <ellipse cx="80" cy="132" rx="18" ry="7" fill="#fff" opacity="0.7" transform="rotate(-30 80 132)"/>
+</svg>

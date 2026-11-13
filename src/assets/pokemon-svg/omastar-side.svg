@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="shell" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff4cc"/><stop offset="1" stop-color="#d8b672"/></linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8ad2f6"/><stop offset="1" stop-color="#3c90d2"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- shell spikes -->
+    <path d="M96 64 L60 34 L110 46 Z M130 38 L118 2 L154 30 Z M176 34 L200 2 L198 44 Z M212 62 L250 44 L228 86 Z M226 112 L254 124 L224 140 Z M204 164 L232 190 L190 180 Z" fill="url(#shell)"/>
+    <!-- tentacles -->
+    <path d="M52 196 C30 206 20 224 28 242 M74 208 C60 224 58 240 70 250 M98 208 C92 226 96 240 108 248 M122 200 C126 218 134 230 148 238" fill="none" stroke-width="22"/>
+    <path d="M52 196 C30 206 20 224 28 242 M74 208 C60 224 58 240 70 250 M98 208 C92 226 96 240 108 248 M122 200 C126 218 134 230 148 238" fill="none" stroke="#56a8e2" stroke-width="12"/>
+    <!-- shell -->
+    <path d="M152 30 C196 30 232 66 232 110 C232 154 196 188 152 188 C108 188 72 154 72 110 C72 66 108 30 152 30 Z" fill="url(#shell)"/>
+    <!-- body -->
+    <path d="M30 168 C26 138 56 120 92 124 C120 128 136 150 132 176 C128 202 104 214 74 212 C48 210 34 192 30 168 Z" fill="url(#skin)"/>
+    <!-- beak -->
+    <path d="M40 172 C34 176 18 184 8 198 C24 200 38 196 48 190 C46 184 44 178 40 172 Z" fill="#fbe39a"/>
+  </g>
+  <path d="M14 196 L40 182" stroke="#2b2433" stroke-width="3" stroke-linecap="round"/>
+  <!-- spiral -->
+  <path d="M154 108 A10 10 0 0 1 174 108 A20 20 0 0 1 134 108 A30 30 0 0 1 194 108 A40 40 0 0 1 114 108 A50 50 0 0 1 214 108" fill="none" stroke="#2b2433" stroke-width="5" stroke-linecap="round"/>
+  <!-- shading -->
+  <path d="M206 64 C230 96 228 144 198 170 C184 182 168 188 152 188 C198 162 216 116 206 64 Z" fill="#a8803e" opacity="0.4"/>
+  <ellipse cx="118" cy="54" rx="18" ry="7" fill="#fff" opacity="0.55" transform="rotate(-30 118 54)"/>
+  <path d="M114 148 C130 164 126 190 106 202 C98 206 88 210 78 210 C102 196 114 176 114 148 Z" fill="#2a6aa8" opacity="0.4"/>
+  <!-- eye -->
+  <circle cx="72" cy="150" r="18" fill="#f4e88a" stroke="#2b2433" stroke-width="4"/>
+  <ellipse cx="68" cy="151" rx="4" ry="11" fill="#1a1418"/>
+  <circle cx="65" cy="148" r="3.2" fill="#fff"/>
+</svg>

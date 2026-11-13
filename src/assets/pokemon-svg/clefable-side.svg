@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd2dc"/><stop offset="1" stop-color="#ec98b2"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- tai phía xa -->
+    <path d="M118 78 C122 50 134 26 154 6 C162 34 156 62 140 84 Z" fill="#e08aa6"/>
+    <path d="M154 6 C158 18 160 28 160 38 C152 38 144 36 140 32 C144 22 148 14 154 6 Z" fill="#6a4230"/>
+    <!-- đuôi xoăn -->
+    <path d="M190 206 C222 210 242 190 234 168 C228 152 206 154 206 170 C206 180 216 182 220 174" fill="none" stroke-width="17"/>
+    <path d="M190 206 C222 210 242 190 234 168 C228 152 206 154 206 170 C206 180 216 182 220 174" fill="none" stroke="#ec98b2" stroke-width="8"/>
+    <!-- chân phía xa -->
+    <ellipse cx="146" cy="240" rx="28" ry="11" fill="#e08aa6"/>
+    <!-- thân -->
+    <path d="M124 64 C168 64 194 102 198 148 C202 204 172 238 126 238 C80 238 50 206 54 150 C58 102 80 64 124 64 Z" fill="url(#skin)"/>
+    <!-- cánh tiên trên lưng -->
+    <path d="M168 120 C186 84 218 66 246 66 C236 84 236 100 228 114 C240 124 238 142 226 150 C208 156 186 146 172 138 Z" fill="#fde6ec"/>
+    <!-- chân phía gần -->
+    <ellipse cx="104" cy="241" rx="32" ry="12" fill="#ec98b2"/>
+    <!-- tai phía gần -->
+    <path d="M84 86 C80 56 86 30 102 2 C120 28 122 60 112 88 Z" fill="url(#skin)"/>
+    <path d="M102 2 C108 14 112 24 114 36 C106 38 96 38 90 34 C92 22 96 12 102 2 Z" fill="#704020"/>
+    <!-- tay ba ngón đưa ra trước -->
+    <path d="M98 168 C76 166 58 174 54 188 C58 196 68 196 74 192 C78 198 88 196 100 186 Z" fill="#fde0e8"/>
+  </g>
+  <!-- lọn tóc xoăn -->
+  <path d="M90 70 C76 58 82 38 98 40 C110 42 112 56 102 60 C96 62 92 56 96 52" fill="none" stroke="#2b2433" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M90 70 C76 58 82 38 98 40 C110 42 112 56 102 60 C96 62 92 56 96 52" fill="none" stroke="#fbc4d2" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M182 150 C190 196 176 222 148 232 C168 206 180 180 182 150 Z" fill="#e08aa6" opacity="0.5"/>
+  <ellipse cx="74" cy="100" rx="16" ry="7" fill="#fff" opacity="0.55" transform="rotate(-40 74 100)"/>
+  <!-- mắt hạnh nhân -->
+  <path d="M62 122 C66 108 82 106 88 118 C84 130 70 134 62 122 Z" fill="#2b2433"/>
+  <ellipse cx="78" cy="116" rx="3.5" ry="3.5" fill="#fff"/>
+  <ellipse cx="66" cy="144" rx="10" ry="6" fill="#f07a96" opacity="0.75"/>
+  <path d="M54 144 Q58 156 70 154" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+</svg>

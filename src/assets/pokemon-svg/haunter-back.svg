@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="body" cx="36%" cy="28%" r="80%">
+      <stop offset="0" stop-color="#9a78d4"/>
+      <stop offset="0.6" stop-color="#7450b0"/>
+      <stop offset="1" stop-color="#4e3488"/>
+    </radialGradient>
+    <path id="hand" d="M-14 14 C-22 2 -20 -12 -12 -18 L-17 -36 C-18 -43 -7 -44 -6 -37 L-3 -23 L0 -41 C2 -47 12 -45 10 -38 L6 -21 L14 -31 C18 -36 27 -31 22 -24 L14 -10 C20 4 15 18 3 22 C-4 24 -10 20 -14 14 Z"/>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <use href="#hand" fill="#7450b0" transform="translate(30 192) rotate(-14)"/>
+    <use href="#hand" fill="#5e3e9a" transform="translate(226 192) scale(-1 1) rotate(-14)"/>
+    <path d="M136 224 C146 212 144 198 150 188 C170 184 184 174 192 160 L210 160 L196 140 C202 122 202 102 196 88 L220 66 L182 66 C174 56 164 48 152 44 L158 14 L132 40 C128 39 124 39 120 40 L94 12 L98 44 C84 50 74 58 68 68 L32 64 L58 88 C52 104 52 124 60 142 L44 160 L66 162 C74 176 90 186 106 190 C110 202 104 214 88 220 C104 232 126 234 136 224 Z" fill="url(#body)"/>
+  </g>
+  <path d="M190 80 C202 108 198 144 182 166 C168 182 150 188 136 190 C170 160 190 124 190 80 Z" fill="#4e3488" opacity="0.5"/>
+  <path d="M100 50 L112 86 M156 50 L144 86" fill="none" stroke="#4e3488" stroke-width="5" stroke-linecap="round" opacity="0.6"/>
+  <ellipse cx="100" cy="74" rx="22" ry="9" fill="#fff" opacity="0.3" transform="rotate(-25 100 74)"/>
+</svg>

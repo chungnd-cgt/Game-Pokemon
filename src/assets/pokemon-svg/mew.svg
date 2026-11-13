@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd2e2"/><stop offset="1" stop-color="#f08ab2"/></linearGradient>
+    <radialGradient id="iris" cx="50%" cy="65%" r="60%"><stop offset="0" stop-color="#7cc8ff"/><stop offset="1" stop-color="#2a64c8"/></radialGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- long tail -->
+    <path d="M146 200 C192 214 222 184 216 140 C212 108 220 78 232 58" fill="none" stroke-width="15"/>
+    <path d="M146 200 C192 214 222 184 216 140 C212 108 220 78 232 58" fill="none" stroke="#f8a6c6" stroke-width="7"/>
+    <ellipse cx="238" cy="44" rx="13" ry="20" fill="url(#skin)" transform="rotate(25 238 44)"/>
+    <!-- feet -->
+    <ellipse cx="108" cy="214" rx="17" ry="13" fill="url(#skin)" transform="rotate(-15 108 214)"/>
+    <ellipse cx="150" cy="214" rx="17" ry="13" fill="#f4a0c2" transform="rotate(15 150 214)"/>
+    <!-- body -->
+    <ellipse cx="128" cy="178" rx="32" ry="34" fill="url(#skin)"/>
+    <!-- arms -->
+    <path d="M100 166 C90 170 84 178 82 188 C90 190 98 184 104 178 Z" fill="#ffc2d8"/>
+    <path d="M156 166 C166 170 172 178 174 188 C166 190 158 184 152 178 Z" fill="#f4a0c2"/>
+    <!-- ears -->
+    <path d="M78 74 C70 54 70 36 76 24 C90 30 102 40 108 52 Z" fill="url(#skin)"/>
+    <path d="M178 74 C186 54 186 36 180 24 C166 30 154 40 148 52 Z" fill="#f4a0c2"/>
+    <!-- head -->
+    <ellipse cx="128" cy="100" rx="58" ry="52" fill="url(#skin)"/>
+  </g>
+  <path d="M84 36 C86 46 92 52 98 54 C92 48 88 42 84 36 Z M172 36 C170 46 164 52 158 54 C164 48 168 42 172 36 Z" fill="#e06898" stroke="none"/>
+  <!-- shading -->
+  <path d="M164 62 C188 84 188 126 164 144 C152 150 140 152 128 152 C160 134 172 98 164 62 Z" fill="#d8669a" opacity="0.4"/>
+  <path d="M148 154 C162 172 160 198 142 208 C136 210 130 212 124 212 C146 196 152 176 148 154 Z" fill="#d8669a" opacity="0.4"/>
+  <ellipse cx="100" cy="66" rx="18" ry="8" fill="#fff" opacity="0.5" transform="rotate(-20 100 66)"/>
+  <!-- eyes -->
+  <g stroke="#2b2433" stroke-width="4">
+    <ellipse cx="104" cy="104" rx="15" ry="21" fill="url(#iris)"/>
+    <ellipse cx="152" cy="104" rx="15" ry="21" fill="url(#iris)"/>
+  </g>
+  <ellipse cx="104" cy="110" rx="7" ry="10" fill="#1a2a5a"/>
+  <ellipse cx="152" cy="110" rx="7" ry="10" fill="#1a2a5a"/>
+  <ellipse cx="99" cy="95" rx="6" ry="8" fill="#fff"/>
+  <ellipse cx="147" cy="95" rx="6" ry="8" fill="#fff"/>
+  <path d="M120 132 Q128 138 136 132" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+</svg>

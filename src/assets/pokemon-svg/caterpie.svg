@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a8de72"/><stop offset="1" stop-color="#5ea844"/></linearGradient>
+    <linearGradient id="belly" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbf2bc"/><stop offset="1" stop-color="#e8d27e"/></linearGradient>
+  </defs>
+  <!-- râu chữ Y đỏ -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M104 50 L104 30 M104 32 L84 12 M104 32 L126 14" stroke="#2b2433" stroke-width="20"/>
+    <path d="M104 50 L104 30 M104 32 L84 12 M104 32 L126 14" stroke="#e8463c" stroke-width="10"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- chân nhỏ -->
+    <ellipse cx="222" cy="240" rx="8" ry="7" fill="#e8d27e"/>
+    <ellipse cx="192" cy="242" rx="9" ry="7" fill="#e8d27e"/>
+    <ellipse cx="158" cy="242" rx="10" ry="7" fill="#e8d27e"/>
+    <ellipse cx="124" cy="236" rx="10" ry="7" fill="#e8d27e"/>
+    <!-- đuôi hình giọt nước -->
+    <path d="M206 210 C214 184 228 166 248 152 C254 178 246 204 230 222 Z" fill="url(#belly)"/>
+    <!-- các đốt thân -->
+    <ellipse cx="216" cy="218" rx="24" ry="22" fill="url(#skin)"/>
+    <ellipse cx="186" cy="214" rx="28" ry="26" fill="url(#skin)"/>
+    <ellipse cx="152" cy="208" rx="32" ry="30" fill="url(#skin)"/>
+    <ellipse cx="118" cy="194" rx="36" ry="36" fill="url(#skin)"/>
+    <ellipse cx="106" cy="156" rx="40" ry="34" fill="url(#skin)"/>
+    <ellipse cx="104" cy="98" rx="62" ry="56" fill="url(#skin)"/>
+  </g>
+  <!-- bụng kem phía trước -->
+  <ellipse cx="98" cy="164" rx="24" ry="20" fill="url(#belly)"/>
+  <ellipse cx="108" cy="204" rx="22" ry="24" fill="url(#belly)"/>
+  <path d="M62 128 C80 150 128 152 150 128 C140 146 122 154 104 154 C86 154 70 146 62 128 Z" fill="url(#belly)"/>
+  <!-- đốm vàng hai bên đốt -->
+  <g fill="#f8d84a" stroke="#2b2433" stroke-width="3">
+    <circle cx="136" cy="144" r="8"/>
+    <circle cx="140" cy="180" r="8"/>
+    <circle cx="166" cy="192" r="8"/>
+    <circle cx="196" cy="200" r="7"/>
+    <circle cx="224" cy="206" r="6"/>
+  </g>
+  <!-- bóng & sáng -->
+  <path d="M140 52 C166 72 172 112 152 136 C140 148 124 152 108 154 C138 132 152 98 140 52 Z" fill="#3f8a32" opacity="0.4"/>
+  <ellipse cx="78" cy="62" rx="22" ry="10" fill="#fff" opacity="0.4" transform="rotate(-25 78 62)"/>
+  <!-- mắt to: vòng vàng, tròng đen -->
+  <g stroke="#2b2433" stroke-width="4">
+    <ellipse cx="76" cy="96" rx="20" ry="24" fill="#f8d84a"/>
+    <ellipse cx="134" cy="96" rx="20" ry="24" fill="#f8d84a"/>
+  </g>
+  <ellipse cx="77" cy="98" rx="13" ry="17" fill="#1e1a24"/>
+  <ellipse cx="133" cy="98" rx="13" ry="17" fill="#1e1a24"/>
+  <ellipse cx="81" cy="90" rx="5" ry="6" fill="#fff"/>
+  <ellipse cx="137" cy="90" rx="5" ry="6" fill="#fff"/>
+  <path d="M96 128 Q105 136 114 128" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+</svg>

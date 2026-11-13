@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="fur" cx="38%" cy="32%" r="78%"><stop offset="0" stop-color="#b48ad8"/><stop offset="0.6" stop-color="#8a5cb6"/><stop offset="1" stop-color="#5e3888"/></radialGradient>
+    <radialGradient id="eye" cx="40%" cy="30%" r="75%"><stop offset="0" stop-color="#ff98a4"/><stop offset="0.5" stop-color="#e83a50"/><stop offset="1" stop-color="#a81c34"/></radialGradient>
+  </defs>
+  <!-- râu trắng -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M112 80 C106 58 100 40 92 22 M144 80 C150 58 156 40 164 22" stroke="#2b2433" stroke-width="12"/>
+    <path d="M112 80 C106 58 100 40 92 22 M144 80 C150 58 156 40 164 22" stroke="#f4f0e0" stroke-width="5"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="94" cy="234" rx="24" ry="13" fill="#ead6b0"/>
+    <ellipse cx="162" cy="234" rx="24" ry="13" fill="#d6b98c"/>
+    <!-- thân tròn lông xù -->
+    <path d="M128 70 Q141 60 150 73 Q165 67 170 82 Q186 81 187 96 Q202 99 199 114 Q213 122 205 135 Q216 146 205 157 Q213 170 199 178 Q202 193 187 196 Q186 211 170 210 Q165 225 150 219 Q141 232 128 222 Q115 232 106 219 Q91 225 86 210 Q70 211 69 196 Q54 193 57 178 Q43 170 51 157 Q40 146 51 135 Q43 122 57 114 Q54 99 69 96 Q70 81 86 82 Q91 67 106 73 Q115 60 128 70 Z" fill="url(#fur)"/>
+  </g>
+  <path d="M168 92 Q190 112 192 146 Q192 182 166 204 Q186 172 184 142 Q182 114 168 92 Z" fill="#4e2c76" opacity="0.35"/>
+  <path d="M82 92 Q96 80 116 78 M74 112 Q80 102 90 98" fill="none" stroke="#d8bcf0" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <!-- mắt kép đỏ to -->
+  <g stroke="#2b2433" stroke-width="4">
+    <circle cx="96" cy="134" r="29" fill="url(#eye)"/>
+    <circle cx="160" cy="134" r="29" fill="url(#eye)"/>
+  </g>
+  <path d="M70 134 L122 134 M96 108 L96 160 M78 116 L114 152 M114 116 L78 152 M134 134 L186 134 M160 108 L160 160 M142 116 L178 152 M178 116 L142 152" stroke="#b8243c" stroke-width="2" opacity="0.45"/>
+  <ellipse cx="86" cy="120" rx="7" ry="9" fill="#fff" opacity="0.9"/>
+  <ellipse cx="150" cy="120" rx="7" ry="9" fill="#fff" opacity="0.9"/>
+  <!-- miệng & răng nanh trắng -->
+  <path d="M114 176 Q128 184 142 176" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+  <path d="M114 178 L118 196 L125 181 Z M142 178 L138 196 L131 181 Z" fill="#fff" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+</svg>

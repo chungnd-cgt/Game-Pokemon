@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="0.5" y2="1">
+      <stop offset="0" stop-color="#f8a060"/>
+      <stop offset="0.5" stop-color="#f07838"/>
+      <stop offset="1" stop-color="#d05a28"/>
+    </linearGradient>
+    <linearGradient id="finv" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f07838"/>
+      <stop offset="0.5" stop-color="#f8a060"/>
+      <stop offset="1" stop-color="#f6f2f4"/>
+    </linearGradient>
+    <clipPath id="body">
+      <path d="M50 120 C50 74 86 44 128 44 C170 44 206 74 206 120 C206 166 170 196 128 196 C86 196 50 166 50 120 Z"/>
+    </clipPath>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- chóp sừng -->
+    <path d="M110 54 L128 2 L146 54 Z" fill="#f6eedc"/>
+    <!-- vây ngực hai bên -->
+    <path d="M62 150 C38 160 20 180 12 210 C38 208 58 190 72 168 Z" fill="url(#finv)"/>
+    <path d="M194 150 C218 160 236 180 244 210 C218 208 198 190 184 168 Z" fill="url(#finv)"/>
+    <!-- thân -->
+    <path d="M50 120 C50 74 86 44 128 44 C170 44 206 74 206 120 C206 166 170 196 128 196 C86 196 50 166 50 120 Z" fill="url(#skin)"/>
+  </g>
+  <g clip-path="url(#body)">
+    <path d="M150 64 C166 58 190 70 196 90 C198 106 184 114 170 110 C154 106 144 84 150 64 Z" fill="#f6f2f4"/>
+    <path d="M40 170 C70 160 100 176 128 176 C156 176 186 160 216 170 L216 210 L40 210 Z" fill="#f6f2f4"/>
+    <g fill="#2b2433">
+      <circle cx="92" cy="96" r="5"/><circle cx="118" cy="146" r="5"/><circle cx="172" cy="136" r="4"/>
+    </g>
+  </g>
+  <path d="M50 120 C50 74 86 44 128 44 C170 44 206 74 206 120 C206 166 170 196 128 196 C86 196 50 166 50 120 Z" fill="none" stroke="#2b2433" stroke-width="5"/>
+  <ellipse cx="96" cy="66" rx="16" ry="7" fill="#fff" opacity="0.45" transform="rotate(-30 96 66)"/>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- vây lưng lớn dựng giữa -->
+    <path d="M112 50 C104 28 112 10 126 0 C134 18 144 32 146 52 Z" fill="#f07838"/>
+    <!-- vây đuôi xoè -->
+    <path d="M128 176 C112 202 82 220 46 228 C58 242 80 252 108 250 C116 244 122 238 128 228 C134 238 140 244 148 250 C176 252 198 242 210 228 C174 220 144 202 128 176 Z" fill="url(#finv)"/>
+  </g>
+</svg>

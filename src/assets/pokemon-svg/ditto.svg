@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="goo" cx="38%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#e4ccf8"/>
+      <stop offset="0.55" stop-color="#c4a0ec"/>
+      <stop offset="1" stop-color="#9a72d0"/>
+    </radialGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- khối nhầy mềm, hai "tay" nhỏ nhô hai bên -->
+    <path d="M40 240 C18 240 10 222 22 208 C12 196 14 180 28 176 C14 170 10 154 20 144 C30 134 44 138 52 146 C58 118 90 96 128 96 C166 96 198 118 204 146 C212 138 226 134 236 144 C246 154 242 170 228 176 C242 180 244 196 234 208 C246 222 238 240 216 240 Z" fill="url(#goo)"/>
+  </g>
+  <!-- bóng, sáng -->
+  <path d="M206 150 C230 170 236 196 224 212 C232 230 220 240 200 240 L150 240 C196 226 214 194 206 150 Z" fill="#8a62c0" opacity="0.45"/>
+  <ellipse cx="82" cy="122" rx="16" ry="7" fill="#fff" opacity="0.55" transform="rotate(-35 82 122)"/>
+  <ellipse cx="112" cy="124" rx="18" ry="6" fill="#fff" opacity="0.4" transform="rotate(-10 112 124)"/>
+  <!-- mắt chấm, miệng mảnh -->
+  <ellipse cx="106" cy="166" rx="6" ry="7" fill="#2b2433"/>
+  <ellipse cx="152" cy="166" rx="6" ry="7" fill="#2b2433"/>
+  <path d="M96 196 C112 206 144 206 160 194" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+</svg>

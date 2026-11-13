@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e8bc84"/><stop offset="1" stop-color="#b4783e"/></linearGradient>
+    <linearGradient id="horn" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#aaa4b0"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M108 60 C114 38 120 20 128 2 C136 20 142 38 148 60 Z" fill="url(#horn)"/>
+    <ellipse cx="128" cy="98" rx="62" ry="54" fill="url(#skin)"/>
+    <ellipse cx="76" cy="238" rx="12" ry="8" fill="#ec8a92"/>
+    <ellipse cx="180" cy="238" rx="12" ry="8" fill="#ec8a92"/>
+    <ellipse cx="128" cy="158" rx="46" ry="30" fill="url(#skin)"/>
+    <ellipse cx="128" cy="188" rx="52" ry="30" fill="url(#skin)"/>
+    <ellipse cx="128" cy="218" rx="54" ry="28" fill="url(#skin)"/>
+    <!-- ngòi đuôi chĩa ra sau -->
+    <path d="M112 236 C116 214 122 196 128 172 C134 196 140 214 144 236 Z" fill="url(#horn)"/>
+  </g>
+  <path d="M168 54 C192 76 196 114 176 136 C164 148 148 152 132 154 C160 134 176 102 168 54 Z" fill="#8a5428" opacity="0.4"/>
+  <ellipse cx="100" cy="66" rx="24" ry="11" fill="#fff" opacity="0.4" transform="rotate(-22 100 66)"/>
+  <path d="M90 150 C100 144 112 142 120 142 M86 180 C96 174 108 172 118 172" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+  <path d="M128 10 C130 28 132 44 134 56" fill="none" stroke="#c8c2cc" stroke-width="4" stroke-linecap="round"/>
+</svg>

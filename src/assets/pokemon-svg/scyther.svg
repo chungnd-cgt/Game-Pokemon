@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a8e070"/><stop offset="1" stop-color="#5aa43c"/></linearGradient>
+    <linearGradient id="blade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fdfaf0"/><stop offset="1" stop-color="#c9c1aa"/></linearGradient>
+    <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eaf8fc"/><stop offset="1" stop-color="#b6dcea"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- wings behind -->
+    <path d="M118 124 C100 100 70 76 22 70 C34 96 66 122 112 142 Z" fill="url(#wing)" stroke-width="4"/>
+    <path d="M138 124 C156 100 186 76 234 70 C222 96 190 122 144 142 Z" fill="url(#wing)" stroke-width="4"/>
+    <path d="M116 142 C92 142 62 154 34 178 C66 182 96 170 120 156 Z" fill="url(#wing)" stroke-width="4"/>
+    <path d="M140 142 C164 142 194 154 222 178 C190 182 160 170 136 156 Z" fill="url(#wing)" stroke-width="4"/>
+    <!-- abdomen -->
+    <ellipse cx="128" cy="206" rx="24" ry="30" fill="#e6e6a8"/>
+    <!-- legs -->
+    <path d="M110 184 C98 200 94 216 100 230 L80 246 C88 250 110 250 118 246 L118 230 C122 214 126 200 124 188 Z" fill="url(#skin)"/>
+    <path d="M146 184 C158 200 162 216 156 230 L176 246 C168 250 146 250 138 246 L138 230 C134 214 130 200 132 188 Z" fill="#5aa43c"/>
+    <!-- thorax -->
+    <path d="M98 132 C90 152 96 182 112 194 C122 200 134 200 144 194 C160 182 166 152 158 132 C150 118 106 118 98 132 Z" fill="url(#skin)"/>
+    <!-- neck -->
+    <path d="M118 100 L120 128 L136 128 L138 100 Z" fill="#7cc24e"/>
+    <!-- arms -->
+    <path d="M104 138 C88 146 78 154 70 164 C66 150 64 138 64 126" fill="none" stroke-width="22"/>
+    <path d="M104 138 C88 146 78 154 70 164 C66 150 64 138 64 126" fill="none" stroke="#7cc24e" stroke-width="12"/>
+    <path d="M152 138 C168 146 178 154 186 164 C190 150 192 138 192 126" fill="none" stroke-width="22"/>
+    <path d="M152 138 C168 146 178 154 186 164 C190 150 192 138 192 126" fill="none" stroke="#5aa43c" stroke-width="12"/>
+    <!-- scythes -->
+    <path d="M60 142 C26 122 14 74 34 32 C40 22 50 18 60 20 C46 48 50 92 84 128 Z" fill="url(#blade)"/>
+    <path d="M196 142 C230 122 242 74 222 32 C216 22 206 18 196 20 C210 48 206 92 172 128 Z" fill="url(#blade)"/>
+    <!-- crest -->
+    <path d="M114 42 L128 4 L142 42 Z" fill="#5aa43c"/>
+    <!-- head -->
+    <path d="M88 64 C88 42 106 30 128 30 C150 30 168 42 168 64 C168 84 152 104 128 112 C104 104 88 84 88 64 Z" fill="url(#skin)"/>
+  </g>
+  <!-- abdomen bands -->
+  <path d="M108 200 Q128 206 148 200 M106 214 Q128 220 150 214 M110 228 Q128 233 146 228" fill="none" stroke="#a6b25e" stroke-width="4" stroke-linecap="round"/>
+  <!-- wing veins -->
+  <path d="M112 132 C86 112 60 94 34 78 M116 150 C92 156 66 166 44 176 M144 132 C170 112 196 94 222 78 M140 150 C164 156 190 166 212 176" fill="none" stroke="#8ab8cc" stroke-width="3" stroke-linecap="round"/>
+  <!-- blade edge shine -->
+  <path d="M54 28 C42 56 48 96 76 128 M202 28 C214 56 208 96 180 128" fill="none" stroke="#9e967e" stroke-width="5" stroke-linecap="round" opacity="0.8"/>
+  <!-- shading -->
+  <path d="M150 128 C162 152 158 180 140 194 C134 198 126 200 118 198 C144 182 152 158 150 128 Z" fill="#3e8a2e" opacity="0.45"/>
+  <path d="M156 46 C168 66 162 90 144 102 C138 106 132 108 126 110 C146 92 156 70 156 46 Z" fill="#3e8a2e" opacity="0.45"/>
+  <ellipse cx="108" cy="42" rx="14" ry="6" fill="#fff" opacity="0.4" transform="rotate(-20 108 42)"/>
+  <path d="M110 140 C104 156 106 172 114 184" fill="none" stroke="#e6f6b8" stroke-width="5" stroke-linecap="round" opacity="0.6"/>
+  <!-- eyes -->
+  <g stroke="#2b2433" stroke-width="4" stroke-linejoin="round">
+    <path d="M94 56 L122 68 C122 80 114 86 106 86 C98 86 94 76 94 56 Z" fill="#fff"/>
+    <path d="M162 56 L134 68 C134 80 142 86 150 86 C158 86 162 76 162 56 Z" fill="#fff"/>
+  </g>
+  <ellipse cx="111" cy="74" rx="6" ry="7" fill="#1a1418"/>
+  <ellipse cx="145" cy="74" rx="6" ry="7" fill="#1a1418"/>
+  <ellipse cx="113" cy="71" rx="2.4" ry="2.8" fill="#fff"/>
+  <ellipse cx="147" cy="71" rx="2.4" ry="2.8" fill="#fff"/>
+  <path d="M116 98 Q128 104 140 98" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+</svg>

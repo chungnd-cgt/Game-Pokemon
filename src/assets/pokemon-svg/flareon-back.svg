@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="fur" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9a4c"/><stop offset="1" stop-color="#e0602a"/></linearGradient>
+    <radialGradient id="mane" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#fffadc"/><stop offset="0.55" stop-color="#fbeeb0"/><stop offset="1" stop-color="#e8c870"/></radialGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="80" cy="240" rx="24" ry="11" fill="#e0602a"/>
+    <ellipse cx="176" cy="240" rx="24" ry="11" fill="#e0602a"/>
+    <ellipse cx="128" cy="198" rx="60" ry="46" fill="url(#fur)"/>
+    <!-- mane around the neck -->
+    <path d="M54 130 C36 140 36 162 50 170 C38 184 48 204 68 202 C72 218 92 224 106 214 C114 226 142 226 150 214 C164 224 184 218 188 202 C208 204 218 184 206 170 C220 162 220 140 202 130 Z" fill="url(#mane)"/>
+    <path d="M82 84 C60 64 40 32 30 2 C66 8 100 32 114 62 Z" fill="url(#fur)"/>
+    <path d="M174 84 C196 64 216 32 226 2 C190 8 156 32 142 62 Z" fill="#ea6c30"/>
+    <path d="M68 110 C66 76 94 58 128 58 C162 58 190 76 188 110 C186 142 160 158 128 158 C96 158 70 142 68 110 Z" fill="url(#fur)"/>
+    <path d="M100 72 C100 52 114 38 130 34 C126 44 128 50 134 52 C140 42 152 38 162 40 C154 48 152 56 156 68 C146 60 136 58 128 58 C116 58 106 64 100 72 Z" fill="url(#mane)"/>
+    <!-- huge fluffy tail in front -->
+    <path d="M110 238 C150 252 204 232 220 190 C232 158 222 120 198 104 C204 122 198 134 188 138 C192 122 180 110 166 114 C174 134 164 156 148 170 C126 190 106 206 110 238 Z" fill="url(#mane)"/>
+  </g>
+  <path d="M162 74 C186 88 190 120 176 140 C166 152 150 156 132 156 C162 140 174 108 162 74 Z" fill="#b84a24" opacity="0.4"/>
+  <ellipse cx="96" cy="86" rx="16" ry="6" fill="#fff" opacity="0.35" transform="rotate(-25 96 86)"/>
+  <path d="M146 220 C170 212 192 196 202 172 M74 152 C82 164 96 168 104 166" fill="none" stroke="#d8b050" stroke-width="4" stroke-linecap="round"/>
+</svg>

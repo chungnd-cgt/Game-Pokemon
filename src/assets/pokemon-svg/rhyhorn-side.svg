@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="rock" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#bcc3d0"/>
+      <stop offset="1" stop-color="#8a92a6"/>
+    </linearGradient>
+    <linearGradient id="horn" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fffaf0"/>
+      <stop offset="1" stop-color="#e2d6b8"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- đuôi -->
+    <path d="M196 148 C220 150 236 160 248 176 C230 182 212 180 194 174 Z" fill="#8a92a6"/>
+    <!-- gai lưng -->
+    <path d="M104 108 L114 78 L132 102 Z" fill="#9ca4b8"/>
+    <path d="M138 100 L154 70 L166 100 Z" fill="#9ca4b8"/>
+    <path d="M172 106 L192 84 L196 116 Z" fill="#8a92a6"/>
+    <!-- chân phía xa -->
+    <path d="M100 182 L96 242 L124 242 L126 186 Z" fill="#7a8296"/>
+    <path d="M170 180 L174 242 L202 242 L198 174 Z" fill="#7a8296"/>
+    <!-- thân -->
+    <path d="M70 152 C66 114 108 96 152 98 C194 100 214 126 210 158 C206 188 182 200 144 200 C102 200 74 188 70 152 Z" fill="url(#rock)"/>
+    <!-- chân phía gần -->
+    <path d="M112 184 L106 246 L146 246 L144 188 Z" fill="#9ca4b8"/>
+    <path d="M162 182 L158 246 L196 246 L194 176 Z" fill="#8a92a6"/>
+    <!-- gai tai -->
+    <path d="M90 110 L124 84 L110 124 Z" fill="#8a92a6"/>
+    <!-- đầu quay trái -->
+    <path d="M112 116 C100 98 72 96 52 104 C34 112 20 126 14 144 C12 156 20 166 36 168 C60 172 92 172 110 164 C124 150 122 128 112 116 Z" fill="url(#rock)"/>
+    <!-- sừng mũi -->
+    <path d="M22 142 C20 120 28 98 42 84 C44 104 48 122 52 138 Z" fill="url(#horn)"/>
+  </g>
+  <g fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round">
+    <path d="M128 110 C136 130 136 160 128 188"/>
+    <path d="M168 110 C178 130 180 160 174 184"/>
+    <path d="M86 120 C92 130 94 144 92 156"/>
+  </g>
+  <path d="M110 238 l6 -10 l6 10 M126 238 l6 -10 l6 10 M162 238 l6 -10 l6 10 M178 238 l6 -10 l6 10" fill="#f4ecd8" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M206 150 C204 178 186 194 150 198 C180 186 198 172 206 150 Z" fill="#6e768a" opacity="0.6"/>
+  <ellipse cx="150" cy="110" rx="26" ry="7" fill="#fff" opacity="0.35" transform="rotate(-4 150 110)"/>
+  <!-- mắt -->
+  <ellipse cx="72" cy="126" rx="8" ry="7" fill="#d8303a" stroke="#2b2433" stroke-width="4"/>
+  <circle cx="70" cy="124" r="2.5" fill="#fff"/>
+  <path d="M58 114 L86 118" stroke="#2b2433" stroke-width="5" stroke-linecap="round"/>
+  <!-- miệng -->
+  <path d="M22 156 Q44 162 70 156" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+</svg>

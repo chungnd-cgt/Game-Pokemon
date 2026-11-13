@@ -39,7 +39,9 @@ export default class BootScene extends Phaser.Scene {
     for (const key of this.pngKeys) {
       if (this.textures.exists(key)) this.textures.get(key).setFilter(Phaser.Textures.FilterMode.NEAREST);
     }
+    // Sprite PNG thật thì không chuyển sang pixel nữa (xem pixelMon)
+    this.registry.set('pngSprites', this.pngKeys);
     generateTextures(this);
-    this.scene.start('Starter');
+    this.scene.start('Title');
   }
 }

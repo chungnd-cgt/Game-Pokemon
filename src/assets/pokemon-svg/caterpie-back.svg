@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a8de72"/><stop offset="1" stop-color="#5ea844"/></linearGradient>
+    <linearGradient id="belly" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbf2bc"/><stop offset="1" stop-color="#e8d27e"/></linearGradient>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M128 46 L128 28 M128 30 L106 10 M128 30 L150 10" stroke="#2b2433" stroke-width="20"/>
+    <path d="M128 46 L128 28 M128 30 L106 10 M128 30 L150 10" stroke="#e8463c" stroke-width="10"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="128" cy="96" rx="64" ry="56" fill="url(#skin)"/>
+    <ellipse cx="78" cy="238" rx="12" ry="8" fill="#e8d27e"/>
+    <ellipse cx="178" cy="238" rx="12" ry="8" fill="#e8d27e"/>
+    <ellipse cx="128" cy="156" rx="46" ry="30" fill="url(#skin)"/>
+    <ellipse cx="128" cy="186" rx="52" ry="30" fill="url(#skin)"/>
+    <ellipse cx="128" cy="216" rx="54" ry="28" fill="url(#skin)"/>
+    <!-- đuôi giọt nước chĩa lên -->
+    <path d="M128 240 C110 226 108 200 128 170 C148 200 146 226 128 240 Z" fill="url(#belly)"/>
+  </g>
+  <g fill="#f8d84a" stroke="#2b2433" stroke-width="3">
+    <circle cx="92" cy="152" r="8"/><circle cx="164" cy="152" r="8"/>
+    <circle cx="86" cy="182" r="8"/><circle cx="170" cy="182" r="8"/>
+    <circle cx="84" cy="212" r="8"/><circle cx="172" cy="212" r="8"/>
+  </g>
+  <path d="M168 52 C192 74 196 112 176 134 C164 146 148 150 132 152 C160 132 176 100 168 52 Z" fill="#3f8a32" opacity="0.4"/>
+  <ellipse cx="100" cy="64" rx="24" ry="11" fill="#fff" opacity="0.4" transform="rotate(-22 100 64)"/>
+  <path d="M120 216 C118 200 120 188 126 180" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity="0.45"/>
+</svg>

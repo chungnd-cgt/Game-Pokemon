@@ -16,7 +16,34 @@ export class MessageBox {
     this.arrow = scene.add.text(x + w - 50, y + h - 52, '▼', textStyle(22, '#e04848')).setVisible(false);
     this.container.add([this.text, this.arrow]);
     this.wideWrap = w - 96;
+    // Chiều cao dành cho chữ (từ dòng đầu tới sát viền dưới): câu dài hơn số dòng vừa khung thì chia thành nhiều trang
+    this.textRoom = h - 34;
     scene.tweens.add({ targets: this.arrow, y: this.arrow.y + 6, duration: 400, yoyo: true, repeat: -1 });
+  }
+
+  // Số dòng vừa khung, đo một lần bằng chính kiểu chữ của hộp thoại (gọi khi đã nạp font)
+  linesPerPage() {
+    if (!this.maxLines) {
+      const t = this.text;
+      t.setText('Ág');
+      const one = t.height;
+      t.setText('Ág\nÁg');
+      const pitch = t.height - one;
+      t.setText('');
+      this.maxLines = Math.max(1, 1 + Math.floor((this.textRoom - one) / pitch));
+    }
+    return this.maxLines;
+  }
+
+  // Chia câu thành các trang vừa khung (giữ nguyên chỗ xuống dòng như khi hiện cả câu)
+  pages(text) {
+    const per = this.linesPerPage();
+    this.text.setWordWrapWidth(this.wideWrap);
+    const lines = this.text.getWrappedText(text).map((l) => l.trimEnd());
+    if (lines.length <= per) return [text];
+    const out = [];
+    for (let i = 0; i < lines.length; i += per) out.push(lines.slice(i, i + per).join('\n'));
+    return out;
   }
 
   // Hiện chữ ngay, không chờ (dùng khi đang mở menu bên cạnh)
@@ -27,7 +54,12 @@ export class MessageBox {
     this.arrow.setVisible(false);
   }
 
-  show(text) {
+  // Hiện câu (chữ chạy), câu dài thì lần lượt từng trang; xong khi người chơi bấm qua trang cuối
+  async show(text) {
+    for (const page of this.pages(text)) await this.showPage(page);
+  }
+
+  showPage(text) {
     this.stopTyping();
     this.text.setWordWrapWidth(this.wideWrap);
     this.text.setText('');

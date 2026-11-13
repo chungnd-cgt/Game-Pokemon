@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="face" cx="38%" cy="32%" r="78%">
+      <stop offset="0" stop-color="#fff2ee"/>
+      <stop offset="0.6" stop-color="#f8d6d2"/>
+      <stop offset="1" stop-color="#e6b0b0"/>
+    </radialGradient>
+    <radialGradient id="torso" cx="38%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.6" stop-color="#f0ecf2"/>
+      <stop offset="1" stop-color="#c8c0d0"/>
+    </radialGradient>
+    <radialGradient id="ball" cx="35%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#ffb4c4"/>
+      <stop offset="0.6" stop-color="#f27c96"/>
+      <stop offset="1" stop-color="#cc5070"/>
+    </radialGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5a82c4"/>
+      <stop offset="1" stop-color="#28467e"/>
+    </linearGradient>
+  </defs>
+  <!-- chân mảnh -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M114 190 L106 226 M142 190 L150 226 M84 122 C66 110 54 98 46 84 M172 122 C190 110 202 98 210 84" stroke="#2b2433" stroke-width="20"/>
+    <path d="M114 190 L106 226 M142 190 L150 226 M84 122 C66 110 54 98 46 84 M172 122 C190 110 202 98 210 84" stroke="#f6cccc" stroke-width="11"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- giày xanh mũi cong -->
+    <path d="M118 228 C118 244 96 248 78 244 C64 242 58 230 62 218 C70 224 78 228 88 226 C98 224 110 222 118 228 Z" fill="url(#blue)"/>
+    <path d="M138 228 C138 244 160 248 178 244 C192 242 198 230 194 218 C186 224 178 228 168 226 C158 224 146 222 138 228 Z" fill="#28467e"/>
+    <!-- đầu gối -->
+    <circle cx="110" cy="208" r="10" fill="url(#ball)"/>
+    <circle cx="146" cy="208" r="10" fill="url(#ball)"/>
+    <!-- thân tròn trắng -->
+    <circle cx="128" cy="154" r="42" fill="url(#torso)"/>
+    <!-- vai -->
+    <circle cx="86" cy="124" r="17" fill="url(#ball)"/>
+    <circle cx="170" cy="124" r="17" fill="url(#ball)"/>
+    <!-- bàn tay trắng giơ lên, làm động tác bức tường vô hình -->
+    <circle cx="38" cy="72" r="21" fill="url(#torso)"/>
+    <circle cx="218" cy="72" r="21" fill="url(#torso)"/>
+  </g>
+  <g fill="url(#ball)" stroke="#2b2433" stroke-width="3.5">
+    <circle cx="18" cy="62" r="7"/><circle cx="24" cy="48" r="7"/><circle cx="38" cy="44" r="7"/><circle cx="52" cy="48" r="7"/><circle cx="60" cy="62" r="7"/>
+    <circle cx="238" cy="62" r="7"/><circle cx="232" cy="48" r="7"/><circle cx="218" cy="44" r="7"/><circle cx="204" cy="48" r="7"/><circle cx="196" cy="62" r="7"/>
+  </g>
+  <!-- vòng hồng trên bụng -->
+  <circle cx="128" cy="162" r="20" fill="url(#ball)" stroke="#2b2433" stroke-width="3.5"/>
+  <path d="M160 128 C176 150 170 182 144 194 C164 192 174 172 170 152 C168 142 166 134 160 128 Z" fill="#9c90a8" opacity="0.4"/>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- tóc xanh hai chỏm -->
+    <path d="M104 46 C90 36 78 22 74 4 C96 10 112 22 122 38 Z" fill="url(#blue)"/>
+    <path d="M152 46 C166 36 178 22 182 4 C160 10 144 22 134 38 Z" fill="#28467e"/>
+    <!-- đầu -->
+    <circle cx="128" cy="74" r="38" fill="url(#face)"/>
+  </g>
+  <ellipse cx="112" cy="52" rx="12" ry="5" fill="#fff" opacity="0.6" transform="rotate(-25 112 52)"/>
+  <!-- má đỏ -->
+  <circle cx="100" cy="90" r="9" fill="#e84a5a"/>
+  <circle cx="156" cy="90" r="9" fill="#e84a5a"/>
+  <!-- mắt, miệng -->
+  <ellipse cx="114" cy="70" rx="6" ry="8" fill="#2b2433"/>
+  <ellipse cx="142" cy="70" rx="6" ry="8" fill="#2b2433"/>
+  <circle cx="115" cy="67" r="2.3" fill="#fff"/>
+  <circle cx="143" cy="67" r="2.3" fill="#fff"/>
+  <path d="M110 94 Q128 106 146 94" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+</svg>

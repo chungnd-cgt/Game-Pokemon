@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="goo" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#e4ccf8"/><stop offset="0.55" stop-color="#c4a0ec"/><stop offset="1" stop-color="#9a72d0"/></radialGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- tay phía xa -->
+    <path d="M190 134 C190 116 204 106 220 112 C234 120 230 138 214 148 Z" fill="#9a72d0"/>
+    <!-- khối nhầy nghiêng, chảy về phía trước bên trái -->
+    <path d="M34 240 C12 240 6 222 18 208 C8 194 12 178 26 174 C12 166 10 150 20 142 C32 132 46 138 54 148 C62 122 94 104 134 104 C178 104 208 128 218 162 C238 172 246 194 236 212 C246 228 236 240 218 240 Z" fill="url(#goo)"/>
+  </g>
+  <path d="M212 168 C232 182 240 204 228 218 C234 234 224 240 206 240 L156 240 C200 226 218 200 212 168 Z" fill="#8a62c0" opacity="0.45"/>
+  <ellipse cx="84" cy="130" rx="16" ry="7" fill="#fff" opacity="0.55" transform="rotate(-35 84 130)"/>
+  <ellipse cx="128" cy="130" rx="20" ry="6" fill="#fff" opacity="0.4" transform="rotate(-5 128 130)"/>
+  <!-- mắt, miệng nhìn sang trái -->
+  <ellipse cx="62" cy="172" rx="5.5" ry="7" fill="#2b2433"/>
+  <ellipse cx="96" cy="172" rx="5.5" ry="7" fill="#2b2433"/>
+  <path d="M46 198 C60 208 88 208 104 198" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+</svg>

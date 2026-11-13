@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6b4e8"/><stop offset="1" stop-color="#b47cc8"/></linearGradient>
+    <linearGradient id="horn" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#dcb0e8"/><stop offset="1" stop-color="#a46cba"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- chóp sừng nhô trên đầu -->
+    <path d="M114 66 C118 46 122 30 128 14 C134 30 138 46 142 66 Z" fill="url(#horn)"/>
+    <!-- tai nhọn nhìn từ sau -->
+    <path d="M98 82 C78 54 46 28 12 18 C14 56 34 102 78 124 Z" fill="url(#skin)"/>
+    <path d="M158 82 C178 54 210 28 244 18 C242 56 222 102 178 124 Z" fill="#b47cc8"/>
+    <!-- sau đầu -->
+    <ellipse cx="128" cy="108" rx="62" ry="54" fill="url(#skin)"/>
+    <!-- chân sau -->
+    <ellipse cx="80" cy="238" rx="24" ry="12" fill="#b47cc8"/>
+    <ellipse cx="176" cy="238" rx="24" ry="12" fill="#a46cba"/>
+    <!-- lưng -->
+    <ellipse cx="128" cy="188" rx="76" ry="52" fill="url(#skin)"/>
+    <!-- gai độc dọc sống lưng -->
+    <path d="M112 162 L128 128 L144 162 Z" fill="#d2a2e0"/>
+    <path d="M114 198 L128 168 L142 198 Z" fill="#d2a2e0"/>
+    <path d="M74 180 L72 146 L98 170 Z" fill="#b884cc"/>
+    <path d="M182 180 L184 146 L158 170 Z" fill="#b884cc"/>
+    <!-- đuôi ngắn -->
+    <path d="M116 224 C114 238 120 246 128 248 C136 246 142 238 140 224 Z" fill="#b47cc8"/>
+  </g>
+  <g fill="#8a4aaa">
+    <ellipse cx="96" cy="80" rx="9" ry="6" transform="rotate(-20 96 80)"/>
+    <ellipse cx="160" cy="80" rx="9" ry="6" transform="rotate(20 160 80)"/>
+    <ellipse cx="88" cy="206" rx="10" ry="7"/>
+    <ellipse cx="170" cy="206" rx="10" ry="7"/>
+    <ellipse cx="102" cy="152" rx="7" ry="5"/>
+    <ellipse cx="156" cy="152" rx="7" ry="5"/>
+  </g>
+  <path d="M190 162 C204 194 188 230 150 238 C176 222 192 198 190 162 Z" fill="#9a5cb4" opacity="0.45"/>
+  <ellipse cx="96" cy="70" rx="16" ry="7" fill="#fff" opacity="0.4" transform="rotate(-25 96 70)"/>
+</svg>

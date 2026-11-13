@@ -1,12 +1,12 @@
 import { TYPES } from '../data/types.js';
-import { shade, textStyle } from './helpers.js';
+import { cssColor, shade, textStyle } from './helpers.js';
 
 // Huy hiệu hệ bo tròn. Trả về container, gốc toạ độ ở mép trái - giữa.
 export function typeBadge(scene, x, y, type, { size = 20, label = TYPES[type].name } = {}) {
   const color = TYPES[type].color;
   const text = scene.add.text(0, 0, label, textStyle(size, '#ffffff', {
     fontStyle: 'bold',
-    stroke: `#${shade(color, -45).toString(16).padStart(6, '0')}`,
+    stroke: cssColor(shade(color, -45)),
     strokeThickness: 4,
   })).setOrigin(0.5);
   const w = text.width + size * 1.1;

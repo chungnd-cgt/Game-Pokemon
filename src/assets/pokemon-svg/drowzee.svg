@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffda6c"/><stop offset="1" stop-color="#e4a92c"/></linearGradient>
+    <linearGradient id="pants" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a06a40"/><stop offset="1" stop-color="#6c4226"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- ears -->
+    <path d="M82 52 C74 36 78 20 88 12 C102 20 110 34 108 46 Z" fill="url(#skin)"/>
+    <path d="M174 52 C182 36 178 20 168 12 C154 20 146 34 148 46 Z" fill="#e8b23a"/>
+    <!-- feet -->
+    <ellipse cx="96" cy="238" rx="28" ry="12" fill="#7e4c2c"/>
+    <ellipse cx="160" cy="238" rx="28" ry="12" fill="#6c4226"/>
+    <!-- arms -->
+    <path d="M80 140 C60 150 48 170 52 190 C56 200 68 200 72 190 C72 176 80 164 92 156 Z" fill="url(#skin)"/>
+    <path d="M176 140 C196 150 208 170 204 190 C200 200 188 200 184 190 C184 176 176 164 164 156 Z" fill="#e8b23a"/>
+    <!-- body: yellow top, brown bottom -->
+    <path d="M70 172 C70 134 96 118 128 118 C160 118 186 134 186 172 C186 206 166 230 128 230 C90 230 70 206 70 172 Z" fill="url(#skin)"/>
+    <path d="M71 166 C96 180 160 180 185 166 C190 204 168 230 128 230 C88 230 66 204 71 166 Z" fill="url(#pants)"/>
+    <!-- head -->
+    <ellipse cx="128" cy="80" rx="58" ry="48" fill="url(#skin)"/>
+    <!-- long trunk -->
+    <path d="M108 84 C106 106 112 126 116 142 C120 154 136 154 140 142 C144 126 150 106 148 84 Z" fill="url(#skin)"/>
+  </g>
+  <path d="M90 22 C98 28 102 36 102 44 L92 48 C88 40 88 30 90 22 Z" fill="#c88a3a" opacity="0.6"/>
+  <path d="M166 22 C158 28 154 36 154 44 L164 48 C168 40 168 30 166 22 Z" fill="#c88a3a" opacity="0.6"/>
+  <path d="M170 50 C186 74 182 104 160 120 C150 126 140 128 132 128 C160 110 174 84 170 50 Z" fill="#cc9426" opacity="0.5"/>
+  <ellipse cx="100" cy="52" rx="22" ry="9" fill="#fff" opacity="0.45" transform="rotate(-18 100 52)"/>
+  <ellipse cx="92" cy="150" rx="12" ry="6" fill="#fff" opacity="0.3" transform="rotate(-30 92 150)"/>
+  <path d="M84 196 C92 212 108 222 124 224" fill="none" stroke="#b07a4c" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  <!-- trunk creases -->
+  <g fill="none" stroke="#b07a24" stroke-width="3.5" stroke-linecap="round">
+    <path d="M112 106 Q128 112 144 106"/>
+    <path d="M116 126 Q128 131 140 126"/>
+  </g>
+  <!-- sleepy half-closed eyes -->
+  <g stroke="#2b2433" stroke-width="4" stroke-linejoin="round">
+    <path d="M78 74 C88 84 104 84 112 74 Z" fill="#fff"/>
+    <path d="M178 74 C168 84 152 84 144 74 Z" fill="#fff"/>
+  </g>
+  <ellipse cx="97" cy="77" rx="6" ry="4" fill="#2b2433"/>
+  <ellipse cx="159" cy="77" rx="6" ry="4" fill="#2b2433"/>
+  <g fill="none" stroke="#2b2433" stroke-width="6" stroke-linecap="round">
+    <path d="M74 72 L116 72"/>
+    <path d="M182 72 L140 72"/>
+  </g>
+  <!-- nostril tip -->
+  <ellipse cx="128" cy="146" rx="8" ry="3.5" fill="#2b2433" opacity="0.6"/>
+</svg>

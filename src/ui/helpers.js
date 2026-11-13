@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { STATUS_INFO } from '../battle/status.js';
 import { FONT } from '../config.js';
 
 const { Color } = Phaser.Display;
@@ -46,6 +47,21 @@ export function shade(color, amount) {
   return c.color;
 }
 
+// Màn hình phụ chạy chồng lên bản đồ (World tạm dừng, vd Pokédex mở bằng phím P): ẩn giao diện bản đồ phía sau cho đỡ rối.
+// World chạy lại thì update() tự hiện lại
+export function hideWorldHud(scene) {
+  const world = scene.scene.get('World');
+  if (!world?.hud) return;
+  for (const part of [world.hud, world.partyPanel, world.areaNav, world.hotbar]) part?.setVisible(false);
+}
+
+// Đóng màn hình phụ (Poké Mart, Pokédex, thông tin Pokémon, bản đồ vùng) và quay lại bản đồ
+export function backToWorld(scene) {
+  scene.router.clear();
+  scene.scene.stop();
+  scene.scene.resume('World');
+}
+
 export function cssColor(color) {
   return `#${color.toString(16).padStart(6, '0')}`;
 }
@@ -63,7 +79,7 @@ export function gradientRect(g, x, y, w, h, top, bottom, steps = 32) {
 
 export const hpColor = (ratio) => (ratio > 0.5 ? 0x38d068 : ratio > 0.2 ? 0xf8c030 : 0xf04838);
 
-// Thanh máu kiểu viên thuốc có nhãn "HP"
+// Thanh máu kiểu viên thuốc: 44px đầu chừa cho nhãn "HP" (hpLabel), phần còn lại là rãnh máu
 export function drawHpBar(g, x, y, w, ratio) {
   const r = Phaser.Math.Clamp(ratio, 0, 1);
   g.fillStyle(0x3a4250);
@@ -82,6 +98,32 @@ export function drawHpBar(g, x, y, w, ratio) {
   }
 }
 
+// Nhãn "HP" vàng nằm ở đầu thanh máu drawHpBar(g, x, y, ...) (cùng kiểu với khung trong trận đấu)
+export function hpLabel(scene, x, y) {
+  return scene.add.text(x + 12, y + 2, 'HP', textStyle(16, '#ffcc33', { fontStyle: 'bold' }));
+}
+
+// Chữ dài quá maxW (tên Pokémon đặt biệt danh dài, tên vật phẩm...): thu nhỏ chữ tới minScale (giữ nguyên tâm theo chiều
+// dọc), vẫn dài thì cắt bớt và thêm "…". Trả về chính object chữ (độ rộng hiển thị text.displayWidth <= maxW).
+// Gọi một lần cho mỗi lần đặt chữ (chữ đã thu nhỏ thì đặt lại toạ độ trước khi gọi lại)
+export function fitText(text, maxW, minScale = 1) {
+  text.setScale(1);
+  if (text.width <= maxW) return text;
+  const scale = Math.max(minScale, maxW / text.width);
+  if (scale < 1) {
+    text.setScale(scale);
+    text.y += text.height * (1 - scale) * (0.5 - text.originY);
+  }
+  const room = maxW / text.scaleX;
+  let s = text.text;
+  while (s.length > 1 && text.width > room) {
+    s = s.slice(0, -1);
+    text.setText(`${s.trimEnd()}…`);
+  }
+  return text;
+}
+
+
 // Ghim object (và mọi con của nó) vào màn hình, không trôi theo camera
 export function fixToCamera(obj) {
   obj.setScrollFactor(0);
@@ -97,4 +139,47 @@ export function tweenAsync(scene, config) {
 
 export function wait(scene, ms) {
   return new Promise((resolve) => scene.time.delayedCall(ms, resolve));
+}
+
+export const GENDER = {
+  male: { symbol: '♂', color: '#3a7ae0' },
+  female: { symbol: '♀', color: '#e8508a' },
+};
+
+// Nhãn trạng thái xấu (BỎNG, ĐỘC, TÊ, NGỦ, BĂNG) dạng viên màu, hoặc null nếu không có trạng thái
+export function statusTag(scene, x, y, status, size = 15) {
+  const info = STATUS_INFO[status];
+  if (!info) return null;
+  return scene.add.text(x, y, info.label, textStyle(size, '#ffffff', {
+    fontStyle: 'bold', backgroundColor: cssColor(info.color), padding: { x: 7, y: 2 },
+  }));
+}
+
+// Nhãn trạng thái xấu của Pokémon (hoặc null). Pokémon đã gục không có nhãn: chỉ làm mờ hình / thanh HP trống
+export const monTag = (scene, x, y, mon, size = 15) => (mon.hp > 0 ? statusTag(scene, x, y, mon.status, size) : null);
+
+// Nút ✕ tròn để đóng màn hình / menu bằng chuột (Esc có thể bị trình duyệt nhúng giữ lại)
+export function closeButton(scene, x, y, onClick, size = 30) {
+  const r = size / 2;
+  const g = scene.add.graphics();
+  const draw = (hover) => {
+    g.clear();
+    g.fillStyle(0x000000, 0.25);
+    g.fillCircle(x + 2, y + 3, r);
+    g.fillStyle(hover ? 0xe04848 : COLORS.ink);
+    g.fillCircle(x, y, r);
+    g.lineStyle(3, 0xffffff);
+    const d = r * 0.42;
+    g.lineBetween(x - d, y - d, x + d, y + d);
+    g.lineBetween(x - d, y + d, x + d, y - d);
+  };
+  draw(false);
+  const zone = scene.add.zone(x, y, size + 6, size + 6).setInteractive({ useHandCursor: true });
+  zone.on('pointerover', () => draw(true));
+  zone.on('pointerout', () => draw(false));
+  zone.on('pointerdown', (p, lx, ly, e) => {
+    e?.stopPropagation();
+    onClick();
+  });
+  return [g, zone];
 }

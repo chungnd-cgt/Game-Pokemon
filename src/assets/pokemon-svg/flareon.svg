@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="fur" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff9a4c"/>
+      <stop offset="1" stop-color="#e0602a"/>
+    </linearGradient>
+    <radialGradient id="mane" cx="40%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#fffadc"/>
+      <stop offset="0.55" stop-color="#fbeeb0"/>
+      <stop offset="1" stop-color="#e8c870"/>
+    </radialGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- huge fluffy tail -->
+    <path d="M156 204 C196 222 240 204 248 166 C254 134 240 104 214 92 C222 108 218 122 206 126 C212 110 200 96 186 100 C196 118 186 140 172 150 C160 160 154 182 156 204 Z" fill="url(#mane)"/>
+    <!-- hind paws -->
+    <ellipse cx="74" cy="238" rx="22" ry="11" fill="#e0602a"/>
+    <ellipse cx="182" cy="238" rx="22" ry="11" fill="#e0602a"/>
+    <!-- body -->
+    <ellipse cx="128" cy="200" rx="58" ry="42" fill="url(#fur)"/>
+    <!-- front legs -->
+    <path d="M92 198 C88 218 88 236 92 247 L118 247 C120 232 120 214 116 198 Z" fill="url(#fur)"/>
+    <path d="M164 198 C168 218 168 236 164 247 L138 247 C136 232 136 214 140 198 Z" fill="#ea6c30"/>
+    <!-- huge fluffy mane -->
+    <path d="M56 136 C38 146 38 168 52 176 C40 190 50 210 70 208 C74 224 94 230 108 220 C116 232 140 232 148 220 C162 230 182 224 186 208 C206 210 216 190 204 176 C218 168 218 146 200 136 Z" fill="url(#mane)"/>
+    <!-- ears -->
+    <path d="M82 88 C60 68 40 36 30 6 C66 12 100 36 114 66 Z" fill="url(#fur)"/>
+    <path d="M174 88 C196 68 216 36 226 6 C190 12 156 36 142 66 Z" fill="#ea6c30"/>
+    <!-- head -->
+    <path d="M68 114 C66 80 94 62 128 62 C162 62 190 80 188 114 C186 146 160 164 128 164 C96 164 70 146 68 114 Z" fill="url(#fur)"/>
+    <!-- forelock tuft -->
+    <path d="M100 76 C100 56 114 42 130 38 C126 48 128 54 134 56 C140 46 152 42 162 44 C154 52 152 60 156 72 C146 64 136 62 128 62 C116 62 106 68 100 76 Z" fill="url(#mane)"/>
+  </g>
+  <path d="M80 76 C62 58 50 38 42 18 C68 26 90 42 102 62 Z" fill="#b84a24"/>
+  <path d="M176 76 C194 58 206 38 214 18 C188 26 166 42 154 62 Z" fill="#b84a24"/>
+  <path d="M162 78 C186 92 190 124 176 144 C166 156 150 162 132 162 C162 146 174 112 162 78 Z" fill="#b84a24" opacity="0.4"/>
+  <ellipse cx="92" cy="90" rx="14" ry="6" fill="#fff" opacity="0.35" transform="rotate(-25 92 90)"/>
+  <path d="M90 176 C100 168 112 168 120 174 M140 176 C150 168 162 168 170 176 M210 150 C222 140 230 128 232 114" fill="none" stroke="#d8b050" stroke-width="4" stroke-linecap="round"/>
+  <g stroke="#2b2433" stroke-width="4">
+    <ellipse cx="102" cy="114" rx="13" ry="17" fill="#2a1c18"/>
+    <ellipse cx="154" cy="114" rx="13" ry="17" fill="#2a1c18"/>
+  </g>
+  <ellipse cx="102" cy="122" rx="7" ry="7" fill="#7a4428"/>
+  <ellipse cx="154" cy="122" rx="7" ry="7" fill="#7a4428"/>
+  <ellipse cx="106" cy="106" rx="5" ry="7" fill="#fff"/>
+  <ellipse cx="158" cy="106" rx="5" ry="7" fill="#fff"/>
+  <ellipse cx="128" cy="136" rx="5" ry="3.5" fill="#2b2433"/>
+  <path d="M116 144 Q122 151 128 144 Q134 151 140 144" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M84 247 l4 -7 l4 7 M96 247 l4 -7 l4 7 M152 247 l4 -7 l4 7 M164 247 l4 -7 l4 7" fill="none" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+</svg>

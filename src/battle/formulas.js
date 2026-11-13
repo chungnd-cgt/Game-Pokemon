@@ -1,36 +1,267 @@
+import { ITEMS } from '../data/items.js';
 import { SPECIES } from '../data/monsters.js';
-import { SPECIAL_TYPES, typeMultiplier } from '../data/types.js';
+import { DEX } from '../data/pokedex.js';
+import { typeMultiplier } from '../data/types.js';
+import { accuracyMultiplier, stageMultiplier, stageOf } from './status.js';
+import { baseSpeciesId } from './transform.js';
 
 export const CRIT_CHANCE = 1 / 16;
+export const HIGH_CRIT_CHANCE = 1 / 8;
 
-export const isSpecial = (move) => SPECIAL_TYPES.includes(move.type);
+// ctx: tình hình trận đấu { weather: 'rain' | 'sun' | 'sand' | 'hail' | null, gas: true khi có Neutralizing Gas trên sân,
+//       cloudNine: true khi có Cloud Nine trên sân (thời tiết mất tác dụng), lastMover: Pokémon ra đòn sau trong lượt,
+//       screens: lớp chắn phía bên đỡ { reflect, lightScreen } (số lượt còn lại),
+//       breaker: Pokémon có Mold Breaker đang ra đòn (đặc tính phòng thủ của bên kia mất tác dụng trong lúc đó) }
 
-export function calcDamage(attacker, defender, move, rng = Math.random) {
-  const atkTypes = SPECIES[attacker.speciesId].types;
-  const defTypes = SPECIES[defender.speciesId].types;
-  const effectiveness = typeMultiplier(move.type, defTypes);
-  if (effectiveness === 0) return { damage: 0, effectiveness, crit: false };
+const weatherOf = (ctx) => (ctx.cloudNine ? null : ctx.weather);
+
+// Đặc tính phòng thủ mà Mold Breaker bỏ qua (như Gen 5): chặn chiêu, miễn nhiễm trạng thái, giảm sát thương, chặn giảm chỉ số...
+// Đặc tính phản đòn khi bị chạm (Static, Poison Point...) vẫn có tác dụng
+export const BREAKABLE = new Set([
+  'battleArmor', 'shellArmor', 'bigPecks', 'clearBody', 'hyperCutter', 'keenEye', 'damp', 'drySkin', 'filter', 'flashFire',
+  'friendGuard', 'immunity', 'innerFocus', 'insomnia', 'vitalSpirit', 'leafGuard', 'levitate', 'lightningRod', 'limber',
+  'marvelScale', 'multiscale', 'oblivious', 'ownTempo', 'sandVeil', 'snowCloak', 'shieldDust', 'soundproof', 'stickyHold',
+  'sturdy', 'tangledFeet', 'thickFat', 'unaware', 'voltAbsorb', 'waterAbsorb', 'waterVeil', 'wonderSkin', 'overcoat',
+]);
+
+// Đặc tính đang có tác dụng (Neutralizing Gas vô hiệu đặc tính của mọi Pokémon khác; Mold Breaker của Pokémon đang ra đòn
+// vô hiệu đặc tính phòng thủ của bên kia)
+export function abilityOf(mon, ctx = {}) {
+  if (ctx.gas && mon.ability !== 'neutralizingGas') return null;
+  if (ctx.breaker && ctx.breaker !== mon && BREAKABLE.has(mon.ability)) return null;
+  return mon.ability;
+}
+
+export const isSpecial = (move) => move.category === 'special';
+
+// Đặc tính tăng 50% sức mạnh chiêu cùng hệ khi HP còn 1/3 trở xuống
+const PINCH = { blaze: 'fire', torrent: 'water', overgrow: 'grass', swarm: 'bug' };
+// Đặc tính miễn nhiễm một hệ chiêu
+const ABSORB = { waterAbsorb: 'water', drySkin: 'water', voltAbsorb: 'electric', lightningRod: 'electric', flashFire: 'fire', levitate: 'ground' };
+
+// Hiệu quả của chiêu lên bên đỡ: { effectiveness, absorbedBy } (absorbedBy: đặc tính đã chặn chiêu)
+// Chiêu trạng thái cũng bị chặn (Thunder Wave vào Volt Absorb, Will-O-Wisp vào Flash Fire), trừ chiêu đổi thời tiết và Levitate.
+// attacker (nếu biết): Scrappy đánh trúng hệ Ma bằng chiêu hệ Thường / Giác đấu
+export function moveEffect(move, defender, ctx = {}, attacker = null) {
+  const ability = abilityOf(defender, ctx);
+  const blockable = move.category !== 'status' || (!move.weather && ability !== 'levitate');
+  if (blockable && ABSORB[ability] === move.type) return { effectiveness: 0, absorbedBy: ability };
+  let types = SPECIES[defender.speciesId].types;
+  if (attacker && abilityOf(attacker, ctx) === 'scrappy' && ['normal', 'fighting'].includes(move.type)) types = types.filter((t) => t !== 'ghost');
+  return { effectiveness: typeMultiplier(move.type, types), absorbedBy: null };
+}
+
+// Chiêu gây sát thương có hiệu ứng phụ (gây trạng thái / rối loạn / chùn bước theo xác suất, đổi chỉ số đối thủ, tự tăng chỉ số
+// theo xác suất): Sheer Force tăng sức mạnh và bỏ hiệu ứng đó. Tự đổi chỉ số chắc chắn (Rapid Spin) không tính
+export function hasSecondary(move) {
+  if (move.category === 'status') return false;
+  if (move.status || move.confuse || move.flinch) return true;
+  return Boolean(move.stages) && (!move.self || (move.chance ?? 100) < 100);
+}
+
+// Hệ số xác suất hiệu ứng phụ của chiêu: 0 = không xảy ra (Sheer Force của bên đánh; Shield Dust của bên đỡ, trừ hiệu ứng lên
+// chính bên đánh), 2 = gấp đôi (Serene Grace), còn lại 1. onSelf: hiệu ứng lên chính bên đánh (Metal Claw, Ancient Power)
+export function secondaryFactor(attacker, defender, move, ctx = {}, onSelf = false) {
+  const ability = abilityOf(attacker, ctx);
+  if (ability === 'sheerForce' && hasSecondary(move)) return 0;
+  if (!onSelf && abilityOf(defender, ctx) === 'shieldDust') return 0;
+  return ability === 'sereneGrace' ? 2 : 1;
+}
+
+// Không bị chí mạng: Shell Armor, Battle Armor
+const noCrit = (ability) => ability === 'shellArmor' || ability === 'battleArmor';
+// Bão cát không làm mất máu
+const SAND_PROOF = ['sandVeil', 'sandRush', 'sandForce'];
+
+// Tốc độ thực: bậc chỉ số, tê liệt (x0.5), đặc tính theo thời tiết (x2), Quick Feet khi bị trạng thái xấu (x1.5, tê liệt không
+// làm chậm), Unburden khi đã mất / dùng hết đồ đang cầm (x2)
+export function effectiveSpeed(mon, ctx = {}) {
+  let speed = mon.speed * stageMultiplier(stageOf(mon, 'speed'));
+  const ability = abilityOf(mon, ctx);
+  if (ability === 'quickFeet' && mon.status) speed *= 1.5;
+  else if (mon.status === 'par') speed *= 0.5;
+  const weather = weatherOf(ctx);
+  if ((weather === 'rain' && ability === 'swiftSwim') || (weather === 'sun' && ability === 'chlorophyll')
+    || (weather === 'sand' && ability === 'sandRush')) speed *= 2;
+  if (ability === 'unburden' && mon.unburdened && !mon.heldItem) speed *= 2;
+  return Math.floor(speed);
+}
+
+export function calcDamage(attacker, defender, move, rng = Math.random, ctx = {}) {
+  const { effectiveness, absorbedBy } = moveEffect(move, defender, ctx, attacker);
+  if (effectiveness === 0) return { damage: 0, effectiveness, crit: false, absorbedBy };
+  // Sát thương cố định (Dragon Rage, Sonic Boom, Seismic Toss, Night Shade): bỏ qua chỉ số, khắc hệ, chí mạng, lớp chắn
+  if (move.fixedDamage) {
+    const damage = move.fixedDamage === 'level' ? attacker.level : move.fixedDamage;
+    return { damage, effectiveness: 1, crit: false, absorbedBy: null };
+  }
 
   const special = isSpecial(move);
-  const atk = special ? attacker.spAtk : attacker.atk;
-  const def = special ? defender.spDef : defender.def;
-  const stab = atkTypes.includes(move.type) ? 1.5 : 1;
-  const crit = rng() < CRIT_CHANCE;
+  const atkKey = special ? 'spAtk' : 'atk';
+  const defKey = special ? 'spDef' : 'def';
+  // Shell Armor / Battle Armor: không bao giờ bị chí mạng
+  const crit = rng() < (move.highCrit ? HIGH_CRIT_CHANCE : CRIT_CHANCE) && !noCrit(abilityOf(defender, ctx));
+  // Unaware: phớt lờ bậc chỉ số của đối thủ (bên đánh có Unaware thì bỏ qua bậc phòng thủ của bên đỡ và ngược lại)
+  let atkStage = abilityOf(defender, ctx) === 'unaware' ? 0 : stageOf(attacker, atkKey);
+  let defStage = abilityOf(attacker, ctx) === 'unaware' ? 0 : stageOf(defender, defKey);
+  // Chí mạng bỏ qua bậc giảm chỉ số của bên đánh và bậc tăng của bên đỡ
+  if (crit) {
+    atkStage = Math.max(0, atkStage);
+    defStage = Math.min(0, defStage);
+  }
+  const ability = abilityOf(attacker, ctx);
+  let atk = attacker[atkKey] * stageMultiplier(atkStage);
+  let def = defender[defKey] * stageMultiplier(defStage);
+  // Bão cát: Pokémon hệ Đá tăng 50% Phòng thủ ĐB
+  if (special && weatherOf(ctx) === 'sand' && SPECIES[defender.speciesId].types.includes('rock')) def *= 1.5;
+  // Marvel Scale: đang bị trạng thái xấu thì Phòng thủ tăng 50%
+  if (!special && defender.status && abilityOf(defender, ctx) === 'marvelScale') def *= 1.5;
+  if (!special && (ability === 'hustle' || (ability === 'guts' && attacker.status))) atk *= 1.5;
+  if (special && ability === 'solarPower' && weatherOf(ctx) === 'sun') atk *= 1.5;
+
+  // Low Kick: sức mạnh theo cân nặng của bên đỡ
+  let power = move.weightPower ? lowKickPower(weightOf(defender)) : move.power;
+  // Knock Off: mạnh hơn 50% khi đối thủ đang cầm đồ (kể cả khi Sticky Hold giữ được đồ)
+  if (move.knockOff && canLoseItem(defender)) power *= 1.5;
+  // Technician: chiêu sức mạnh 60 trở xuống mạnh hơn 50% (Struggle thì không)
+  if (ability === 'technician' && power <= 60 && move.id !== 'struggle') power *= 1.5;
+  if (PINCH[ability] === move.type && attacker.hp <= attacker.maxHp / 3) power *= 1.5;
+  // Sheer Force: chiêu có hiệu ứng phụ mạnh hơn 30% (hiệu ứng phụ bị bỏ, xem secondaryFactor)
+  if (ability === 'sheerForce' && hasSecondary(move)) power *= 1.3;
+  // Sand Force: bão cát làm chiêu hệ Đá / Đất / Thép mạnh hơn 30%
+  if (ability === 'sandForce' && weatherOf(ctx) === 'sand' && ['rock', 'ground', 'steel'].includes(move.type)) power *= 1.3;
+  // Rivalry: cùng giới mạnh hơn 25%, khác giới yếu đi 25%, không có giới tính thì như thường
+  if (ability === 'rivalry' && attacker.gender && defender.gender) power *= attacker.gender === defender.gender ? 1.25 : 0.75;
+  if (ability === 'flashFire' && attacker.flashFire && move.type === 'fire') power *= 1.5;
+  if (ability === 'analytic' && ctx.lastMover === attacker) power *= 1.3;
+  if ((ability === 'reckless' && move.recoil && move.id !== 'struggle') || (ability === 'ironFist' && move.punch)) power *= 1.2;
+  // Đồ cầm tăng sức mạnh theo hệ (Charcoal, Mystic Water...)
+  const held = ITEMS[attacker.heldItem];
+  if (held?.held === 'boost' && held.boostType === move.type) power *= 1.2;
+
+  // Cùng hệ x1.5, Adaptability x2
+  const stab = SPECIES[attacker.speciesId].types.includes(move.type) ? (ability === 'adaptability' ? 2 : 1.5) : 1;
+  let weather = 1;
+  if (weatherOf(ctx) === 'rain') weather = move.type === 'water' ? 1.5 : move.type === 'fire' ? 0.5 : 1;
+  if (weatherOf(ctx) === 'sun') weather = move.type === 'fire' ? 1.5 : move.type === 'water' ? 0.5 : 1;
+  // Bỏng làm giảm một nửa sát thương vật lý (Guts thì không)
+  const burn = attacker.status === 'brn' && !special && ability !== 'guts' ? 0.5 : 1;
+  // Đặc tính bên đỡ: Thick Fat chịu Lửa / Băng một nửa, Dry Skin bị Lửa đánh đau hơn 25%
+  const defAbility = abilityOf(defender, ctx);
+  let guard = 1;
+  if (defAbility === 'thickFat' && ['fire', 'ice'].includes(move.type)) guard = 0.5;
+  if (defAbility === 'drySkin' && move.type === 'fire') guard = 1.25;
+  if (defAbility === 'multiscale' && defender.hp === defender.maxHp) guard *= 0.5;
+  // Filter: chiêu rất hiệu quả giảm 25% • Tinted Lens (bên đánh): chiêu không hiệu quả lắm gây gấp đôi
+  if (defAbility === 'filter' && effectiveness > 1) guard *= 0.75;
+  if (ability === 'tintedLens' && effectiveness < 1) guard *= 2;
+  // Reflect / Light Screen phía bên đỡ: giảm một nửa sát thương vật lý / đặc biệt (chí mạng và Infiltrator xuyên qua)
+  const screen = special ? ctx.screens?.lightScreen : ctx.screens?.reflect;
+  if (screen && !crit && ability !== 'infiltrator') guard *= 0.5;
   const levelFactor = Math.floor((2 * attacker.level) / 5) + 2;
-  const base = Math.floor(Math.floor((levelFactor * move.power * atk) / def) / 50) + 2;
+  const base = Math.floor(Math.floor((levelFactor * power * atk) / def) / 50) + 2;
   const random = 0.85 + rng() * 0.15;
-  const damage = Math.max(1, Math.floor(base * stab * effectiveness * (crit ? 1.5 : 1) * random));
-  return { damage, effectiveness, crit };
+  // Chí mạng x1.5, Sniper x2.25
+  const critMult = crit ? (ability === 'sniper' ? 2.25 : 1.5) : 1;
+  const damage = Math.max(1, Math.floor(base * weather * critMult * random * stab * effectiveness * burn * guard));
+  return { damage, effectiveness, crit, absorbedBy: null };
 }
 
-export function moveHits(move, rng = Math.random) {
-  return rng() * 100 < move.accuracy;
+// Trúng hay trượt, tính cả bậc độ chính xác của bên đánh và né tránh của bên đỡ
+export function moveHits(move, attacker, defender, rng = Math.random, ctx = {}) {
+  // Thunder / Hurricane luôn trúng khi mưa, chỉ 50% khi nắng gắt; Blizzard luôn trúng khi mưa đá
+  const weather = weatherOf(ctx);
+  const accuracy = weather && move.weatherAccuracy && weather in move.weatherAccuracy ? move.weatherAccuracy[weather] : move.accuracy;
+  if (accuracy === null) return true;
+  // No Guard: chiêu của nó và chiêu nhắm vào nó đều luôn trúng
+  if (abilityOf(attacker, ctx) === 'noGuard' || abilityOf(defender, ctx) === 'noGuard') return true;
+  const atkAbility = abilityOf(attacker, ctx);
+  const defAbility = abilityOf(defender, ctx);
+  // Unaware: bỏ qua bậc né tránh của bên đỡ (bên đánh có Unaware) / bậc chính xác của bên đánh (bên đỡ có Unaware)
+  const accStage = defAbility === 'unaware' ? 0 : stageOf(attacker, 'accuracy');
+  const evaStage = atkAbility === 'unaware' ? 0 : stageOf(defender, 'evasion');
+  const stage = Math.max(-6, Math.min(6, accStage - evaStage));
+  // Wonder Skin: chiêu trạng thái nhắm vào nó chỉ còn tối đa 50% độ chính xác
+  const base = move.category === 'status' && defAbility === 'wonderSkin' ? Math.min(50, accuracy) : accuracy;
+  let chance = base * accuracyMultiplier(stage);
+  if (atkAbility === 'hustle' && move.category === 'physical') chance *= 0.8;
+  if (atkAbility === 'compoundEyes') chance *= 1.3;
+  // Né tránh của bên đỡ: Tangled Feet khi rối loạn (x2), Sand Veil khi có bão cát / Snow Cloak khi có mưa đá (x1.25)
+  if (defAbility === 'tangledFeet' && defender.confused) chance *= 0.5;
+  if ((defAbility === 'sandVeil' && weatherOf(ctx) === 'sand') || (defAbility === 'snowCloak' && weatherOf(ctx) === 'hail')) chance *= 0.8;
+  return rng() * 100 < chance;
 }
 
-// Xác suất bắt thành công: máu càng thấp càng dễ bắt
+// Số đòn của chiêu đánh nhiều lần: hits: 2 luôn 2 lần • hits: [2, 5] đánh 2-5 lần (35/35/15/15%), Skill Link luôn 5 lần
+export function hitCount(move, ability = null, rng = Math.random) {
+  if (!move.hits) return 1;
+  if (typeof move.hits === 'number') return move.hits;
+  if (ability === 'skillLink') return move.hits[1];
+  const r = rng();
+  return r < 0.35 ? 2 : r < 0.7 ? 3 : r < 0.85 ? 4 : 5;
+}
+
+// Rối loạn tự đánh mình: đòn vật lý 40 sức mạnh không theo hệ, dùng Tấn công / Phòng thủ của chính nó, không chí mạng
+export function confusionDamage(mon, rng = Math.random) {
+  const atk = mon.atk * stageMultiplier(stageOf(mon, 'atk'));
+  const def = mon.def * stageMultiplier(stageOf(mon, 'def'));
+  const levelFactor = Math.floor((2 * mon.level) / 5) + 2;
+  const base = Math.floor(Math.floor((levelFactor * 40 * atk) / def) / 50) + 2;
+  return Math.max(1, Math.floor(base * (0.85 + rng() * 0.15)));
+}
+
+// Đồ đang cầm có thể bị lấy / hất đi không (vật phẩm quan trọng thì không)
+export const canLoseItem = (mon) => Boolean(mon.heldItem) && ITEMS[mon.heldItem]?.kind !== 'key';
+
+// Thời tiết cuối lượt: số HP thay đổi (dương = hồi, âm = mất). Bão cát làm mất 1/16 HP trừ hệ Đá / Đất / Thép và Sand Veil /
+// Sand Rush / Sand Force, mưa đá làm mất 1/16 HP trừ hệ Băng và Snow Cloak; Ice Body hồi 1/16 HP khi mưa đá. Magic Guard, Overcoat không mất máu vì thời tiết.
+export function weatherHpChange(mon, ctx = {}) {
+  const weather = weatherOf(ctx);
+  if (mon.hp <= 0 || (weather !== 'sand' && weather !== 'hail')) return 0;
+  const ability = abilityOf(mon, ctx);
+  const part = Math.max(1, Math.floor(mon.maxHp / 16));
+  if (weather === 'hail' && ability === 'iceBody') return Math.min(part, mon.maxHp - mon.hp);
+  if (ability === 'magicGuard' || ability === 'overcoat') return 0;
+  const types = SPECIES[mon.speciesId].types;
+  if (weather === 'sand' && (SAND_PROOF.includes(ability) || types.some((t) => ['rock', 'ground', 'steel'].includes(t)))) return 0;
+  if (weather === 'hail' && (ability === 'snowCloak' || types.includes('ice'))) return 0;
+  return -Math.min(part, mon.hp);
+}
+
+// Cân nặng (kg) theo Pokédex, vd "8.5 kg (18.7 lbs)" -> 8.5
+export const weightOf = (mon) => parseFloat(DEX[SPECIES[mon.speciesId].dexId - 1].weight);
+
+// Low Kick (từ Gen 3): sức mạnh theo cân nặng bên đỡ
+export function lowKickPower(kg) {
+  if (kg < 10) return 20;
+  if (kg < 25) return 40;
+  if (kg < 50) return 60;
+  if (kg < 100) return 80;
+  if (kg < 200) return 100;
+  return 120;
+}
+
+// Đứng trên mặt đất: không phải hệ Bay, không có Levitate (Arena Trap giữ chân được)
+export const grounded = (mon, ctx = {}) => !SPECIES[mon.speciesId].types.includes('flying') && abilityOf(mon, ctx) !== 'levitate';
+
+// Bị giữ chân: Magnet Pull không cho Pokémon hệ Thép chạy trốn / rút về, Arena Trap giữ chân Pokémon đứng trên mặt đất;
+// bị đối thủ trói (Wrap) cũng vậy. Hệ Ma luôn thoát được như từ Gen 6.
+// Trả về id đặc tính (vd 'magnetPull') hoặc id chiêu (vd 'wrap') đang giữ chân, hoặc null.
+export function trappedBy(mon, foe, ctx = {}) {
+  if (!foe || foe.hp <= 0) return null;
+  const types = SPECIES[mon.speciesId].types;
+  if (types.includes('ghost')) return null;
+  if (abilityOf(foe, ctx) === 'magnetPull' && types.includes('steel')) return 'magnetPull';
+  if (abilityOf(foe, ctx) === 'arenaTrap' && grounded(mon, ctx)) return 'arenaTrap';
+  if (mon.bound?.source === foe) return mon.bound.move;
+  return null;
+}
+
+// Xác suất bắt thành công: máu càng thấp càng dễ bắt, đang ngủ / đóng băng / trạng thái xấu thì dễ hơn
 export function catchChance(mon, ballBonus = 1) {
-  const rate = SPECIES[mon.speciesId].catchRate;
-  const a = ((3 * mon.maxHp - 2 * mon.hp) * rate * ballBonus) / (3 * mon.maxHp);
+  const rate = SPECIES[baseSpeciesId(mon)].catchRate;
+  const status = mon.status === 'slp' || mon.status === 'frz' ? 2.5 : mon.status ? 1.5 : 1;
+  const a = ((3 * mon.maxHp - 2 * mon.hp) * rate * ballBonus * status) / (3 * mon.maxHp);
   return Math.min(1, a / 255);
 }
 
@@ -42,18 +273,45 @@ export function rollCatch(mon, ballBonus = 1, rng = Math.random) {
   return { caught: shakes === 3, shakes };
 }
 
-export function expGain(defeated) {
-  return Math.floor((SPECIES[defeated.speciesId].baseExp * defeated.level) / 5);
+// EXP khi hạ / bắt một Pokémon, theo công thức Gen 5 (EXP gốc trong dữ liệu là bộ số từ Gen 5):
+//   (a × EXP gốc × cấp nó) / (5 × s) × ((2 × cấp nó + 10) / (cấp nó + cấp mình + 10))^2.5 + 1
+// a: 1.5 nếu là Pokémon của nhà huấn luyện • s: số Pokémon chia nhau. Hệ số cuối làm cho hạ Pokémon cấp cao hơn mình
+// được nhiều EXP hơn, hạ Pokémon yếu hơn hẳn thì được ít đi (không cày mãi ở bụi cỏ đầu game được)
+export function expGain(defeated, level = defeated.level, { trainer = false, split = 1 } = {}) {
+  const base = ((trainer ? 1.5 : 1) * SPECIES[defeated.speciesId].baseExp * defeated.level) / (5 * split);
+  const scale = ((2 * defeated.level + 10) / (defeated.level + level + 10)) ** 2.5;
+  return Math.floor(base * scale) + 1;
 }
 
-export function escapeChance(runner, enemy, attempts) {
-  if (runner.speed >= enemy.speed) return 1;
-  return Math.min(1, ((runner.speed * 128) / enemy.speed + 30 * attempts) / 256);
+// Chia EXP như Gen 5: các Pokémon đã ra sân đấu với nó và còn đứng (participants) chia nhau, mỗi con tính theo cấp của mình;
+// cầm Lucky Egg x1.5. Trả về [{ mon, amount }]
+export function expShares(defeated, participants, { trainer = false } = {}) {
+  if (!participants.length) return [];
+  return participants.map((mon) => {
+    const egg = ITEMS[mon.heldItem]?.held === 'luckyEgg' ? 1.5 : 1;
+    return { mon, amount: Math.floor(expGain(defeated, mon.level, { trainer, split: participants.length }) * egg) };
+  });
 }
 
-// Ai ra đòn trước: độ ưu tiên chiêu > tốc độ > ngẫu nhiên
-export function playerGoesFirst(player, playerMove, enemy, enemyMove, rng = Math.random) {
+export function escapeChance(runner, enemy, attempts, ctx = {}) {
+  const mine = effectiveSpeed(runner, ctx);
+  const theirs = effectiveSpeed(enemy, ctx);
+  if (abilityOf(runner, ctx) === 'runAway' || mine >= theirs) return 1;
+  return Math.min(1, ((mine * 128) / theirs + 30 * attempts) / 256);
+}
+
+// Ai ra đòn trước: độ ưu tiên chiêu > tốc độ (tính bậc, tê liệt, đặc tính) > ngẫu nhiên
+export function playerGoesFirst(player, playerMove, enemy, enemyMove, rng = Math.random, ctx = {}) {
   if (playerMove.priority !== enemyMove.priority) return playerMove.priority > enemyMove.priority;
-  if (player.speed !== enemy.speed) return player.speed > enemy.speed;
+  const ps = effectiveSpeed(player, ctx);
+  const es = effectiveSpeed(enemy, ctx);
+  if (ps !== es) return ps > es;
   return rng() < 0.5;
+}
+
+// Thứ tự kích hoạt đặc tính khi hai bên cùng ra sân: nhanh trước, bằng tốc độ thì ngẫu nhiên
+export function entryOrder(a, b, rng = Math.random, ctx = {}) {
+  const sa = effectiveSpeed(a, ctx);
+  const sb = effectiveSpeed(b, ctx);
+  return sa > sb || (sa === sb && rng() < 0.5) ? [a, b] : [b, a];
 }

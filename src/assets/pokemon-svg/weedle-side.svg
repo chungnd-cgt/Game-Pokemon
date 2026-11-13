@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e8bc84"/><stop offset="1" stop-color="#b4783e"/></linearGradient>
+    <linearGradient id="horn" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#aaa4b0"/></linearGradient>
+    <radialGradient id="nose" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#ffb4b8"/><stop offset="1" stop-color="#e05a6c"/></radialGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M70 64 C76 40 84 20 94 4 C100 22 104 42 108 62 Z" fill="url(#horn)"/>
+    <ellipse cx="226" cy="240" rx="8" ry="7" fill="#ec8a92"/>
+    <ellipse cx="194" cy="242" rx="9" ry="7" fill="#ec8a92"/>
+    <ellipse cx="160" cy="242" rx="10" ry="7" fill="#ec8a92"/>
+    <ellipse cx="124" cy="240" rx="10" ry="7" fill="#ec8a92"/>
+    <path d="M214 214 C224 194 236 178 254 166 C252 190 244 210 234 226 Z" fill="url(#horn)"/>
+    <ellipse cx="222" cy="220" rx="22" ry="21" fill="url(#skin)"/>
+    <ellipse cx="192" cy="216" rx="26" ry="25" fill="url(#skin)"/>
+    <ellipse cx="158" cy="210" rx="30" ry="29" fill="url(#skin)"/>
+    <ellipse cx="122" cy="198" rx="34" ry="34" fill="url(#skin)"/>
+    <ellipse cx="94" cy="160" rx="36" ry="32" fill="url(#skin)"/>
+    <ellipse cx="84" cy="102" rx="54" ry="52" fill="url(#skin)"/>
+  </g>
+  <path d="M94 12 C98 30 100 44 102 58" fill="none" stroke="#c8c2cc" stroke-width="4" stroke-linecap="round"/>
+  <path d="M114 58 C140 78 144 116 126 140 C114 152 98 156 84 156 C112 136 126 102 114 58 Z" fill="#8a5428" opacity="0.4"/>
+  <ellipse cx="70" cy="68" rx="20" ry="9" fill="#fff" opacity="0.4" transform="rotate(-25 70 68)"/>
+  <path d="M72 168 C72 180 78 190 88 196 M100 206 C102 218 108 226 116 230" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+  <ellipse cx="66" cy="96" rx="10" ry="14" fill="#1e1a24" stroke="#2b2433" stroke-width="3"/>
+  <ellipse cx="68" cy="91" rx="3.5" ry="5" fill="#fff"/>
+  <ellipse cx="36" cy="118" rx="18" ry="17" fill="url(#nose)" stroke="#2b2433" stroke-width="4"/>
+  <ellipse cx="31" cy="112" rx="6" ry="4" fill="#fff" opacity="0.6"/>
+</svg>

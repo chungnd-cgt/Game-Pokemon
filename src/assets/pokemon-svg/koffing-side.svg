@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="body" cx="38%" cy="32%" r="75%">
+      <stop offset="0" stop-color="#b098c8"/>
+      <stop offset="0.6" stop-color="#8a6aa8"/>
+      <stop offset="1" stop-color="#5e4480"/>
+    </radialGradient>
+  </defs>
+  <g fill="#c8c0a0" opacity="0.75">
+    <circle cx="228" cy="80" r="16"/>
+    <circle cx="242" cy="58" r="10"/>
+    <circle cx="214" cy="40" r="7"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round">
+    <path d="M96 60 l-4 -24 l16 16 Z M144 52 l8 -22 l6 22 Z M188 76 l20 -12 l-6 22 Z M212 132 l22 4 l-18 14 Z M196 192 l16 16 l-22 -2 Z M118 216 l-6 22 l18 -14 Z M60 82 l-18 -10 l6 20 Z" fill="#8a6aa8"/>
+    <circle cx="132" cy="134" r="84" fill="url(#body)"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="3">
+    <circle cx="176" cy="96" r="10" fill="#9a7cb8"/>
+    <circle cx="192" cy="160" r="9" fill="#9a7cb8"/>
+    <circle cx="150" cy="196" r="8" fill="#9a7cb8"/>
+    <circle cx="140" cy="76" r="6" fill="#9a7cb8"/>
+  </g>
+  <path d="M184 76 C222 104 226 156 202 188 C186 210 162 218 136 218 C190 190 210 136 184 76 Z" fill="#5e4480" opacity="0.45"/>
+  <!-- skull mark seen from the side -->
+  <path d="M74 166 C70 158 75 150 84 152 C85 144 97 144 97 152 C106 151 110 159 106 166 C107 173 102 179 96 177 L96 184 L84 184 L84 177 C79 179 72 173 74 166 Z" fill="#f4ecd0" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="85" cy="163" r="4" fill="#2b2433"/>
+  <circle cx="96" cy="163" r="4" fill="#2b2433"/>
+  <!-- face turned left -->
+  <path d="M60 98 C68 90 80 92 84 102 C74 106 66 106 60 98 Z M100 98 C94 90 86 92 82 100 C90 104 96 104 100 98 Z" fill="#2b2433"/>
+  <ellipse cx="72" cy="110" rx="9" ry="11" fill="#fff" stroke="#2b2433" stroke-width="3"/>
+  <ellipse cx="94" cy="110" rx="7" ry="10" fill="#fff" stroke="#2b2433" stroke-width="3"/>
+  <circle cx="69" cy="112" r="5" fill="#1a1010"/>
+  <circle cx="91" cy="112" r="4.5" fill="#1a1010"/>
+  <path d="M56 132 Q68 140 82 133" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="102" cy="72" rx="20" ry="9" fill="#fff" opacity="0.3" transform="rotate(-25 102 72)"/>
+</svg>

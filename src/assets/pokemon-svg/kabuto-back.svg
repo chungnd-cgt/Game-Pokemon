@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="shell" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d89a58"/><stop offset="1" stop-color="#8a5226"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- legs -->
+    <path d="M70 214 L58 244 M98 220 L92 248 M158 220 L164 248 M186 214 L198 244" fill="none" stroke-width="15"/>
+    <path d="M70 214 L58 244 M98 220 L92 248 M158 220 L164 248 M186 214 L198 244" fill="none" stroke="#f2cc58" stroke-width="7"/>
+    <ellipse cx="128" cy="214" rx="90" ry="22" fill="#2e2630"/>
+    <!-- shell dome from behind -->
+    <path d="M18 206 C16 116 66 56 128 56 C190 56 240 116 238 206 C200 222 56 222 18 206 Z" fill="url(#shell)"/>
+  </g>
+  <path d="M28 200 C70 214 186 214 228 200" fill="none" stroke="#e8b070" stroke-width="7" stroke-linecap="round"/>
+  <!-- shell marks on the back -->
+  <path d="M100 88 C94 100 92 112 94 122 M156 88 C162 100 164 112 162 122" fill="none" stroke="#4a2a14" stroke-width="7" stroke-linecap="round"/>
+  <!-- shading and gloss -->
+  <path d="M196 92 C226 128 232 170 226 198 C210 206 196 210 180 212 C204 178 208 130 196 92 Z" fill="#5e3416" opacity="0.4"/>
+  <ellipse cx="76" cy="100" rx="30" ry="13" fill="#fff" opacity="0.5" transform="rotate(-38 76 100)"/>
+  <ellipse cx="108" cy="70" rx="12" ry="5" fill="#fff" opacity="0.45" transform="rotate(-10 108 70)"/>
+</svg>

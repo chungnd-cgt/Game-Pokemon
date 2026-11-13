@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="0.6"><stop offset="0" stop-color="#c08a60"/><stop offset="1" stop-color="#84502e"/></linearGradient>
+    <radialGradient id="nose" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#ffc0cc"/><stop offset="1" stop-color="#e45c7c"/></radialGradient>
+    <linearGradient id="dirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a49c96"/><stop offset="1" stop-color="#6e6862"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- đầu sau (phải) -->
+    <path d="M152 216 C150 150 162 84 198 84 C234 84 244 150 242 216 Z" fill="#94603a"/>
+    <!-- đầu giữa cao nhất -->
+    <path d="M88 210 C84 124 96 32 132 32 C168 32 178 124 174 210 Z" fill="url(#skin)"/>
+  </g>
+  <!-- mặt đầu giữa -->
+  <ellipse cx="106" cy="76" rx="6" ry="11" fill="#2b2433"/>
+  <ellipse cx="107" cy="71" rx="2.5" ry="3.5" fill="#fff"/>
+  <ellipse cx="88" cy="104" rx="20" ry="13" fill="url(#nose)" stroke="#2b2433" stroke-width="4.5"/>
+  <ellipse cx="81" cy="99" rx="6" ry="3" fill="#fff" opacity="0.7"/>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- đầu trước (trái, thấp) -->
+    <path d="M24 226 C20 168 32 122 68 122 C104 122 112 168 110 226 Z" fill="url(#skin)"/>
+    <!-- ụ đất -->
+    <path d="M2 252 C8 216 46 204 128 206 C210 204 248 216 254 252 Z" fill="url(#dirt)"/>
+    <ellipse cx="40" cy="236" rx="16" ry="10" fill="#9e9488"/>
+    <ellipse cx="216" cy="236" rx="17" ry="10" fill="#8a8078"/>
+    <ellipse cx="136" cy="240" rx="13" ry="8" fill="#aaa094"/>
+  </g>
+  <path d="M158 56 C170 92 174 150 170 204 C164 206 158 204 154 202 C160 150 162 98 158 56 Z" fill="#6e4024" opacity="0.5"/>
+  <path d="M94 138 C104 166 106 196 104 220 C98 222 92 220 88 216 C94 190 96 162 94 138 Z" fill="#6e4024" opacity="0.5"/>
+  <ellipse cx="134" cy="54" rx="16" ry="6" fill="#fff" opacity="0.35" transform="rotate(-30 134 54)"/>
+  <ellipse cx="66" cy="138" rx="14" ry="6" fill="#fff" opacity="0.35" transform="rotate(-25 66 138)"/>
+  <ellipse cx="206" cy="102" rx="14" ry="6" fill="#fff" opacity="0.3" transform="rotate(-30 206 102)"/>
+  <!-- mặt đầu trước -->
+  <ellipse cx="54" cy="160" rx="6" ry="11" fill="#2b2433"/>
+  <ellipse cx="55" cy="155" rx="2.5" ry="3.5" fill="#fff"/>
+  <ellipse cx="32" cy="190" rx="20" ry="13" fill="url(#nose)" stroke="#2b2433" stroke-width="4.5"/>
+  <ellipse cx="25" cy="185" rx="6" ry="3" fill="#fff" opacity="0.7"/>
+</svg>

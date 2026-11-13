@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="body" cx="36%" cy="30%" r="78%"><stop offset="0" stop-color="#8ab0f0"/><stop offset="0.6" stop-color="#5f8ad8"/><stop offset="1" stop-color="#3f64b0"/></radialGradient>
+    <radialGradient id="glove" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#ffffff"/><stop offset="0.7" stop-color="#f4f4f8"/><stop offset="1" stop-color="#d6d8e2"/></radialGradient>
+  </defs>
+  <g stroke-linecap="round" fill="none">
+    <path d="M110 146 Q70 150 44 140" stroke="#2b2433" stroke-width="32"/>
+    <path d="M110 146 Q70 150 44 140" stroke="#3f64b0" stroke-width="22"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <circle cx="34" cy="136" r="22" fill="url(#glove)"/>
+    <ellipse cx="164" cy="238" rx="30" ry="11" fill="#2f50a0"/>
+    <ellipse cx="128" cy="82" rx="18" ry="22" fill="#e8eaf2"/>
+    <ellipse cx="134" cy="152" rx="74" ry="70" fill="url(#body)"/>
+    <ellipse cx="106" cy="238" rx="32" ry="12" fill="#3f64b0"/>
+    <ellipse cx="118" cy="214" rx="26" ry="22" fill="#4f78c8"/>
+    <path d="M64 124 C52 168 70 212 112 214 C128 188 128 148 108 124 C92 114 74 114 64 124 Z" fill="#fbfbfb"/>
+    <ellipse cx="86" cy="86" rx="20" ry="22" fill="#fff"/>
+  </g>
+  <path d="M92 164 a6 6 0 0 1 6 6 a12 12 0 0 1 -12 12 a18 18 0 0 1 -18 -18 a24 24 0 0 1 24 -24 a28 28 0 0 1 26 28" fill="none" stroke="#2b2433" stroke-width="6" stroke-linecap="round"/>
+  <ellipse cx="78" cy="90" rx="9" ry="11" fill="#1a1a2a"/>
+  <circle cx="81" cy="84" r="3.5" fill="#fff"/>
+  <ellipse cx="150" cy="106" rx="22" ry="10" fill="#fff" opacity="0.3" transform="rotate(-30 150 106)"/>
+  <g stroke-linecap="round" fill="none">
+    <path d="M150 146 Q180 164 196 186" stroke="#2b2433" stroke-width="32"/>
+    <path d="M150 146 Q180 164 196 186" stroke="#5f8ad8" stroke-width="22"/>
+    <circle cx="146" cy="142" r="17" fill="#6890dc" stroke="none"/>
+  </g>
+  <circle cx="202" cy="194" r="24" fill="url(#glove)" stroke="#2b2433" stroke-width="5"/>
+</svg>

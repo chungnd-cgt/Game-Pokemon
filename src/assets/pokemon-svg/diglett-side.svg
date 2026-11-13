@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="0.6"><stop offset="0" stop-color="#c8946a"/><stop offset="1" stop-color="#8a5634"/></linearGradient>
+    <radialGradient id="nose" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#ffc0cc"/><stop offset="1" stop-color="#e45c7c"/></radialGradient>
+    <linearGradient id="dirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a49c96"/><stop offset="1" stop-color="#6e6862"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- thân nhìn nghiêng -->
+    <path d="M74 216 C68 140 82 50 132 50 C182 50 194 140 188 216 Z" fill="url(#skin)"/>
+    <!-- ụ đất -->
+    <path d="M10 250 C18 214 56 196 92 200 C108 210 148 210 164 200 C200 196 238 214 246 250 Z" fill="url(#dirt)"/>
+    <ellipse cx="52" cy="228" rx="16" ry="11" fill="#9e9488"/>
+    <ellipse cx="204" cy="232" rx="17" ry="11" fill="#8a8078"/>
+    <ellipse cx="128" cy="238" rx="13" ry="8" fill="#aaa094"/>
+  </g>
+  <path d="M174 76 C188 110 190 162 186 210 C178 212 168 206 162 204 C170 160 176 112 174 76 Z" fill="#6e4024" opacity="0.5"/>
+  <ellipse cx="128" cy="76" rx="22" ry="9" fill="#fff" opacity="0.35" transform="rotate(-30 128 76)"/>
+  <path d="M30 224 C46 214 64 210 80 212" fill="none" stroke="#c8c0b8" stroke-width="4" stroke-linecap="round"/>
+  <!-- mắt -->
+  <ellipse cx="100" cy="110" rx="7" ry="13" fill="#2b2433"/>
+  <ellipse cx="101" cy="104" rx="2.5" ry="4" fill="#fff"/>
+  <!-- mũi hồng nhô ra trước -->
+  <ellipse cx="74" cy="148" rx="24" ry="17" fill="url(#nose)" stroke="#2b2433" stroke-width="4.5"/>
+  <ellipse cx="66" cy="142" rx="7" ry="4" fill="#fff" opacity="0.7"/>
+</svg>

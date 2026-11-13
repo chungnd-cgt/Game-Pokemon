@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Porygon: các mặt phẳng đa giác hồng / xanh -->
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round">
+    <!-- chân sau -->
+    <path d="M150 206 L178 196 L178 232 L150 242 Z" fill="#2e8aa4"/>
+    <!-- đuôi -->
+    <path d="M196 148 L250 112 L224 162 Z" fill="#9ce0ec"/>
+    <path d="M224 162 L250 112 L240 176 L202 190 Z" fill="#4cb4cc"/>
+    <!-- thân -->
+    <path d="M82 142 L148 118 L208 138 L140 162 Z" fill="#ff9cb4"/>
+    <path d="M82 142 L140 162 L136 214 L86 198 Z" fill="#f06a8c"/>
+    <path d="M140 162 L208 138 L206 190 L136 214 Z" fill="#4cb4cc"/>
+    <!-- chân trước -->
+    <path d="M94 204 L124 212 L124 246 L94 238 Z" fill="#4cb4cc"/>
+    <path d="M124 212 L140 206 L140 240 L124 246 Z" fill="#2e8aa4"/>
+    <!-- đầu -->
+    <path d="M150 38 L178 24 L196 54 L172 64 Z" fill="#d85478"/>
+    <path d="M94 56 L122 28 L178 24 L150 38 Z" fill="#ff9cb4"/>
+    <path d="M94 56 L150 38 L172 64 L168 106 L144 124 L102 118 L98 88 Z" fill="#f06a8c"/>
+    <!-- mỏ nhọn -->
+    <path d="M94 56 L26 96 L98 88 Z" fill="#ff9cb4"/>
+    <path d="M98 88 L26 96 L102 118 Z" fill="#4cb4cc"/>
+  </g>
+  <!-- sáng / tối trên các mặt -->
+  <path d="M100 150 L132 162 L130 176 L98 164 Z" fill="#fff" opacity="0.25"/>
+  <path d="M110 34 L130 30 L118 44 Z" fill="#fff" opacity="0.5"/>
+  <path d="M144 124 L168 106 L172 64 L176 104 Z" fill="#c84870" opacity="0.6"/>
+  <path d="M52 82 L76 68 L62 84 Z" fill="#fff" opacity="0.5"/>
+  <!-- mắt tròn trắng -->
+  <circle cx="134" cy="76" r="16" fill="#fff" stroke="#2b2433" stroke-width="4"/>
+  <circle cx="129" cy="76" r="7.5" fill="#2b2433"/>
+  <circle cx="131" cy="73" r="2.2" fill="#fff"/>
+</svg>

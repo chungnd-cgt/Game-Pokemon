@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="body" cx="38%" cy="32%" r="75%">
+      <stop offset="0" stop-color="#b098c8"/>
+      <stop offset="0.6" stop-color="#8a6aa8"/>
+      <stop offset="1" stop-color="#5e4480"/>
+    </radialGradient>
+  </defs>
+  <g fill="#c8c0a0" opacity="0.75">
+    <circle cx="200" cy="70" r="16"/>
+    <circle cx="218" cy="52" r="10"/>
+    <circle cx="44" cy="96" r="12"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round">
+    <path d="M84 70 l-6 -22 l18 12 Z M128 52 l0 -24 l12 20 Z M174 70 l10 -20 l2 24 Z M200 120 l22 -6 l-12 18 Z M58 128 l-22 -4 l16 16 Z M76 192 l-14 18 l22 -6 Z M180 192 l16 16 l-4 -22 Z" fill="#8a6aa8"/>
+    <circle cx="128" cy="134" r="84" fill="url(#body)"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="3">
+    <circle cx="70" cy="110" r="10" fill="#9a7cb8"/>
+    <circle cx="186" cy="104" r="8" fill="#9a7cb8"/>
+    <circle cx="176" cy="186" r="9" fill="#9a7cb8"/>
+  </g>
+  <path d="M108 168 C102 158 108 148 120 150 C120 140 136 140 136 150 C148 148 154 158 148 168 C150 176 144 184 136 182 L136 190 L120 190 L120 182 C112 184 106 176 108 168 Z" fill="#f4ecd0" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="121" cy="164" r="5" fill="#2b2433"/>
+  <circle cx="135" cy="164" r="5" fill="#2b2433"/>
+  <path d="M100 98 C108 90 120 92 124 102 C114 106 106 106 100 98 Z M156 98 C148 90 136 92 132 102 C142 106 150 106 156 98 Z" fill="#2b2433"/>
+  <ellipse cx="112" cy="110" rx="9" ry="11" fill="#fff" stroke="#2b2433" stroke-width="3"/>
+  <ellipse cx="144" cy="110" rx="9" ry="11" fill="#fff" stroke="#2b2433" stroke-width="3"/>
+  <circle cx="113" cy="112" r="5" fill="#1a1010"/>
+  <circle cx="143" cy="112" r="5" fill="#1a1010"/>
+  <path d="M112 132 Q128 140 144 132" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="96" cy="74" rx="20" ry="9" fill="#fff" opacity="0.3" transform="rotate(-25 96 74)"/>
+</svg>

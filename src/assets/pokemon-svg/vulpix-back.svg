@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="fur" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d66a48"/>
+      <stop offset="1" stop-color="#b04a30"/>
+    </linearGradient>
+    <path id="b1" d="M122 222 C86 228 46 218 32 192 C24 174 40 160 52 170 C58 176 52 184 46 180" fill="none"/>
+    <path id="b2" d="M124 216 C94 204 62 180 52 148 C46 128 64 120 72 134 C76 142 68 148 64 142" fill="none"/>
+    <path id="b3" d="M126 212 C114 190 102 166 98 142 C96 124 114 118 118 134 C120 142 112 146 108 140" fill="none"/>
+    <path id="b4" d="M134 222 C170 228 210 218 224 192 C232 174 216 160 204 170 C198 176 204 184 210 180" fill="none"/>
+    <path id="b5" d="M132 216 C162 204 194 180 204 148 C210 128 192 120 184 134 C180 142 188 148 192 142" fill="none"/>
+    <path id="b6" d="M130 212 C142 190 154 166 158 142 C160 124 142 118 138 134 C136 142 144 146 148 140" fill="none"/>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- tai nhìn từ sau -->
+    <path d="M80 84 L50 14 L118 58 Z" fill="url(#fur)"/>
+    <path d="M176 84 L206 14 L138 58 Z" fill="#b04a30"/>
+    <!-- chỏm lông ló trên đỉnh -->
+    <path d="M100 60 C90 44 100 28 116 32 C120 20 140 20 144 32 C158 30 166 46 156 60 Z" fill="#f0943c"/>
+    <!-- đầu -->
+    <path d="M70 104 C66 70 94 52 128 52 C162 52 190 70 186 104 C196 112 196 126 184 130 C176 148 154 156 128 156 C102 156 80 148 72 130 C60 126 60 112 70 104 Z" fill="url(#fur)"/>
+    <!-- chân sau -->
+    <ellipse cx="80" cy="238" rx="22" ry="11" fill="#9a3c28"/>
+    <ellipse cx="176" cy="238" rx="22" ry="11" fill="#9a3c28"/>
+    <!-- thân -->
+    <ellipse cx="128" cy="192" rx="60" ry="50" fill="url(#fur)"/>
+  </g>
+  <!-- sáu đuôi xòe phía trước -->
+  <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <use xlink:href="#b3" href="#b3" stroke="#2b2433" stroke-width="30"/><use xlink:href="#b3" href="#b3" stroke="#f0943c" stroke-width="20"/>
+    <use xlink:href="#b6" href="#b6" stroke="#2b2433" stroke-width="30"/><use xlink:href="#b6" href="#b6" stroke="#f0943c" stroke-width="20"/>
+    <use xlink:href="#b2" href="#b2" stroke="#2b2433" stroke-width="30"/><use xlink:href="#b2" href="#b2" stroke="#f0943c" stroke-width="20"/>
+    <use xlink:href="#b5" href="#b5" stroke="#2b2433" stroke-width="30"/><use xlink:href="#b5" href="#b5" stroke="#f0943c" stroke-width="20"/>
+    <use xlink:href="#b1" href="#b1" stroke="#2b2433" stroke-width="30"/><use xlink:href="#b1" href="#b1" stroke="#f0943c" stroke-width="20"/>
+    <use xlink:href="#b4" href="#b4" stroke="#2b2433" stroke-width="30"/><use xlink:href="#b4" href="#b4" stroke="#f0943c" stroke-width="20"/>
+  </g>
+  <g fill="none" stroke="#ffc27a" stroke-width="6" stroke-linecap="round" opacity="0.8">
+    <path d="M38 188 C36 176 46 170 52 176"/><path d="M58 146 C56 134 66 130 70 136"/><path d="M104 138 C102 126 112 122 116 128"/>
+    <path d="M218 188 C220 176 210 170 204 176"/><path d="M198 146 C200 134 190 130 186 136"/><path d="M152 138 C154 126 144 122 140 128"/>
+  </g>
+  <path d="M176 84 C190 112 176 146 132 156 C166 136 178 112 176 84 Z" fill="#9a3c28" opacity="0.5"/>
+  <ellipse cx="100" cy="74" rx="16" ry="7" fill="#fff" opacity="0.3" transform="rotate(-25 100 74)"/>
+  <path d="M116 42 C122 36 134 36 140 42" fill="none" stroke="#ffc27a" stroke-width="4" stroke-linecap="round"/>
+</svg>

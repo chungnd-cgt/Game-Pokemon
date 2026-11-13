@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="dome" cx="40%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#d4f2ff"/>
+      <stop offset="0.5" stop-color="#7cc8f0"/>
+      <stop offset="1" stop-color="#3f8cd0"/>
+    </radialGradient>
+    <radialGradient id="gem" cx="38%" cy="34%" r="70%">
+      <stop offset="0" stop-color="#ff9a9a"/>
+      <stop offset="0.5" stop-color="#e8302e"/>
+      <stop offset="1" stop-color="#a01820"/>
+    </radialGradient>
+    <linearGradient id="low" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d0e4f4"/>
+      <stop offset="1" stop-color="#98bce0"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M110 168 C100 196 112 214 96 234 C88 244 74 240 76 230" fill="none" stroke-width="22"/>
+    <path d="M146 168 C156 196 144 214 160 234 C168 244 182 240 180 230" fill="none" stroke-width="22"/>
+    <path d="M110 168 C100 196 112 214 96 234 C88 244 74 240 76 230" fill="none" stroke="#a8cce8" stroke-width="12"/>
+    <path d="M146 168 C156 196 144 214 160 234 C168 244 182 240 180 230" fill="none" stroke="#a8cce8" stroke-width="12"/>
+    <path d="M84 138 C82 168 102 184 128 184 C154 184 174 168 172 138 Z" fill="url(#low)"/>
+    <path d="M128 20 C188 20 214 72 210 120 C208 140 188 148 168 142 C150 136 106 136 88 142 C68 148 48 140 46 120 C42 72 68 20 128 20 Z" fill="url(#dome)"/>
+  </g>
+  <path d="M128 34 C176 36 196 76 192 116 C190 130 178 134 166 130 C150 124 106 124 90 130 C78 134 66 130 64 116 C60 76 80 36 128 34 Z" fill="#fff" opacity="0.22"/>
+  <ellipse cx="100" cy="54" rx="24" ry="10" fill="#fff" opacity="0.6" transform="rotate(-30 100 54)"/>
+  <path d="M176 44 C200 70 204 110 198 128" fill="none" stroke="#2f6eb0" stroke-width="6" stroke-linecap="round" opacity="0.4"/>
+  <g stroke="#2b2433" stroke-width="4">
+    <circle cx="66" cy="112" r="19" fill="url(#gem)"/>
+    <circle cx="190" cy="112" r="19" fill="url(#gem)"/>
+  </g>
+  <ellipse cx="60" cy="105" rx="6" ry="4" fill="#fff" opacity="0.85"/>
+  <ellipse cx="184" cy="105" rx="6" ry="4" fill="#fff" opacity="0.85"/>
+</svg>

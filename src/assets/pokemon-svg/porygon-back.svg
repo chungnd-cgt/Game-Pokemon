@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Porygon nhìn từ sau (quay lưng, hướng lên trái): thấy lưng xanh, đuôi chĩa về phía người xem -->
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round">
+    <!-- chân -->
+    <path d="M92 196 L120 206 L120 242 L92 232 Z" fill="#4cb4cc"/>
+    <path d="M150 206 L178 196 L178 232 L150 242 Z" fill="#2e8aa4"/>
+    <!-- thân -->
+    <path d="M78 130 L140 110 L206 130 L144 152 Z" fill="#ff9cb4"/>
+    <path d="M78 130 L144 152 L140 210 L82 190 Z" fill="#f06a8c"/>
+    <path d="M144 152 L206 130 L202 188 L140 210 Z" fill="#4cb4cc"/>
+    <!-- đầu -->
+    <path d="M78 44 L30 30 L84 72 Z" fill="#ff9cb4"/>
+    <path d="M78 44 L124 22 L178 32 L132 56 Z" fill="#ff9cb4"/>
+    <path d="M78 44 L132 56 L136 112 L86 104 Z" fill="#f06a8c"/>
+    <path d="M132 56 L178 32 L176 90 L136 112 Z" fill="#4cb4cc"/>
+    <!-- đuôi chĩa ra sau -->
+    <path d="M150 160 L240 178 L176 178 Z" fill="#9ce0ec"/>
+    <path d="M176 178 L240 178 L170 200 Z" fill="#2e8aa4"/>
+  </g>
+  <path d="M94 140 L130 152 L128 166 L92 154 Z" fill="#fff" opacity="0.25"/>
+  <path d="M104 36 L124 30 L114 44 Z" fill="#fff" opacity="0.5"/>
+  <path d="M136 112 L176 90 L176 100 L140 120 Z" fill="#226c84" opacity="0.5"/>
+  <path d="M140 196 L202 174 L202 188 L140 210 Z" fill="#226c84" opacity="0.4"/>
+</svg>

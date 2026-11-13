@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c4b8d4"/><stop offset="0.5" stop-color="#a898b8"/><stop offset="1" stop-color="#8c7ca4"/></linearGradient>
+    <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a494bc"/><stop offset="1" stop-color="#8676a0"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- far wing -->
+    <path d="M150 140 L176 70 L198 16 C204 40 216 52 232 58 C226 74 232 88 246 96 C234 106 230 120 234 134 C214 134 196 142 186 158 Z" fill="#7a6a94"/>
+    <!-- tail -->
+    <path d="M176 182 C204 198 228 202 242 192" fill="none" stroke-width="20"/>
+    <path d="M176 182 C204 198 228 202 242 192" fill="none" stroke="#9a8ab0" stroke-width="11"/>
+    <path d="M236 192 L256 176 L252 204 Z" fill="#9a8ab0"/>
+    <!-- legs -->
+    <path d="M150 196 C146 212 146 226 150 236 L136 246 L156 244 L164 250 L166 238 C166 226 166 212 168 198 Z" fill="#8676a0"/>
+    <path d="M124 194 C118 210 116 224 118 234 L104 244 L124 242 L132 248 L136 236 C138 224 140 210 142 196 Z" fill="#9a8ab0"/>
+    <!-- body -->
+    <ellipse cx="150" cy="166" rx="46" ry="36" fill="url(#skin)" transform="rotate(-12 150 166)"/>
+    <!-- neck -->
+    <path d="M86 102 C96 96 110 98 120 108 C128 118 132 128 132 142 L104 150 C104 138 98 124 86 116 Z" fill="url(#skin)"/>
+    <!-- near wing raised -->
+    <path d="M126 140 L104 70 L94 10 C114 26 132 30 150 28 C150 48 160 60 176 64 C170 82 178 98 192 104 C176 112 166 126 166 146 Z" fill="url(#wing)"/>
+    <!-- crest -->
+    <path d="M94 74 L146 48 L114 98 Z" fill="url(#skin)"/>
+  </g>
+  <!-- mouth inside -->
+  <path d="M100 100 L28 94 L24 128 L98 110 Z" fill="#8a2848" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- lower jaw hanging open -->
+    <path d="M104 106 C90 116 64 126 38 130 L18 132 C30 120 52 112 70 106 L100 100 Z" fill="url(#skin)"/>
+    <!-- skull and upper jaw -->
+    <path d="M112 84 C110 66 94 58 76 60 C58 62 42 72 26 82 L6 92 C18 98 34 98 50 98 L102 102 C110 98 114 92 112 84 Z" fill="url(#skin)"/>
+  </g>
+  <path d="M36 98 L40 108 L44 98 Z M52 99 L56 110 L60 99 Z M68 100 L72 110 L76 100 Z" fill="#fff" stroke="#2b2433" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M34 124 L40 114 L44 122 Z M52 120 L58 110 L62 118 Z M70 115 L76 106 L80 113 Z" fill="#fff" stroke="#2b2433" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M104 70 C118 100 122 120 126 140 M104 70 C130 74 152 64 176 64" fill="none" stroke="#6e5e88" stroke-width="4" stroke-linecap="round"/>
+  <path d="M104 70 L92 58 L110 60 Z" fill="#f4f0f8" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M176 146 C194 158 196 182 176 194 C166 200 156 202 146 200 C174 188 184 168 176 146 Z" fill="#6e5e88" opacity="0.4"/>
+  <ellipse cx="64" cy="70" rx="14" ry="5" fill="#fff" opacity="0.4" transform="rotate(-15 64 70)"/>
+  <path d="M60 72 L94 76 L92 84 L62 80 Z" fill="#2b2433"/>
+  <ellipse cx="80" cy="86" rx="9" ry="7" fill="#fff" stroke="#2b2433" stroke-width="3"/>
+  <circle cx="78" cy="87" r="4.5" fill="#c83040"/>
+  <circle cx="77" cy="85" r="1.6" fill="#fff"/>
+  <ellipse cx="14" cy="90" rx="3" ry="2.5" fill="#2b2433"/>
+</svg>

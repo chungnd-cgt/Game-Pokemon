@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="fur" cx="38%" cy="32%" r="78%"><stop offset="0" stop-color="#b48ad8"/><stop offset="0.6" stop-color="#8a5cb6"/><stop offset="1" stop-color="#5e3888"/></radialGradient>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M112 80 C106 58 100 40 92 22 M144 80 C150 58 156 40 164 22" stroke="#2b2433" stroke-width="12"/>
+    <path d="M112 80 C106 58 100 40 92 22 M144 80 C150 58 156 40 164 22" stroke="#f4f0e0" stroke-width="5"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- mép mắt đỏ ló hai bên -->
+    <path d="M58 110 C42 124 42 150 58 164 C64 146 64 128 58 110 Z M198 110 C214 124 214 150 198 164 C192 146 192 128 198 110 Z" fill="#e83a50" stroke-width="4"/>
+    <ellipse cx="94" cy="234" rx="24" ry="13" fill="#ead6b0"/>
+    <ellipse cx="162" cy="234" rx="24" ry="13" fill="#d6b98c"/>
+    <path d="M128 70 Q141 60 150 73 Q165 67 170 82 Q186 81 187 96 Q202 99 199 114 Q213 122 205 135 Q216 146 205 157 Q213 170 199 178 Q202 193 187 196 Q186 211 170 210 Q165 225 150 219 Q141 232 128 222 Q115 232 106 219 Q91 225 86 210 Q70 211 69 196 Q54 193 57 178 Q43 170 51 157 Q40 146 51 135 Q43 122 57 114 Q54 99 69 96 Q70 81 86 82 Q91 67 106 73 Q115 60 128 70 Z" fill="url(#fur)"/>
+  </g>
+  <path d="M168 92 Q190 112 192 146 Q192 182 166 204 Q186 172 184 142 Q182 114 168 92 Z" fill="#4e2c76" opacity="0.35"/>
+  <path d="M82 92 Q96 80 116 78 M74 112 Q80 102 90 98" fill="none" stroke="#d8bcf0" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <g fill="none" stroke="#6a4294" stroke-width="4" stroke-linecap="round">
+    <path d="M100 120 Q106 126 112 120 M140 110 Q146 116 152 110 M118 152 Q124 158 130 152 M152 150 Q158 156 164 150 M90 160 Q96 166 102 160 M120 190 Q126 196 132 190"/>
+  </g>
+</svg>

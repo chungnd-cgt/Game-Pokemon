@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fcc8d4"/>
+      <stop offset="1" stop-color="#ec98b0"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- chân -->
+    <ellipse cx="92" cy="238" rx="26" ry="12" fill="#e08aa4"/>
+    <ellipse cx="164" cy="238" rx="26" ry="12" fill="#e08aa4"/>
+    <!-- túm lông xoăn hai bên đầu -->
+    <path d="M58 64 C34 56 22 70 30 84 C18 88 16 104 32 108 C22 116 28 132 46 128 L62 104 Z" fill="url(#skin)"/>
+    <path d="M198 64 C222 56 234 70 226 84 C238 88 240 104 224 108 C234 116 228 132 210 128 L194 104 Z" fill="#ec98b0"/>
+    <!-- thân hình quả trứng -->
+    <path d="M128 30 C188 30 222 98 220 160 C218 214 180 240 128 240 C76 240 38 214 36 160 C34 98 68 30 128 30 Z" fill="url(#skin)"/>
+    <!-- tay ngắn -->
+    <ellipse cx="62" cy="168" rx="18" ry="13" fill="#f4b0c4" transform="rotate(-25 62 168)"/>
+    <ellipse cx="194" cy="168" rx="18" ry="13" fill="#ec98b0" transform="rotate(25 194 168)"/>
+    <!-- túi trước bụng và quả trứng trắng -->
+    <ellipse cx="128" cy="168" rx="22" ry="27" fill="#ffffff"/>
+    <path d="M78 176 C92 166 164 166 178 176 C176 210 156 224 128 224 C100 224 80 210 78 176 Z" fill="#fde0e8"/>
+  </g>
+  <!-- bóng trên trứng, nét túi -->
+  <ellipse cx="120" cy="158" rx="6" ry="9" fill="#eef2f8"/>
+  <path d="M96 196 C112 204 144 204 160 196" stroke="#e8a8bc" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- mặt -->
+  <ellipse cx="102" cy="98" rx="8" ry="10" fill="#2b2433"/>
+  <ellipse cx="154" cy="98" rx="8" ry="10" fill="#2b2433"/>
+  <circle cx="99" cy="94" r="3" fill="#ffffff"/>
+  <circle cx="151" cy="94" r="3" fill="#ffffff"/>
+  <ellipse cx="84" cy="120" rx="10" ry="6" fill="#f07898" opacity="0.7"/>
+  <ellipse cx="172" cy="120" rx="10" ry="6" fill="#f07898" opacity="0.7"/>
+  <path d="M116 120 C122 128 134 128 140 120" stroke="#2b2433" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <!-- bóng sáng trên thân -->
+  <ellipse cx="88" cy="70" rx="14" ry="22" fill="#ffe4ec" opacity="0.8" transform="rotate(-25 88 70)"/>
+</svg>

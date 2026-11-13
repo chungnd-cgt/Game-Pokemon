@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="star" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#b48ed8"/><stop offset="0.55" stop-color="#8a5cb8"/><stop offset="1" stop-color="#5e3c88"/></radialGradient>
+    <radialGradient id="star2" cx="50%" cy="40%" r="70%"><stop offset="0" stop-color="#8460b0"/><stop offset="1" stop-color="#5a3a84"/></radialGradient>
+    <radialGradient id="gold" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#fff0a0"/><stop offset="0.5" stop-color="#f0c840"/><stop offset="1" stop-color="#c08a20"/></radialGradient>
+    <radialGradient id="gem" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#ff8a80"/><stop offset="0.5" stop-color="#e42c3c"/><stop offset="1" stop-color="#9a1428"/></radialGradient>
+  </defs>
+  <path d="M124.5 36.9 Q128 28 131.5 36.9 L150.7 85.8 Q155 96.8 166.8 97.5 L219.2 100.7 Q228.8 101.2 221.4 107.4 L180.9 140.7 Q171.7 148.2 174.7 159.7 L187.9 210.5 Q190.3 219.8 182.2 214.6 L138 186.4 Q128 180 118 186.4 L73.8 214.6 Q65.7 219.8 68.1 210.5 L81.3 159.7 Q84.3 148.2 75.1 140.7 L34.6 107.4 Q27.2 101.2 36.8 100.7 L89.2 97.5 Q101 96.8 105.3 85.8 Z" fill="url(#star2)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M185.3 49.2 Q193.8 43.4 191 53.3 L175.3 107.6 Q171.7 119.8 181.8 127.6 L226.4 162.3 Q234.5 168.6 224.2 168.9 L167.8 170.8 Q155 171.2 150.7 183.2 L131.5 236.3 Q128 246 124.5 236.3 L105.3 183.2 Q101 171.2 88.2 170.8 L31.8 168.9 Q21.5 168.6 29.6 162.3 L74.2 127.6 Q84.3 119.8 80.7 107.6 L65 53.3 Q62.2 43.4 70.7 49.2 L117.5 80.9 Q128 88 138.5 80.9 Z" fill="url(#star)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M151.5 101.6 L180.9 61.2" stroke="#c8a8e8" stroke-width="6" stroke-linecap="round" opacity="0.5"/>
+  <path d="M166 146.4 L213.6 161.8" stroke="#c8a8e8" stroke-width="6" stroke-linecap="round" opacity="0.5"/>
+  <path d="M128 174 L128 224" stroke="#c8a8e8" stroke-width="6" stroke-linecap="round" opacity="0.5"/>
+  <path d="M90 146.4 L42.4 161.8" stroke="#c8a8e8" stroke-width="6" stroke-linecap="round" opacity="0.5"/>
+  <path d="M104.5 101.6 L75.1 61.2" stroke="#c8a8e8" stroke-width="6" stroke-linecap="round" opacity="0.5"/>
+  <circle cx="128" cy="134" r="22" fill="#7a50a8" stroke="#5e3c88" stroke-width="5"/>
+
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fab060"/><stop offset="1" stop-color="#d8662a"/></linearGradient>
+    <radialGradient id="cap" cx="38%" cy="28%" r="80%"><stop offset="0" stop-color="#f88660"/><stop offset="0.6" stop-color="#e2502e"/><stop offset="1" stop-color="#a82a20"/></radialGradient>
+    <linearGradient id="claw" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fdeec0"/><stop offset="1" stop-color="#d8b470"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M120 226 L114 248 L128 248 L132 226 Z M176 224 L178 246 L192 246 L188 222 Z" fill="#d8a068"/>
+    <ellipse cx="144" cy="206" rx="84" ry="34" fill="url(#skin)"/>
+    <path d="M90 226 L80 250 L96 250 L104 228 Z M146 230 L142 252 L158 252 L160 230 Z M206 222 L214 246 L228 242 L218 218 Z" fill="#f2c084"/>
+    <ellipse cx="136" cy="168" rx="104" ry="18" fill="#ecd29a" transform="rotate(-6 136 168)"/>
+    <!-- mũ nấm nghiêng về phía trước -->
+    <path d="M28 182 C14 102 60 30 136 22 C208 16 252 68 246 144 C234 152 218 150 206 144 C192 154 172 156 158 150 C144 162 124 164 110 158 C94 172 72 174 58 168 C46 180 36 184 28 182 Z" fill="url(#cap)"/>
+  </g>
+  <g fill="#fde69a">
+    <circle cx="72" cy="100" r="14"/><circle cx="118" cy="58" r="12"/><circle cx="166" cy="44" r="10"/><circle cx="208" cy="80" r="14"/>
+    <circle cx="140" cy="102" r="12"/><circle cx="222" cy="124" r="9"/><circle cx="50" cy="146" r="8"/><circle cx="100" cy="134" r="10"/><circle cx="180" cy="124" r="10"/>
+  </g>
+  <path d="M206 40 C238 68 250 104 244 140 C232 148 218 146 210 140 C224 106 222 72 206 40 Z" fill="#8e2218" opacity="0.35"/>
+  <ellipse cx="82" cy="54" rx="24" ry="9" fill="#fff" opacity="0.35" transform="rotate(-35 82 54)"/>
+  <path d="M60 196 C64 190 84 190 88 196 C86 210 64 212 60 196 Z" fill="#fffdf4" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M60 196 L88 196" stroke="#2b2433" stroke-width="5" stroke-linecap="round"/>
+  <path d="M60 210 C40 208 24 218 22 236 C32 236 38 230 44 224 C42 236 48 244 58 248 C68 236 72 220 60 210 Z" fill="url(#claw)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+</svg>

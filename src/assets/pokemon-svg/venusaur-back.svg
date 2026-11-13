@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9ae0c2"/><stop offset="1" stop-color="#62b49a"/></linearGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6cc464"/><stop offset="0.6" stop-color="#3f9444"/><stop offset="1" stop-color="#2e7034"/></linearGradient>
+    <radialGradient id="petal" cx="50%" cy="20%" r="80%"><stop offset="0" stop-color="#ffb4c4"/><stop offset="1" stop-color="#ec7290"/></radialGradient>
+    <path id="pet" d="M0 0 C-34 -12 -40 -54 0 -70 C40 -54 34 -12 0 0 Z" fill="url(#petal)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- tai lấp ló -->
+    <path d="M58 150 L40 116 L86 138 Z" fill="url(#skin)"/>
+    <path d="M198 150 L216 116 L170 138 Z" fill="#62b49a"/>
+    <!-- chân sau -->
+    <path d="M66 204 C50 206 42 224 46 240 C48 248 56 250 64 250 L94 250 C102 250 104 242 102 232 Z" fill="url(#skin)"/>
+    <path d="M190 204 C206 206 214 224 210 240 C208 248 200 250 192 250 L162 250 C154 250 152 242 154 232 Z" fill="#62b49a"/>
+    <!-- thân -->
+    <ellipse cx="128" cy="190" rx="94" ry="52" fill="url(#skin)"/>
+    <!-- lá lớn hai bên -->
+    <path d="M136 128 C100 94 50 92 4 122 C34 162 96 172 140 148 Z" fill="url(#leaf)"/>
+    <path d="M120 128 C156 94 206 92 252 122 C222 162 160 172 116 148 Z" fill="url(#leaf)"/>
+    <path d="M124 136 C90 118 54 116 18 122 M132 136 C166 118 202 116 238 122" fill="none" stroke="#2a6a32" stroke-width="4"/>
+  </g>
+  <g transform="translate(128 84) scale(1.16 0.74)">
+    <use xlink:href="#pet" href="#pet" transform="rotate(-36)"/>
+    <use xlink:href="#pet" href="#pet" transform="rotate(36)"/>
+    <use xlink:href="#pet" href="#pet" transform="rotate(-108)"/>
+    <use xlink:href="#pet" href="#pet" transform="rotate(108)"/>
+    <use xlink:href="#pet" href="#pet" transform="rotate(180)"/>
+  </g>
+  <g fill="#fff4f6" opacity="0.9">
+    <ellipse cx="96" cy="48" rx="8" ry="5"/>
+    <ellipse cx="160" cy="48" rx="8" ry="5"/>
+    <ellipse cx="60" cy="98" rx="8" ry="5"/>
+    <ellipse cx="196" cy="98" rx="8" ry="5"/>
+    <ellipse cx="128" cy="126" rx="8" ry="5"/>
+  </g>
+  <ellipse cx="128" cy="84" rx="24" ry="17" fill="#ffe040" stroke="#2b2433" stroke-width="4"/>
+  <ellipse cx="122" cy="79" rx="9" ry="4" fill="#fff8d0"/>
+  <g fill="#3f8a74">
+    <path d="M58 190 l14 -6 l4 12 l-12 4 Z"/>
+    <path d="M178 196 l12 -4 l4 10 l-12 4 Z"/>
+    <path d="M118 212 l12 -2 l2 10 l-12 2 Z"/>
+    <path d="M66 220 l10 0 l0 10 l-10 0 Z"/>
+  </g>
+</svg>

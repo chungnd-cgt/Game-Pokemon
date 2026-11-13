@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="fur" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d4a46c"/><stop offset="1" stop-color="#9c6a3c"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-linecap="round">
+    <path d="M208 206 C248 206 254 166 234 150 C218 138 198 150 210 166" fill="none" stroke-width="17"/>
+    <path d="M208 206 C248 206 254 166 234 150 C218 138 198 150 210 166" fill="none" stroke="#b88250" stroke-width="9"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="198" cy="236" rx="26" ry="12" fill="#e4cc98"/>
+    <ellipse cx="156" cy="190" rx="70" ry="48" fill="url(#fur)"/>
+    <ellipse cx="146" cy="238" rx="26" ry="12" fill="#f3dfb0"/>
+    <ellipse cx="116" cy="78" rx="24" ry="28" fill="url(#fur)"/>
+    <!-- túm lông má hướng ra sau -->
+    <path d="M118 124 L166 112 L144 132 L176 142 L144 152 L166 170 L114 160 Z" fill="#b88250"/>
+    <path d="M24 148 C18 110 50 88 86 90 C124 92 142 116 138 148 C134 178 110 192 80 192 C48 192 30 176 24 148 Z" fill="url(#fur)"/>
+    <ellipse cx="98" cy="238" rx="26" ry="12" fill="#f3dfb0"/>
+  </g>
+  <ellipse cx="116" cy="82" rx="12" ry="16" fill="#f3dfb0"/>
+  <path d="M18 152 C22 136 40 130 58 134 C74 142 76 166 60 176 C44 184 22 174 18 152 Z" fill="#f3dfb0" stroke="#2b2433" stroke-width="4"/>
+  <path d="M30 166 h16 v30 c0 5 -16 5 -16 0 Z" fill="#fff6d8" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <ellipse cx="18" cy="146" rx="8" ry="6" fill="#d06878" stroke="#2b2433" stroke-width="3"/>
+  <path d="M44 150 L4 138 M44 160 L2 166" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+  <path d="M44 100 L90 114 C90 128 80 136 68 136 C52 136 42 122 44 100 Z" fill="#fff" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="62" cy="122" r="10" fill="#1a0a10"/>
+  <circle cx="65" cy="118" r="3.5" fill="#fff"/>
+  <ellipse cx="96" cy="104" rx="16" ry="6" fill="#fff" opacity="0.3" transform="rotate(-10 96 104)"/>
+</svg>

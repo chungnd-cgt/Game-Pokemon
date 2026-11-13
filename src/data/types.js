@@ -47,5 +47,3 @@ export function typeMultiplier(moveType, targetTypes) {
   return [targetTypes].flat().reduce((m, t) => m * (CHART[moveType]?.[t] ?? 1), 1);
 }
 
-// Gen 1-3: chiêu thuộc các hệ này là chiêu đặc biệt (dùng Sp. Atk / Sp. Def)
-export const SPECIAL_TYPES = ['fire', 'water', 'grass', 'electric', 'ice', 'psychic', 'dragon', 'dark'];

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a8d6fc"/>
+      <stop offset="0.5" stop-color="#6aa8ee"/>
+      <stop offset="1" stop-color="#4682d4"/>
+    </linearGradient>
+  </defs>
+  <!-- thân chữ S quay trái, bụng trắng phía dưới -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M100 108 C150 118 190 142 170 176 C150 206 84 196 86 222 C88 242 160 244 200 228" stroke="#2b2433" stroke-width="52"/>
+    <path d="M100 108 C150 118 190 142 170 176 C150 206 84 196 86 222 C88 242 160 244 200 228" stroke="url(#skin)" stroke-width="42"/>
+    <path d="M100 108 C150 118 190 142 170 176 C150 206 84 196 86 222 C88 242 160 244 200 228" stroke="#f4f2fa" stroke-width="16" transform="translate(-6 7)"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- đuôi nhọn -->
+    <path d="M192 212 C212 214 232 206 250 190 C244 218 224 238 196 244 Z" fill="#6aa8ee"/>
+    <!-- vây tai -->
+    <path d="M118 62 C136 48 156 44 178 48 C166 54 162 60 160 64 C172 66 182 74 186 84 C170 82 158 84 150 86 C158 92 162 100 162 110 C148 104 132 96 120 88 Z" fill="#f4f2fa"/>
+    <!-- đầu, mõm tròn quay trái -->
+    <path d="M28 86 C26 62 44 42 72 38 C100 34 128 50 132 78 C136 104 116 124 88 126 C66 128 46 122 36 110 C28 104 28 96 28 86 Z" fill="url(#skin)"/>
+  </g>
+  <path d="M120 54 C138 78 130 112 104 122 C96 125 88 126 82 126 C110 112 124 86 120 54 Z" fill="#4682d4" opacity="0.5"/>
+  <ellipse cx="80" cy="48" rx="18" ry="7" fill="#fff" opacity="0.4" transform="rotate(-15 80 48)"/>
+  <ellipse cx="52" cy="54" rx="10" ry="8" fill="#f4f2fa" stroke="#2b2433" stroke-width="4"/>
+  <ellipse cx="74" cy="80" rx="12" ry="16" fill="#2a2240" stroke="#2b2433" stroke-width="4"/>
+  <ellipse cx="73" cy="89" rx="6" ry="5" fill="#7a68b8"/>
+  <ellipse cx="77" cy="73" rx="4.5" ry="6" fill="#fff"/>
+  <circle cx="34" cy="86" r="2.5" fill="#2b2433"/>
+  <path d="M32 104 Q48 112 66 106" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+</svg>

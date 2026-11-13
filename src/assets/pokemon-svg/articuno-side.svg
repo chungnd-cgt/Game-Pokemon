@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#aee0fc"/><stop offset="1" stop-color="#4c9ee0"/></linearGradient>
+    <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a4dafa"/><stop offset="1" stop-color="#4a92dc"/></linearGradient>
+    <linearGradient id="crest" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a7cd0"/><stop offset="1" stop-color="#22449a"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- far wing -->
+    <path d="M136 124 C150 90 176 52 214 22 C214 44 210 58 202 70 C212 76 214 88 208 98 C214 106 212 118 202 124 C188 136 164 142 146 142 Z" fill="#4a92dc"/>
+    <!-- long tail -->
+    <path d="M160 162 C196 170 220 194 234 230 C238 240 244 246 252 250 C230 252 214 240 204 224 C192 206 172 194 150 186 Z" fill="#5aa4e4"/>
+    <path d="M154 176 C178 196 192 218 196 248 C178 244 170 228 164 212 C160 202 152 194 142 188 Z" fill="#3e86d4"/>
+    <!-- legs -->
+    <path d="M118 180 L112 230 M138 182 L140 230" fill="none" stroke-width="12"/>
+    <path d="M118 180 L112 230 M138 182 L140 230" fill="none" stroke="#8a9cb8" stroke-width="5"/>
+    <path d="M112 228 L96 238 M112 228 L104 244 M140 228 L124 238 M140 228 L132 244" fill="none" stroke="#2b2433" stroke-width="5"/>
+    <!-- body -->
+    <ellipse cx="128" cy="152" rx="46" ry="36" fill="url(#skin)" transform="rotate(-15 128 152)"/>
+    <!-- neck -->
+    <path d="M62 86 C70 108 82 124 100 136 L118 120 C100 108 88 96 82 78 Z" fill="#8ccaf4"/>
+    <!-- crest -->
+    <path d="M70 52 C76 30 96 16 120 12 C108 28 102 42 98 58 Z" fill="url(#crest)"/>
+    <path d="M78 58 C96 40 120 34 146 38 C128 46 116 56 104 68 Z" fill="url(#crest)"/>
+    <path d="M84 70 C104 60 128 60 150 70 C130 72 114 76 100 84 Z" fill="url(#crest)"/>
+    <!-- head -->
+    <ellipse cx="68" cy="74" rx="28" ry="24" fill="url(#skin)"/>
+    <!-- beak -->
+    <path d="M44 72 L18 82 L44 90 Z" fill="#9aa2b0"/>
+    <!-- near wing -->
+    <path d="M104 132 C112 96 136 54 174 22 C176 46 172 60 166 72 C178 78 182 92 176 102 C186 110 184 124 174 130 C162 146 136 152 116 150 Z" fill="url(#wing)"/>
+  </g>
+  <!-- chest -->
+  <path d="M90 150 C92 172 108 186 126 188 C112 176 104 162 102 146 Z" fill="#e2f4ff"/>
+  <!-- feather lines -->
+  <path d="M166 72 C146 90 130 108 116 128 M176 102 C158 114 140 126 122 138 M174 130 C158 136 140 142 124 146" fill="none" stroke="#2f6cbc" stroke-width="4" stroke-linecap="round"/>
+  <path d="M176 182 C200 196 216 214 228 238" fill="none" stroke="#2c5cb0" stroke-width="4" stroke-linecap="round"/>
+  <!-- shading -->
+  <path d="M164 140 C172 160 162 180 140 188 C132 190 124 190 116 188 C144 176 160 160 164 140 Z" fill="#2c6ab8" opacity="0.4"/>
+  <ellipse cx="60" cy="60" rx="12" ry="5" fill="#fff" opacity="0.5" transform="rotate(-20 60 60)"/>
+  <ellipse cx="140" cy="62" rx="16" ry="5" fill="#fff" opacity="0.45" transform="rotate(-48 140 62)"/>
+  <path d="M20 82 L42 82" stroke="#2b2433" stroke-width="2.5"/>
+  <!-- eye -->
+  <path d="M48 66 L68 72 C68 82 62 86 56 86 C50 86 48 78 48 66 Z" fill="#c8202a" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="56" cy="74" r="2.6" fill="#fff"/>
+</svg>

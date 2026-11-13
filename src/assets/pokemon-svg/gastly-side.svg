@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="gas" gradientUnits="userSpaceOnUse" cx="128" cy="122" r="112">
+      <stop offset="0" stop-color="#d4b8f0"/>
+      <stop offset="0.6" stop-color="#b08ae0"/>
+      <stop offset="0.82" stop-color="#9a6ad0"/>
+      <stop offset="1" stop-color="#8456bc"/>
+    </radialGradient>
+    <radialGradient id="ball" cx="36%" cy="30%" r="76%">
+      <stop offset="0" stop-color="#4a4656"/>
+      <stop offset="0.55" stop-color="#2e2b36"/>
+      <stop offset="1" stop-color="#18161e"/>
+    </radialGradient>
+    <g id="puffs">
+      <circle cx="128" cy="122" r="82"/>
+      <circle cx="204" cy="118" r="30"/>
+      <circle cx="194" cy="162" r="28"/>
+      <circle cx="164" cy="192" r="30"/>
+      <circle cx="124" cy="202" r="28"/>
+      <circle cx="86" cy="190" r="30"/>
+      <circle cx="58" cy="158" r="28"/>
+      <circle cx="52" cy="116" r="30"/>
+      <circle cx="64" cy="74" r="28"/>
+      <circle cx="96" cy="48" r="30"/>
+      <circle cx="140" cy="40" r="28"/>
+      <circle cx="182" cy="58" r="30"/>
+      <circle cx="208" cy="84" r="22"/>
+      <circle cx="232" cy="150" r="16"/>
+      <circle cx="244" cy="124" r="10"/>
+      <circle cx="226" cy="204" r="12"/>
+    </g>
+  </defs>
+  <use href="#puffs" fill="#5a3a8a" stroke="#5a3a8a" stroke-width="10"/>
+  <use href="#puffs" fill="url(#gas)"/>
+  <circle cx="122" cy="122" r="62" fill="url(#ball)" stroke="#2b2433" stroke-width="5"/>
+  <ellipse cx="140" cy="80" rx="20" ry="8" fill="#fff" opacity="0.22" transform="rotate(25 140 80)"/>
+  <!-- mắt nhìn sang trái -->
+  <path d="M60 92 C72 84 92 92 98 110 C84 118 66 110 60 92 Z" fill="#fff" stroke="#2b2433" stroke-width="3.5" stroke-linejoin="round"/>
+  <circle cx="80" cy="103" r="6" fill="#141018"/>
+  <!-- miệng -->
+  <path d="M64 138 Q96 150 124 140 Q118 176 92 178 Q70 174 64 138 Z" fill="#7a2a48" stroke="#141018" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M76 142 L83 160 L91 145 Z" fill="#fff" stroke="#141018" stroke-width="2.5" stroke-linejoin="round"/>
+</svg>

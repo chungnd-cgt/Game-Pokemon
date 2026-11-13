@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="star" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#b48ed8"/><stop offset="0.55" stop-color="#8a5cb8"/><stop offset="1" stop-color="#5e3c88"/></radialGradient>
+    <radialGradient id="star2" cx="50%" cy="40%" r="70%"><stop offset="0" stop-color="#8460b0"/><stop offset="1" stop-color="#5a3a84"/></radialGradient>
+    <radialGradient id="gold" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#fff0a0"/><stop offset="0.5" stop-color="#f0c840"/><stop offset="1" stop-color="#c08a20"/></radialGradient>
+    <radialGradient id="gem" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#ff8a80"/><stop offset="0.5" stop-color="#e42c3c"/><stop offset="1" stop-color="#9a1428"/></radialGradient>
+  </defs>
+  <path d="M182.2 53.4 Q190.3 48.2 187.9 57.5 L174.7 108.3 Q171.7 119.8 180.9 127.3 L221.4 160.6 Q228.8 166.8 219.2 167.3 L166.8 170.5 Q155 171.2 150.7 182.2 L131.5 231.1 Q128 240 124.5 231.1 L105.3 182.2 Q101 171.2 89.2 170.5 L36.8 167.3 Q27.2 166.8 34.6 160.6 L75.1 127.3 Q84.3 119.8 81.3 108.3 L68.1 57.5 Q65.7 48.2 73.8 53.4 L118 81.6 Q128 88 138 81.6 Z" fill="url(#star2)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M124.5 31.7 Q128 22 131.5 31.7 L150.7 84.8 Q155 96.8 167.8 97.2 L224.2 99.1 Q234.5 99.4 226.4 105.7 L181.8 140.4 Q171.7 148.2 175.3 160.4 L191 214.7 Q193.8 224.6 185.3 218.8 L138.5 187.1 Q128 180 117.5 187.1 L70.7 218.8 Q62.2 224.6 65 214.7 L80.7 160.4 Q84.3 148.2 74.2 140.4 L29.6 105.7 Q21.5 99.4 31.8 99.1 L88.2 97.2 Q101 96.8 105.3 84.8 Z" fill="url(#star)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M128 88 L128 42" stroke="#c8a8e8" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
+  <path d="M171.7 119.8 L215.5 105.6" stroke="#c8a8e8" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
+  <path d="M155 171.2 L182.1 208.4" stroke="#c8a8e8" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
+  <path d="M101 171.2 L73.9 208.4" stroke="#c8a8e8" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
+  <path d="M84.3 119.8 L40.5 105.6" stroke="#c8a8e8" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
+  <ellipse cx="84" cy="96" rx="22" ry="9" fill="#fff" opacity="0.3" transform="rotate(-30 84 96)"/>
+  <path d="M128 88 L142 104 C156 106 162 118 162 134 C162 150 156 162 142 164 L128 180 L114 164 C100 162 94 150 94 134 C94 118 100 106 114 104 Z" fill="url(#gold)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="134" rx="21" ry="22" fill="url(#gem)" stroke="#2b2433" stroke-width="4"/>
+  <path d="M116 128 L124 120 L134 120 L122 132 Z" fill="#fff" opacity="0.8"/>
+
+</svg>

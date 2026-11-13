@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="shell" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d89a58"/><stop offset="1" stop-color="#8a5226"/></linearGradient>
+    <radialGradient id="eye" cx="42%" cy="38%" r="60%"><stop offset="0" stop-color="#ffd0d6"/><stop offset="0.5" stop-color="#f87088"/><stop offset="1" stop-color="#d03a56"/></radialGradient>
+    <linearGradient id="claw" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0b0"/><stop offset="1" stop-color="#ecc24c"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- pale-yellow hooked legs -->
+    <path d="M66 214 C50 222 44 236 50 248 C58 240 66 236 76 234 Z" fill="url(#claw)"/>
+    <path d="M100 222 C90 232 88 242 92 250 C100 244 106 240 114 238 Z" fill="url(#claw)"/>
+    <path d="M190 214 C206 222 212 236 206 248 C198 240 190 236 180 234 Z" fill="url(#claw)"/>
+    <path d="M156 222 C166 232 168 242 164 250 C156 244 150 240 142 238 Z" fill="url(#claw)"/>
+    <!-- black face under the shell -->
+    <path d="M30 196 C34 150 74 122 128 122 C182 122 222 150 226 196 C226 214 186 228 128 228 C70 228 30 214 30 196 Z" fill="#2e2630"/>
+    <!-- shell dome, front rim arches up over the face -->
+    <path d="M12 200 C8 112 60 40 128 40 C196 40 248 112 244 200 C232 176 216 148 190 138 C162 128 94 128 66 138 C40 148 24 176 12 200 Z" fill="url(#shell)"/>
+  </g>
+  <!-- rim band -->
+  <path d="M22 184 C40 158 80 136 128 136 C176 136 216 158 234 184" fill="none" stroke="#e8b070" stroke-width="6" stroke-linecap="round" opacity="0.9"/>
+  <!-- two small dots on the shell -->
+  <circle cx="108" cy="70" r="5" fill="#5e3416"/>
+  <circle cx="148" cy="70" r="5" fill="#5e3416"/>
+  <!-- shading and gloss -->
+  <path d="M196 76 C222 104 234 136 236 176 C228 160 214 148 200 142 C206 120 206 98 196 76 Z" fill="#5e3416" opacity="0.4"/>
+  <ellipse cx="72" cy="92" rx="30" ry="12" fill="#fff" opacity="0.5" transform="rotate(-40 72 92)"/>
+  <ellipse cx="116" cy="54" rx="12" ry="5" fill="#fff" opacity="0.45" transform="rotate(-8 116 54)"/>
+  <!-- big round pink-red eyes -->
+  <g stroke="#2b2433" stroke-width="3.5">
+    <circle cx="94" cy="182" r="24" fill="url(#eye)"/>
+    <circle cx="162" cy="182" r="24" fill="url(#eye)"/>
+  </g>
+  <ellipse cx="87" cy="174" rx="7" ry="6" fill="#fff" opacity="0.8"/>
+  <ellipse cx="155" cy="174" rx="7" ry="6" fill="#fff" opacity="0.8"/>
+</svg>

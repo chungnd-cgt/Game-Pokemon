@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="vine" cx="38%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#8cb4f4"/>
+      <stop offset="0.5" stop-color="#5a86d8"/>
+      <stop offset="1" stop-color="#3458a8"/>
+    </radialGradient>
+    <radialGradient id="shoe" cx="35%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#ff8a7a"/>
+      <stop offset="0.5" stop-color="#e8443e"/>
+      <stop offset="1" stop-color="#b02a2c"/>
+    </radialGradient>
+    <clipPath id="ball">
+      <path d="M143.3 35.3 A27 27 0 0 1 181.8 52.4 A27 27 0 0 1 208 85.3 A27 27 0 0 1 215.9 126.7 A27 27 0 0 1 203.6 167 A27 27 0 0 1 174 197 A27 27 0 0 1 133.9 209.8 A27 27 0 0 1 92.4 202.5 A27 27 0 0 1 59.1 176.7 A27 27 0 0 1 41.5 138.4 A27 27 0 0 1 43.8 96.4 A27 27 0 0 1 65.4 60.2 A27 27 0 0 1 101.3 38.2 A27 27 0 0 1 143.3 35.3 Z"/>
+    </clipPath>
+  </defs>
+  <!-- giày đỏ -->
+  <g stroke="#2b2433" stroke-width="5">
+    <ellipse cx="96" cy="234" rx="30" ry="15" fill="url(#shoe)"/>
+    <ellipse cx="162" cy="234" rx="30" ry="15" fill="url(#shoe)"/>
+  </g>
+  <!-- sợi dây leo thò ra ngoài -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M52 92 C32 86 20 70 30 58 C40 48 54 58 46 68 M196 58 C204 38 222 30 232 40 C240 50 228 62 218 56 M214 150 C236 152 248 170 240 182 C232 192 218 186 224 174 M62 184 C44 196 26 194 22 182 C18 170 32 164 38 174 M128 40 C126 22 136 10 148 14" stroke="#2b2433" stroke-width="15"/>
+    <path d="M52 92 C32 86 20 70 30 58 C40 48 54 58 46 68 M196 58 C204 38 222 30 232 40 C240 50 228 62 218 56 M214 150 C236 152 248 170 240 182 C232 192 218 186 224 174 M62 184 C44 196 26 194 22 182 C18 170 32 164 38 174 M128 40 C126 22 136 10 148 14" stroke="#5a86d8" stroke-width="6"/>
+  </g>
+  <!-- khối dây leo xanh -->
+  <path d="M143.3 35.3 A27 27 0 0 1 181.8 52.4 A27 27 0 0 1 208 85.3 A27 27 0 0 1 215.9 126.7 A27 27 0 0 1 203.6 167 A27 27 0 0 1 174 197 A27 27 0 0 1 133.9 209.8 A27 27 0 0 1 92.4 202.5 A27 27 0 0 1 59.1 176.7 A27 27 0 0 1 41.5 138.4 A27 27 0 0 1 43.8 96.4 A27 27 0 0 1 65.4 60.2 A27 27 0 0 1 101.3 38.2 A27 27 0 0 1 143.3 35.3 Z" fill="url(#vine)"/>
+  <g clip-path="url(#ball)" fill="none" stroke-linecap="round">
+    <!-- khoảng tối ở giữa -->
+    <ellipse cx="128" cy="126" rx="54" ry="24" fill="#1c2444"/>
+    <!-- dây leo đan chéo -->
+    <g stroke="#2c4a98" stroke-width="7">
+      <path d="M40 80 C90 60 150 100 220 70"/>
+      <path d="M50 170 C100 190 170 150 220 180"/>
+      <path d="M80 30 C70 90 110 160 90 220"/>
+      <path d="M170 30 C190 90 150 160 180 220"/>
+      <path d="M40 120 C60 96 74 104 80 120"/>
+      <path d="M176 136 C188 154 206 150 220 128"/>
+      <path d="M110 40 C130 60 150 50 160 34"/>
+      <path d="M100 200 C116 186 140 190 156 212"/>
+    </g>
+    <g stroke="#9cc0f6" stroke-width="4" opacity="0.9">
+      <path d="M58 70 C80 58 104 62 124 72"/>
+      <path d="M60 150 C70 170 90 178 110 176"/>
+      <path d="M150 50 C170 54 186 66 196 84"/>
+      <path d="M180 100 C196 108 204 120 206 136"/>
+      <path d="M84 104 C80 84 86 70 98 58"/>
+    </g>
+    <path d="M128 100 C126 120 132 140 128 156" stroke="#5a86d8" stroke-width="8"/>
+  </g>
+  <path d="M143.3 35.3 A27 27 0 0 1 181.8 52.4 A27 27 0 0 1 208 85.3 A27 27 0 0 1 215.9 126.7 A27 27 0 0 1 203.6 167 A27 27 0 0 1 174 197 A27 27 0 0 1 133.9 209.8 A27 27 0 0 1 92.4 202.5 A27 27 0 0 1 59.1 176.7 A27 27 0 0 1 41.5 138.4 A27 27 0 0 1 43.8 96.4 A27 27 0 0 1 65.4 60.2 A27 27 0 0 1 101.3 38.2 A27 27 0 0 1 143.3 35.3 Z" fill="none" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+  <ellipse cx="88" cy="232" rx="10" ry="4" fill="#fff" opacity="0.5"/>
+  <ellipse cx="154" cy="232" rx="10" ry="4" fill="#fff" opacity="0.5"/>
+  <!-- mắt trắng ló ra trong bóng tối -->
+  <g stroke="#2b2433" stroke-width="3">
+    <ellipse cx="104" cy="128" rx="13" ry="12" fill="#fff"/>
+    <ellipse cx="152" cy="128" rx="13" ry="12" fill="#fff"/>
+  </g>
+  <ellipse cx="107" cy="129" rx="6" ry="7" fill="#2b2433"/>
+  <ellipse cx="149" cy="129" rx="6" ry="7" fill="#2b2433"/>
+  <circle cx="109" cy="126" r="2" fill="#fff"/>
+  <circle cx="151" cy="126" r="2" fill="#fff"/>
+</svg>

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8cc4f4"/>
+      <stop offset="0.55" stop-color="#4a8ad8"/>
+      <stop offset="1" stop-color="#2c5eaa"/>
+    </linearGradient>
+    <linearGradient id="fin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fffbe0"/>
+      <stop offset="1" stop-color="#e8d48c"/>
+    </linearGradient>
+  </defs>
+  <!-- đuôi cuộn -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M128 190 C126 228 160 244 186 228 C202 216 194 190 172 194 C158 198 162 216 176 212" stroke="#2b2433" stroke-width="33"/>
+    <path d="M128 190 C126 228 160 244 186 228 C202 216 194 190 172 194 C158 198 162 216 176 212" stroke="#3e7cc8" stroke-width="23"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- mào gai xòe sau đầu -->
+    <path d="M128 24 L114 0 L102 30 L74 8 L76 42 L40 34 L62 62 L28 74 L64 88 L128 92 L192 88 L228 74 L194 62 L216 34 L180 42 L182 8 L154 30 L142 0 Z" fill="url(#fin)"/>
+    <!-- thân -->
+    <path d="M88 112 C72 140 76 186 100 204 C118 218 138 218 156 204 C180 186 184 140 168 112 Z" fill="url(#skin)"/>
+    <!-- vây gai dọc sống lưng -->
+    <path d="M128 112 L104 124 L120 134 L96 150 L118 156 L100 176 L122 178 L128 196 L134 178 L156 176 L138 156 L160 150 L136 134 L152 124 Z" fill="url(#fin)"/>
+    <!-- đầu -->
+    <path d="M84 80 C84 54 102 40 128 40 C154 40 172 54 172 80 C172 104 154 118 128 118 C102 118 84 104 84 80 Z" fill="url(#skin)"/>
+  </g>
+  <path d="M68 46 L96 60 M188 46 L160 60 M50 72 L84 74 M206 72 L172 74" stroke="#c8b070" stroke-width="3" stroke-linecap="round"/>
+  <path d="M160 122 C176 150 172 186 150 206 C168 202 178 180 178 160 C178 142 172 130 160 122 Z" fill="#1e4a8a" opacity="0.45"/>
+  <path d="M160 54 C176 72 174 100 154 112 C148 116 142 118 136 118 C158 102 166 80 160 54 Z" fill="#1e4a8a" opacity="0.4"/>
+  <ellipse cx="108" cy="58" rx="16" ry="6" fill="#fff" opacity="0.45" transform="rotate(-20 108 58)"/>
+</svg>

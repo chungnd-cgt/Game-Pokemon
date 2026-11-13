@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6aa6e8"/>
+      <stop offset="0.5" stop-color="#3a7ac8"/>
+      <stop offset="1" stop-color="#2a5aa0"/>
+    </linearGradient>
+  </defs>
+  <!-- thân rắn cuộn chữ S: viền tối, da xanh, dải bụng kem có vạch -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M128 128 C124 176 64 180 58 212 C54 238 116 244 166 234 C210 224 230 200 224 176" stroke="#2b2433" stroke-width="64"/>
+    <path d="M128 128 C124 176 64 180 58 212 C54 238 116 244 166 234 C210 224 230 200 224 176" stroke="url(#skin)" stroke-width="54"/>
+    <path d="M128 128 C124 176 64 180 58 212 C54 238 116 244 166 234 C210 224 230 200 224 176" stroke="#f4e6b0" stroke-width="24"/>
+    <path d="M128 128 C124 176 64 180 58 212 C54 238 116 244 166 234 C210 224 230 200 224 176" stroke="#c8b070" stroke-width="24" stroke-dasharray="3.5 14" stroke-linecap="butt"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- vây lưng trắng dọc thân -->
+    <path d="M250 206 L256 188 L244 192 Z M234 230 L250 224 L236 216 Z M20 210 L2 202 L12 222 Z M28 184 L12 172 L16 192 Z" fill="#e4ecf4"/>
+    <!-- vây đuôi ba thuỳ -->
+    <path d="M212 168 C204 148 206 128 214 112 C220 126 224 132 228 134 C232 118 242 108 254 104 C252 124 246 140 238 150 C244 148 250 150 254 154 C246 166 236 174 224 180 Z" fill="#3a7ac8"/>
+    <!-- vây trắng hai bên đầu -->
+    <path d="M74 78 C52 68 30 72 12 58 C18 84 34 100 68 106 Z" fill="#e4ecf4"/>
+    <path d="M182 78 C204 68 226 72 244 58 C238 84 222 100 188 106 Z" fill="#e4ecf4"/>
+    <!-- mào ba nhánh -->
+    <path d="M104 42 L94 6 L118 28 L128 -2 L138 28 L162 6 L152 42 Z" fill="#2a5aa0"/>
+    <!-- đầu -->
+    <path d="M70 80 C70 46 96 30 128 30 C160 30 186 46 186 80 C198 96 198 118 186 130 C176 146 152 154 128 154 C104 154 80 146 70 130 C58 118 58 96 70 80 Z" fill="url(#skin)"/>
+  </g>
+  <!-- miệng há to -->
+  <path d="M84 100 C96 90 160 90 172 100 C174 128 154 150 128 150 C102 150 82 128 84 100 Z" fill="#8a2030" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M100 136 C112 128 144 128 156 136 C148 146 138 150 128 150 C118 150 108 146 100 136 Z" fill="#e87080"/>
+  <!-- răng nanh -->
+  <path d="M94 98 L102 98 L98 114 Z M154 98 L162 98 L158 114 Z M112 96 L118 96 L115 106 Z M138 96 L144 96 L141 106 Z M104 140 L110 138 L106 128 Z M152 140 L146 138 L150 128 Z" fill="#fff" stroke="#2b2433" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- râu dài -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M84 106 C60 106 40 116 28 136 C24 144 30 150 36 144 M172 106 C196 106 216 116 228 136 C232 144 226 150 220 144" stroke="#2b2433" stroke-width="11"/>
+    <path d="M84 106 C60 106 40 116 28 136 C24 144 30 150 36 144 M172 106 C196 106 216 116 228 136 C232 144 226 150 220 144" stroke="#f4e6b0" stroke-width="5"/>
+  </g>
+  <!-- lỗ mũi -->
+  <path d="M116 84 l4 4 M140 84 l-4 4" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+  <!-- mắt dữ -->
+  <path d="M82 56 L114 68 L112 74 L84 64 Z M174 56 L142 68 L144 74 L172 64 Z" fill="#2b2433"/>
+  <path d="M88 68 C96 64 106 66 112 74 C104 82 92 80 88 68 Z" fill="#fff" stroke="#2b2433" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M168 68 C160 64 150 66 144 74 C152 82 164 80 168 68 Z" fill="#fff" stroke="#2b2433" stroke-width="3.5" stroke-linejoin="round"/>
+  <circle cx="102" cy="73" r="4" fill="#1a1010"/>
+  <circle cx="154" cy="73" r="4" fill="#1a1010"/>
+  <ellipse cx="104" cy="44" rx="16" ry="6" fill="#fff" opacity="0.35" transform="rotate(-15 104 44)"/>
+</svg>

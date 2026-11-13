@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="feather" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#cc8e56"/><stop offset="1" stop-color="#8a5226"/></linearGradient>
+    <linearGradient id="wing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ee6a56"/><stop offset="1" stop-color="#b0302a"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M108 222 L96 248 M108 222 L120 248 M148 222 L136 248 M148 222 L160 248" stroke-width="11"/>
+    <path d="M108 222 L96 248 M108 222 L120 248 M148 222 L136 248 M148 222 L160 248" stroke="#eaa090" stroke-width="5"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- đuôi xòe -->
+    <path d="M106 200 L84 242 L106 236 L116 248 L128 234 L140 248 L150 236 L172 242 L150 200 Z" fill="#7a4620"/>
+    <ellipse cx="128" cy="168" rx="54" ry="54" fill="url(#feather)"/>
+    <path d="M98 134 C64 124 30 138 16 170 C28 174 40 174 50 170 C42 182 42 192 46 204 C70 198 92 180 108 160 Z" fill="url(#wing)"/>
+    <path d="M158 134 C192 124 226 138 240 170 C228 174 216 174 206 170 C214 182 214 192 210 204 C186 198 164 180 148 160 Z" fill="url(#wing)"/>
+    <ellipse cx="128" cy="98" rx="50" ry="42" fill="url(#feather)"/>
+    <path d="M100 76 C90 52 80 34 66 20 C90 24 108 40 118 64 Z" fill="url(#feather)"/>
+    <path d="M114 70 C112 44 116 24 128 6 C140 24 144 44 142 70 Z" fill="url(#feather)"/>
+    <path d="M156 76 C166 52 176 34 190 20 C166 24 148 40 138 64 Z" fill="url(#feather)"/>
+  </g>
+  <path d="M72 24 C86 34 96 46 104 60 M128 14 C126 28 126 42 128 54 M184 24 C170 34 160 46 152 60" fill="none" stroke="#5e3416" stroke-width="5" stroke-linecap="round"/>
+  <path d="M32 170 L54 164 M48 196 L68 182 M224 170 L202 164 M208 196 L188 182" stroke="#8c2620" stroke-width="4" stroke-linecap="round"/>
+  <path d="M164 74 C180 92 180 118 166 132 C156 140 144 140 132 140 C154 124 166 102 164 74 Z" fill="#6e3e1a" opacity="0.4"/>
+  <path d="M120 150 C124 170 124 190 120 206" fill="none" stroke="#6e3e1a" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+  <ellipse cx="106" cy="80" rx="18" ry="8" fill="#fff" opacity="0.35" transform="rotate(-20 106 80)"/>
+</svg>

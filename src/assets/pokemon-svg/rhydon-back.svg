@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="rock" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#bcc3d0"/>
+      <stop offset="1" stop-color="#8a92a6"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- chóp sừng khoan ló lên -->
+    <path d="M118 40 L128 4 L138 40 Z" fill="#f4ecd8"/>
+    <!-- gai tai -->
+    <path d="M92 58 L56 40 L88 78 Z" fill="#9ca4b8"/>
+    <path d="M164 58 L200 40 L168 78 Z" fill="#8a92a6"/>
+    <!-- đầu từ sau -->
+    <path d="M84 68 C80 44 102 28 128 28 C154 28 176 44 172 68 C170 90 156 104 128 106 C100 104 86 90 84 68 Z" fill="url(#rock)"/>
+    <!-- chân -->
+    <path d="M70 192 C60 214 60 232 64 246 L114 246 C116 230 114 212 108 196 Z" fill="#9ca4b8"/>
+    <path d="M186 192 C196 214 196 232 192 246 L142 246 C140 230 142 212 148 196 Z" fill="#8a92a6"/>
+    <!-- tay -->
+    <path d="M64 130 C42 142 32 168 36 192 L56 194 C56 172 64 158 80 148 Z" fill="#9ca4b8"/>
+    <path d="M192 130 C214 142 224 168 220 192 L200 194 C200 172 192 158 176 148 Z" fill="#8a92a6"/>
+    <!-- thân -->
+    <path d="M66 116 C52 156 58 212 88 228 C110 240 146 240 168 228 C198 212 204 156 190 116 C178 94 78 94 66 116 Z" fill="url(#rock)"/>
+    <!-- giáp lưng lớn -->
+    <path d="M78 118 C72 100 96 92 128 92 C160 92 184 100 178 118 C174 150 158 170 128 174 C98 170 82 150 78 118 Z" fill="#9ca4b8"/>
+    <!-- giáp vai -->
+    <path d="M46 124 C38 98 62 82 92 92 C98 110 88 128 66 136 Z" fill="#9ca4b8"/>
+    <path d="M210 124 C218 98 194 82 164 92 C158 110 168 128 190 136 Z" fill="#8a92a6"/>
+    <!-- đuôi chĩa xuống đất -->
+    <path d="M104 180 C100 206 108 232 128 250 C148 232 156 206 152 180 Z" fill="#8a92a6"/>
+  </g>
+  <g fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round">
+    <path d="M128 98 L128 168"/>
+    <path d="M90 132 Q108 140 124 138 M166 132 Q148 140 132 138"/>
+    <path d="M114 206 Q128 212 142 206 M118 226 Q128 230 138 226"/>
+  </g>
+  <path d="M36 192 l4 10 l6 -8 l4 10 l6 -10 Z M220 192 l-4 10 l-6 -8 l-4 10 l-6 -10 Z" fill="#f4ecd8" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M182 140 C196 170 190 206 168 226 C180 196 184 170 182 140 Z" fill="#6e768a" opacity="0.6"/>
+  <ellipse cx="100" cy="44" rx="16" ry="6" fill="#fff" opacity="0.4" transform="rotate(-20 100 44)"/>
+  <ellipse cx="100" cy="108" rx="14" ry="5" fill="#fff" opacity="0.4" transform="rotate(-15 100 108)"/>
+</svg>

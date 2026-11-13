@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="body" cx="36%" cy="28%" r="80%">
+      <stop offset="0" stop-color="#9a78d4"/>
+      <stop offset="0.6" stop-color="#7450b0"/>
+      <stop offset="1" stop-color="#4e3488"/>
+    </radialGradient>
+    <path id="hand" d="M-14 14 C-22 2 -20 -12 -12 -18 L-17 -36 C-18 -43 -7 -44 -6 -37 L-3 -23 L0 -41 C2 -47 12 -45 10 -38 L6 -21 L14 -31 C18 -36 27 -31 22 -24 L14 -10 C20 4 15 18 3 22 C-4 24 -10 20 -14 14 Z"/>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- thân ma: gai trên đầu, đuôi khói cong -->
+    <path d="M120 224 C110 212 112 198 106 188 C86 184 72 174 64 160 L46 160 L60 140 C54 122 54 102 60 88 L36 66 L74 66 C82 56 92 48 104 44 L98 14 L124 40 C128 39 132 39 136 40 L162 12 L158 44 C172 50 182 58 188 68 L224 64 L198 88 C204 104 204 124 196 142 L212 160 L190 162 C182 176 166 186 150 190 C146 202 152 214 168 220 C152 232 130 234 120 224 Z" fill="url(#body)"/>
+    <!-- hai bàn tay lơ lửng -->
+    <use href="#hand" fill="#7450b0" transform="translate(30 192) rotate(-14)"/>
+    <use href="#hand" fill="#5e3e9a" transform="translate(226 192) scale(-1 1) rotate(-14)"/>
+  </g>
+  <path d="M184 76 C198 104 196 140 180 164 C166 180 148 188 132 190 C168 160 186 122 184 76 Z" fill="#4e3488" opacity="0.5"/>
+  <ellipse cx="96" cy="64" rx="22" ry="9" fill="#fff" opacity="0.3" transform="rotate(-25 96 64)"/>
+  <!-- mắt -->
+  <g stroke="#2b2433" stroke-width="4" stroke-linejoin="round">
+    <path d="M74 86 C90 80 114 90 122 108 C104 118 82 108 74 86 Z" fill="#fff"/>
+    <path d="M182 86 C166 80 142 90 134 108 C152 118 174 108 182 86 Z" fill="#fff"/>
+  </g>
+  <circle cx="106" cy="102" r="7" fill="#141018"/>
+  <circle cx="150" cy="102" r="7" fill="#141018"/>
+  <circle cx="108" cy="99" r="2.5" fill="#fff"/>
+  <circle cx="152" cy="99" r="2.5" fill="#fff"/>
+  <!-- miệng cười, lưỡi -->
+  <path d="M76 124 Q128 182 180 124 Q128 146 76 124 Z" fill="#3a1a3a" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M112 146 C112 168 144 168 144 146 Q128 152 112 146 Z" fill="#e8749c" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+</svg>

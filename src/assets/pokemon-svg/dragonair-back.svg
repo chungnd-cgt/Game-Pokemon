@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a8d6fc"/>
+      <stop offset="0.5" stop-color="#6aa8ee"/>
+      <stop offset="1" stop-color="#4682d4"/>
+    </linearGradient>
+    <radialGradient id="orb" cx="35%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#a8b4ff"/>
+      <stop offset="0.45" stop-color="#4858e0"/>
+      <stop offset="1" stop-color="#2a30a8"/>
+    </radialGradient>
+  </defs>
+  <!-- thân cuộn nhìn từ sau -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M128 120 C126 160 192 160 204 192 C216 228 146 246 90 236 C42 228 20 196 42 170 C56 154 80 160 86 176" stroke="#2b2433" stroke-width="46"/>
+    <path d="M128 120 C126 160 192 160 204 192 C216 228 146 246 90 236 C42 228 20 196 42 170 C56 154 80 160 86 176" stroke="url(#skin)" stroke-width="36"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- đuôi với hai ngọc -->
+    <path d="M94 184 C100 164 96 144 80 126 C70 146 70 166 76 186 Z" fill="#6aa8ee"/>
+    <circle cx="84" cy="150" r="10" fill="url(#orb)"/>
+    <circle cx="80" cy="128" r="8" fill="url(#orb)"/>
+    <!-- cánh tai trắng -->
+    <path d="M88 60 C72 40 52 24 24 16 C34 30 38 40 38 50 C26 48 14 52 6 62 C24 66 38 72 48 80 C38 86 30 94 26 106 C46 102 68 94 86 84 Z" fill="#f4f2fa"/>
+    <path d="M168 60 C184 40 204 24 232 16 C222 30 218 40 218 50 C230 48 242 52 250 62 C232 66 218 72 208 80 C218 86 226 94 230 106 C210 102 188 94 170 84 Z" fill="#f4f2fa"/>
+    <!-- đầu sau, chóp sừng -->
+    <path d="M120 32 L128 6 L136 32 Z" fill="#f4f2fa"/>
+    <path d="M82 72 C80 44 102 28 128 28 C154 28 176 44 174 72 C172 100 152 120 128 120 C104 120 84 100 82 72 Z" fill="url(#skin)"/>
+  </g>
+  <path d="M162 46 C178 70 172 102 150 114 C142 118 134 120 126 119 C152 104 166 80 162 46 Z" fill="#4682d4" opacity="0.5"/>
+  <ellipse cx="106" cy="48" rx="18" ry="8" fill="#fff" opacity="0.4" transform="rotate(-25 106 48)"/>
+</svg>

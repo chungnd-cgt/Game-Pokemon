@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="body" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#7a94e0"/><stop offset="0.6" stop-color="#4b68b8"/><stop offset="1" stop-color="#344c90"/></radialGradient>
+    <radialGradient id="petalFill" gradientUnits="userSpaceOnUse" cx="128" cy="86" r="124"><stop offset="0.25" stop-color="#b02a32"/><stop offset="0.6" stop-color="#d83838"/><stop offset="1" stop-color="#ee6050"/></radialGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="94" cy="238" rx="26" ry="12" fill="#344c90"/>
+    <ellipse cx="162" cy="238" rx="26" ry="12" fill="#344c90"/>
+    <path d="M70 172 C50 170 38 186 42 198 C48 208 64 202 74 192 Z" fill="#4b68b8"/>
+    <path d="M186 172 C206 170 218 186 214 198 C208 208 192 202 182 192 Z" fill="#344c90"/>
+    <ellipse cx="128" cy="178" rx="66" ry="62" fill="url(#body)"/>
+  </g>
+  <ellipse cx="92" cy="176" rx="16" ry="8" fill="#fff" opacity="0.25" transform="rotate(-30 92 176)"/>
+    <path d="M128 90.2 C192 99.5 210 138 162 148.4 C142 152.6 114 152.6 94 148.4 C46 138 64 99.5 128 90.2 Z" fill="url(#petalFill)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+    <g transform="matrix(-1 0 0 -0.52 128 86)" fill="#f6c8c0"><ellipse cx="-26" cy="-84" rx="15" ry="13"/><ellipse cx="22" cy="-100" rx="12" ry="10"/><ellipse cx="12" cy="-56" rx="10" ry="9"/></g>
+    <path d="M135.6 87.3 C172.5 58.5 248.4 61.5 252.6 88.5 C254.1 99.6 245.4 113.5 231.6 122.1 C197.8 142.6 133 121.8 135.6 87.3 Z" fill="url(#petalFill)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+    <g transform="matrix(-0.309 0.495 -0.951 -0.161 128 86)" fill="#f6c8c0"><ellipse cx="-26" cy="-84" rx="15" ry="13"/><ellipse cx="22" cy="-100" rx="12" ry="10"/><ellipse cx="12" cy="-56" rx="10" ry="9"/></g>
+    <path d="M120.4 87.3 C123 121.8 58.2 142.6 24.4 122.1 C10.6 113.5 1.9 99.6 3.4 88.5 C7.6 61.5 83.5 58.5 120.4 87.3 Z" fill="url(#petalFill)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+    <g transform="matrix(-0.309 -0.495 0.951 -0.161 128 86)" fill="#f6c8c0"><ellipse cx="-26" cy="-84" rx="15" ry="13"/><ellipse cx="22" cy="-100" rx="12" ry="10"/><ellipse cx="12" cy="-56" rx="10" ry="9"/></g>
+    <path d="M132.7 82.6 C91.5 55.5 120.4 18.9 171 25.1 C191.9 27.9 214.6 36.4 226 45.9 C253.1 69 195.1 94.6 132.7 82.6 Z" fill="url(#petalFill)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+    <g transform="matrix(0.809 0.306 -0.588 0.421 128 86)" fill="#f6c8c0"><ellipse cx="-26" cy="-84" rx="15" ry="13"/><ellipse cx="22" cy="-100" rx="12" ry="10"/><ellipse cx="12" cy="-56" rx="10" ry="9"/></g>
+    <path d="M123.3 82.6 C60.9 94.6 2.9 69 30 45.9 C41.4 36.4 64.1 27.9 85 25.1 C135.6 18.9 164.5 55.5 123.3 82.6 Z" fill="url(#petalFill)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+    <g transform="matrix(0.809 -0.306 0.588 0.421 128 86)" fill="#f6c8c0"><ellipse cx="-26" cy="-84" rx="15" ry="13"/><ellipse cx="22" cy="-100" rx="12" ry="10"/><ellipse cx="12" cy="-56" rx="10" ry="9"/></g>
+    <ellipse cx="128" cy="86" rx="40" ry="20.8" fill="#4a3458" stroke="#2b2433" stroke-width="5"/>
+    <ellipse cx="128" cy="86" rx="26" ry="13.5" fill="#5e4470"/>
+</svg>

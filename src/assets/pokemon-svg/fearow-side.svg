@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="feather" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c4854a"/><stop offset="1" stop-color="#7a4820"/></linearGradient>
+    <linearGradient id="tan" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6e0b0"/><stop offset="1" stop-color="#d2a868"/></linearGradient>
+    <linearGradient id="crest" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f26a5c"/><stop offset="1" stop-color="#b8302c"/></linearGradient>
+    <linearGradient id="beak" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8c4b8"/><stop offset="1" stop-color="#cc7c74"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M140 214 L126 248 M140 216 L140 250 M170 214 L156 248 M170 216 L172 250" stroke-width="11"/>
+    <path d="M140 214 L126 248 M140 216 L140 250 M170 214 L156 248 M170 216 L172 250" stroke="#e8a090" stroke-width="5"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M196 168 L254 190 L242 168 L254 148 L230 150 L236 130 L198 152 Z" fill="#8a5426"/>
+    <ellipse cx="160" cy="170" rx="58" ry="44" fill="url(#feather)"/>
+    <path d="M104 160 C92 130 78 104 70 80 L98 72 C106 98 120 124 138 146 Z" fill="url(#tan)"/>
+    <path d="M98 170 L92 150 L106 156 L102 134 L116 148 L120 128 L130 146 L140 132 L142 154 C130 168 112 172 98 170 Z" fill="#8a5426"/>
+    <path d="M88 46 L100 12 L108 38 L132 22 L122 48 L150 50 L104 72 Z" fill="url(#crest)"/>
+    <ellipse cx="76" cy="62" rx="32" ry="24" fill="url(#tan)"/>
+    <path d="M54 56 C40 58 20 64 6 70 C0 74 2 84 8 88 L12 80 C28 78 42 74 56 72 Z" fill="url(#beak)"/>
+  </g>
+  <path d="M12 78 L54 66" stroke="#2b2433" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="146" cy="190" rx="34" ry="20" fill="#f8ead2"/>
+  <path d="M132 138 C172 124 218 140 242 172 C214 186 174 182 148 170 C136 162 128 150 132 138 Z" fill="url(#feather)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M168 150 C190 156 210 164 226 174 M156 160 C176 168 194 174 212 180" fill="none" stroke="#5a3214" stroke-width="4" stroke-linecap="round"/>
+  <path d="M206 176 L232 174" stroke="#e8c48c" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+  <path d="M82 92 C88 112 98 130 110 144" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity="0.45"/>
+  <ellipse cx="80" cy="48" rx="14" ry="6" fill="#fff" opacity="0.4" transform="rotate(-10 80 48)"/>
+  <ellipse cx="68" cy="58" rx="10" ry="9" fill="#fff" stroke="#2b2433" stroke-width="3"/>
+  <circle cx="65" cy="59" r="5.5" fill="#1a1418"/>
+  <circle cx="67" cy="56" r="2" fill="#fff"/>
+  <path d="M52 46 L84 54" stroke="#2b2433" stroke-width="6" stroke-linecap="round"/>
+</svg>

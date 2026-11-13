@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#fbfbff"/>
+      <stop offset="0.5" stop-color="#eceef8"/>
+      <stop offset="1" stop-color="#c8cce0"/>
+    </linearGradient>
+    <linearGradient id="fin" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#eceef8"/>
+      <stop offset="0.55" stop-color="#eceef8"/>
+      <stop offset="1" stop-color="#f6a060"/>
+    </linearGradient>
+    <linearGradient id="finv" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eceef8"/>
+      <stop offset="0.5" stop-color="#eceef8"/>
+      <stop offset="1" stop-color="#f6a060"/>
+    </linearGradient>
+    <clipPath id="body">
+      <path d="M38 128 C38 88 80 64 128 64 C176 64 204 94 204 130 C204 166 176 190 128 190 C80 190 38 168 38 128 Z"/>
+    </clipPath>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- vây đuôi xoè -->
+    <path d="M190 118 C206 92 226 70 252 56 C248 86 238 108 222 126 C238 144 248 166 250 198 C228 182 208 160 190 144 Z" fill="url(#fin)"/>
+    <!-- vây lưng -->
+    <path d="M104 72 C118 42 150 20 192 14 C180 32 176 50 182 76 C160 68 132 66 104 72 Z" fill="url(#fin)"/>
+    <!-- vây bụng sau -->
+    <path d="M160 176 C168 196 184 210 208 216 C204 196 194 180 180 168 Z" fill="url(#finv)"/>
+    <!-- thân trắng -->
+    <path d="M38 128 C38 88 80 64 128 64 C176 64 204 94 204 130 C204 166 176 190 128 190 C80 190 38 168 38 128 Z" fill="url(#skin)"/>
+  </g>
+  <!-- đốm cam -->
+  <g clip-path="url(#body)" fill="#f07a30">
+    <path d="M52 96 C64 70 96 60 124 62 C130 80 120 96 98 100 C82 102 64 102 52 96 Z"/>
+    <path d="M140 60 C170 60 196 80 206 104 C188 116 162 112 150 98 C140 88 136 74 140 60 Z"/>
+    <path d="M150 156 C166 144 190 144 206 150 C200 172 180 190 156 192 C148 180 146 166 150 156 Z"/>
+  </g>
+  <path d="M38 128 C38 88 80 64 128 64 C176 64 204 94 204 130 C204 166 176 190 128 190 C80 190 38 168 38 128 Z" fill="none" stroke="#2b2433" stroke-width="5"/>
+  <path d="M184 112 C196 146 176 178 140 188 C176 186 202 162 204 130 Z" fill="#a8acc8" opacity="0.5"/>
+  <ellipse cx="146" cy="128" rx="30" ry="10" fill="#fff" opacity="0.6" transform="rotate(-10 146 128)"/>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- vây ngực -->
+    <path d="M100 176 C100 202 116 224 144 238 C146 214 138 194 124 180 Z" fill="url(#finv)"/>
+    <!-- sừng trắng -->
+    <path d="M64 92 L26 22 L92 78 Z" fill="#f6eedc"/>
+    <!-- môi hồng -->
+    <path d="M44 114 C30 112 24 126 32 132 C24 140 30 152 44 150 C54 148 56 138 50 132 C56 126 54 116 44 114 Z" fill="#f48ca0"/>
+  </g>
+  <path d="M34 132 L50 132" stroke="#2b2433" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- mắt -->
+  <g stroke="#2b2433" stroke-width="4">
+    <ellipse cx="74" cy="112" rx="13" ry="15" fill="#22203a"/>
+    <ellipse cx="110" cy="106" rx="11" ry="13" fill="#22203a"/>
+  </g>
+  <ellipse cx="78" cy="106" rx="5" ry="6" fill="#fff"/>
+  <ellipse cx="113" cy="100" rx="4" ry="5" fill="#fff"/>
+</svg>

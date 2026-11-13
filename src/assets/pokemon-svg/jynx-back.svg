@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe680"/><stop offset="1" stop-color="#e8a628"/></linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a87ad8"/><stop offset="1" stop-color="#6c44a6"/></linearGradient>
+    <linearGradient id="dress" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f05452"/><stop offset="1" stop-color="#b42232"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M98 118 C84 150 58 196 52 230 C50 244 62 249 76 249 L180 249 C194 249 206 244 204 230 C198 196 172 150 158 118 Z" fill="url(#dress)"/>
+    <path d="M100 128 C84 138 70 156 64 178 C62 186 70 192 78 186 C86 170 96 158 108 150 Z" fill="url(#skin)"/>
+    <path d="M156 128 C172 138 186 156 192 178 C194 186 186 192 178 186 C170 170 160 158 148 150 Z" fill="#7a50b4"/>
+    <ellipse cx="68" cy="186" rx="12" ry="10" fill="#9a6ccc"/>
+    <ellipse cx="188" cy="186" rx="12" ry="10" fill="#7a50b4"/>
+    <!-- long hair covering the back of the head -->
+    <path d="M60 84 C52 44 86 18 128 18 C170 18 204 44 196 84 C200 122 192 160 184 196 C172 208 156 206 148 196 C140 206 116 206 108 196 C100 206 84 208 72 196 C64 160 56 122 60 84 Z" fill="url(#hair)"/>
+  </g>
+  <g fill="none" stroke="#c8861c" stroke-width="4" stroke-linecap="round" opacity="0.8">
+    <path d="M100 40 C88 80 86 140 96 190"/>
+    <path d="M128 30 C124 80 124 140 128 194"/>
+    <path d="M156 40 C168 80 170 140 160 190"/>
+  </g>
+  <path d="M174 60 C192 100 188 150 178 194 C172 198 166 198 160 194 C172 150 178 100 174 60 Z" fill="#c8861c" opacity="0.4"/>
+  <ellipse cx="100" cy="42" rx="22" ry="8" fill="#fff" opacity="0.5" transform="rotate(-20 100 42)"/>
+  <path d="M84 214 C80 226 76 236 74 244" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity="0.3"/>
+</svg>

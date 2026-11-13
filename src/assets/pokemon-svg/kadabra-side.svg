@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe27c"/><stop offset="1" stop-color="#e8b42e"/></linearGradient>
+    <linearGradient id="armor" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a86e3a"/><stop offset="1" stop-color="#74461f"/></linearGradient>
+    <radialGradient id="steel" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset="0.5" stop-color="#d4d8e2"/><stop offset="1" stop-color="#8e94a6"/></radialGradient>
+  </defs>
+  <!-- tail -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M150 196 C190 208 224 192 232 156 C236 132 226 112 210 102" stroke="#2b2433" stroke-width="42"/>
+    <path d="M150 196 C190 208 224 192 232 156 C236 132 226 112 210 102" stroke="#f4c840" stroke-width="32"/>
+    <path d="M230 166 L233 148" stroke="#8c5a2e" stroke-width="32" stroke-linecap="butt"/>
+    <!-- legs -->
+    <path d="M140 192 C146 208 150 222 154 234" stroke="#2b2433" stroke-width="24"/>
+    <path d="M140 192 C146 208 150 222 154 234" stroke="#e8b42e" stroke-width="15"/>
+    <path d="M118 192 C114 208 110 222 106 234" stroke="#2b2433" stroke-width="24"/>
+    <path d="M118 192 C114 208 110 222 106 234" stroke="#f4c840" stroke-width="15"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="146" cy="240" rx="24" ry="9" fill="#e8b42e"/>
+    <ellipse cx="96" cy="240" rx="24" ry="9" fill="#f4c840"/>
+    <!-- far ear -->
+    <path d="M92 38 C92 22 100 10 110 4 C118 18 118 32 112 42 Z" fill="#e0aa2a"/>
+    <!-- torso -->
+    <path d="M96 116 C84 146 92 186 112 196 C128 202 146 200 158 190 C172 172 170 136 156 114 Z" fill="url(#skin)"/>
+    <path d="M92 126 C92 112 110 106 128 106 C148 106 162 114 162 128 C162 152 156 172 142 182 C128 190 110 188 102 180 C92 168 90 146 92 126 Z" fill="url(#armor)"/>
+  </g>
+  <!-- spoon -->
+  <path d="M58 204 L32 126" stroke="#2b2433" stroke-width="12" stroke-linecap="round"/>
+  <path d="M58 204 L32 126" stroke="#c4c8d4" stroke-width="5" stroke-linecap="round"/>
+  <ellipse cx="26" cy="106" rx="15" ry="21" fill="url(#steel)" stroke="#2b2433" stroke-width="5" transform="rotate(-18 26 106)"/>
+  <ellipse cx="22" cy="98" rx="4" ry="7" fill="#fff" opacity="0.9"/>
+  <!-- arm -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M118 132 C96 146 76 164 58 184" stroke="#2b2433" stroke-width="24"/>
+    <path d="M118 132 C96 146 76 164 58 184" stroke="#f4c840" stroke-width="15"/>
+  </g>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <circle cx="54" cy="188" r="13" fill="#ffe27c"/>
+    <!-- head, snout to the left -->
+    <path d="M58 82 C46 80 38 74 40 66 C44 56 56 52 70 48 C78 34 96 28 116 30 C142 32 158 48 158 70 C158 86 164 94 176 100 C160 106 148 110 136 114 C120 120 104 118 92 110 C80 104 70 92 58 82 Z" fill="url(#skin)"/>
+    <path d="M112 40 C120 22 136 10 156 4 C160 26 154 46 142 58 Z" fill="url(#skin)"/>
+  </g>
+  <path d="M124 34 C132 24 142 16 152 12 C152 26 148 38 140 46 C136 40 130 36 124 34 Z" fill="#8c5a2e"/>
+  <path d="M150 58 C156 76 154 94 142 106 C134 112 124 116 114 116 C136 100 148 82 150 58 Z" fill="#d49a22" opacity="0.5"/>
+  <ellipse cx="102" cy="40" rx="14" ry="5" fill="#fff" opacity="0.45" transform="rotate(-15 102 40)"/>
+  <path d="M88.0 34.0 L91.1 41.8 L99.4 42.3 L92.9 47.6 L95.1 55.7 L88.0 51.2 L80.9 55.7 L83.1 47.6 L76.6 42.3 L84.9 41.8 Z" fill="#ff4636" stroke="#2b2433" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M62 62 C72 58 82 60 90 68 C80 74 70 72 62 62 Z" fill="#2b2433" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+  <circle cx="78" cy="66" r="2.5" fill="#fff"/>
+  <ellipse cx="44" cy="68" rx="5" ry="4" fill="#2b2433"/>
+  <g fill="none" stroke-linecap="round">
+    <path d="M58 84 C50 100 48 120 56 142" stroke="#2b2433" stroke-width="13"/>
+    <path d="M58 84 C50 100 48 120 56 142" stroke="#8c5a2e" stroke-width="6"/>
+  </g>
+</svg>

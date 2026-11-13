@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="steel" cx="36%" cy="30%" r="78%"><stop offset="0" stop-color="#c6d2e4"/><stop offset="0.55" stop-color="#94a4bc"/><stop offset="1" stop-color="#5e708e"/></radialGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c6d2e4"/><stop offset="0.5" stop-color="#94a4bc"/><stop offset="1" stop-color="#6a7c9a"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <g transform="rotate(140 128 128)">
+      <rect x="121.5" y="55" width="13.1" height="22.5" fill="#7c8ca6"/>
+      <path d="M114 56 C114 44.7 142 44.7 142 56 Z" fill="#b4c0d4"/>
+    </g>
+    <g transform="rotate(-150 128 128)">
+      <rect x="121.5" y="55" width="13.1" height="22.5" fill="#7c8ca6"/>
+      <path d="M114 56 C114 44.7 142 44.7 142 56 Z" fill="#b4c0d4"/>
+    </g>
+    <g transform="translate(368.3 0) scale(-1 1)">
+      <path d="M133.4 101.1 L162.6 101.1 A21.5 26.9 0 0 1 162.6 154.9 L133.4 154.9 L133.4 137.7 L162.6 137.7 A7.7 9.7 0 0 0 162.6 118.3 L133.4 118.3 Z" fill="url(#bar)"/>
+      <rect x="131.4" y="101.1" width="13.2" height="17.2" rx="2" fill="#3048e0"/>
+      <rect x="131.4" y="137.7" width="13.2" height="17.2" rx="2" fill="#e8403a"/>
+    </g>
+    <circle cx="128" cy="128" r="58" fill="url(#steel)"/>
+    <g transform="rotate(-8 128 128)">
+      <rect x="121.5" y="55" width="13.1" height="22.5" fill="#7c8ca6"/>
+      <path d="M114 56 C114 44.7 142 44.7 142 56 Z" fill="#b4c0d4"/>
+    </g>
+    <g>
+      <path d="M51.7 109.4 L69.8 109.4 A13.3 24.2 0 0 1 69.8 157.8 L51.7 157.8 L51.7 142.3 L69.8 142.3 A4.8 8.7 0 0 0 69.8 124.9 L51.7 124.9 Z" fill="url(#bar)"/>
+      <rect x="49.7" y="109.4" width="8.9" height="15.5" rx="2" fill="#e8403a"/>
+      <rect x="49.7" y="142.3" width="8.9" height="15.5" rx="2" fill="#3048e0"/>
+    </g>
+
+  </g>
+  <circle cx="103.6" cy="126.1" r="18.3" fill="#fff" stroke="#2b2433" stroke-width="3.6"/>
+  <circle cx="99.9" cy="126.1" r="6.8" fill="#1a1622"/>
+  <circle cx="102.2" cy="123.7" r="2.4" fill="#fff"/>
+  <ellipse cx="103.6" cy="99" rx="17.4" ry="8.1" fill="#fff" opacity="0.45" transform="rotate(-35 103.6 99)"/>
+</svg>

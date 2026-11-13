@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d2ac84"/><stop offset="1" stop-color="#9a7250"/></linearGradient>
+    <linearGradient id="horn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6f0e6"/><stop offset="1" stop-color="#b8ae9e"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- pincers (seen from behind) -->
+    <path d="M114 84 C76 76 56 42 80 4 L92 18 L102 14 L98 28 L110 30 L104 42 L116 46 L110 56 L124 62 Z" fill="url(#horn)"/>
+    <path d="M142 84 C180 76 200 42 176 4 L164 18 L154 14 L158 28 L146 30 L152 42 L140 46 L146 56 L132 62 Z" fill="#c8bfb0"/>
+    <!-- arms -->
+    <path d="M80 148 C64 154 52 164 46 180" fill="none" stroke-width="24"/>
+    <path d="M80 148 C64 154 52 164 46 180" fill="none" stroke="#c49c76" stroke-width="14"/>
+    <path d="M176 148 C192 154 204 164 210 180" fill="none" stroke-width="24"/>
+    <path d="M176 148 C192 154 204 164 210 180" fill="none" stroke="#9a7250" stroke-width="14"/>
+    <path d="M38 176 L30 194 L44 188 L44 204 L54 190 L60 200 L58 180 Z" fill="#c49c76" stroke-width="4"/>
+    <path d="M218 176 L226 194 L212 188 L212 204 L202 190 L196 200 L198 180 Z" fill="#9a7250" stroke-width="4"/>
+    <!-- legs -->
+    <path d="M100 214 C84 218 76 230 78 242 C80 249 86 250 94 250 L120 250 C126 250 128 244 126 236 C124 224 116 214 100 214 Z" fill="url(#skin)"/>
+    <path d="M156 214 C172 218 180 230 178 242 C176 249 170 250 162 250 L136 250 C130 250 128 244 130 236 C132 224 140 214 156 214 Z" fill="#9a7250"/>
+    <!-- body -->
+    <path d="M74 112 C64 162 74 222 128 228 C182 222 192 162 182 112 C176 62 80 62 74 112 Z" fill="url(#skin)"/>
+  </g>
+  <!-- back plates -->
+  <path d="M128 76 L128 222" stroke="#7a5638" stroke-width="5" stroke-linecap="round"/>
+  <path d="M82 120 Q128 132 174 120 M80 148 Q128 160 176 148 M82 176 Q128 190 174 176 M88 202 Q128 214 168 202" fill="none" stroke="#7a5638" stroke-width="5" stroke-linecap="round"/>
+  <!-- shading -->
+  <path d="M164 84 C186 116 184 176 164 206 C152 222 140 226 128 228 C164 196 176 140 164 84 Z" fill="#6e4c30" opacity="0.4"/>
+  <ellipse cx="98" cy="92" rx="14" ry="6" fill="#fff" opacity="0.45" transform="rotate(-25 98 92)"/>
+  <path d="M60 30 C66 50 80 64 98 72" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+</svg>

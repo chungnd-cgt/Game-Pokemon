@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="fur" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d8a468"/><stop offset="1" stop-color="#a8703c"/></linearGradient>
+    <linearGradient id="ruff" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6dc"/><stop offset="1" stop-color="#e8d2a0"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="80" cy="240" rx="24" ry="11" fill="#a8703c"/>
+    <ellipse cx="176" cy="240" rx="24" ry="11" fill="#a8703c"/>
+    <ellipse cx="128" cy="196" rx="60" ry="46" fill="url(#fur)"/>
+    <!-- ruff showing under the head -->
+    <path d="M60 140 C56 164 68 180 80 182 L86 196 L98 186 L110 200 L120 188 L128 202 L136 188 L146 200 L158 186 L170 196 L176 182 C188 180 200 164 196 140 Z" fill="url(#ruff)"/>
+    <path d="M84 84 C64 62 44 32 34 6 C68 14 100 38 114 66 Z" fill="url(#fur)"/>
+    <path d="M172 84 C192 62 212 32 222 6 C188 14 156 38 142 66 Z" fill="#b07840"/>
+    <path d="M68 108 C66 74 94 56 128 56 C162 56 190 74 188 108 C186 140 160 158 128 158 C96 158 70 140 68 108 Z" fill="url(#fur)"/>
+    <!-- bushy tail raised in front -->
+    <path d="M118 232 C164 238 210 214 216 170 C220 140 208 114 192 102 C180 122 172 142 160 158 C142 180 122 200 118 232 Z" fill="url(#fur)"/>
+    <path d="M216 170 C220 140 208 114 192 102 C182 118 176 132 168 146 L180 142 L184 156 L194 146 L202 160 L208 150 Z" fill="url(#ruff)"/>
+  </g>
+  <path d="M160 64 C186 80 190 114 176 134 C166 148 150 156 132 156 C162 140 174 104 160 64 Z" fill="#8a5a30" opacity="0.45"/>
+  <ellipse cx="100" cy="74" rx="22" ry="9" fill="#fff" opacity="0.35" transform="rotate(-18 100 74)"/>
+  <path d="M146 214 C166 206 186 192 196 176" fill="none" stroke="#8a5a30" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
+</svg>

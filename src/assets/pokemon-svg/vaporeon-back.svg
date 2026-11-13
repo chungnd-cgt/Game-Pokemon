@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7cc8f0"/><stop offset="1" stop-color="#3e94c8"/></linearGradient>
+    <linearGradient id="frill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbf8e4"/><stop offset="1" stop-color="#e0dab4"/></linearGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="80" cy="240" rx="24" ry="11" fill="#3e94c8"/>
+    <ellipse cx="176" cy="240" rx="24" ry="11" fill="#3e94c8"/>
+    <ellipse cx="128" cy="196" rx="60" ry="46" fill="url(#skin)"/>
+    <!-- dorsal ridge -->
+    <path d="M128 150 L112 168 L124 172 L110 190 L124 192 L114 210 L128 226 L142 210 L132 192 L146 190 L132 172 L144 168 Z" fill="#2c5c9c"/>
+    <!-- frill -->
+    <path d="M58 138 C52 162 64 180 78 182 L84 198 L98 186 L110 202 L120 188 L128 204 L136 188 L146 202 L158 186 L172 198 L178 182 C192 180 204 162 198 138 Z" fill="url(#frill)"/>
+    <path d="M82 94 C50 86 24 58 16 22 C52 26 84 50 98 78 Z" fill="url(#frill)"/>
+    <path d="M174 94 C206 86 232 58 240 22 C204 26 172 50 158 78 Z" fill="url(#frill)"/>
+    <path d="M72 112 C70 78 96 62 128 62 C160 62 186 78 184 112 C182 142 158 158 128 158 C98 158 74 142 72 112 Z" fill="url(#skin)"/>
+    <path d="M102 70 C104 42 118 22 128 10 C138 22 152 42 154 70 C146 64 138 62 128 62 C118 62 110 64 102 70 Z" fill="url(#frill)"/>
+    <!-- fish tail coming forward then up -->
+    <path d="M132 228 C176 236 214 214 212 168" fill="none" stroke-width="32"/>
+    <path d="M132 228 C176 236 214 214 212 168" fill="none" stroke="#58b0e0" stroke-width="22"/>
+    <path d="M212 176 C184 160 176 126 190 100 C198 116 208 124 220 126 C224 108 232 96 244 90 C246 128 238 158 212 176 Z" fill="#2c5c9c"/>
+  </g>
+  <path d="M128 70 C128 100 128 130 128 152" fill="none" stroke="#2c5c9c" stroke-width="7" stroke-linecap="round"/>
+  <path d="M30 32 C54 40 74 56 86 76 M226 32 C202 40 182 56 170 76" fill="none" stroke="#2c5c9c" stroke-width="5" stroke-linecap="round"/>
+  <path d="M160 72 C184 88 188 118 174 136 C164 148 150 154 134 156 C162 140 174 106 160 72 Z" fill="#2c5c9c" opacity="0.35"/>
+  <ellipse cx="102" cy="80" rx="20" ry="8" fill="#fff" opacity="0.4" transform="rotate(-15 102 80)"/>
+</svg>

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="body" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#7a94e0"/><stop offset="0.6" stop-color="#4b68b8"/><stop offset="1" stop-color="#344c90"/></radialGradient>
+    <radialGradient id="petal" cx="50%" cy="30%" r="80%"><stop offset="0" stop-color="#f69060"/><stop offset="1" stop-color="#dc5e38"/></radialGradient>
+    <g id="pet">
+      <path d="M0 -6 C-50 -14 -58 -70 0 -86 C58 -70 50 -14 0 -6 Z" fill="url(#petal)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+      <ellipse cx="0" cy="-52" rx="18" ry="16" fill="#f8c890"/>
+    </g>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round">
+    <ellipse cx="96" cy="238" rx="26" ry="13" fill="#344c90"/>
+    <ellipse cx="160" cy="238" rx="26" ry="13" fill="#344c90"/>
+    <ellipse cx="62" cy="186" rx="18" ry="14" fill="#4b68b8" transform="rotate(-30 62 186)"/>
+    <ellipse cx="194" cy="186" rx="18" ry="14" fill="#344c90" transform="rotate(30 194 186)"/>
+    <ellipse cx="128" cy="180" rx="66" ry="60" fill="url(#body)"/>
+  </g>
+  <ellipse cx="96" cy="176" rx="20" ry="9" fill="#fff" opacity="0.25" transform="rotate(-25 96 176)"/>
+  <g transform="translate(128 98) scale(1.38 0.78)">
+    <use xlink:href="#pet" href="#pet" transform="rotate(-36)"/>
+    <use xlink:href="#pet" href="#pet" transform="rotate(36)"/>
+    <use xlink:href="#pet" href="#pet" transform="rotate(-104)"/>
+    <use xlink:href="#pet" href="#pet" transform="rotate(104)"/>
+    <use xlink:href="#pet" href="#pet" transform="rotate(180)"/>
+  </g>
+  <ellipse cx="128" cy="96" rx="28" ry="15" fill="#6a2a30" stroke="#2b2433" stroke-width="4"/>
+  <ellipse cx="122" cy="92" rx="10" ry="4" fill="#9a4a48"/>
+</svg>

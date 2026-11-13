@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c7cd6"/><stop offset="0.55" stop-color="#5656b0"/><stop offset="1" stop-color="#3c3c8c"/></linearGradient>
+    <linearGradient id="wing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d6dcee"/></linearGradient>
+    <radialGradient id="eye" cx="40%" cy="30%" r="75%"><stop offset="0" stop-color="#ff8a96"/><stop offset="0.5" stop-color="#e83448"/><stop offset="1" stop-color="#a81c30"/></radialGradient>
+    <path id="uw" d="M118 118 C126 72 156 28 206 12 C234 6 250 22 246 46 C240 82 204 112 156 130 Z"/>
+    <path id="lw" d="M126 146 C158 140 198 152 214 176 C226 198 210 216 186 210 C160 202 140 180 126 158 Z"/>
+  </defs>
+  <!-- cánh phía xa -->
+  <g transform="translate(-14 6)">
+    <use href="#uw" xlink:href="#uw" fill="#2b2433" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+    <use href="#uw" xlink:href="#uw" fill="#c4c8dc" transform="translate(130 116) scale(0.8) translate(-130 -116)"/>
+  </g>
+  <use href="#uw" xlink:href="#uw" fill="#2b2433" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+  <use href="#uw" xlink:href="#uw" fill="url(#wing)" transform="translate(130 116) scale(0.8) translate(-130 -116)"/>
+  <use href="#lw" xlink:href="#lw" fill="#2b2433" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+  <use href="#lw" xlink:href="#lw" fill="url(#wing)" transform="translate(130 156) scale(0.76) translate(-130 -156)"/>
+  <path d="M124 116 L196 40 M128 122 L226 66 M134 156 L194 194" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+  <path d="M88 64 C82 42 70 26 52 18 C40 14 34 24 42 30" fill="none" stroke="#2b2433" stroke-width="6" stroke-linecap="round"/>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M120 196 C112 208 108 220 112 232 C118 234 124 228 124 222 Z M140 198 C138 212 138 222 144 232 C150 232 152 226 150 220 Z" fill="#6ab4de"/>
+    <ellipse cx="134" cy="170" rx="22" ry="34" fill="url(#body)" transform="rotate(-12 134 170)"/>
+    <ellipse cx="120" cy="132" rx="28" ry="22" fill="url(#body)"/>
+    <path d="M104 142 C90 148 82 158 84 168 C92 170 100 164 106 156 Z" fill="#6ab4de"/>
+    <ellipse cx="84" cy="98" rx="40" ry="36" fill="url(#body)"/>
+  </g>
+  <ellipse cx="66" cy="96" rx="24" ry="28" fill="url(#eye)" stroke="#2b2433" stroke-width="4"/>
+  <path d="M44 96 L90 96 M66 70 L66 122" stroke="#a81c30" stroke-width="2.5" opacity="0.6"/>
+  <ellipse cx="58" cy="84" rx="6" ry="8" fill="#fff" opacity="0.9"/>
+  <ellipse cx="96" cy="74" rx="14" ry="6" fill="#fff" opacity="0.35" transform="rotate(-20 96 74)"/>
+  <path d="M50 126 Q60 132 70 128" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+  <path d="M56 128 L58 138 L63 130 Z" fill="#fff" stroke="#2b2433" stroke-width="2" stroke-linejoin="round"/>
+</svg>
