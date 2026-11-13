@@ -5,6 +5,8 @@ import { fitScale } from '../gfx/textures.js';
 import { ItemTip } from './BagParts.js';
 import { bagItems, pocketCounts, searchKey } from './bagSearch.js';
 import { closeButton, fitText, fixToCamera, textStyle } from './helpers.js';
+import { directionOf, isCancel, isConfirm, isTyping } from './input.js';
+import { HOTBAR_ACTIONS, keysFor, shortKeyName } from '../game/keybinds.js';
 
 // Màu khung túi đồ (tối, cùng tông thanh phím tắt / khung mô tả vật phẩm)
 const C = {
@@ -23,7 +25,7 @@ const TAB_W = 66; // dải tab dọc bên trái
 const OUT = 8; // lề khung ngoài
 const TAB_H = 66;
 const HEAD_H = 96; // tiêu đề + ô tìm kiếm
-const FOOT_H = 30;
+const FOOT_H = 12; // lề dưới lưới vật phẩm
 const CELL_H = 58;
 const GAP = 6;
 const PAD = 14;
@@ -64,9 +66,10 @@ class InlineTip {
   }
 }
 
-// Túi đồ dạng khung bên phải màn hình: dải tab ngăn túi dọc bên TRÁI, đầu khung có tên ngăn + ô tìm kiếm (gõ phím là tìm,
-// không phân biệt dấu; Backspace xoá, Esc xoá chữ / đóng túi), vật phẩm xếp lưới 2 cột (icon, tên, ×số lượng) cuộn bằng
-// con lăn chuột / phím mũi tên. Rê chuột / di phím tới vật phẩm thì hiện mô tả (BagParts.ItemTip) cạnh khung.
+// Túi đồ dạng khung bên phải màn hình: dải tab ngăn túi dọc bên TRÁI, đầu khung có tên ngăn + ô tìm kiếm (phím gõ ra chữ
+// là tìm, không phân biệt dấu; Backspace xoá, Esc / phím quay lại xoá chữ rồi đóng túi), vật phẩm xếp lưới 2 cột (icon,
+// tên, ×số lượng) cuộn bằng con lăn chuột / phím hướng. Phím hướng / xác nhận / quay lại theo Cài đặt → Phím tắt, trừ
+// phím gõ ra chữ (dành cho ô tìm kiếm). Rê chuột / di phím tới vật phẩm thì hiện mô tả (BagParts.ItemTip) cạnh khung.
 // open() trả về id vật phẩm được chọn, hoặc null nếu đóng túi.
 // opts:
 //  x, y, width, height  khung ngoài (bao cả dải tab lẫn khung vật phẩm)        depth, fixed (ghim vào màn hình khi camera trôi)
@@ -74,8 +77,8 @@ class InlineTip {
 //  pockets              các ngăn hiện trên dải tab (mặc định BAG_POCKETS)
 //  memory               object nhớ ngăn / chữ tìm / vị trí con trỏ giữa các lần mở: { pocket, query, index }
 //  title                tiêu đề thay cho tên ngăn (vd "Chọn đồ cho ô 3")
-//  hotbar               thanh phím tắt (ui/Hotbar.js): kéo icon vật phẩm thả vào ô để gán, bấm 1-6 để gán
-//  onAssign(slot, id)   gán vật phẩm id vào ô phím tắt slot       hotkey(e): phím số -> ô (0-5) hoặc null
+//  hotbar               thanh phím tắt (ui/Hotbar.js): kéo icon vật phẩm thả vào ô để gán, bấm phím của ô để gán
+//  onAssign(slot, id)   gán vật phẩm id vào ô phím tắt slot       hotkey(e): phím -> ô (0-5) hoặc null
 //  tipSide              'left' | 'right': khung mô tả nằm bên nào của túi; 'inside': ô mô tả trong khung, dưới lưới
 //  count(id)            số lượng (mặc định game/state.js itemCount)
 export class BagPanel {
@@ -179,7 +182,7 @@ export class BagPanel {
     if (this.opts.fixed) fixToCamera(this.tabLayer);
   }
 
-  // Tiêu đề (tên ngăn / "Tìm kiếm"), ô tìm kiếm có kính lúp và con trỏ nhấp nháy, dòng gợi ý phím dưới đáy
+  // Tiêu đề (tên ngăn / "Tìm kiếm"), ô tìm kiếm có kính lúp và con trỏ nhấp nháy
   drawHead() {
     const { scene, body } = this;
     this.headLayer.removeAll(true);
@@ -203,7 +206,7 @@ export class BagPanel {
     g.strokeCircle(fx + 20, fy + 15, 6.5);
     g.lineBetween(fx + 25, fy + 20, fx + 30, fy + 25);
     this.headLayer.add(g);
-    const shown = this.query || 'Gõ để tìm vật phẩm...';
+    const shown = this.query || 'Tìm vật phẩm';
     const text = scene.add.text(fx + 40, fy + 17, shown, textStyle(16, this.query ? '#ffffff' : '#6a7698')).setOrigin(0, 0.5);
     this.headLayer.add(text);
     const caret = scene.add.rectangle(this.query ? text.x + text.width + 2 : text.x - 3, fy + 17, 2, 18, C.gold);
@@ -217,9 +220,6 @@ export class BagPanel {
       this.headLayer.add(clear);
     }
 
-    const hints = ['Gõ để tìm', '↑↓←→ chọn', 'Tab đổi ngăn'];
-    if (this.opts.hotbar) hints.push('Kéo / 1-6: gán phím tắt');
-    this.headLayer.add(scene.add.text(body.x + PAD + 4, body.y + body.h - FOOT_H / 2 - 2, hints.join('  •  '), textStyle(12, '#6a7698')).setOrigin(0, 0.5));
     if (this.opts.fixed) fixToCamera(this.headLayer);
   }
 
@@ -243,16 +243,18 @@ export class BagPanel {
       const icon = scene.add.image(-w / 2 + 26, 0, item.icon).setScale(fitScale(scene, item.icon, 36));
       // Vật phẩm quan trọng không có dòng số lượng: tên nằm giữa ô
       const name = scene.add.text(-w / 2 + 52, item.kind === 'key' ? 0 : -10, item.name, textStyle(16, '#ffffff', { fontStyle: 'bold' })).setOrigin(0, 0.5);
-      // Đã gán phím tắt: số ô nhỏ góc phải (tên chừa chỗ cho số ô, không đè lên nhau)
+      // Đã gán phím tắt: nhãn phím của ô (như trên thanh phím tắt; ô không có phím thì số ô) nhỏ ở góc phải
+      // (tên chừa chỗ cho nhãn, không đè lên nhau)
       const slot = this.opts.hotbar ? (state.hotbar ?? []).indexOf(id) : -1;
+      const slotLabel = slot >= 0 ? shortKeyName(keysFor(HOTBAR_ACTIONS[slot])[0]) || `${slot + 1}` : '';
       // Tên dài quá ô thì thu nhỏ chữ (vẫn dài thì cắt bớt kèm "…")
-      fitText(name, w - 52 - 10 - (slot >= 0 ? 24 : 0), 0.72);
+      fitText(name, w - 52 - 10 - (slot >= 0 ? 16 + slotLabel.length * 8 : 0), 0.72);
       cell.add([bg, icon, name]);
       if (item.kind !== 'key') {
         cell.add(scene.add.text(-w / 2 + 52, 12, `×${this.count(id)}`, textStyle(14, '#a8b4d0', { fontStyle: 'bold' })).setOrigin(0, 0.5));
       }
       if (slot >= 0) {
-        cell.add(scene.add.text(w / 2 - 8, 12, `${slot + 1}`, textStyle(12, '#141a2c', { fontStyle: 'bold', backgroundColor: '#ffd860', padding: { x: 5, y: 1 } })).setOrigin(1, 0.5));
+        cell.add(scene.add.text(w / 2 - 8, 12, slotLabel, textStyle(12, '#141a2c', { fontStyle: 'bold', backgroundColor: '#ffd860', padding: { x: 5, y: 1 } })).setOrigin(1, 0.5));
       }
       const zone = scene.add.zone(0, 0, w, CELL_H).setInteractive({ useHandCursor: true });
       zone.on('pointerover', () => {
@@ -445,58 +447,58 @@ export class BagPanel {
     const n = this.list.length;
     const i = this.index;
     const searching = Boolean(searchKey(this.query));
-    // Ô đang chọn bị bỏ sáng (chuột vừa rời đi): phím mũi tên / Enter đầu tiên chỉ hiện lại con trỏ ở đó
-    if (!this.focused && i >= 0 && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'NumpadEnter'].includes(e.code)) {
+    if (e.code === 'Tab') {
+      e.preventDefault?.();
+      if (!e.repeat) this.setPocket(this.pocket + (e.shiftKey ? -1 : 1));
+      return;
+    }
+    if (e.code === 'PageUp' || e.code === 'PageDown') {
+      this.setPocket(this.pocket + (e.code === 'PageUp' ? -1 : 1));
+      return;
+    }
+    if (e.code === 'Backspace' && this.query) {
+      this.setQuery(this.query.slice(0, -1));
+      return;
+    }
+    // Phím gõ ra chữ dành cho ô tìm kiếm (Space khi chưa gõ gì vẫn là phím xác nhận nếu đã gán) — trừ phím của ô phím tắt
+    const slot = this.opts.hotkey?.(e) ?? null;
+    const typing = isTyping(e) && !(e.code === 'Space' && !this.query) && slot === null;
+    const dir = typing ? null : directionOf(e);
+    const confirm = !typing && isConfirm(e);
+    // Ô đang chọn bị bỏ sáng (chuột vừa rời đi): phím hướng / xác nhận đầu tiên chỉ hiện lại con trỏ ở đó
+    if (!this.focused && i >= 0 && (dir || confirm)) {
       if (!e.repeat) this.select(i);
       return;
     }
-    switch (e.code) {
-      case 'ArrowUp':
+    switch (dir) {
+      case 'up':
         if (i - 2 >= 0) this.select(i - 2);
         return;
-      case 'ArrowDown':
+      case 'down':
         if (i + 2 < n) this.select(i + 2);
         else if (i % 2 === 0 && Math.floor(i / 2) < Math.floor((n - 1) / 2)) this.select(n - 1);
         return;
-      case 'ArrowLeft':
+      case 'left':
         if (i % 2 === 1) this.select(i - 1);
         else if (!searching) this.setPocket(this.pocket - 1);
         return;
-      case 'ArrowRight':
+      case 'right':
         if (i % 2 === 0 && i + 1 < n) this.select(i + 1);
         else if (!searching) this.setPocket(this.pocket + 1);
         return;
-      case 'Tab':
-        e.preventDefault?.();
-        if (!e.repeat) this.setPocket(this.pocket + (e.shiftKey ? -1 : 1));
-        return;
-      case 'PageUp':
-        this.setPocket(this.pocket - 1);
-        return;
-      case 'PageDown':
-        this.setPocket(this.pocket + 1);
-        return;
-      case 'Enter':
-      case 'NumpadEnter':
-        if (!e.repeat) this.confirm();
-        return;
-      case 'Escape':
-        if (e.repeat) return;
-        if (this.query) this.setQuery('');
-        else this.finish(null);
-        return;
-      case 'Backspace':
-        if (this.query) this.setQuery(this.query.slice(0, -1));
-        else if (!e.repeat) this.finish(null);
-        return;
-      case 'Space':
-        if (this.query) this.setQuery(`${this.query} `);
-        else if (!e.repeat) this.confirm();
-        return;
+    }
+    if (confirm) {
+      this.confirm();
+      return;
+    }
+    // Esc luôn là nút thoát của ô tìm kiếm; phím quay lại (không phải phím gõ chữ) cũng vậy: có chữ thì xoá, không thì đóng
+    if ((e.code === 'Escape' || (!typing && isCancel(e))) && !e.repeat) {
+      if (this.query) this.setQuery('');
+      else this.finish(null);
+      return;
     }
     if (e.ctrlKey || e.metaKey || e.altKey) return;
-    // Phím số 1-6 (khi có thanh phím tắt): gán vật phẩm đang chọn vào ô đó
-    const slot = this.opts.hotkey?.(e) ?? null;
+    // Phím của ô phím tắt (mặc định 1-6, khi có thanh phím tắt): gán vật phẩm đang chọn vào ô đó
     if (slot !== null && this.opts.onAssign) {
       if (!e.repeat && this.list[i]) {
         this.opts.onAssign(slot, this.list[i]);
@@ -505,7 +507,7 @@ export class BagPanel {
       }
       return;
     }
-    if (typeof e.key === 'string' && e.key.length === 1 && /[\p{L}\p{N}\-' .]/u.test(e.key)) this.setQuery(this.query + e.key);
+    if (typing && /[\p{L}\p{N}\-' .]/u.test(e.key)) this.setQuery(this.query + e.key);
   }
 
   confirm() {

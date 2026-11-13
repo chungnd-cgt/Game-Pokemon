@@ -1,41 +1,41 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="feather" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c4854a"/><stop offset="1" stop-color="#7a4820"/></linearGradient>
-    <linearGradient id="tan" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6e0b0"/><stop offset="1" stop-color="#d2a868"/></linearGradient>
-    <linearGradient id="crest" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f26a5c"/><stop offset="1" stop-color="#b8302c"/></linearGradient>
-    <linearGradient id="beak" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8c4b8"/><stop offset="1" stop-color="#cc7c74"/></linearGradient>
+    <linearGradient id="feather" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#dca068"/>
+      <stop offset="0.5" stop-color="#c4854a"/>
+      <stop offset="1" stop-color="#8e5a2c"/>
+    </linearGradient>
+    <linearGradient id="wing" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#a86e3c"/>
+      <stop offset="0.6" stop-color="#c4854a"/>
+      <stop offset="1" stop-color="#ecc890"/>
+    </linearGradient>
+    <linearGradient id="beak" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8c4c0"/>
+      <stop offset="1" stop-color="#d88088"/>
+    </linearGradient>
   </defs>
-  <g stroke="#2b2433" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M110 220 L96 248 M110 222 L110 250 M110 220 L124 248 M148 220 L134 248 M148 222 L148 250 M148 220 L162 248" stroke-width="11"/>
-    <path d="M110 220 L96 248 M110 222 L110 250 M110 220 L124 248 M148 220 L134 248 M148 222 L148 250 M148 220 L162 248" stroke="#e8a090" stroke-width="5"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M108 222 L108 240 M108 240 L96 246 M108 240 L108 248 M108 240 L120 246 M150 222 L150 240 M150 240 L138 246 M150 240 L150 248 M150 240 L162 246 " fill="none" stroke="#2b2433" stroke-width="12"/>
+    <path d="M108 222 L108 240 M108 240 L96 246 M108 240 L108 248 M108 240 L120 246 M150 222 L150 240 M150 240 L138 246 M150 240 L150 248 M150 240 L162 246 " fill="none" stroke="#f0aab0" stroke-width="6"/>
   </g>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- đuôi -->
-    <path d="M152 196 L216 236 L206 212 L234 212 L196 184 Z" fill="#8a5426"/>
-    <!-- đôi cánh lớn dang rộng -->
-    <path d="M100 150 C74 118 44 80 8 52 C10 76 18 92 28 104 C12 106 6 118 8 132 C24 128 36 130 46 134 C34 146 32 158 36 170 C58 166 80 168 98 174 Z" fill="url(#feather)"/>
-    <path d="M156 150 C182 118 212 80 248 52 C246 76 238 92 228 104 C244 106 250 118 248 132 C232 128 220 130 210 134 C222 146 224 158 220 170 C198 166 176 168 158 174 Z" fill="url(#feather)"/>
-    <ellipse cx="128" cy="182" rx="50" ry="46" fill="url(#feather)"/>
-    <!-- cổ dài màu be -->
-    <path d="M106 150 C102 124 98 100 102 78 L134 78 C132 102 136 126 148 150 Z" fill="url(#tan)"/>
-    <!-- bờm lông quanh gốc cổ -->
-    <path d="M84 154 L94 136 L102 150 L110 128 L118 148 L128 126 L136 148 L146 128 L152 150 L162 136 L170 156 C150 168 104 168 84 154 Z" fill="#8a5426"/>
-    <!-- mào đỏ -->
-    <path d="M104 48 L100 10 L120 34 L136 6 L142 38 L172 22 L156 54 Z" fill="url(#crest)"/>
-    <ellipse cx="116" cy="64" rx="32" ry="26" fill="url(#tan)"/>
-    <!-- mỏ dài nhọn -->
-    <path d="M94 58 L22 80 C12 84 10 96 18 102 L24 94 L96 78 Z" fill="url(#beak)"/>
+    <path d="M110 206 L92 246 L116 236 L128 252 L140 236 L164 246 L146 206 Z" fill="#a86e3c"/>
+    <path d="M104 130 L84 100 L56 60 L22 4 L40 44 L8 30 L30 70 L2 66 L28 98 L4 110 L40 124 L18 146 L60 144 L52 166 L90 156 Z" fill="url(#wing)"/>
+    <path d="M60 104 L26 84 M70 126 L36 120 M58 80 L30 50" fill="none" stroke="#7a4820" stroke-width="4"/>
+    <path d="M152 130 L172 100 L200 60 L234 4 L216 44 L248 30 L226 70 L254 66 L228 98 L252 110 L216 124 L238 146 L196 144 L204 166 L166 156 Z" fill="url(#wing)"/>
+    <path d="M196 104 L230 84 M186 126 L220 120 M198 80 L226 50" fill="none" stroke="#7a4820" stroke-width="4"/>
+    <path d="M84 176 C82 138 104 120 130 120 C156 120 176 138 174 176 C172 210 152 226 128 226 C104 226 86 210 84 176 Z" fill="url(#feather)"/>
+    <path d="M128 132 C112 108 96 96 88 80" fill="none" stroke-width="34"/>
+    <path d="M128 132 C112 108 96 96 88 80" fill="none" stroke="#c4854a" stroke-width="24"/>
+    <path d="M94 134 L100 120 L108 132 L116 116 L124 132 L134 116 L140 132 L150 118 L156 134 L166 124 L168 142 C146 156 112 156 92 146 Z" fill="#f2e2c4"/>
+    <path d="M80 62 L72 28 L86 48 L92 18 L100 48 L116 26 L110 58 Z" fill="#e2382e"/>
+    <path d="M60 84 C58 64 74 52 92 54 C110 56 120 70 116 88 C112 102 98 110 84 108 C68 106 60 98 60 84 Z" fill="url(#feather)"/>
+    <path d="M70 92 L12 152 C8 158 12 164 20 160 L84 104 Z" fill="url(#beak)"/>
   </g>
-  <path d="M24 92 L92 70" stroke="#2b2433" stroke-width="3" stroke-linecap="round"/>
-  <path d="M30 108 L50 118 M18 128 L42 134 M220 108 L206 118 M238 128 L214 134" stroke="#5a3214" stroke-width="4" stroke-linecap="round"/>
-  <path d="M36 166 L44 140 M220 166 L212 140" stroke="#e8c48c" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
-  <ellipse cx="126" cy="196" rx="32" ry="26" fill="#f8ead2"/>
-  <path d="M164 150 C180 168 182 200 168 216 C158 224 146 226 134 226 C158 208 168 182 164 150 Z" fill="#5a3214" opacity="0.4"/>
-  <path d="M110 96 C108 112 108 128 112 142" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity="0.45"/>
-  <ellipse cx="124" cy="48" rx="14" ry="6" fill="#fff" opacity="0.4" transform="rotate(-10 124 48)"/>
-  <!-- mắt dữ -->
-  <ellipse cx="108" cy="62" rx="10" ry="9" fill="#fff" stroke="#2b2433" stroke-width="3"/>
-  <circle cx="105" cy="63" r="5.5" fill="#1a1418"/>
-  <circle cx="107" cy="60" r="2" fill="#fff"/>
-  <path d="M92 50 L126 58" stroke="#2b2433" stroke-width="6" stroke-linecap="round"/>
+  <path d="M18 154 L76 98" stroke="#2b2433" stroke-width="3" stroke-linecap="round"/>
+  <path d="M74 70 C82 64 98 64 108 72 C98 80 84 80 74 70 Z" fill="#2b2433"/>
+  <circle cx="90" cy="76" r="5.5" fill="#fff" stroke="#2b2433" stroke-width="2.5"/>
+  <circle cx="89" cy="77" r="3" fill="#1a1418"/>
+  <path d="M104 172 C102 192 110 208 122 216" fill="none" stroke="#f2d8b0" stroke-width="5" stroke-linecap="round" opacity="0.6"/>
 </svg>

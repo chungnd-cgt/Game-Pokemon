@@ -22,6 +22,8 @@
   </g>
   <path d="M120 54 C138 78 130 112 104 122 C96 125 88 126 82 126 C110 112 124 86 120 54 Z" fill="#4682d4" opacity="0.5"/>
   <ellipse cx="80" cy="48" rx="18" ry="7" fill="#fff" opacity="0.4" transform="rotate(-15 80 48)"/>
+  <path d="M30 80 C44 78 58 88 62 104 C60 116 50 124 40 121 C31 116 27 98 30 80 Z" fill="#f4f2fa"/>
+  <path d="M36 80 C50 82 60 92 62 104" fill="none" stroke="#9ab8dc" stroke-width="3" stroke-linecap="round"/>
   <ellipse cx="52" cy="54" rx="10" ry="8" fill="#f4f2fa" stroke="#2b2433" stroke-width="4"/>
   <ellipse cx="74" cy="80" rx="12" ry="16" fill="#2a2240" stroke="#2b2433" stroke-width="4"/>
   <ellipse cx="73" cy="89" rx="6" ry="5" fill="#7a68b8"/>

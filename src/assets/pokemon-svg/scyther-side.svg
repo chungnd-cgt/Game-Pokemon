@@ -1,47 +1,45 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a8e070"/><stop offset="1" stop-color="#5aa43c"/></linearGradient>
-    <linearGradient id="blade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fdfaf0"/><stop offset="1" stop-color="#c9c1aa"/></linearGradient>
-    <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eaf8fc"/><stop offset="1" stop-color="#b6dcea"/></linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9ad47c"/>
+      <stop offset="1" stop-color="#6ab84c"/>
+    </linearGradient>
+    <linearGradient id="blade" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#c8ccd8"/>
+    </linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- wings -->
-    <path d="M140 130 C164 100 196 72 246 54 C240 86 208 120 156 146 Z" fill="url(#wing)" stroke-width="4"/>
-    <path d="M144 146 C174 136 210 136 248 150 C222 170 186 172 150 162 Z" fill="url(#wing)" stroke-width="4"/>
-    <!-- back blade -->
-    <path d="M138 150 C150 160 154 172 148 184" fill="none" stroke-width="20"/>
-    <path d="M138 150 C150 160 154 172 148 184" fill="none" stroke="#5aa43c" stroke-width="10"/>
-    <path d="M152 178 C120 172 92 186 78 222 C100 202 124 196 152 198 Z" fill="#cdc6b0"/>
-    <!-- back leg -->
-    <path d="M140 182 C152 198 156 214 150 230 L166 248 C158 251 140 251 134 246 L136 230 C138 214 136 200 130 190 Z" fill="#5aa43c"/>
-    <!-- abdomen -->
-    <ellipse cx="170" cy="196" rx="42" ry="22" fill="url(#skin)" transform="rotate(32 170 196)"/>
-    <!-- front leg -->
-    <path d="M116 180 C104 196 100 212 104 228 L82 246 C90 251 112 251 120 246 L120 230 C124 214 128 200 128 188 Z" fill="url(#skin)"/>
-    <!-- thorax -->
-    <ellipse cx="128" cy="152" rx="30" ry="36" fill="url(#skin)" transform="rotate(-12 128 152)"/>
-    <!-- neck -->
-    <path d="M96 98 L108 130 L126 124 L116 92 Z" fill="#7cc24e"/>
-    <!-- crest -->
-    <path d="M106 50 L156 22 L124 72 Z" fill="#5aa43c"/>
-    <!-- head -->
-    <path d="M38 72 C42 50 62 38 88 38 C110 38 126 50 128 70 C130 90 116 102 96 104 C80 106 64 102 52 96 C42 90 36 82 38 72 Z" fill="url(#skin)"/>
-    <!-- front arm + blade -->
-    <path d="M118 140 C104 146 94 150 84 152" fill="none" stroke-width="20"/>
-    <path d="M118 140 C104 146 94 150 84 152" fill="none" stroke="#7cc24e" stroke-width="10"/>
-    <path d="M96 140 C58 128 24 144 10 194 C30 172 58 164 96 166 Z" fill="url(#blade)"/>
+    <!-- wings raised behind -->
+    <path d="M140 100 C160 66 196 34 236 18 C228 58 200 96 150 120 Z" fill="#e2e6cc"/>
+    <path d="M142 118 C176 110 212 116 244 132 C206 146 174 142 144 132 Z" fill="#eef0dc"/>
+    <!-- abdomen out the back -->
+    <path d="M146 150 C176 152 204 170 214 196 C196 206 168 196 148 180 Z" fill="#58a63e"/>
+    <!-- far leg -->
+    <path d="M140 168 C158 178 168 196 160 212 L170 236 L146 236 L138 210 C136 198 132 188 126 176 Z" fill="#4a9434"/>
+    <!-- far arm + scythe -->
+    <path d="M130 108 C140 126 140 140 130 152" fill="none" stroke-width="20"/>
+    <path d="M130 108 C140 126 140 140 130 152" fill="none" stroke="#58a63e" stroke-width="10"/>
+    <path d="M138 146 C110 150 88 172 82 206 C100 186 118 174 140 168 Z" fill="#c8ccd8"/>
+    <!-- torso -->
+    <path d="M118 82 C142 82 154 104 152 132 C150 158 138 176 118 178 C98 176 88 158 86 132 C84 104 94 82 118 82 Z" fill="url(#skin)"/>
+    <!-- near leg -->
+    <path d="M110 166 C92 176 84 196 92 214 L84 238 L112 238 L114 210 C116 198 120 188 122 174 Z" fill="#6ab84c"/>
+    <!-- head in profile, crest swept back -->
+    <path d="M118 40 L136 8 L136 34 L158 16 L150 46 L170 40 L150 62 Z" fill="#6ab84c"/>
+    <path d="M118 30 C140 30 152 46 150 64 C148 82 136 94 116 94 C102 94 88 86 80 74 C76 66 78 58 84 52 C92 40 104 30 118 30 Z" fill="url(#skin)"/>
+    <!-- near arm with scythe reaching forward -->
+    <path d="M108 104 C92 116 80 126 70 136" fill="none" stroke-width="22"/>
+    <path d="M108 104 C92 116 80 126 70 136" fill="none" stroke="#7cc45e" stroke-width="12"/>
+    <path d="M80 128 C46 128 20 150 10 190 C30 168 52 156 84 154 Z" fill="url(#blade)"/>
   </g>
-  <!-- abdomen bands -->
-  <path d="M146 194 Q152 206 146 214 M164 202 Q170 214 162 222 M182 210 Q188 220 180 228" fill="none" stroke="#e6e6a8" stroke-width="5" stroke-linecap="round"/>
-  <path d="M152 136 C184 112 214 88 238 66 M150 154 C180 152 212 152 238 152" fill="none" stroke="#8ab8cc" stroke-width="3" stroke-linecap="round"/>
-  <path d="M90 150 C60 144 34 156 20 182" fill="none" stroke="#9e967e" stroke-width="5" stroke-linecap="round" opacity="0.8"/>
-  <!-- shading -->
-  <path d="M146 128 C162 150 158 178 140 188 C132 192 124 192 116 190 C140 176 150 154 146 128 Z" fill="#3e8a2e" opacity="0.45"/>
-  <path d="M118 50 C130 66 126 88 110 98 C104 102 98 104 92 104 C112 90 120 72 118 50 Z" fill="#3e8a2e" opacity="0.45"/>
-  <ellipse cx="72" cy="48" rx="14" ry="6" fill="#fff" opacity="0.4" transform="rotate(-15 72 48)"/>
-  <!-- eye -->
-  <path d="M50 58 L76 66 C76 78 70 84 62 84 C54 84 50 76 50 58 Z" fill="#fff" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
-  <ellipse cx="60" cy="72" rx="5.5" ry="6.5" fill="#1a1418"/>
-  <ellipse cx="58" cy="69" rx="2.2" ry="2.6" fill="#fff"/>
-  <path d="M42 90 Q54 96 68 94" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="96" cy="130" rx="10" ry="24" fill="#f0eab0" stroke="#2b2433" stroke-width="3"/>
+  <path d="M74 142 C50 146 30 162 18 182" fill="none" stroke="#9aa0b4" stroke-width="4" stroke-linecap="round"/>
+  <path d="M154 166 L176 176 M160 180 L184 190" stroke="#3e8a2c" stroke-width="4" stroke-linecap="round"/>
+  <path d="M140 96 C154 118 154 152 140 172 C148 146 148 120 140 96 Z" fill="#3e8a2c" opacity="0.5"/>
+  <ellipse cx="108" cy="42" rx="10" ry="5" fill="#fff" opacity="0.45" transform="rotate(-30 108 42)"/>
+  <path d="M86 238 l-6 6 l12 0 Z M146 238 l-6 6 l12 0 Z" fill="#fff" stroke="#2b2433" stroke-width="2"/>
+  <path d="M90 56 L112 62 L94 70 Z" fill="#2b2433"/>
+  <circle cx="100" cy="62" r="2" fill="#fff"/>
+  <path d="M82 80 L94 80" stroke="#2b2433" stroke-width="3" stroke-linecap="round"/>
 </svg>

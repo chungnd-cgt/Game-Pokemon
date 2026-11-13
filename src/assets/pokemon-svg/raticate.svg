@@ -16,16 +16,16 @@
     <!-- thân mập -->
     <ellipse cx="134" cy="190" rx="76" ry="54" fill="url(#fur)"/>
     <!-- tai nhỏ -->
-    <ellipse cx="62" cy="62" rx="26" ry="28" fill="url(#fur)"/>
-    <ellipse cx="166" cy="56" rx="26" ry="28" fill="#b88250"/>
+    <ellipse cx="56" cy="74" rx="20" ry="22" fill="url(#fur)"/>
+    <ellipse cx="164" cy="70" rx="20" ry="22" fill="#b88250"/>
     <!-- túm lông má răng cưa -->
     <path d="M46 104 L4 96 L28 118 L0 132 L30 140 L12 160 L52 152 Z" fill="#b88250"/>
     <path d="M176 100 L222 90 L198 114 L230 126 L198 138 L220 156 L172 150 Z" fill="#a87848"/>
     <!-- đầu to -->
     <path d="M30 128 C24 88 60 64 108 64 C158 64 192 88 188 126 C184 162 152 184 110 184 C66 184 36 164 30 128 Z" fill="url(#fur)"/>
   </g>
-  <ellipse cx="62" cy="66" rx="14" ry="16" fill="#f3dfb0"/>
-  <ellipse cx="166" cy="60" rx="14" ry="16" fill="#e4cc98"/>
+  <ellipse cx="56" cy="76" rx="10" ry="12" fill="#f3dfb0"/>
+  <ellipse cx="164" cy="72" rx="10" ry="12" fill="#e4cc98"/>
   <!-- bụng kem -->
   <ellipse cx="130" cy="210" rx="44" ry="30" fill="#f3dfb0"/>
   <!-- tay -->
@@ -35,7 +35,8 @@
   <path d="M90 156 h17 v34 c0 5 -17 5 -17 0 Z M110 156 h17 v34 c0 5 -17 5 -17 0 Z" fill="#fff6d8" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
   <ellipse cx="108" cy="138" rx="10" ry="7" fill="#d06878" stroke="#2b2433" stroke-width="3"/>
   <!-- ria -->
-  <path d="M64 142 L16 128 M64 154 L12 160 M152 142 L200 128 M152 154 L204 160" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+  <path d="M66 140 L6 120 M66 150 L2 150 M66 160 L8 180 M150 140 L210 120 M150 150 L214 150 M150 160 L208 180" stroke="#2b2433" stroke-width="8" stroke-linecap="round"/>
+  <path d="M66 140 L6 120 M66 150 L2 150 M66 160 L8 180 M150 140 L210 120 M150 150 L214 150 M150 160 L208 180" stroke="#fbf4dc" stroke-width="3.5" stroke-linecap="round"/>
   <ellipse cx="96" cy="78" rx="22" ry="7" fill="#fff" opacity="0.3" transform="rotate(-10 96 78)"/>
   <!-- mắt dữ -->
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round">

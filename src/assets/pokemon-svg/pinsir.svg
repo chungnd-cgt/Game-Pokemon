@@ -5,18 +5,20 @@
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
     <!-- pincers -->
-    <path d="M114 84 C76 76 56 42 80 4 L92 18 L102 14 L98 28 L110 30 L104 42 L116 46 L110 56 L124 62 Z" fill="url(#horn)"/>
-    <path d="M142 84 C180 76 200 42 176 4 L164 18 L154 14 L158 28 L146 30 L152 42 L140 46 L146 56 L132 62 Z" fill="url(#horn)"/>
+    <path d="M70 44 L52 38 L72 30 Z M100 40 L114 38 L104 52 Z" fill="url(#horn)" stroke-width="4"/>
+    <path d="M110 84 C90 80 72 64 70 44 C68 24 82 8 108 2 C100 14 96 26 98 38 C100 52 110 62 124 70 Z" fill="url(#horn)"/>
+    <path d="M186 44 L204 38 L184 30 Z M156 40 L142 38 L152 52 Z" fill="url(#horn)" stroke-width="4"/>
+    <path d="M146 84 C166 80 184 64 186 44 C188 24 174 8 148 2 C156 14 160 26 158 38 C156 52 146 62 132 70 Z" fill="url(#horn)"/>
     <!-- legs -->
     <path d="M100 214 C84 218 76 230 78 242 C80 249 86 250 94 250 L120 250 C126 250 128 244 126 236 C124 224 116 214 100 214 Z" fill="url(#skin)"/>
     <path d="M156 214 C172 218 180 230 178 242 C176 249 170 250 162 250 L136 250 C130 250 128 244 130 236 C132 224 140 214 156 214 Z" fill="#9a7250"/>
     <!-- arms -->
-    <path d="M80 148 C64 154 52 164 46 180" fill="none" stroke-width="24"/>
-    <path d="M80 148 C64 154 52 164 46 180" fill="none" stroke="#c49c76" stroke-width="14"/>
-    <path d="M176 148 C192 154 204 164 210 180" fill="none" stroke-width="24"/>
-    <path d="M176 148 C192 154 204 164 210 180" fill="none" stroke="#9a7250" stroke-width="14"/>
-    <path d="M38 176 L30 194 L44 188 L44 204 L54 190 L60 200 L58 180 Z" fill="#c49c76" stroke-width="4"/>
-    <path d="M218 176 L226 194 L212 188 L212 204 L202 190 L196 200 L198 180 Z" fill="#9a7250" stroke-width="4"/>
+    <path d="M84 146 C62 150 48 158 42 178" fill="none" stroke-width="18"/>
+    <path d="M84 146 C62 150 48 158 42 178" fill="none" stroke="#c49c76" stroke-width="9"/>
+    <path d="M172 146 C194 150 208 158 214 178" fill="none" stroke-width="18"/>
+    <path d="M172 146 C194 150 208 158 214 178" fill="none" stroke="#9a7250" stroke-width="9"/>
+    <path d="M32 174 L26 194 L38 184 L40 200 L46 186 L54 194 L52 174 Z" fill="#c49c76" stroke-width="4"/>
+    <path d="M224 174 L230 194 L218 184 L216 200 L210 186 L202 194 L204 174 Z" fill="#9a7250" stroke-width="4"/>
     <!-- body -->
     <path d="M74 112 C64 162 74 222 128 228 C182 222 192 162 182 112 C176 62 80 62 74 112 Z" fill="url(#skin)"/>
   </g>
@@ -25,7 +27,7 @@
   <!-- shading -->
   <path d="M164 84 C186 116 184 176 164 206 C152 222 140 226 128 228 C164 196 176 140 164 84 Z" fill="#6e4c30" opacity="0.4"/>
   <ellipse cx="98" cy="88" rx="14" ry="6" fill="#fff" opacity="0.45" transform="rotate(-25 98 88)"/>
-  <path d="M60 30 C66 50 80 64 98 72" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+  <path d="M70 30 C68 48 80 62 100 70" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
   <!-- mouth -->
   <path d="M116 108 C116 100 140 100 140 108 L138 140 C138 148 118 148 118 140 Z" fill="#3a2430" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
   <path d="M117 110 l10 3 l-10 4 Z M118 122 l10 3 l-10 4 Z M118 134 l9 3 l-9 4 Z M139 110 l-10 3 l10 4 Z M138 122 l-10 3 l10 4 Z M138 134 l-9 3 l9 4 Z" fill="#fff" stroke="#2b2433" stroke-width="2" stroke-linejoin="round"/>

@@ -5,7 +5,8 @@ import { DexDetail } from '../ui/dex/DexDetail.js';
 import { DexGrid, GRID_COLS, GRID_ROWS } from '../ui/dex/DexGrid.js';
 import { filterDex } from '../ui/dex/dexData.js';
 import { COLORS, backToWorld, closeButton, gradientRect, hideWorldHud, textStyle } from '../ui/helpers.js';
-import { InputRouter, directionOf, isCancel } from '../ui/input.js';
+import { InputRouter, directionOf, isCancel, isConfirm, isTyping } from '../ui/input.js';
+import { matches } from '../game/keybinds.js';
 
 // Khung cửa sổ (thế giới vẫn hiện mờ phía sau)
 const WIN = { x: 28, y: 18, w: 904, h: 684 };
@@ -95,8 +96,6 @@ export default class PokedexScene extends Phaser.Scene {
     icon.fillStyle(0xffffff, 0.75);
     icon.fillCircle(x + 28, cy - 4, 4);
     this.add.text(x + 56, cy + 1, 'POKÉDEX', textStyle(24, '#ffffff', { fontStyle: 'bold', stroke: '#6a1014', strokeThickness: 5 })).setOrigin(0, 0.5);
-    this.add.text(x + w - 56, cy, '←↑↓→ chọn  •  PgUp/PgDn trang  •  F tìm  •  H ẩn  •  Tab khắc hệ  •  Esc đóng',
-      textStyle(13, '#ffd8d8')).setOrigin(1, 0.5);
     closeButton(this, x + w - 26, cy, () => this.close(), 30);
   }
 
@@ -134,7 +133,7 @@ export default class PokedexScene extends Phaser.Scene {
     const { x, y, w, h } = SEARCH;
     this.searchBg = this.add.graphics();
     this.searchText = this.add.text(x + 36, y + h / 2, '', textStyle(16, COLORS.text, { fontStyle: 'bold' })).setOrigin(0, 0.5);
-    this.searchHint = this.add.text(x + 36, y + h / 2, 'Tìm theo tên hoặc số...', textStyle(15, '#a0a8bc')).setOrigin(0, 0.5);
+    this.searchHint = this.add.text(x + 36, y + h / 2, 'Tên hoặc số', textStyle(15, '#a0a8bc')).setOrigin(0, 0.5);
     this.searchClear = this.add.text(x + w - 14, y + h / 2, '✕', textStyle(16, '#8a92a6', { fontStyle: 'bold' })).setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
     this.searchClear.on('pointerdown', (_p, _x, _y, e) => {
@@ -235,7 +234,7 @@ export default class PokedexScene extends Phaser.Scene {
   handleKey(e) {
     if (this.searching && this.searchKey(e)) return;
     const dir = directionOf(e);
-    if (dir && !(this.searching && e.code.startsWith('Key'))) {
+    if (dir && !(this.searching && isTyping(e))) {
       const step = { up: -GRID_COLS, down: GRID_COLS, left: -1, right: 1 }[dir];
       this.select(this.index + step);
       return;
@@ -247,7 +246,8 @@ export default class PokedexScene extends Phaser.Scene {
     else if (e.code === 'Tab') {
       e.preventDefault?.();
       this.detail.toggleTab();
-    } else if ((e.code === 'KeyF' || e.key === '/') && !e.repeat) {
+    } else if ((isCancel(e) || matches(e, 'dex')) && !e.repeat) this.close();
+    else if ((e.code === 'KeyF' || e.key === '/') && !e.repeat) {
       e.preventDefault?.();
       this.setSearching(true);
     } else if (e.code === 'KeyH' && !e.repeat) this.toggleHide();
@@ -255,12 +255,13 @@ export default class PokedexScene extends Phaser.Scene {
       // Gõ số: bắt đầu tìm theo số thứ tự
       this.setSearching(true);
       this.setQuery(e.key);
-    } else if ((isCancel(e) || e.code === 'KeyP') && !e.repeat) this.close();
+    }
   }
 
   // Đang gõ vào ô tìm kiếm: trả về true nếu phím đã được dùng
   searchKey(e) {
-    if (e.code === 'Escape' || e.code === 'Enter' || e.code === 'NumpadEnter') {
+    // Esc / Enter luôn thoát ô tìm; phím xác nhận / quay lại đã gán (nếu không phải phím gõ chữ) cũng vậy
+    if (e.code === 'Escape' || e.code === 'Enter' || e.code === 'NumpadEnter' || (!isTyping(e) && (isCancel(e) || isConfirm(e)))) {
       this.setSearching(false);
       return true;
     }
@@ -268,8 +269,9 @@ export default class PokedexScene extends Phaser.Scene {
       this.setQuery(this.query.slice(0, -1));
       return true;
     }
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Tab'].includes(e.code)) return false;
-    if (e.key?.length === 1 && !e.ctrlKey && !e.metaKey && /[\p{L}\p{N} .'-]/u.test(e.key)) {
+    // Phím không gõ ra chữ (phím hướng, PgUp / PgDn, Tab...) vẫn dùng như bình thường
+    if (!isTyping(e)) return false;
+    if (/[\p{L}\p{N} .'-]/u.test(e.key)) {
       e.preventDefault?.();
       this.setQuery(this.query + e.key);
       return true;

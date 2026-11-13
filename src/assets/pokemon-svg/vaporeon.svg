@@ -25,15 +25,15 @@
     <!-- neck frill -->
     <path d="M60 144 C54 168 66 186 80 188 L86 204 L100 192 L112 210 L122 194 L128 214 L134 194 L144 210 L156 192 L170 204 L176 188 C190 186 202 168 196 144 Z" fill="url(#frill)"/>
     <!-- ear fins -->
-    <path d="M82 98 C50 90 24 62 16 26 C52 30 84 54 98 82 Z" fill="url(#frill)"/>
-    <path d="M174 98 C206 90 232 62 240 26 C204 30 172 54 158 82 Z" fill="url(#frill)"/>
+    <path d="M98 84 C80 64 50 40 16 28 C24 42 22 52 12 60 C26 64 30 74 24 84 C40 84 48 92 50 102 C62 96 74 98 84 104 Z" fill="url(#frill)"/>
+    <path d="M158 84 C176 64 206 40 240 28 C232 42 234 52 244 60 C230 64 226 74 232 84 C216 84 208 92 206 102 C194 96 182 98 172 104 Z" fill="url(#frill)"/>
     <!-- head -->
     <path d="M72 116 C70 82 96 66 128 66 C160 66 186 82 184 116 C182 146 158 162 128 162 C98 162 74 146 72 116 Z" fill="url(#skin)"/>
     <!-- crest fin -->
-    <path d="M102 74 C104 46 118 26 128 14 C138 26 152 46 154 74 C146 68 138 66 128 66 C118 66 110 68 102 74 Z" fill="url(#frill)"/>
+    <path d="M102 74 C104 46 118 26 128 14 C138 26 152 46 154 74 C146 68 138 66 128 66 C118 66 110 68 102 74 Z" fill="#2c5c9c"/>
   </g>
-  <path d="M30 36 C54 44 74 60 86 80 M226 36 C202 44 182 60 170 80" fill="none" stroke="#2c5c9c" stroke-width="5" stroke-linecap="round"/>
-  <path d="M120 34 L128 22 L136 34" fill="none" stroke="#2c5c9c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M88 92 L22 34 M88 94 L16 62 M86 98 L30 86 M168 92 L234 34 M168 94 L240 62 M170 98 L226 86" fill="none" stroke="#5a9ad8" stroke-width="4" stroke-linecap="round"/>
+  <path d="M120 40 L128 26 L136 40" fill="none" stroke="#5a8ad0" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M206 98 C214 112 226 118 238 116" fill="none" stroke="#5a8ad0" stroke-width="4" stroke-linecap="round"/>
   <path d="M160 76 C184 92 188 122 174 140 C164 152 150 158 134 160 C162 144 174 110 160 76 Z" fill="#2c5c9c" opacity="0.35"/>
   <ellipse cx="102" cy="84" rx="20" ry="8" fill="#fff" opacity="0.4" transform="rotate(-15 102 84)"/>

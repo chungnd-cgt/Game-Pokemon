@@ -1,30 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="feather" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#cfa274"/><stop offset="1" stop-color="#946a42"/></linearGradient>
-    <linearGradient id="leek" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#92d062"/><stop offset="1" stop-color="#4e9a3a"/></linearGradient>
+    <linearGradient id="fur" x1="0" y1="0" x2="0.5" y2="1"><stop offset="0" stop-color="#d6b89c"/><stop offset="0.5" stop-color="#b08a6a"/><stop offset="1" stop-color="#846048"/></linearGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a9a40"/><stop offset="1" stop-color="#a8d850"/></linearGradient>
+    <linearGradient id="bill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd860"/><stop offset="1" stop-color="#f0a020"/></linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- cọng hành ló bên phải -->
-    <path d="M190 202 L176 198 L198 110 L214 114 Z" fill="#f6f8ec"/>
-    <path d="M214 114 L198 110 L204 64 L220 68 Z" fill="url(#leek)"/>
-    <path d="M220 68 C234 54 242 36 244 14 C228 28 216 46 212 64 Z" fill="url(#leek)"/>
-    <path d="M204 64 C204 44 198 26 184 12 C182 32 188 50 200 66 Z" fill="#6cb44a"/>
-    <!-- chân -->
-    <path d="M100 226 L98 240 L80 250 L120 250 L108 240 L108 226 Z" fill="#f0b040"/>
-    <path d="M156 226 L156 240 L140 250 L180 250 L166 240 L164 226 Z" fill="#e09c30"/>
-    <!-- lưng -->
-    <ellipse cx="128" cy="176" rx="70" ry="60" fill="url(#feather)"/>
-    <!-- sau đầu -->
-    <ellipse cx="128" cy="90" rx="52" ry="48" fill="url(#feather)"/>
-    <!-- hai cánh xếp trên lưng -->
-    <path d="M124 140 C96 134 70 152 66 184 C70 206 94 214 112 206 C124 186 128 162 124 140 Z" fill="#a87a4e"/>
-    <path d="M132 140 C160 134 186 152 190 184 C186 206 162 214 144 206 C132 186 128 162 132 140 Z" fill="#9a6e44"/>
-    <!-- đuôi lông sẫm chĩa xuống -->
-    <path d="M108 210 L100 246 L118 236 L128 252 L138 236 L156 246 L148 210 Z" fill="#6e4a2c"/>
+    <!-- leek behind, held in the right wing -->
+    <path d="M196 236 C190 180 190 120 196 70 L216 70 C220 120 220 180 214 236 C210 244 200 244 196 236 Z" fill="#f4f6ea"/>
+    <path d="M196 74 C184 50 174 30 178 10 C190 12 200 30 206 56 C210 34 218 18 232 14 C234 34 224 56 216 76 Z" fill="url(#leaf)"/>
+    <!-- feet -->
+    <path d="M92 214 L92 236 L76 244 L112 244 L106 214 Z M150 214 L150 236 L144 244 L180 244 L164 214 Z" fill="url(#bill)"/>
+    <!-- body -->
+    <path d="M58 150 C56 110 88 90 128 90 C168 90 200 110 198 150 C196 196 168 222 128 222 C88 222 60 196 58 150 Z" fill="url(#fur)"/>
+    <!-- tail -->
+    <path d="M104 200 C112 220 120 236 128 240 C136 236 144 220 152 200 Z" fill="#94725a"/>
+    <!-- wings -->
+    <path d="M62 116 C44 130 40 168 54 196 C70 192 84 170 86 140 Z" fill="#9c7e64"/>
+    <path d="M194 116 C212 130 216 168 202 196 C186 192 172 170 170 140 Z" fill="#9c7e64"/>
+    <!-- head -->
+    <path d="M118 34 L112 10 L128 30 L134 6 L140 30 L156 14 L148 40 Z" fill="url(#fur)"/>
+    <path d="M78 82 C76 50 100 30 128 30 C156 30 180 50 178 82 C176 110 156 126 128 126 C100 126 80 110 78 82 Z" fill="url(#fur)"/>
   </g>
-  <path d="M70 186 C74 200 86 208 100 208 C88 200 78 194 70 186 Z" fill="#6e4a2c"/>
-  <path d="M186 186 C182 200 170 208 156 208 C168 200 178 194 186 186 Z" fill="#6e4a2c"/>
-  <path d="M88 76 C100 66 116 64 128 70 C140 64 156 66 168 76" fill="none" stroke="#2b2433" stroke-width="7" stroke-linecap="round"/>
-  <path d="M184 64 C200 92 190 124 160 136 C178 116 186 92 184 64 Z" fill="#7e5634" opacity="0.5"/>
-  <ellipse cx="104" cy="58" rx="20" ry="8" fill="#fff" opacity="0.35" transform="rotate(-20 104 58)"/>
+  <path d="M200 100 L200 220" stroke="#d4dcc0" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="104" cy="48" rx="18" ry="7" fill="#fff" opacity="0.35" transform="rotate(-25 104 48)"/>
+  <path d="M74 112 C70 136 70 160 76 180 M182 112 C186 136 186 160 180 180" fill="none" stroke="#846048" stroke-width="3" stroke-linecap="round"/>
 </svg>

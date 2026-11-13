@@ -6,31 +6,43 @@
       <stop offset="1" stop-color="#d84a28"/>
     </radialGradient>
   </defs>
-  <!-- whiskers poking out at the front -->
+  <!-- seen from behind: the fish turned to face right, back toward the viewer -->
+  <g transform="translate(256 0) scale(-1 1)">
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- vây đuôi chẻ đôi -->
+    <path d="M196 128 C214 98 236 74 252 70 C244 98 240 112 236 128 C240 144 244 158 252 186 C236 182 214 158 196 128 Z" fill="#f4e6c8"/>
+    <!-- vây lưng hình vương miện -->
+    <path d="M78 74 L88 30 L104 58 L120 24 L136 56 L152 26 L164 62 L178 46 L180 86 Z" fill="#f8c840"/>
+    <!-- vây bụng -->
+    <path d="M118 182 C116 208 128 226 150 230 C150 210 146 194 140 184 Z" fill="#f8c840"/>
+    <!-- thân -->
+    <ellipse cx="124" cy="128" rx="88" ry="66" fill="url(#body)"/>
+  </g>
+  <!-- bụng sáng -->
+  <path d="M58 150 C88 186 150 194 196 156 C178 184 150 194 120 194 C92 194 70 180 58 150 Z" fill="#f8d8a0"/>
+  <!-- vảy -->
+  <g fill="none" stroke="#c84020" stroke-width="3.5" stroke-linecap="round">
+    <path d="M110 104 a14 14 0 0 0 0 28 M132 96 a14 14 0 0 0 0 28 M154 104 a14 14 0 0 0 0 28 M132 124 a14 14 0 0 0 0 28 M154 132 a14 14 0 0 0 0 28 M176 116 a12 12 0 0 0 0 24"/>
+  </g>
+  <!-- vây ngực -->
+  <path d="M120 138 C134 132 150 138 156 154 C142 158 128 154 120 138 Z" fill="#f4e6c8" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <!-- râu -->
   <g fill="none" stroke="#2b2433" stroke-width="9" stroke-linecap="round">
-    <path d="M58 128 C36 118 20 98 18 70"/>
-    <path d="M198 128 C220 118 236 98 238 70"/>
+    <path d="M52 140 C30 150 14 172 18 204"/>
+    <path d="M60 148 C50 168 50 190 64 212"/>
   </g>
   <g fill="none" stroke="#f8e070" stroke-width="5" stroke-linecap="round">
-    <path d="M58 128 C36 118 20 98 18 70"/>
-    <path d="M198 128 C220 118 236 98 238 70"/>
+    <path d="M52 140 C30 150 14 172 18 204"/>
+    <path d="M60 148 C50 168 50 190 64 212"/>
   </g>
-  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- crown dorsal fin -->
-    <path d="M90 66 L96 26 L110 50 L120 16 L130 46 L142 18 L150 50 L164 32 L166 72 Z" fill="#f4e6c8"/>
-    <!-- side fins -->
-    <path d="M62 150 C42 158 30 176 30 196 C48 192 64 180 72 164 Z" fill="#f4e6c8"/>
-    <path d="M194 150 C214 158 226 176 226 196 C208 192 192 180 184 164 Z" fill="#f4e6c8"/>
-    <!-- body seen from behind -->
-    <ellipse cx="128" cy="130" rx="70" ry="74" fill="url(#body)"/>
-    <!-- split tail fin facing the viewer -->
-    <path d="M128 172 C110 190 92 214 80 250 C100 244 116 236 128 222 C140 236 156 244 176 250 C164 214 146 190 128 172 Z" fill="#f4e6c8"/>
+  <!-- môi dày há ra -->
+  <path d="M44 118 C34 118 28 128 32 138 C36 148 50 150 58 142 C52 136 50 126 44 118 Z" fill="#f08a9a" stroke="#2b2433" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M36 130 C42 132 48 132 54 136" fill="none" stroke="#2b2433" stroke-width="3" stroke-linecap="round"/>
+  <!-- ánh sáng trên lưng -->
+  <ellipse cx="104" cy="88" rx="26" ry="10" fill="#fff" opacity="0.32" transform="rotate(-14 104 88)"/>
+  <!-- mắt to tròn -->
+  <circle cx="78" cy="108" r="21" fill="#fff" stroke="#2b2433" stroke-width="4.5"/>
+  <circle cx="74" cy="109" r="7" fill="#1a1a2a"/>
+  <circle cx="72" cy="106" r="2.5" fill="#fff"/>
   </g>
-  <path d="M68 168 C84 196 106 204 116 202 M188 168 C172 196 150 204 140 202" fill="none" stroke="#f8d8a0" stroke-width="10" stroke-linecap="round"/>
-  <g fill="none" stroke="#c84020" stroke-width="3.5" stroke-linecap="round">
-    <path d="M100 94 a14 14 0 0 0 0 28 M128 86 a14 14 0 0 0 0 28 M156 94 a14 14 0 0 0 0 28 M114 120 a14 14 0 0 0 0 28 M142 120 a14 14 0 0 0 0 28"/>
-  </g>
-  <path d="M128 196 L128 226" fill="none" stroke="#d8c8a0" stroke-width="4" stroke-linecap="round"/>
-  <path d="M166 76 C200 98 206 144 186 174 C176 188 160 198 144 202 C182 174 190 120 166 76 Z" fill="#c84020" opacity="0.35"/>
-  <ellipse cx="100" cy="80" rx="24" ry="10" fill="#fff" opacity="0.32" transform="rotate(-24 100 80)"/>
 </svg>

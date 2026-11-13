@@ -1,31 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <radialGradient id="body" cx="36%" cy="28%" r="80%">
-      <stop offset="0" stop-color="#9a78d4"/>
-      <stop offset="0.6" stop-color="#7450b0"/>
-      <stop offset="1" stop-color="#4e3488"/>
-    </radialGradient>
-    <path id="hand" d="M-14 14 C-22 2 -20 -12 -12 -18 L-17 -36 C-18 -43 -7 -44 -6 -37 L-3 -23 L0 -41 C2 -47 12 -45 10 -38 L6 -21 L14 -31 C18 -36 27 -31 22 -24 L14 -10 C20 4 15 18 3 22 C-4 24 -10 20 -14 14 Z"/>
+    <linearGradient id="ghost" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#9484c4"/><stop offset="0.5" stop-color="#6a58a0"/><stop offset="1" stop-color="#46386e"/></linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- thân ma: gai trên đầu, đuôi khói cong -->
-    <path d="M120 224 C110 212 112 198 106 188 C86 184 72 174 64 160 L46 160 L60 140 C54 122 54 102 60 88 L36 66 L74 66 C82 56 92 48 104 44 L98 14 L124 40 C128 39 132 39 136 40 L162 12 L158 44 C172 50 182 58 188 68 L224 64 L198 88 C204 104 204 124 196 142 L212 160 L190 162 C182 176 166 186 150 190 C146 202 152 214 168 220 C152 232 130 234 120 224 Z" fill="url(#body)"/>
-    <!-- hai bàn tay lơ lửng -->
-    <use href="#hand" fill="#7450b0" transform="translate(30 192) rotate(-14)"/>
-    <use href="#hand" fill="#5e3e9a" transform="translate(226 192) scale(-1 1) rotate(-14)"/>
+    <!-- head + wispy body -->
+    <path d="M86 86 L112 6 L150 70 L250 84 L188 118 L236 146 L184 150 L212 188 L168 176 L178 238 L144 186 C124 196 98 194 80 180 C64 166 58 146 62 126 L46 116 L64 108 L50 94 L72 94 Z" fill="url(#ghost)"/>
+    <!-- floating hands -->
+    <path d="M8 122 C10 104 30 96 50 104 C64 110 66 126 58 136 L62 156 L50 144 L44 160 L36 144 L24 156 L24 140 C14 138 6 132 8 122 Z" fill="url(#ghost)"/>
+    <path d="M118 210 C120 194 140 186 158 194 C172 200 174 214 166 224 L170 246 L156 232 L150 250 L142 232 L130 246 L130 228 C122 226 116 220 118 210 Z" fill="url(#ghost)"/>
   </g>
-  <path d="M184 76 C198 104 196 140 180 164 C166 180 148 188 132 190 C168 160 186 122 184 76 Z" fill="#4e3488" opacity="0.5"/>
-  <ellipse cx="96" cy="64" rx="22" ry="9" fill="#fff" opacity="0.3" transform="rotate(-25 96 64)"/>
-  <!-- mắt -->
+  <path d="M150 74 L230 88 L186 108 Z" fill="#46386e" opacity="0.5"/>
+  <path d="M110 22 L136 66 L112 70 Z" fill="#b4a8dc" opacity="0.6"/>
+  <!-- mouth -->
+  <path d="M70 140 C84 154 126 160 160 140 C156 168 136 184 112 184 C90 184 74 166 70 140 Z" fill="#e47aa4" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M74 144 L84 158 L92 150 L102 162 L112 154 L122 162 L132 152 L142 160 L156 144 Z" fill="#fff" stroke="#2b2433" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M90 180 L98 170 L106 182 Z M118 182 L126 170 L132 180 Z" fill="#fff" stroke="#2b2433" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- eyes -->
   <g stroke="#2b2433" stroke-width="4" stroke-linejoin="round">
-    <path d="M74 86 C90 80 114 90 122 108 C104 118 82 108 74 86 Z" fill="#fff"/>
-    <path d="M182 86 C166 80 142 90 134 108 C152 118 174 108 182 86 Z" fill="#fff"/>
+    <path d="M70 104 L106 122 C104 136 88 138 78 130 C70 124 68 114 70 104 Z" fill="#fff"/>
+    <path d="M160 100 L122 122 C126 136 142 138 152 128 C160 120 162 110 160 100 Z" fill="#fff"/>
   </g>
-  <circle cx="106" cy="102" r="7" fill="#141018"/>
-  <circle cx="150" cy="102" r="7" fill="#141018"/>
-  <circle cx="108" cy="99" r="2.5" fill="#fff"/>
-  <circle cx="152" cy="99" r="2.5" fill="#fff"/>
-  <!-- miệng cười, lưỡi -->
-  <path d="M76 124 Q128 182 180 124 Q128 146 76 124 Z" fill="#3a1a3a" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M112 146 C112 168 144 168 144 146 Q128 152 112 146 Z" fill="#e8749c" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+  <circle cx="94" cy="124" r="4" fill="#1a1622"/>
+  <circle cx="134" cy="124" r="4" fill="#1a1622"/>
 </svg>

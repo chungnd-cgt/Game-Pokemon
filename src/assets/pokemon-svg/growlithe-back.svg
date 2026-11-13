@@ -1,24 +1,47 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="fur" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb468"/><stop offset="1" stop-color="#e07a30"/></linearGradient>
+    <linearGradient id="fur" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f4a050"/>
+      <stop offset="1" stop-color="#e88a3a"/>
+    </linearGradient>
+    <linearGradient id="mane" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbecc8"/>
+      <stop offset="1" stop-color="#f0dcb0"/>
+    </linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M68 74 L56 28 L102 52 Z" fill="url(#fur)"/>
-    <path d="M188 74 L200 28 L154 52 Z" fill="#e88a3a"/>
-    <path d="M62 96 C58 58 92 38 128 38 C164 38 198 58 194 96 C190 132 160 150 128 150 C96 150 66 132 62 96 Z" fill="url(#fur)"/>
-    <path d="M100 46 C106 26 122 22 128 14 C134 22 150 26 156 46 C146 54 136 48 128 56 C120 48 110 54 100 46 Z" fill="#f8e8b8"/>
-    <path d="M82 200 C72 212 70 236 74 248 L102 248 C104 232 102 212 98 200 Z" fill="url(#fur)"/>
-    <path d="M174 200 C184 212 186 236 182 248 L154 248 C152 232 154 212 158 200 Z" fill="#e88a3a"/>
-    <ellipse cx="128" cy="192" rx="70" ry="52" fill="url(#fur)"/>
-    <path d="M108 206 C90 170 104 130 128 120 C152 130 166 170 148 206 C140 226 116 226 108 206 Z" fill="#f8e8b8"/>
+    <!-- chân trước phía xa -->
+    <path d="M180 184 L182 232 C182 242 206 242 206 234 L208 182 Z" fill="#c8682a"/>
+    <!-- thân nhìn từ sau -->
+    <path d="M60 186 C58 150 100 128 150 126 C194 124 218 150 210 180 C202 206 160 218 116 220 C84 222 62 210 60 186 Z" fill="url(#fur)"/>
+    <!-- tai -->
+    <path d="M118 74 C100 66 92 46 100 34 C114 30 130 42 136 58 Z" fill="#e88a3a"/>
+    <path d="M206 58 C212 40 228 30 240 36 C246 50 236 68 220 76 Z" fill="#e88a3a"/>
+    <!-- đầu sau gáy -->
+    <path d="M110 96 C110 66 136 50 168 50 C202 50 226 68 226 98 C226 128 200 146 168 146 C134 146 110 126 110 96 Z" fill="url(#fur)"/>
+    <!-- chỏm tóc kem -->
+    <path d="M132 62 L126 40 L146 48 L150 22 L166 40 L184 16 L188 40 L210 32 L202 54 L218 62 L196 66 C180 58 154 58 132 62 Z" fill="url(#mane)"/>
+    <!-- hai chân sau gần -->
+    <path d="M62 190 L60 234 C60 244 88 244 88 236 L94 200 Z" fill="#e88a3a"/>
+    <path d="M122 200 L122 236 C122 244 150 244 150 236 L154 196 Z" fill="#e88a3a"/>
+    <!-- đuôi bông che mông -->
+    <path d="M100 196 C76 182 54 160 50 130 L36 124 L50 112 L44 94 L62 98 L66 78 L80 92 L94 76 L100 96 L118 94 L112 114 L128 122 L112 132 L124 146 L108 150 L118 168 L102 170 Z" fill="url(#mane)"/>
   </g>
+  <!-- sọc đen -->
   <g fill="#2b2433">
-    <path d="M66 170 L92 168 L84 180 Z"/>
-    <path d="M62 196 L88 192 L82 206 Z"/>
-    <path d="M190 170 L164 168 L172 180 Z"/>
-    <path d="M194 196 L168 192 L174 206 Z"/>
-    <path d="M70 82 L88 86 L74 94 Z"/>
-    <path d="M186 82 L168 86 L182 94 Z"/>
+    <path d="M150 150 L166 148 L160 168 L172 186 L154 184 L146 166 Z"/>
+    <path d="M188 150 L202 156 L196 174 L206 192 L190 188 L184 170 Z"/>
+    <path d="M62 210 L74 220 L90 208 L88 222 L74 230 L60 222 Z"/>
+    <path d="M122 212 L136 222 L152 210 L150 224 L136 232 L122 224 Z"/>
+    <path d="M120 106 L134 112 L128 124 Z M218 104 L204 112 L212 124 Z"/>
   </g>
-  <ellipse cx="96" cy="64" rx="20" ry="8" fill="#fff" opacity="0.35" transform="rotate(-20 96 64)"/>
+  <!-- bóng & sáng -->
+  <path d="M150 214 C178 208 202 196 210 178 C212 198 190 214 150 214 Z" fill="#c8682a"/>
+  <path d="M214 92 C218 118 200 138 172 144 C204 144 226 124 226 98 Z" fill="#c8682a" opacity="0.6"/>
+  <ellipse cx="72" cy="104" rx="12" ry="5" fill="#fff" opacity="0.6" transform="rotate(-40 72 104)"/>
+  <ellipse cx="166" cy="30" rx="10" ry="4" fill="#fff" opacity="0.6" transform="rotate(-15 166 30)"/>
+  <path d="M100 100 C104 122 102 144 96 160 L106 164 C112 144 112 120 100 100 Z" fill="#d8c090"/>
+  <g fill="none" stroke="#2b2433" stroke-width="2.5" stroke-linecap="round">
+    <path d="M68 238 L68 243 M76 238 L76 243 M130 238 L130 243 M138 238 L138 243"/>
+  </g>
 </svg>

@@ -14,6 +14,7 @@ import { GBA_MON, fitScale, pixelMon } from '../gfx/textures.js';
 import { COLORS, GENDER, backToWorld, closeButton, cssColor, drawHpBar, drawPanel, fitText, gradientRect, hpLabel, monTag, textStyle } from '../ui/helpers.js';
 import { ItemTip } from '../ui/BagParts.js';
 import { InputRouter, directionOf, isCancel, isConfirm } from '../ui/input.js';
+import { matches } from '../game/keybinds.js';
 import { withShinyMark } from '../ui/shinyMark.js';
 import { typeBadges } from '../ui/TypeBadge.js';
 
@@ -45,7 +46,6 @@ export default class SummaryScene extends Phaser.Scene {
     this.page = this.add.container(0, 0);
     this.router = new InputRouter(this);
     this.router.set((e) => this.handleKey(e), (p) => p.rightButtonDown() && this.close());
-    this.add.text(480, 700, '← →  Pokémon khác      B  Túi đồ (kéo đồ vào ô Đồ cầm)      Esc / X  Đóng', textStyle(16, '#aab4d0')).setOrigin(0.5, 1);
     closeButton(this, 940, 22, () => this.close(), 34).forEach((o) => o.setDepth(10));
     this.bagOpen = false;
     this.bagScroll = 0;
@@ -65,7 +65,7 @@ export default class SummaryScene extends Phaser.Scene {
     const n = state.party.length;
     if (dir === 'left' || dir === 'up') this.show((this.index - 1 + n) % n);
     else if (dir === 'right' || dir === 'down') this.show((this.index + 1) % n);
-    else if (e.code === 'KeyB' && !e.repeat) this.toggleBag();
+    else if (matches(e, 'bag') && !e.repeat) this.toggleBag();
     else if (isCancel(e) && this.bagOpen) this.toggleBag(false);
     else if (isCancel(e) || isConfirm(e)) this.close();
   }
@@ -145,7 +145,6 @@ export default class SummaryScene extends Phaser.Scene {
     };
     add(drawPanel(this, x, y, w, h, 18, true));
     add(this.add.text(x + 24, y + 18, 'Túi đồ', textStyle(22, '#3a4660', { fontStyle: 'bold' })));
-    add(this.add.text(x + 24, y + 50, 'Kéo vật phẩm thả vào ô Đồ cầm • kéo đồ đang cầm vào đây để cất', textStyle(14, MUTED)));
     closeButton(this, x + w - 30, y + 30, () => this.toggleBag(false), 28).forEach(add);
     const ids = this.holdable();
     if (!ids.length) {

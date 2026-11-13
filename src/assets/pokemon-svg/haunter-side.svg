@@ -1,22 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <radialGradient id="body" cx="36%" cy="28%" r="80%">
-      <stop offset="0" stop-color="#9a78d4"/>
-      <stop offset="0.6" stop-color="#7450b0"/>
-      <stop offset="1" stop-color="#4e3488"/>
-    </radialGradient>
-    <path id="hand" d="M-14 14 C-22 2 -20 -12 -12 -18 L-17 -36 C-18 -43 -7 -44 -6 -37 L-3 -23 L0 -41 C2 -47 12 -45 10 -38 L6 -21 L14 -31 C18 -36 27 -31 22 -24 L14 -10 C20 4 15 18 3 22 C-4 24 -10 20 -14 14 Z"/>
+    <linearGradient id="ghost" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#9484c4"/><stop offset="0.5" stop-color="#6a58a0"/><stop offset="1" stop-color="#46386e"/></linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <use href="#hand" fill="#5e3e9a" transform="translate(206 180) rotate(-30)"/>
-    <path d="M166 224 C148 216 146 202 148 190 C120 192 88 184 72 166 C58 150 52 130 54 110 C56 84 72 62 96 52 L90 20 L120 44 C126 43 132 43 138 44 L172 16 L164 52 C178 58 188 66 194 78 L234 68 L206 96 C212 108 214 120 212 132 L242 142 L208 154 C200 170 186 182 172 188 C170 200 178 210 194 214 C186 222 178 226 166 224 Z" fill="url(#body)"/>
-    <use href="#hand" fill="#7450b0" transform="translate(34 186) rotate(-40)"/>
+    <!-- far hand -->
+    <path d="M40 186 C42 170 60 162 78 170 C90 176 92 190 84 200 L88 218 L76 206 L70 222 L62 206 L52 218 L52 202 C44 200 38 194 40 186 Z" fill="#544484"/>
+    <!-- head + body, spikes sweeping back to the right -->
+    <path d="M70 74 L118 4 L140 66 L252 70 L176 108 L244 136 L178 144 L222 188 L162 170 L188 238 L138 182 C118 190 92 188 72 176 C54 164 46 146 48 126 L34 118 L50 110 L38 98 L58 96 Z" fill="url(#ghost)"/>
+    <!-- near hand reaching forward -->
+    <path d="M4 128 C6 110 26 102 46 110 C60 116 62 132 54 142 L58 162 L46 150 L40 166 L32 150 L20 162 L20 146 C10 144 2 138 4 128 Z" fill="url(#ghost)"/>
   </g>
-  <path d="M190 84 C206 112 204 146 186 168 C172 182 156 188 140 190 C176 160 192 124 190 84 Z" fill="#4e3488" opacity="0.5"/>
-  <ellipse cx="100" cy="70" rx="20" ry="8" fill="#fff" opacity="0.3" transform="rotate(-30 100 70)"/>
-  <path d="M60 94 C72 86 94 92 100 108 C86 116 68 112 60 94 Z" fill="#fff" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
-  <circle cx="82" cy="102" r="6.5" fill="#141018"/>
-  <circle cx="84" cy="99" r="2.5" fill="#fff"/>
-  <path d="M56 128 C70 140 98 144 120 132 C112 162 90 170 74 162 C64 154 58 142 56 128 Z" fill="#3a1a3a" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M70 152 C70 170 98 172 100 152 Q86 158 70 152 Z" fill="#e8749c" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M140 70 L236 74 L180 100 Z" fill="#46386e" opacity="0.5"/>
+  <path d="M116 22 L130 64 L104 70 Z" fill="#b4a8dc" opacity="0.6"/>
+  <path d="M56 140 C68 152 96 156 118 144 C114 168 98 180 80 180 C64 180 54 162 56 140 Z" fill="#e47aa4" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M58 144 L66 156 L74 148 L84 160 L94 150 L104 158 L116 146 Z" fill="#fff" stroke="#2b2433" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M62 102 L100 120 C98 134 82 136 72 128 C64 122 60 112 62 102 Z" fill="#fff" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="80" cy="122" r="4" fill="#1a1622"/>
 </svg>

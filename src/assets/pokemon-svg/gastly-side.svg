@@ -35,9 +35,9 @@
   <circle cx="122" cy="122" r="62" fill="url(#ball)" stroke="#2b2433" stroke-width="5"/>
   <ellipse cx="140" cy="80" rx="20" ry="8" fill="#fff" opacity="0.22" transform="rotate(25 140 80)"/>
   <!-- mắt nhìn sang trái -->
-  <path d="M60 92 C72 84 92 92 98 110 C84 118 66 110 60 92 Z" fill="#fff" stroke="#2b2433" stroke-width="3.5" stroke-linejoin="round"/>
-  <circle cx="80" cy="103" r="6" fill="#141018"/>
+  <path d="M50 84 C68 72 102 86 108 112 C86 124 58 112 50 84 Z" fill="#fff" stroke="#141018" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="84" cy="102" r="6" fill="#141018"/>
   <!-- miệng -->
-  <path d="M64 138 Q96 150 124 140 Q118 176 92 178 Q70 174 64 138 Z" fill="#7a2a48" stroke="#141018" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M64 138 Q96 150 124 140 Q118 176 92 178 Q70 174 64 138 Z" fill="#6a2858" stroke="#141018" stroke-width="4" stroke-linejoin="round"/>
   <path d="M76 142 L83 160 L91 145 Z" fill="#fff" stroke="#141018" stroke-width="2.5" stroke-linejoin="round"/>
 </svg>

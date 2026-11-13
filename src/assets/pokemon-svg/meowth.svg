@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
     <linearGradient id="fur" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#fbf0cc"/>
-      <stop offset="1" stop-color="#f6e6b8"/>
+      <stop offset="0" stop-color="#fbeec6"/>
+      <stop offset="1" stop-color="#f2dca0"/>
     </linearGradient>
     <radialGradient id="coin" cx="40%" cy="35%" r="70%">
       <stop offset="0" stop-color="#fff2a0"/>
@@ -13,26 +13,26 @@
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
     <!-- đuôi dài cong chữ S sau lưng, chóp nâu -->
     <path d="M160 214 C200 214 226 196 226 168 C226 146 208 136 196 148 C188 156 196 168 206 162" fill="none" stroke="#2b2433" stroke-width="17"/>
-    <path d="M160 214 C200 214 226 196 226 168 C226 146 208 136 196 148 C188 156 196 168 206 162" fill="none" stroke="#f6e6b8" stroke-width="9"/>
+    <path d="M160 214 C200 214 226 196 226 168 C226 146 208 136 196 148 C188 156 196 168 206 162" fill="none" stroke="#f2dca0" stroke-width="9"/>
     <circle cx="206" cy="160" r="9" fill="#8a5a32"/>
     <!-- tai nhọn to, trong tai nâu đen -->
     <path d="M70 84 C56 58 46 30 42 6 C70 18 98 38 112 60 Z" fill="url(#fur)"/>
-    <path d="M186 84 C200 58 210 30 214 6 C186 18 158 38 144 60 Z" fill="#f6e6b8"/>
+    <path d="M186 84 C200 58 210 30 214 6 C186 18 158 38 144 60 Z" fill="#f2dca0"/>
     <!-- chân -->
-    <ellipse cx="104" cy="242" rx="20" ry="10" fill="#f6e6b8"/>
-    <ellipse cx="152" cy="242" rx="20" ry="10" fill="#f6e6b8"/>
+    <ellipse cx="104" cy="242" rx="20" ry="10" fill="#9a6a3a"/>
+    <ellipse cx="152" cy="242" rx="20" ry="10" fill="#9a6a3a"/>
     <!-- thân nhỏ đứng thẳng -->
     <path d="M96 168 C84 200 90 240 128 242 C166 240 172 200 160 168 C150 154 106 154 96 168 Z" fill="url(#fur)"/>
     <!-- tay -->
-    <path d="M100 178 C86 186 80 200 86 208 C94 212 104 200 110 190 Z" fill="#fbf0cc"/>
-    <path d="M156 178 C170 186 176 200 170 208 C162 212 152 200 146 190 Z" fill="#f6e6b8"/>
+    <path d="M100 178 C86 186 80 200 86 208 C94 212 104 200 110 190 Z" fill="#fbeec6"/>
+    <path d="M156 178 C170 186 176 200 170 208 C162 212 152 200 146 190 Z" fill="#f2dca0"/>
     <!-- đầu to -->
     <ellipse cx="128" cy="110" rx="72" ry="58" fill="url(#fur)"/>
   </g>
   <path d="M54 22 C70 32 86 46 96 60 C86 62 76 64 70 70 C64 54 58 38 54 22 Z" fill="#5a3426"/>
   <path d="M202 22 C186 32 170 46 160 60 C170 62 180 64 186 70 C192 54 198 38 202 22 Z" fill="#5a3426"/>
   <!-- bóng má phải -->
-  <path d="M184 82 C202 104 200 140 176 156 C160 166 140 168 124 166 C160 152 186 124 184 82 Z" fill="#e8d098" opacity="0.6"/>
+  <path d="M184 82 C202 104 200 140 176 156 C160 166 140 168 124 166 C160 152 186 124 184 82 Z" fill="#d8bc7c" opacity="0.6"/>
   <ellipse cx="94" cy="78" rx="22" ry="9" fill="#fff" opacity="0.5" transform="rotate(-18 94 78)"/>
   <!-- đồng xu vàng trên trán -->
   <ellipse cx="128" cy="64" rx="17" ry="21" fill="url(#coin)" stroke="#2b2433" stroke-width="4.5"/>

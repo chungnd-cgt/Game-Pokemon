@@ -88,7 +88,7 @@ const bikeQuest = questNpc({
     ],
     hint: ['Xích ở Tuyến đường 4, bánh xe ở Tuyến đường 5, yên xe ở Tuyến đường 6. Nhờ cậu đấy!'],
     done: ['Đủ cả rồi! Cậu đúng là ân nhân của tiệm.', 'Như đã hứa, chiếc xe đạp này là của cậu. Không lấy một đồng nào!'],
-    after: ['Xe chạy êm chứ? Bấm C để lên / xuống xe nhé.'],
+    after: ['Xe chạy êm chứ? Bấm {key:bike} để lên / xuống xe nhé.'],
     need: { items: BIKE_PARTS },
     reward: ['bicycle', 1],
   },
@@ -99,7 +99,7 @@ const bikeOwner = {
   ...bikeQuest,
   async onTalk(world) {
     if (itemCount('bicycle')) {
-      await world.say(this.name, ['Xe chạy êm chứ? Bấm C để lên / xuống xe nhé.']);
+      await world.say(this.name, ['Xe chạy êm chứ? Bấm {key:bike} để lên / xuống xe nhé.']);
       return;
     }
     if (!questTaken('bike')) {
@@ -213,7 +213,7 @@ export const QUEST_NPCS = [
       ],
       hint: ['Thắng gym Lò Gốm và mang theo một Pokémon hệ Lửa từ cấp 35 trở lên.'],
       done: ['Ánh mắt của Pokémon kia cho ta biết cậu chăm nó rất tốt.', 'Arcanine, từ giờ hãy theo cậu ấy nhé!'],
-      after: ['Bấm R để cưỡi Arcanine. Nó chạy nhanh như gió đấy!'],
+      after: ['Bấm {key:ride} để cưỡi Arcanine. Nó chạy nhanh như gió đấy!'],
       need: { badge: 'fire', show: { type: 'fire', level: 35 } },
       reward: ['arcanineMount', 1],
     },
@@ -225,7 +225,7 @@ export const QUEST_NPCS = [
       ask: ['Lapras trong hồ này mùa đông kén ăn lắm, chỉ thích quả Aspear mát lạnh.', 'Bạn mang giúp mình 3 quả Aspear được không?'],
       hint: ['Quả Aspear hái ở Tuyến đường 10, Làng Đèo Tuyết hoặc dãy cây ngay trong thành phố này. Mình cần 3 quả.'],
       done: ['Lapras ăn ngon lành rồi! Nó quý bạn lắm đó.', 'Nó muốn đi theo bạn ngắm biển. Bạn chở nó... à không, nó chở bạn nhé!'],
-      after: ['Đứng ở bờ nước bấm Enter, chọn cưỡi Lapras để lướt thật nhanh.'],
+      after: ['Đứng ở bờ nước bấm {key:confirm}, chọn cưỡi Lapras để lướt thật nhanh.'],
       need: { items: { aspearBerry: 3 } },
       reward: ['laprasMount', 1],
     },

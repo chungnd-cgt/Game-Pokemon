@@ -1,57 +1,57 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff27a"/><stop offset="1" stop-color="#f0b81e"/></linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff27a"/><stop offset="1" stop-color="#f8c828"/></linearGradient>
     <linearGradient id="red" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff6a4a"/><stop offset="1" stop-color="#d43626"/></linearGradient>
     <radialGradient id="flame" cx="50%" cy="72%" r="65%"><stop offset="0" stop-color="#fff7b0"/><stop offset="0.42" stop-color="#ffc63a"/><stop offset="1" stop-color="#f04a1c"/></radialGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- tail sweeping back, flame tip -->
-    <path d="M170 200 C204 214 228 200 232 170" fill="none" stroke-width="24"/>
-    <path d="M170 200 C204 214 228 200 232 170" fill="none" stroke="#f0b81e" stroke-width="14"/>
-    <path d="M180 206 C206 212 222 200 226 184" fill="none" stroke="#d43626" stroke-width="5" stroke-linecap="round"/>
-    <path d="M232 174 C210 162 210 134 222 116 C226 104 230 94 230 82 C244 98 254 120 252 142 C250 160 242 172 232 174 Z" fill="url(#flame)"/>
-    <!-- far leg -->
-    <path d="M150 226 C170 228 182 238 180 246 C178 251 172 252 164 252 L136 252 C130 252 128 246 132 238 C136 230 142 226 150 226 Z" fill="#d43626"/>
-    <path d="M138 220 L170 220 L170 232 L138 232 Z" fill="#2b2433" stroke-width="3"/>
-    <ellipse cx="156" cy="196" rx="30" ry="28" fill="#f0b81e"/>
-    <!-- far arm, behind the body -->
-    <path d="M150 134 C170 146 178 160 180 178" fill="none" stroke-width="22"/>
-    <path d="M150 134 C170 146 178 160 180 178" fill="none" stroke="#c42e20" stroke-width="12"/>
-    <!-- stocky torso: yellow belly -->
-    <path d="M78 126 C64 158 72 198 108 212 C136 222 168 208 176 176 C182 146 168 120 146 112 C122 104 92 108 78 126 Z" fill="url(#skin)"/>
-    <!-- red upper body, flame-shaped edge -->
-    <path d="M78 126 C74 136 72 146 74 156 L86 146 L92 166 L104 150 L114 170 L124 150 L138 164 L144 146 L158 156 L172 146 C178 132 166 118 146 112 C122 104 92 108 78 126 Z" fill="url(#red)" stroke-width="4"/>
-    <!-- near leg: big yellow thigh, black band, red foot -->
-    <path d="M76 226 C56 228 44 238 46 246 C48 251 54 252 62 252 L96 252 C104 252 106 246 102 238 C98 230 90 226 76 226 Z" fill="url(#red)"/>
-    <path d="M64 220 L98 220 L98 232 L64 232 Z" fill="#2b2433" stroke-width="3"/>
-    <ellipse cx="96" cy="194" rx="36" ry="30" fill="url(#skin)"/>
-    <!-- black neck collar -->
-    <path d="M70 102 Q96 116 120 104 L122 116 Q96 130 70 114 Z" fill="#2b2433" stroke-width="3"/>
-    <!-- flame tufts on the head, blowing back -->
-    <path d="M100 46 C102 28 118 14 138 10 C130 20 132 30 138 36 C130 44 120 50 108 52 Z" fill="url(#flame)"/>
-    <path d="M80 44 C76 26 86 10 102 2 C98 14 102 24 108 30 C102 38 94 44 86 48 Z" fill="url(#flame)"/>
-    <!-- red round head -->
-    <path d="M64 70 C62 48 80 34 100 34 C122 34 136 50 134 72 C132 94 116 106 96 106 C78 106 66 92 64 70 Z" fill="url(#red)"/>
-    <!-- short flat yellow bill -->
-    <path d="M70 80 C58 78 44 82 36 90 C42 100 58 104 72 98 Z" fill="#ffe25a"/>
-    <!-- near arm reaching forward, flame spikes, white claws -->
-    <path d="M104 136 C86 146 72 156 58 166" fill="none" stroke-width="26"/>
-    <path d="M104 136 C86 146 72 156 58 166" fill="none" stroke="#ff6a4a" stroke-width="16"/>
-    <path d="M86 140 L80 120 L96 134 Z M72 150 L58 134 L78 144 Z" fill="#f05a2a" stroke-width="4"/>
-    <path d="M50 162 L28 160 L42 170 L28 180 L50 176 Z" fill="#fff" stroke-width="4"/>
+    <!-- tail behind, flame tip -->
+    <path d="M160 204 C198 214 224 198 228 164" fill="none" stroke-width="24"/>
+    <path d="M160 204 C198 214 224 198 228 164" fill="none" stroke="#f0b81e" stroke-width="14"/>
+    <path d="M228 168 C208 158 206 132 218 114 C222 104 224 94 222 82 C240 98 252 120 250 142 C248 158 240 168 228 168 Z" fill="url(#flame)"/>
+    <!-- far arm raised behind -->
+    <path d="M144 128 C164 124 176 112 180 92" fill="none" stroke-width="26"/>
+    <path d="M144 128 C164 124 176 112 180 92" fill="none" stroke="#c42e20" stroke-width="16"/>
+    <path d="M172 90 L170 66 L180 80 L190 64 L190 90 Z" fill="#fff" stroke-width="4"/>
+    <!-- far foot -->
+    <path d="M150 226 C132 228 124 238 126 246 L172 246 C174 236 166 226 150 226 Z" fill="#c42e20"/>
+    <path d="M138 216 L166 216 L166 230 L138 230 Z" fill="#2b2433" stroke-width="3"/>
+    <!-- round yellow belly -->
+    <ellipse cx="118" cy="166" rx="46" ry="44" fill="url(#skin)"/>
+    <!-- red back, flame edge toward the belly -->
+    <path d="M118 112 C146 110 166 128 166 156 C166 176 160 192 150 202 L144 182 L134 192 L134 170 L120 178 L126 156 L110 160 L120 140 L104 138 L112 124 L96 122 C100 116 108 112 118 112 Z" fill="url(#red)" stroke-width="4"/>
+    <!-- near foot, claws forward -->
+    <path d="M104 226 C84 228 74 238 76 246 L130 246 C132 236 122 226 104 226 Z" fill="url(#red)"/>
+    <path d="M80 246 L68 252 L86 252 Z" fill="#fff" stroke-width="3"/>
+    <path d="M90 216 L122 216 L122 230 L90 230 Z" fill="#2b2433" stroke-width="3"/>
+    <!-- big near thigh -->
+    <ellipse cx="116" cy="194" rx="36" ry="28" fill="url(#skin)"/>
+    <!-- flame crest, blowing up and back -->
+    <path d="M104 50 C96 34 102 16 116 6 C116 18 120 24 128 26 C130 18 136 14 142 12 C138 22 142 30 150 32 C156 30 160 26 162 20 C168 36 160 54 142 58 Z" fill="url(#flame)"/>
+    <!-- black collar -->
+    <path d="M90 104 Q118 118 144 104 L144 116 Q118 130 90 116 Z" fill="#2b2433" stroke-width="3"/>
+    <!-- round red head -->
+    <path d="M80 76 C78 56 94 42 114 42 C136 42 150 58 148 80 C146 100 132 112 112 112 C94 112 82 98 80 76 Z" fill="url(#red)"/>
+    <!-- big pale pouty lips, pushed forward -->
+    <path d="M88 80 C76 74 58 76 50 86 C46 98 58 108 74 108 C88 108 96 100 94 90 Z" fill="#ffe8a0"/>
+    <!-- near arm held forward at chest height, ringed, white claws up -->
+    <path d="M122 134 C100 146 80 146 64 136" fill="none" stroke-width="28"/>
+    <path d="M122 134 C100 146 80 146 64 136" fill="none" stroke="#ff6a4a" stroke-width="18"/>
+    <path d="M104 150 L98 166 L92 146 Z M84 152 L74 166 L72 146 Z" fill="#f05a2a" stroke-width="4"/>
+    <path d="M60 138 L44 120 L60 126 L58 110 L72 132 Z" fill="#fff" stroke-width="4"/>
   </g>
-  <!-- red flame marks on belly and thigh -->
-  <path d="M138 196 C134 184 140 176 146 168 C148 180 156 186 150 198 Z" fill="#e84a2a" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M90 208 C84 196 92 186 98 178 C100 190 108 196 102 210 Z" fill="#e84a2a" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M52 96 Q70 101 92 94" fill="none" stroke="#2b2433" stroke-width="3.5" stroke-linecap="round"/>
+  <ellipse cx="64" cy="84" rx="6" ry="2.5" fill="#fff" opacity="0.7"/>
+  <!-- flame marks on belly and thigh -->
+  <path d="M84 196 C78 184 86 176 90 166 C94 178 102 182 98 196 Z" fill="#e84a2a" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M120 212 C116 200 122 192 128 186 C130 196 136 202 132 214 Z" fill="#e84a2a" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
   <!-- shading -->
-  <path d="M160 126 C176 150 176 186 150 206 C176 196 182 170 176 146 C172 136 166 130 160 126 Z" fill="#c87414" opacity="0.35"/>
-  <path d="M124 50 C138 66 134 90 116 102 C108 106 100 106 94 106 C118 94 128 74 124 50 Z" fill="#9c1e14" opacity="0.4"/>
-  <ellipse cx="84" cy="48" rx="12" ry="5" fill="#fff" opacity="0.45" transform="rotate(-25 84 48)"/>
-  <ellipse cx="84" cy="184" rx="10" ry="5" fill="#fff" opacity="0.4" transform="rotate(-30 84 184)"/>
-  <path d="M40 92 C50 94 60 94 70 90" fill="none" stroke="#2b2433" stroke-width="3" stroke-linecap="round"/>
+  <path d="M138 52 C152 66 150 90 138 102 C132 108 124 112 116 112 C134 98 142 78 138 52 Z" fill="#9c1e14" opacity="0.4"/>
+  <ellipse cx="100" cy="54" rx="10" ry="4" fill="#fff" opacity="0.45" transform="rotate(-25 100 54)"/>
+  <ellipse cx="96" cy="182" rx="9" ry="5" fill="#fff" opacity="0.4" transform="rotate(-30 96 182)"/>
   <!-- half-lidded eye -->
-  <path d="M68 58 L88 62 C88 72 82 76 76 75 C70 74 67 68 68 58 Z" fill="#fff" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
-  <ellipse cx="75" cy="68" rx="4" ry="5" fill="#1a1418"/>
-  <circle cx="74" cy="66" r="1.5" fill="#fff"/>
-  <path d="M66 57 L91 61" stroke="#2b2433" stroke-width="5" stroke-linecap="round"/>
+  <path d="M86 64 L104 68 C104 76 100 80 94 80 C88 80 85 74 86 64 Z" fill="#fff" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <ellipse cx="93" cy="73" rx="3.5" ry="4.5" fill="#1a1418"/>
+  <circle cx="92" cy="71" r="1.5" fill="#fff"/>
+  <path d="M84 63 L106 67" stroke="#2b2433" stroke-width="5" stroke-linecap="round"/>
 </svg>

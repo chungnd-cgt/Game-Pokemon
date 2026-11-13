@@ -1,29 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="feather" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d8a670"/><stop offset="1" stop-color="#a87444"/></linearGradient>
-    <linearGradient id="crest" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f06a6a"/><stop offset="1" stop-color="#c83c48"/></linearGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fae078"/><stop offset="1" stop-color="#ecbc34"/></linearGradient>
+    <linearGradient id="feather" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d8a670"/>
+      <stop offset="1" stop-color="#a87444"/>
+    </linearGradient>
+    <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4dc98"/>
+      <stop offset="1" stop-color="#d8b06a"/>
+    </linearGradient>
+    <linearGradient id="crest" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f4c040"/>
+      <stop offset="0.35" stop-color="#e8502e"/>
+      <stop offset="1" stop-color="#d8382a"/>
+    </linearGradient>
   </defs>
-  <g stroke="#2b2433" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M104 226 L92 250 M110 228 L110 252 M146 228 L146 252 M152 226 L164 250" stroke-width="11"/>
-    <path d="M104 226 L92 250 M110 228 L110 252 M146 228 L146 252 M152 226 L164 250" stroke="#ec9e90" stroke-width="5"/>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M102 200 L74 248 L100 238 L112 254 L128 236 L144 254 L156 238 L182 248 L154 200 Z" fill="#e2482e"/>
+    <path d="M110 214 L100 238 M128 212 L128 236 M146 214 L156 238" fill="none" stroke="#f4c040" stroke-width="4"/>
+  </g>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M100 218 L100 234 M100 234 L88 240 M100 234 L100 242 M100 234 L112 240 M156 218 L156 234 M156 234 L144 240 M156 234 L156 242 M156 234 L168 240 " fill="none" stroke="#2b2433" stroke-width="12"/>
+    <path d="M100 218 L100 234 M100 234 L88 240 M100 234 L100 242 M100 234 L112 240 M156 218 L156 234 M156 234 L144 240 M156 234 L156 242 M156 234 L168 240 " fill="none" stroke="#e898a8" stroke-width="6"/>
   </g>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- hai cánh xòe -->
-    <path d="M96 150 C80 104 46 58 4 34 C10 62 2 80 14 98 C6 114 12 128 24 136 C20 152 30 164 44 168 C62 178 84 172 100 164 Z" fill="#8e6036"/>
-    <path d="M160 150 C176 104 210 58 252 34 C246 62 254 80 242 98 C250 114 244 128 232 136 C236 152 226 164 212 168 C194 178 172 172 156 164 Z" fill="#8e6036"/>
-    <!-- đuôi xòe đỏ vàng -->
-    <path d="M108 200 L84 252 L128 228 Z" fill="url(#gold)"/>
-    <path d="M148 200 L172 252 L128 228 Z" fill="url(#gold)"/>
-    <path d="M114 204 L128 254 L142 204 Z" fill="url(#crest)"/>
-    <ellipse cx="128" cy="172" rx="62" ry="56" fill="url(#feather)"/>
-    <ellipse cx="128" cy="96" rx="50" ry="44" fill="url(#feather)"/>
-    <!-- mào dài rủ xuống lưng -->
-    <path d="M98 66 C82 114 92 166 128 206 C164 166 174 114 158 66 Z" fill="url(#crest)"/>
-    <path d="M110 56 C102 104 108 146 128 184 C148 146 154 104 146 56 Z" fill="url(#gold)"/>
-    <path d="M90 74 C84 54 86 36 96 22 C102 36 108 44 114 50 C114 30 120 14 128 4 C136 14 142 30 142 50 C148 44 154 36 160 22 C170 36 172 54 166 74 C150 64 140 62 128 66 C116 62 106 64 90 74 Z" fill="url(#gold)"/>
+    <path d="M56 150 C52 104 86 76 128 76 C170 76 204 104 200 150 C196 200 166 224 128 224 C90 224 60 200 56 150 Z" fill="#a87444"/>
+    <path d="M128 100 C104 124 92 164 96 214 M128 100 C152 124 164 164 160 214" fill="none" stroke-width="4"/>
+    <path d="M84 70 C82 40 104 22 128 22 C152 22 174 40 172 70 C170 96 152 110 128 110 C104 110 86 96 84 70 Z" fill="url(#feather)"/>
+    <path d="M104 30 C110 4 150 0 158 24 C178 40 186 80 176 120 C168 160 150 190 136 206 C140 166 146 120 128 84 C114 60 102 48 104 30 Z" fill="url(#crest)"/>
+    <path d="M132 16 C152 40 160 80 150 140" fill="none" stroke="#f8e070" stroke-width="5"/>
   </g>
-  <path d="M30 104 C50 112 70 128 86 148 M226 104 C206 112 186 128 170 148" fill="none" stroke="#6e4826" stroke-width="4" stroke-linecap="round"/>
-  <path d="M128 70 L128 170" stroke="#d8a838" stroke-width="4" stroke-linecap="round"/>
-  <ellipse cx="104" cy="70" rx="14" ry="6" fill="#fff" opacity="0.3" transform="rotate(-20 104 70)"/>
+  <ellipse cx="102" cy="44" rx="12" ry="5" fill="#fff" opacity="0.35" transform="rotate(-25 102 44)"/>
 </svg>

@@ -1,33 +1,55 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <radialGradient id="body" cx="38%" cy="32%" r="75%">
-      <stop offset="0" stop-color="#b098c8"/>
-      <stop offset="0.6" stop-color="#8a6aa8"/>
-      <stop offset="1" stop-color="#5e4480"/>
+    <radialGradient id="body" cx="38%" cy="32%" r="72%">
+      <stop offset="0" stop-color="#b09ad0"/>
+      <stop offset="1" stop-color="#8a6aa8"/>
     </radialGradient>
   </defs>
-  <g fill="#c8c0a0" opacity="0.75">
-    <circle cx="200" cy="70" r="16"/>
-    <circle cx="218" cy="52" r="10"/>
-    <circle cx="44" cy="96" r="12"/>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- gas puffs -->
+    <path d="M14 58 C10 42 26 32 38 38 C44 26 64 28 66 42 C78 44 80 62 66 66 C60 78 38 78 34 68 C20 72 10 66 14 58 Z" fill="#e4dc98"/>
+    <path d="M196 34 C196 20 214 14 224 24 C236 18 250 30 244 42 C254 52 244 66 232 62 C226 72 206 70 204 58 C192 56 188 42 196 34 Z" fill="#e4dc98"/>
+    <path d="M14 212 C12 198 28 192 36 200 C44 190 62 196 60 210 C68 220 56 234 44 228 C34 236 16 228 14 212 Z" fill="#e4dc98"/>
+    <path d="M208 206 C210 194 226 192 232 202 C246 200 252 218 240 224 C238 238 218 238 214 228 C202 226 200 212 208 206 Z" fill="#e4dc98"/>
+    <!-- bumps around the rim -->
+    <circle cx="128" cy="38" r="13" fill="#8a6aa8"/>
+    <circle cx="70" cy="58" r="12" fill="#9a80bc"/>
+    <circle cx="186" cy="58" r="12" fill="#8a6aa8"/>
+    <circle cx="40" cy="128" r="13" fill="#9a80bc"/>
+    <circle cx="216" cy="128" r="13" fill="#7a5c98"/>
+    <circle cx="62" cy="196" r="12" fill="#8a6aa8"/>
+    <circle cx="194" cy="196" r="12" fill="#7a5c98"/>
+    <circle cx="128" cy="222" r="13" fill="#7a5c98"/>
+    <!-- round body -->
+    <circle cx="128" cy="130" r="90" fill="url(#body)"/>
   </g>
-  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round">
-    <path d="M84 70 l-6 -22 l18 12 Z M128 52 l0 -24 l12 20 Z M174 70 l10 -20 l2 24 Z M200 120 l22 -6 l-12 18 Z M58 128 l-22 -4 l16 16 Z M76 192 l-14 18 l22 -6 Z M180 192 l16 16 l-4 -22 Z" fill="#8a6aa8"/>
-    <circle cx="128" cy="134" r="84" fill="url(#body)"/>
+  <!-- craters -->
+  <g fill="#7a5c98">
+    <ellipse cx="70" cy="96" rx="9" ry="7"/>
+    <ellipse cx="190" cy="98" rx="8" ry="6"/>
+    <ellipse cx="74" cy="176" rx="8" ry="6"/>
+    <ellipse cx="186" cy="174" rx="9" ry="7"/>
+    <ellipse cx="128" cy="62" rx="8" ry="5"/>
   </g>
-  <g stroke="#2b2433" stroke-width="3">
-    <circle cx="70" cy="110" r="10" fill="#9a7cb8"/>
-    <circle cx="186" cy="104" r="8" fill="#9a7cb8"/>
-    <circle cx="176" cy="186" r="9" fill="#9a7cb8"/>
+  <path d="M190 70 C226 110 224 170 176 206 C206 170 210 116 190 70 Z" fill="#6a4c88" opacity="0.5"/>
+  <ellipse cx="88" cy="74" rx="20" ry="10" fill="#fff" opacity="0.35" transform="rotate(-30 88 74)"/>
+  <!-- big eyes -->
+  <g stroke="#2b2433" stroke-width="4">
+    <ellipse cx="100" cy="100" rx="17" ry="19" fill="#fff"/>
+    <ellipse cx="156" cy="100" rx="17" ry="19" fill="#fff"/>
   </g>
-  <path d="M108 168 C102 158 108 148 120 150 C120 140 136 140 136 150 C148 148 154 158 148 168 C150 176 144 184 136 182 L136 190 L120 190 L120 182 C112 184 106 176 108 168 Z" fill="#f4ecd0" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
-  <circle cx="121" cy="164" r="5" fill="#2b2433"/>
-  <circle cx="135" cy="164" r="5" fill="#2b2433"/>
-  <path d="M100 98 C108 90 120 92 124 102 C114 106 106 106 100 98 Z M156 98 C148 90 136 92 132 102 C142 106 150 106 156 98 Z" fill="#2b2433"/>
-  <ellipse cx="112" cy="110" rx="9" ry="11" fill="#fff" stroke="#2b2433" stroke-width="3"/>
-  <ellipse cx="144" cy="110" rx="9" ry="11" fill="#fff" stroke="#2b2433" stroke-width="3"/>
-  <circle cx="113" cy="112" r="5" fill="#1a1010"/>
-  <circle cx="143" cy="112" r="5" fill="#1a1010"/>
-  <path d="M112 132 Q128 140 144 132" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
-  <ellipse cx="96" cy="74" rx="20" ry="9" fill="#fff" opacity="0.3" transform="rotate(-25 96 74)"/>
+  <circle cx="102" cy="106" r="6" fill="#2b2433"/>
+  <circle cx="154" cy="106" r="6" fill="#2b2433"/>
+  <path d="M82 92 C90 80 112 80 118 92" fill="#8a6aa8" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M138 92 C144 80 166 80 174 92" fill="#8a6aa8" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <!-- wide grin with fangs -->
+  <path d="M80 130 C96 168 160 168 176 130 C152 138 104 138 80 130 Z" fill="#5a2a4a" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M100 152 C112 144 144 144 156 152 C146 160 110 160 100 152 Z" fill="#e88aa0"/>
+  <path d="M90 134 l6 10 l5 -9 Z M166 134 l-6 10 l-5 -9 Z" fill="#fff" stroke="#2b2433" stroke-width="2"/>
+  <!-- skull and crossbones -->
+  <path d="M104 186 L152 212 M152 186 L104 212" stroke="#2b2433" stroke-width="12" stroke-linecap="round"/>
+  <path d="M104 186 L152 212 M152 186 L104 212" stroke="#f0e8c8" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="128" cy="184" r="11" fill="#f0e8c8" stroke="#2b2433" stroke-width="3"/>
+  <circle cx="124" cy="183" r="2.5" fill="#2b2433"/>
+  <circle cx="132" cy="183" r="2.5" fill="#2b2433"/>
 </svg>

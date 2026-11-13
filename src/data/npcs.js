@@ -49,7 +49,7 @@ export const NPCS = [
   },
   {
     id: 'boy', sprite: 'npc-boy', name: 'Cậu bé', map: 'route1', x: 12, y: 17, facing: 'down', wander: 2,
-    lines: ['Bấm P để mở Pokédex nha!', 'Gặp Pokémon nào là Pokédex ghi lại, bắt được thì xem được hết thông tin luôn!'],
+    lines: ['Bấm {key:dex} để mở Pokédex nha!', 'Gặp Pokémon nào là Pokédex ghi lại, bắt được thì xem được hết thông tin luôn!'],
   },
   {
     id: 'woman', sprite: 'npc-woman', name: 'Cô hàng xóm', map: 'route1', x: 8, y: 7, facing: 'down', wander: 1,

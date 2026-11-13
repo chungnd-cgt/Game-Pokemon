@@ -10,6 +10,7 @@ const DEFAULTS = {
   questOpen: true, // khung nhiệm vụ góc phải dưới đang mở hay thu gọn chỉ còn tiêu đề
   hudMenuOpen: true, // cột nút menu bên trái (Đội hình, Túi đồ...) đang hiện hay thu lại vào nút ≡
   catchPreview: true, // đội đã đủ 6, bắt thêm thì Pokémon vào PC: hiện bảng xem nhanh (IV, tính cách, đặc tính)
+  keybinds: null, // phím người chơi tự đặt { hànhĐộng: [phím chính, phím phụ] } (game/keybinds.js); null / thiếu: phím mặc định
 };
 
 function read() {

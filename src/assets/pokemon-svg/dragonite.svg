@@ -28,30 +28,30 @@
     <path d="M70 128 C50 136 40 154 44 170 C50 178 62 174 68 166 C72 158 78 152 86 148 Z" fill="#f09a3a"/>
     <path d="M186 128 C206 136 216 154 212 170 C206 178 194 174 188 166 C184 158 178 152 170 148 Z" fill="#e08a30"/>
     <!-- râu cảm ứng -->
-    <path d="M112 30 C106 16 96 8 82 8 M144 30 C150 16 160 8 174 8" fill="none" stroke-width="10"/>
-    <path d="M112 30 C106 16 96 8 82 8 M144 30 C150 16 160 8 174 8" fill="none" stroke="#f09a3a" stroke-width="4"/>
-    <circle cx="80" cy="9" r="6" fill="#f09a3a"/>
-    <circle cx="176" cy="9" r="6" fill="#f09a3a"/>
+    <path d="M116 36 C110 20 100 10 84 8 M140 36 C146 20 156 10 172 8" fill="none" stroke-width="10"/>
+    <path d="M116 36 C110 20 100 10 84 8 M140 36 C146 20 156 10 172 8" fill="none" stroke="#f09a3a" stroke-width="4"/>
+    <circle cx="82" cy="9" r="6" fill="#f09a3a"/>
+    <circle cx="174" cy="9" r="6" fill="#f09a3a"/>
     <!-- đầu -->
-    <path d="M82 70 C80 38 102 20 128 20 C154 20 176 38 174 70 C174 98 154 114 128 114 C102 114 82 98 82 70 Z" fill="url(#skin)"/>
+    <path d="M94 66 C92 42 108 30 128 30 C148 30 164 42 162 66 C162 80 158 88 152 92 C156 104 146 116 128 116 C110 116 100 104 104 92 C98 88 94 80 94 66 Z" fill="url(#skin)"/>
     <!-- sừng nhỏ -->
-    <path d="M122 24 L128 8 L134 24 Z" fill="#f8b858"/>
+    <path d="M122 34 L128 18 L134 34 Z" fill="#f8b858"/>
   </g>
   <!-- sọc bụng -->
   <path d="M102 140 Q128 148 154 140 M94 162 Q128 172 162 162 M94 186 Q128 196 162 186 M102 208 Q128 218 154 208" fill="none" stroke="#e0c890" stroke-width="4" stroke-linecap="round"/>
   <!-- móng -->
   <path d="M74 247 l4 -8 l4 8 Z M88 247 l4 -8 l4 8 Z M102 247 l4 -8 l4 8 Z M154 247 l4 -8 l4 8 Z M168 247 l4 -8 l4 8 Z M182 247 l-4 -8 l-4 8 Z" fill="#fff" stroke="#2b2433" stroke-width="2"/>
   <path d="M182 120 C204 146 202 196 176 220 C160 232 144 236 130 236 C170 214 188 170 182 120 Z" fill="#d87c28" opacity="0.5"/>
-  <ellipse cx="104" cy="38" rx="16" ry="7" fill="#fff" opacity="0.4" transform="rotate(-25 104 38)"/>
+  <ellipse cx="110" cy="44" rx="12" ry="5" fill="#fff" opacity="0.4" transform="rotate(-25 104 38)"/>
   <ellipse cx="90" cy="120" rx="14" ry="6" fill="#fff" opacity="0.35" transform="rotate(-35 90 120)"/>
   <!-- mắt hiền -->
   <g stroke="#2b2433" stroke-width="4">
-    <ellipse cx="110" cy="64" rx="9" ry="12" fill="#2a2030"/>
-    <ellipse cx="146" cy="64" rx="9" ry="12" fill="#2a2030"/>
+    <ellipse cx="114" cy="64" rx="7" ry="9" fill="#2a2030"/>
+    <ellipse cx="142" cy="64" rx="7" ry="9" fill="#2a2030"/>
   </g>
-  <ellipse cx="113" cy="59" rx="3.5" ry="5" fill="#fff"/>
-  <ellipse cx="149" cy="59" rx="3.5" ry="5" fill="#fff"/>
-  <circle cx="120" cy="88" r="2.5" fill="#2b2433"/>
-  <circle cx="136" cy="88" r="2.5" fill="#2b2433"/>
-  <path d="M108 96 Q128 108 148 96" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="116" cy="60" rx="2.6" ry="3.6" fill="#fff"/>
+  <ellipse cx="144" cy="60" rx="2.6" ry="3.6" fill="#fff"/>
+  <circle cx="121" cy="94" r="2.5" fill="#2b2433"/>
+  <circle cx="135" cy="94" r="2.5" fill="#2b2433"/>
+  <path d="M112 104 Q128 112 144 104" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
 </svg>

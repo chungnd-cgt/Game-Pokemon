@@ -1,6 +1,7 @@
 import { ITEMS } from '../data/items.js';
 import { itemCount, state } from '../game/state.js';
 import { fitScale } from '../gfx/textures.js';
+import { HOTBAR_ACTIONS, bindingsVersion, keysFor, shortKeyName } from '../game/keybinds.js';
 import { textStyle } from './helpers.js';
 
 const DEPTH = 100;
@@ -16,8 +17,9 @@ export const HOTBAR_RIGHT = LEFT + HOTBAR_SIZE * SLOT + (HOTBAR_SIZE - 1) * GAP;
 
 const DRAG_START = 8; // nhấn giữ rồi kéo quá chừng này px mới tính là kéo (ít hơn là bấm để dùng)
 
-// Thanh phím tắt góc dưới màn hình: 6 ô đánh số 1-6. Mở túi đồ thì thanh vẫn hiện: kéo icon vật phẩm thả vào ô để gán
-// (hoặc chọn vật phẩm -> "Gán phím tắt", hoặc bấm phím số). Bấm phím số hoặc bấm chuột vào ô để dùng (cưỡi thú, câu cá,
+// Thanh phím tắt góc dưới màn hình: 6 ô, góc mỗi ô ghi phím của ô đó (mặc định 1-6, đổi trong Cài đặt → Phím tắt).
+// Mở túi đồ thì thanh vẫn hiện: kéo icon vật phẩm thả vào ô để gán (hoặc chọn vật phẩm -> "Gán phím tắt", hoặc bấm phím
+// của ô). Bấm phím của ô hoặc bấm chuột vào ô để dùng (cưỡi thú, câu cá,
 // dùng thuốc...); ô còn trống thì không làm gì. Kéo icon từ ô này thả sang ô khác là đổi chỗ hai ô.
 // Rê chuột vào ô có đồ: viền sáng và hiện tên vật phẩm phía trên ô.
 // Chỉ hiện trên bản đồ, khi không có hội thoại / menu (và khi mở túi đồ).
@@ -47,7 +49,7 @@ export class Hotbar {
   // Vẽ lại khi vật phẩm gán / số lượng / món đang dùng (xe, thú cưỡi) thay đổi
   update(active = null) {
     const ids = state.hotbar ?? [];
-    const key = `${ids.map((id) => `${id}:${id ? itemCount(id) : ''}`).join('|')}|${active}|${this.hover}|${this.pointed}`;
+    const key = `${ids.map((id) => `${id}:${id ? itemCount(id) : ''}`).join('|')}|${active}|${this.hover}|${this.pointed}|${bindingsVersion()}`;
     if (key === this.key) return;
     this.key = key;
     this.active = active;
@@ -100,7 +102,9 @@ export class Hotbar {
           })).setOrigin(1, 1));
         }
       }
-      this.container.add(scene.add.text(x + 5, top + 3, `${i + 1}`, textStyle(12, '#ffd860', { fontStyle: 'bold', stroke: '#141a2c', strokeThickness: 3 })));
+      // Phím của ô (phím chính, chưa có thì phím phụ; không gán phím nào thì để trống)
+      const keyText = shortKeyName(keysFor(HOTBAR_ACTIONS[i])[0]);
+      if (keyText) this.container.add(scene.add.text(x + 5, top + 3, keyText, textStyle(12, '#ffd860', { fontStyle: 'bold', stroke: '#141a2c', strokeThickness: 3 })));
       const zone = scene.add.zone(x + SLOT / 2, top + SLOT / 2, SLOT, SLOT).setScrollFactor(0).setDepth(DEPTH + 1)
         .setInteractive({ useHandCursor: true });
       zone.on('pointerdown', (p, lx, ly, e) => {

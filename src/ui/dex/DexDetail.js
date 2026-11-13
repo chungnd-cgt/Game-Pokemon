@@ -180,8 +180,6 @@ export class DexDetail {
     const { scene, x, y, w } = this;
     const cx = x + 196 + (w - 196 - 14) / 2;
     add(scene.add.text(cx, y + 150, 'Chưa gặp', textStyle(30, '#b4bac8', { fontStyle: 'bold' })).setOrigin(0.5));
-    add(scene.add.text(cx, y + 196, 'Gặp Pokémon này ngoài tự nhiên hoặc\ntrong trận đấu để ghi vào Pokédex.',
-      textStyle(14, MUTED, { align: 'center', lineSpacing: 2 })).setOrigin(0.5));
     for (const b of Object.values(this.boxes)) {
       add(scene.add.text(b.x + b.w / 2, b.y + 30 + (b.h - 30) / 2, '???', textStyle(28, '#c8ccd6', { fontStyle: 'bold' })).setOrigin(0.5));
     }

@@ -268,8 +268,8 @@ thủ lĩnh và mục tiêu ở `src/story/chapter2.js`, nhiệm vụ các làng
     kèm bọt nước. Đang cưỡi Arcanine / đạp xe mà đi ra nước thì tự xuống trước. Đổi Surf ⇄ Lapras bằng R có bọt nước.
   - **Arcanine:** phi nước đại tung bụi, nhảy gờ đất thì bóng vẫn nằm dưới đất, đáp xuống tung bụi; lên / xuống cũng có bụi.
     Bụi cỏ cao che chân Arcanine và chân Pokémon đi theo (loài bay / lơ lửng thì không). Lapras và khối nước vẫn nhấp nhô khi đứng yên.
-  - Lưu game lúc đang đạp xe / cưỡi Arcanine thì tải lại vẫn đang đi xe / cưỡi; vị trí lưu nằm trên mặt nước thì luôn tải lại trên thú
-    cưỡi nước (không bị kẹt giữa nước).
+  - Thoát game rồi vào lại lúc đang đạp xe / cưỡi Arcanine thì vào lại là **đi bộ**; vị trí lưu nằm trên mặt nước thì luôn vào lại
+    trên thú cưỡi nước (không bị kẹt giữa nước).
   Như FireRed/LeafGreen, Surf không học theo cấp mà qua **HM03 Surf** (thủ lĩnh Gym Nước tặng): dùng trong túi đồ để dạy cho
   Pokémon hệ Nước (và Snorlax, Rhydon, dòng Dratini), không mất khi dùng; đã đủ 4 chiêu thì chọn chiêu để quên.
 - **Máy tính PC** trong Pokémon Center: bật máy là vào thẳng **Hộp Pokémon** dạng lưới như game gốc. Bên trái là thông tin con đang
@@ -278,7 +278,7 @@ thủ lĩnh và mục tiêu ở `src/story/chapter2.js`, nhiệm vụ các làng
   - **Kéo thả** giữa hộp và đội: thả lên con khác là đổi chỗ, thả vào ô trống là gửi vào hộp / rút về đội (đội tối đa 6, luôn phải
     còn ít nhất một con chiến đấu được). Đổi chỗ trong hộp / trong đội cũng kéo thả như vậy.
   - **Kéo vào thùng rác** là thả Pokémon: hỏi lại một lần, con trỏ mặc định ở "Không" (mất vĩnh viễn, đồ đang cầm được cất vào túi).
-  - Bàn phím: mũi tên di con trỏ, Enter nhấc / đặt Pokémon, Esc huỷ nhấc hoặc tắt máy.
+  - Bàn phím: phím hướng di con trỏ, phím xác nhận nhấc / đặt Pokémon, phím quay lại huỷ nhấc hoặc tắt máy.
   - Có sẵn **5 hộp** (150 ô), đầy thì tự mở thêm hộp. Pokémon nằm đúng ô đã thả (giữa các con có thể để ô trống).
   - Pokémon đang cầm đồ có icon nhỏ ở góc trên phải ô. Khung thông tin bên trái có hình, cấp, hệ, máu, đồ cầm,
     **tính cách, đặc tính và 4 chiêu thức** (kèm PP).
@@ -366,35 +366,61 @@ Mở game ở hai tab cùng lúc: tab nào lưu sau thì tab còn lại thôi l�
 - Thủ lĩnh gym, Tứ Thiên Vương, Nhà vô địch, trận trong cốt truyện: thách đấu lại được ngay (trận cốt truyện thì xem lại cảnh từ đầu).
 - Nếu lúc tắt cả đội đã gục thì như thua trận bình thường.
 
-Mở **Cài đặt** bằng phím **Esc**, hoặc nút tròn bánh răng ở cột nút bên trái:
+Mở **Cài đặt** bằng phím **Esc** / **X**, hoặc nút tròn bánh răng ở cột nút bên trái. Đóng bằng nút ✕, phím Cài đặt / Quay lại
+hoặc bấm ra ngoài khung (không còn mục "Đóng" hay "Về màn hình chính"):
 
-- **Bản đồ vùng** (phím N) và **Trợ giúp, phím điều khiển** (phím H).
+- **Bản đồ vùng** (khi đã có bản đồ).
+- **Phím tắt**: đổi phím cho mọi hành động (xem mục Phím tắt bên dưới).
 - **Đổi diện mạo**: mở lại bảng tạo nhân vật (giới tính, kiểu tóc, màu tóc, màu da, trang phục, màu mắt), đổi xong nhân vật trên bản đồ đổi ngay.
 - **Ánh sáng & thời tiết**: bật/tắt hình ảnh ngày đêm và thời tiết (mưa, tuyết, mưa đá, bão cát).
 - **Xem nhanh Pokémon gửi vào PC** (mặc định bật): đội đã đủ 6 mà bắt thêm thì Pokémon tự vào hộp PC; khi bật, ngay sau khi bắt
-  hiện bảng nhỏ cho biết cấp, giới tính, hệ, tính cách, đặc tính (đặc tính ẩn tô tím) và IV từng chỉ số, bấm Enter / X để đóng.
+  hiện bảng nhỏ cho biết cấp, giới tính, hệ, tính cách, đặc tính (đặc tính ẩn tô tím) và IV từng chỉ số; bấm phím xác nhận /
+  quay lại hoặc bấm chuột để đóng.
 - **Chơi bản thử 3D** (chỉ ở bản 2D): lưu rồi chuyển sang bản 3D.
-- **Về màn hình chính**: lưu rồi về màn hình chính.
 
 Màn hình chính có **Tiếp tục** (chơi tiếp bản lưu), **Chơi mới** (chọn nhân vật, đặt tên; bản lưu cũ bị thay) và **Xoá dữ liệu** (xoá bản lưu, có hỏi lại).
 Bản lưu nằm trong trình duyệt đang dùng, đổi trình duyệt hoặc xoá dữ liệu trang web là mất.
 
 ## Cách chơi
 
-| Phím | Tác dụng |
+Phím mặc định (mỗi hành động có **phím chính** và **phím phụ**, đổi được trong **Cài đặt → Phím tắt**):
+
+| Phím mặc định | Tác dụng |
 | --- | --- |
 | Mũi tên / WASD | Di chuyển (chạm nhẹ để xoay người, giữ để đi), chọn trong menu |
-| Enter / Space / Z | Nói chuyện, đọc biển báo, xác nhận, đọc tiếp hội thoại |
-| Esc / X | Quay lại (trên bản đồ: mở Cài đặt) |
-| M | Xem đội hình (Shift + ↑/↓ trong bảng đội hình: đổi chỗ Pokémon) |
+| Enter / Space | Nói chuyện, đọc biển báo, xác nhận, đọc tiếp hội thoại (Enter ở bàn phím số cũng như Enter) |
+| Esc / X | Quay lại / huỷ; trên bản đồ: mở Cài đặt |
+| M | Đội hình (Shift + ↑/↓ trong bảng đội hình: đổi chỗ Pokémon) |
 | B | Túi đồ |
-| P | Mở Pokédex |
-| N | Bản đồ vùng và huy hiệu |
+| P | Pokédex |
+| T | Thẻ Huấn luyện viên |
+| N | Bản đồ vùng |
 | C | Lên / xuống xe đạp |
 | R | Cưỡi Arcanine / đổi cách bơi (cần thú cưỡi) |
-| 1 - 6 | Dùng vật phẩm ở ô phím tắt (trong túi đồ: bấm 1-6 để gán vật phẩm đang chọn) |
-| Gờ đất | Đi tới gờ theo chiều dốc xuống là tự nhảy qua (chỉ một chiều) |
-| H | Bảng phím điều khiển |
+| 1 - 6 (cả bàn phím số) | Dùng vật phẩm ở ô phím tắt (trong túi đồ: bấm phím của ô để gán vật phẩm đang chọn) |
+
+Đi tới gờ đất theo chiều dốc xuống là tự nhảy qua (chỉ một chiều).
+
+### Phím tắt (Cài đặt → Phím tắt)
+
+Màn `src/ui/KeyBindings.js` liệt kê mọi hành động: Đi lên / xuống / sang trái / sang phải, Xác nhận / nói chuyện,
+Quay lại / huỷ, Đội hình, Túi đồ, Pokédex, Thẻ HLV, Bản đồ vùng, Cài đặt, Xe đạp, Cưỡi thú, Ô phím tắt 1-6. Mỗi dòng có hai ô
+**Phím chính** / **Phím phụ** ghi tên phím ("M", "Enter", "Space", "↑", "Esc", "1", "Numpad 1"...).
+- Bấm vào ô (hoặc chọn ô bằng phím hướng rồi bấm phím xác nhận): ô nhấp nháy vàng "…", phím bấm tiếp theo được gán cho ô đó
+  (Esc, Enter, Backspace... đều gán được; Tab không gán được). Bấm lại đúng phím cũ hoặc bấm chuột ra chỗ khác là thôi.
+- Ô đang chọn có nút ✕ nhỏ để bỏ phím (bàn phím: Delete). Không bỏ được phím cuối cùng của di chuyển / xác nhận / quay lại
+  (dòng sáng đỏ), nên không bao giờ bị kẹt trong menu.
+- Phím mới đang thuộc hành động khác thì **hai bên đổi phím cho nhau** (dòng bị đổi sáng vàng một lúc). Riêng **Quay lại** và
+  **Cài đặt** được dùng chung phím (mặc định cùng Esc / X).
+- Nút **Khôi phục mặc định**. Danh sách dài thì cuộn bằng con lăn chuột / phím hướng. Đóng bằng ✕, phím quay lại hiện tại hoặc
+  bấm ra ngoài khung.
+- Phím nhận theo vị trí trên bàn phím (`KeyboardEvent.code`) nên vẫn dùng được khi đang bật bộ gõ tiếng Việt. Bảng phím lưu trong
+  cài đặt của trình duyệt (`src/game/settings.js`, mục `keybinds`), thiếu / hỏng thì dùng phím mặc định. Code: `src/game/keybinds.js`
+  (bảng hành động, đổi phím, tên phím), `src/ui/input.js` (xác nhận / quay lại / hướng theo bảng phím).
+- Lời thoại nhắc phím (vd cậu bé "Bấm P để mở Pokédex") luôn ghi đúng phím đang dùng. Số ở góc ô phím tắt dưới đáy màn hình là
+  phím của ô đó.
+- Giao diện không có dòng chữ hướng dẫn phím: mọi màn hình (tạo nhân vật, màn hình chính, túi đồ, Pokédex, thông tin Pokémon,
+  hộp PC, cửa hàng, bản đồ vùng, trận đấu) chỉ còn nội dung, đóng bằng ✕ / phím quay lại.
 
 Bố cục màn hình trên bản đồ:
 - **Góc trái trên:** **cột đội hình** kiểu game MMO: mỗi Pokémon một hàng dạng viên thuốc tối, chân dung tròn bên trái có **vòng HP
@@ -404,33 +430,35 @@ Bố cục màn hình trên bản đồ:
   (`src/ui/PartyPanel.js`).
 - **Góc phải trên:** giờ, buổi trong ngày, tên bản đồ; ngay dưới là bảng **mọi Pokémon hoang dã của bản đồ**, chia hai nhóm
   **Trên cạn** (mọi bãi cỏ; trong hang là Pokémon của hang đó, chỉ hiện khi đã vào hang) và **Dưới nước** (lướt nước + mọi loại
-  cần câu). Rê chuột vào một Pokémon thì hiện tên, khoảng cấp và buổi xuất hiện ("???" nếu chưa gặp). Thu gọn được (▶).
-- **Bên trái, trên thanh phím tắt:** cột nút tròn có nhãn Đội hình / Túi đồ / Pokédex / **Thẻ HLV** / Cài đặt (kèm phím tắt; Bản đồ
-  vùng và Trợ giúp nằm trong Cài đặt). Nút **≡** ở góc dưới trái ẩn / hiện cột nút (nhớ cho lần sau).
-- **Đáy màn hình:** nút ≡, **ô tiền** (đồng ₽ + số tiền), rồi **6 ô phím tắt** đánh số 1-6. **Góc phải dưới:** khung nhiệm vụ, bấm để
-  thu gọn chỉ còn tiêu đề.
+  cần câu). Chưa gặp thì bóng đen "?", đã gặp thì hiện hình, đã bắt thì hiện hình kèm Poké Ball nhỏ ở góc dưới phải. Rê chuột
+  vào một Pokémon thì hiện tên, khoảng cấp và buổi xuất hiện ("???" nếu chưa gặp). Thu gọn được (▶).
+- **Bên trái, trên thanh phím tắt:** cột nút tròn có nhãn Túi đồ / Pokédex / **Thẻ HLV** / Cài đặt (Đội hình mở bằng cột
+  Pokémon góc trái trên hoặc phím M; Bản đồ vùng và Phím tắt nằm trong Cài đặt). Nút **≡** ở góc dưới trái ẩn / hiện cột nút
+  (nhớ cho lần sau).
+- **Đáy màn hình:** nút ≡, **ô tiền** (đồng ₽ + số tiền), rồi **6 ô phím tắt**, góc mỗi ô ghi phím của ô (mặc định 1-6).
+  **Góc phải dưới:** khung nhiệm vụ, bấm để thu gọn chỉ còn tiêu đề.
 - **Thẻ Huấn luyện viên** (phím **T** hoặc nút Thẻ HLV, `src/ui/TrainerCard.js`): tên, thời gian chơi, ngày bắt đầu (bản lưu cũ không
   có thì "—"), tổng số Pokémon (đội + PC), Pokédex đã bắt / đã gặp, số lần vô địch Liên minh, hình nhân vật trên bục, tiền,
-  **khung 8 huy hiệu** (chưa có thì bóng đen; rê chuột xem tên huy hiệu và thành phố). Đóng: Esc / X / T / ✕ hoặc bấm ra ngoài.
-- Phím tắt chữ cái (M, B, P, T, C, R, N, H, X) nhận theo vị trí phím nên vẫn dùng được khi đang bật bộ gõ tiếng Việt.
+  **khung 8 huy hiệu** (chưa có thì bóng đen; rê chuột xem tên huy hiệu và thành phố). Đóng: phím quay lại / phím Thẻ HLV / ✕
+  hoặc bấm ra ngoài.
 - Rê chuột vào ô phím tắt thì hiện tên vật phẩm. Báo "Đã gán..." (gán phím tắt) nằm giữa đáy màn hình (giữa thanh phím tắt và khung
   nhiệm vụ), dài thì xuống dòng. Mở Pokédex / cửa hàng thì giao diện bản đồ ẩn đi.
 - Tên Pokémon dài ở mọi màn hình (đội hình, thông tin, PC, trận đấu, xem nhanh khi bắt) tự thu nhỏ rồi cắt bằng "…", không đè lên
   cấp / thanh HP. Pokémon kiệt sức không có nhãn, chỉ mờ đi và thanh HP trống. Màn thông tin Pokémon có nút ◀ 1/6 ▶ để đổi con bằng chuột.
-  Lên cấp trong trận thì hiện chỉ số mới kèm mức tăng (+2 Atk...). Bảng trợ giúp (H) có nút ✕, bấm chuột để đóng.
+  Lên cấp trong trận thì hiện chỉ số mới kèm mức tăng (+2 Atk...).
 
 Túi đồ (B) là khung bên phải, một khung lớn bọc cả dải tab các ngăn (ở **bên trái**) lẫn danh sách vật phẩm, ô tìm kiếm (gõ là lọc, không cần dấu: "xe dap" ra "Xe đạp",
 tìm cả mọi ngăn), vật phẩm xếp lưới 2 cột, mô tả hiện cạnh khung. Trong trận đấu túi đồ cũng dùng khung này. Mở túi đồ (B) thì thanh phím tắt vẫn hiện ở đáy màn hình; gán vật phẩm
 (xe đạp, thú cưỡi, cần câu, thuốc, quả mọng, bóng...) bằng một trong các cách:
-- **Kéo thả**: nhấn giữ vật phẩm trong túi, kéo icon thả vào ô dưới đáy (ô dưới con trỏ sáng viền vàng); hoặc chọn vật phẩm rồi bấm 1-6.
+- **Kéo thả**: nhấn giữ vật phẩm trong túi, kéo icon thả vào ô dưới đáy (ô dưới con trỏ sáng viền vàng).
 - **Chọn rồi gán**: bấm vào vật phẩm → **Gán phím tắt** → chọn ô (bảng thao tác vật phẩm có Dùng / Cho cầm / Gán phím tắt như game gốc).
-- **Phím số**: chọn vật phẩm rồi bấm 1-6.
+- **Phím của ô**: chọn vật phẩm rồi bấm phím của ô (mặc định 1-6).
 
 **Kéo icon từ ô này thả sang ô khác** trên thanh phím tắt là đổi chỗ hai ô (thả vào ô trống thì chuyển sang). Bấm vào ô còn trống
 thì không có gì xảy ra.
 
 Mỗi vật phẩm chỉ nằm một ô (gán sang ô khác thì ô cũ trống), gán lại đúng ô đang có là bỏ gán.
-Trên bản đồ bấm phím số hoặc bấm chuột vào ô để dùng. Xe / thú cưỡi đang dùng thì ô sáng viền.
+Trên bản đồ bấm phím của ô hoặc bấm chuột vào ô để dùng. Xe / thú cưỡi đang dùng thì ô sáng viền.
 Thanh phím tắt ẩn khi đang đánh trận, hội thoại hay mở menu.
 Khung nhiệm vụ hẹp, nhiệm vụ dài thì xuống dòng. Đồng hồ góc phải trên hiện buổi trong ngày (Ban ngày / Chiều / Ban đêm),
 giờ trong game (00:00-23:59) và **tên bản đồ đang đứng**.
@@ -515,7 +543,7 @@ vượt đội:
   `lanternGarlands` trong `src/data/tiles.js`).
 - **Cây quả mọng** trồng thành **dãy 2-3 cây liền nhau trên một luống đất cày**, rải đều dọc hành trình (tuyến đường, làng,
   thành phố; vài nơi có 2 dãy), từ Tuyến đường 2 trở đi. Đứng trước cây bấm Enter để hái 1-3 quả, 2-3 ngày sau cây ra quả lại.
-  Đang cưỡi Arcanine thì xuống đứng cạnh cây hái bằng tay (thú cưỡi dài hơn 2 ô, không chồng lên cây), hái xong tự leo lên lại.
+  Đang đạp xe hay cưỡi Arcanine vẫn hái thẳng được, không phải xuống.
   **Vườn quả mọng Lò Gốm** (phía nam Thành phố Lò Gốm, giữa / cuối hành trình) có 8 dãy x 3 cây: đủ mọi loại quả hồi phục
   và mỗi loại quả giảm EV (Pomeg, Kelpsy, Qualot, Hondew, Grepa, Tamato) 2 cây. Sitrus / Figy chỉ mọc sau khi trả gói hàng
   cho Poké Mart Lục Bình, Lum sau khi xong chương 1. Vị trí các dãy khai báo bằng `berryRow` (`src/data/berryRows.js`).
@@ -556,7 +584,8 @@ Pokédex có đủ 151 Pokémon thế hệ 1, mở dạng cửa sổ nổi trên
 - **Bên phải:** số, tên, loài, hệ, hình, chiều cao, cân nặng, **biểu đồ lục giác chỉ số gốc**, mô tả, đặc tính (đặc tính ẩn ghi
   "(ẩn)"), danh sách **chiêu thức** học theo cấp (tab **Khắc hệ** bên cạnh), danh sách **nơi xuất hiện** (bản đồ, cách gặp: bụi
   cỏ / hang / lướt nước / từng loại cần câu, khoảng cấp, buổi trong ngày).
-- Phím: mũi tên chọn, PgUp / PgDn sang trang, F hoặc / để tìm, H ẩn chưa gặp, Tab đổi Chiêu thức / Khắc hệ, Esc / P đóng.
+- Phím: phím hướng chọn, PgUp / PgDn sang trang, F hoặc / để tìm, H ẩn chưa gặp, Tab đổi Chiêu thức / Khắc hệ, phím quay lại /
+  phím Pokédex đóng. Ô tìm kiếm chỉ ghi "Tên hoặc số", không có dòng hướng dẫn phím.
 - Code: `src/scenes/PokedexScene.js`, các phần trong `src/ui/dex/`.
 
 Thông tin hiện theo mức độ:
@@ -594,6 +623,10 @@ Phong cách pixel art kiểu Gen 5 (giống PRO), toàn bộ vẽ bằng code:
   Trận đấu / Pokédex / thông tin Pokémon dùng sprite 64×64, Pokémon đi theo 20×20 (Pokémon đứng cạnh NPC như Meowth của
   Team Rocket 16×16), thu nhỏ kiểu lấy màu đa số cho mảng màu sạch, không đục; tất cả phóng to ×3
   để mỗi pixel to bằng pixel của bản đồ và nhân vật. Sửa SVG bằng Inkscape hoặc Figma.
+  Toàn bộ 151 loài đã được rà soát lại bằng cách so với hình tham khảo (artwork + sprite trước / sau / shiny) ở cỡ 64px: phần lớn
+  vẽ lại cho đúng dáng (Nidoran / Nidorina / Nidorino đi bốn chân, Growlithe / Arcanine / Persian / Ponyta / Rhyhorn bốn chân,
+  Machamp đủ 4 tay, Graveler 4 tay, Kabutops mũ nhọn, Magmar, Golduck, Gloom, Victreebel, Sandshrew, Geodude xám...),
+  Chansey có thêm mặt sau và mặt nghiêng; màu shiny cập nhật theo bảng màu mới. Hình là vector tự vẽ, không dùng ảnh gốc.
 - **Pokémon shiny** (`src/data/shiny.js`): mỗi loài có bảng màu shiny riêng theo game gốc (Charizard đen cánh đỏ,
   Gyarados đỏ, Pikachu vàng cam, Magikarp vàng kim, Ponyta lửa xanh...), chỉ đổi phần thân / bụng / cánh / mai / hoa,
   mắt và lửa đuôi giữ nguyên. Hình vẽ bằng code thì vẽ lại bằng màu shiny; hình SVG / PNG thì đổi màu theo vùng sắc độ
@@ -670,7 +703,7 @@ src/
   battle/formulas.js   Công thức sát thương, bắt Pokémon, EXP, bỏ chạy
   battle/status.js     Trạng thái (độc, bỏng...), hiệu ứng tạm thời trong trận
   gfx/                 Pixel art bản đồ (đồ trang trí ngoài trời: decor.js), nhân vật, hiệu ứng
-  ui/                  Hộp thoại, menu, thanh máu
+  ui/                  Hộp thoại, menu, thanh máu, màn Phím tắt (KeyBindings.js), input.js (phím theo bảng phím)
   story/chapter1.js    Cốt truyện chương 1
   story/chapter2.js    Thủ lĩnh gym, mục tiêu hành trình, cổng huy hiệu
   story/league.js      Tứ Thiên Vương, Nhà vô địch, Điện vinh danh

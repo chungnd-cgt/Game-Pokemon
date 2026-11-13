@@ -1,64 +1,61 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 256">
   <defs>
-    <radialGradient id="vine" cx="38%" cy="30%" r="80%">
-      <stop offset="0" stop-color="#8cb4f4"/>
-      <stop offset="0.5" stop-color="#5a86d8"/>
-      <stop offset="1" stop-color="#3458a8"/>
+    <radialGradient id="vine" cx="40%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#3a5e8e"/>
+      <stop offset="1" stop-color="#26406a"/>
     </radialGradient>
-    <radialGradient id="shoe" cx="35%" cy="30%" r="80%">
-      <stop offset="0" stop-color="#ff8a7a"/>
-      <stop offset="0.5" stop-color="#e8443e"/>
-      <stop offset="1" stop-color="#b02a2c"/>
-    </radialGradient>
-    <clipPath id="ball">
-      <path d="M143.3 35.3 A27 27 0 0 1 181.8 52.4 A27 27 0 0 1 208 85.3 A27 27 0 0 1 215.9 126.7 A27 27 0 0 1 203.6 167 A27 27 0 0 1 174 197 A27 27 0 0 1 133.9 209.8 A27 27 0 0 1 92.4 202.5 A27 27 0 0 1 59.1 176.7 A27 27 0 0 1 41.5 138.4 A27 27 0 0 1 43.8 96.4 A27 27 0 0 1 65.4 60.2 A27 27 0 0 1 101.3 38.2 A27 27 0 0 1 143.3 35.3 Z"/>
-    </clipPath>
+    <path id="v1" d="M44 112 C60 70 110 58 132 84"/>
+    <path id="v2" d="M212 104 C196 66 150 58 124 84"/>
+    <path id="v3" d="M50 176 C72 150 112 164 128 182 C142 196 176 190 204 166"/>
+    <path id="v4" d="M80 214 C104 196 150 196 176 216"/>
+    <path id="v5" d="M88 44 C108 64 148 56 164 32"/>
+    <path id="v6" d="M30 118 C8 112 6 142 28 148 C42 150 46 136 36 130"/>
+    <path id="v7" d="M226 128 C248 122 252 152 232 158 C218 160 214 146 224 140"/>
+    <path id="v8" d="M102 32 C92 10 122 2 128 20"/>
+    <path id="v9" d="M156 28 C166 8 192 18 180 38"/>
+    <path id="v10" d="M46 196 C26 206 30 230 54 222"/>
+    <path id="v11" d="M210 196 C230 206 226 230 202 222"/>
+    <path id="v12" d="M62 78 C80 98 72 128 50 148"/>
+    <path id="v13" d="M194 78 C176 98 184 128 206 148"/>
+    <path id="v14" d="M60 52 C40 40 30 62 48 72"/>
+    <path id="v15" d="M196 52 C216 40 226 62 208 72"/>
+    <path id="v16" d="M110 222 C116 206 140 206 146 222"/>
+    <path id="v17" d="M38 160 C56 166 66 184 64 200"/>
+    <path id="v18" d="M218 160 C200 166 190 184 192 200"/>
   </defs>
-  <!-- giày đỏ -->
-  <g stroke="#2b2433" stroke-width="5">
-    <ellipse cx="96" cy="234" rx="30" ry="15" fill="url(#shoe)"/>
-    <ellipse cx="162" cy="234" rx="30" ry="15" fill="url(#shoe)"/>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- red feet -->
+    <path d="M40 232 C34 210 54 196 78 200 C100 204 110 220 104 236 C98 248 48 250 40 232 Z" fill="#e8705a"/>
+    <path d="M216 232 C222 210 202 196 178 200 C156 204 146 220 152 236 C158 248 208 250 216 232 Z" fill="#d05a48"/>
+    <!-- vine ball -->
+    <path d="M128 20 C166 18 196 34 214 64 C234 92 236 132 226 164 C214 202 178 226 128 228 C78 226 42 202 30 164 C20 132 22 92 42 64 C60 34 90 22 128 20 Z" fill="url(#vine)"/>
   </g>
-  <!-- sợi dây leo thò ra ngoài -->
-  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M52 92 C32 86 20 70 30 58 C40 48 54 58 46 68 M196 58 C204 38 222 30 232 40 C240 50 228 62 218 56 M214 150 C236 152 248 170 240 182 C232 192 218 186 224 174 M62 184 C44 196 26 194 22 182 C18 170 32 164 38 174 M128 40 C126 22 136 10 148 14" stroke="#2b2433" stroke-width="15"/>
-    <path d="M52 92 C32 86 20 70 30 58 C40 48 54 58 46 68 M196 58 C204 38 222 30 232 40 C240 50 228 62 218 56 M214 150 C236 152 248 170 240 182 C232 192 218 186 224 174 M62 184 C44 196 26 194 22 182 C18 170 32 164 38 174 M128 40 C126 22 136 10 148 14" stroke="#5a86d8" stroke-width="6"/>
+  <!-- tangled vines: dark outline pass, then colour pass -->
+  <g fill="none" stroke="#1c2438" stroke-width="23" stroke-linecap="round">
+    <use xlink:href="#v1"/><use xlink:href="#v2"/><use xlink:href="#v3"/><use xlink:href="#v4"/><use xlink:href="#v5"/><use xlink:href="#v6"/>
+    <use xlink:href="#v7"/><use xlink:href="#v8"/><use xlink:href="#v9"/><use xlink:href="#v10"/><use xlink:href="#v11"/><use xlink:href="#v12"/>
+    <use xlink:href="#v13"/><use xlink:href="#v14"/><use xlink:href="#v15"/><use xlink:href="#v16"/><use xlink:href="#v17"/><use xlink:href="#v18"/>
   </g>
-  <!-- khối dây leo xanh -->
-  <path d="M143.3 35.3 A27 27 0 0 1 181.8 52.4 A27 27 0 0 1 208 85.3 A27 27 0 0 1 215.9 126.7 A27 27 0 0 1 203.6 167 A27 27 0 0 1 174 197 A27 27 0 0 1 133.9 209.8 A27 27 0 0 1 92.4 202.5 A27 27 0 0 1 59.1 176.7 A27 27 0 0 1 41.5 138.4 A27 27 0 0 1 43.8 96.4 A27 27 0 0 1 65.4 60.2 A27 27 0 0 1 101.3 38.2 A27 27 0 0 1 143.3 35.3 Z" fill="url(#vine)"/>
-  <g clip-path="url(#ball)" fill="none" stroke-linecap="round">
-    <!-- khoảng tối ở giữa -->
-    <ellipse cx="128" cy="126" rx="54" ry="24" fill="#1c2444"/>
-    <!-- dây leo đan chéo -->
-    <g stroke="#2c4a98" stroke-width="7">
-      <path d="M40 80 C90 60 150 100 220 70"/>
-      <path d="M50 170 C100 190 170 150 220 180"/>
-      <path d="M80 30 C70 90 110 160 90 220"/>
-      <path d="M170 30 C190 90 150 160 180 220"/>
-      <path d="M40 120 C60 96 74 104 80 120"/>
-      <path d="M176 136 C188 154 206 150 220 128"/>
-      <path d="M110 40 C130 60 150 50 160 34"/>
-      <path d="M100 200 C116 186 140 190 156 212"/>
-    </g>
-    <g stroke="#9cc0f6" stroke-width="4" opacity="0.9">
-      <path d="M58 70 C80 58 104 62 124 72"/>
-      <path d="M60 150 C70 170 90 178 110 176"/>
-      <path d="M150 50 C170 54 186 66 196 84"/>
-      <path d="M180 100 C196 108 204 120 206 136"/>
-      <path d="M84 104 C80 84 86 70 98 58"/>
-    </g>
-    <path d="M128 100 C126 120 132 140 128 156" stroke="#5a86d8" stroke-width="8"/>
+  <g fill="none" stroke="#5a92cc" stroke-width="14" stroke-linecap="round">
+    <use xlink:href="#v1"/><use xlink:href="#v2" stroke="#4a7eb8"/><use xlink:href="#v3" stroke="#4a7eb8"/><use xlink:href="#v4" stroke="#3e6ea6"/>
+    <use xlink:href="#v5" stroke="#7ab0e0"/><use xlink:href="#v6"/><use xlink:href="#v7" stroke="#4a7eb8"/><use xlink:href="#v8" stroke="#7ab0e0"/>
+    <use xlink:href="#v9" stroke="#6aa2d8"/><use xlink:href="#v10" stroke="#3e6ea6"/><use xlink:href="#v11" stroke="#3e6ea6"/><use xlink:href="#v12"/>
+    <use xlink:href="#v13" stroke="#4a7eb8"/><use xlink:href="#v14" stroke="#7ab0e0"/><use xlink:href="#v15" stroke="#6aa2d8"/><use xlink:href="#v16" stroke="#3e6ea6"/>
+    <use xlink:href="#v17"/><use xlink:href="#v18" stroke="#4a7eb8"/>
   </g>
-  <path d="M143.3 35.3 A27 27 0 0 1 181.8 52.4 A27 27 0 0 1 208 85.3 A27 27 0 0 1 215.9 126.7 A27 27 0 0 1 203.6 167 A27 27 0 0 1 174 197 A27 27 0 0 1 133.9 209.8 A27 27 0 0 1 92.4 202.5 A27 27 0 0 1 59.1 176.7 A27 27 0 0 1 41.5 138.4 A27 27 0 0 1 43.8 96.4 A27 27 0 0 1 65.4 60.2 A27 27 0 0 1 101.3 38.2 A27 27 0 0 1 143.3 35.3 Z" fill="none" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
-  <ellipse cx="88" cy="232" rx="10" ry="4" fill="#fff" opacity="0.5"/>
-  <ellipse cx="154" cy="232" rx="10" ry="4" fill="#fff" opacity="0.5"/>
-  <!-- mắt trắng ló ra trong bóng tối -->
-  <g stroke="#2b2433" stroke-width="3">
-    <ellipse cx="104" cy="128" rx="13" ry="12" fill="#fff"/>
-    <ellipse cx="152" cy="128" rx="13" ry="12" fill="#fff"/>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round">
+    <path d="M42 234 C36 214 54 202 76 206 C96 210 106 224 100 238 C94 250 50 252 42 234 Z" fill="#e8705a"/>
+    <path d="M214 234 C220 214 202 202 180 206 C160 210 150 224 156 238 C162 250 206 252 214 234 Z" fill="#d05a48"/>
   </g>
-  <ellipse cx="107" cy="129" rx="6" ry="7" fill="#2b2433"/>
-  <ellipse cx="149" cy="129" rx="6" ry="7" fill="#2b2433"/>
-  <circle cx="109" cy="126" r="2" fill="#fff"/>
-  <circle cx="151" cy="126" r="2" fill="#fff"/>
+  <ellipse cx="66" cy="218" rx="10" ry="5" fill="#fff" opacity="0.4" transform="rotate(-20 66 218)"/>
+  <!-- dark face gap with white eyes, framed by vines -->
+  <path d="M74 128 C76 106 102 98 128 98 C154 98 180 106 182 128 C180 148 154 156 128 156 C102 156 76 148 74 128 Z" fill="#14161f" stroke="#1c2438" stroke-width="6"/>
+  <ellipse cx="106" cy="127" rx="14" ry="16" fill="#fff"/>
+  <ellipse cx="150" cy="127" rx="14" ry="16" fill="#fff"/>
+  <circle cx="109" cy="130" r="5.5" fill="#14161f"/>
+  <circle cx="147" cy="130" r="5.5" fill="#14161f"/>
+  <path d="M70 100 C96 82 160 82 186 100" fill="none" stroke="#1c2438" stroke-width="23" stroke-linecap="round"/>
+  <path d="M70 100 C96 82 160 82 186 100" fill="none" stroke="#7ab0e0" stroke-width="14" stroke-linecap="round"/>
+  <path d="M84 158 C104 146 120 156 128 162 C138 170 156 154 172 156" fill="none" stroke="#1c2438" stroke-width="23" stroke-linecap="round"/>
+  <path d="M84 158 C104 146 120 156 128 162 C138 170 156 154 172 156" fill="none" stroke="#5a92cc" stroke-width="14" stroke-linecap="round"/>
 </svg>

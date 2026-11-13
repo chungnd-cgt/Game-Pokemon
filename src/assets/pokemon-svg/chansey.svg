@@ -1,37 +1,41 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#fcc8d4"/>
-      <stop offset="1" stop-color="#ec98b0"/>
-    </linearGradient>
+    <radialGradient id="skin" cx="38%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#fde0ea"/>
+      <stop offset="1" stop-color="#f8c0d4"/>
+    </radialGradient>
+    <radialGradient id="egg" cx="40%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e6e4ee"/>
+    </radialGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- chân -->
-    <ellipse cx="92" cy="238" rx="26" ry="12" fill="#e08aa4"/>
-    <ellipse cx="164" cy="238" rx="26" ry="12" fill="#e08aa4"/>
-    <!-- túm lông xoăn hai bên đầu -->
-    <path d="M58 64 C34 56 22 70 30 84 C18 88 16 104 32 108 C22 116 28 132 46 128 L62 104 Z" fill="url(#skin)"/>
-    <path d="M198 64 C222 56 234 70 226 84 C238 88 240 104 224 108 C234 116 228 132 210 128 L194 104 Z" fill="#ec98b0"/>
-    <!-- thân hình quả trứng -->
-    <path d="M128 30 C188 30 222 98 220 160 C218 214 180 240 128 240 C76 240 38 214 36 160 C34 98 68 30 128 30 Z" fill="url(#skin)"/>
-    <!-- tay ngắn -->
-    <ellipse cx="62" cy="168" rx="18" ry="13" fill="#f4b0c4" transform="rotate(-25 62 168)"/>
-    <ellipse cx="194" cy="168" rx="18" ry="13" fill="#ec98b0" transform="rotate(25 194 168)"/>
-    <!-- túi trước bụng và quả trứng trắng -->
-    <ellipse cx="128" cy="168" rx="22" ry="27" fill="#ffffff"/>
-    <path d="M78 176 C92 166 164 166 178 176 C176 210 156 224 128 224 C100 224 80 210 78 176 Z" fill="#fde0e8"/>
+    <!-- feet -->
+    <ellipse cx="90" cy="238" rx="26" ry="11" fill="#e898b4"/>
+    <ellipse cx="166" cy="238" rx="26" ry="11" fill="#e898b4"/>
+    <!-- egg-shaped body -->
+    <path d="M128 26 C186 26 222 92 220 156 C218 212 182 238 128 238 C74 238 38 212 36 156 C34 92 70 26 128 26 Z" fill="url(#skin)"/>
+    <!-- side tufts: long flaps with three curls -->
+    <path d="M62 66 C40 54 16 54 4 66 C16 70 18 74 8 80 C20 84 22 88 12 94 C30 100 50 96 66 90 Z" fill="#f08c8c"/>
+    <path d="M194 66 C216 54 240 54 252 66 C240 70 238 74 248 80 C236 84 234 88 244 94 C226 100 206 96 190 90 Z" fill="#f08c8c"/>
+    <!-- egg in the pouch -->
+    <ellipse cx="128" cy="150" rx="28" ry="34" fill="url(#egg)"/>
+    <path d="M90 180 C104 174 152 174 166 180 C164 206 150 220 128 220 C106 220 92 206 90 180 Z" fill="#ee98b0"/>
+    <!-- little arms hugging the egg -->
+    <path d="M68 140 C82 134 100 138 106 148 C104 158 90 160 78 156 C70 152 66 146 68 140 Z" fill="#fbd0dc"/>
+    <path d="M188 140 C174 134 156 138 150 148 C152 158 166 160 178 156 C186 152 190 146 188 140 Z" fill="#f2b4c8"/>
   </g>
-  <!-- bóng trên trứng, nét túi -->
-  <ellipse cx="120" cy="158" rx="6" ry="9" fill="#eef2f8"/>
-  <path d="M96 196 C112 204 144 204 160 196" stroke="#e8a8bc" stroke-width="4" fill="none" stroke-linecap="round"/>
-  <!-- mặt -->
-  <ellipse cx="102" cy="98" rx="8" ry="10" fill="#2b2433"/>
-  <ellipse cx="154" cy="98" rx="8" ry="10" fill="#2b2433"/>
-  <circle cx="99" cy="94" r="3" fill="#ffffff"/>
-  <circle cx="151" cy="94" r="3" fill="#ffffff"/>
-  <ellipse cx="84" cy="120" rx="10" ry="6" fill="#f07898" opacity="0.7"/>
-  <ellipse cx="172" cy="120" rx="10" ry="6" fill="#f07898" opacity="0.7"/>
-  <path d="M116 120 C122 128 134 128 140 120" stroke="#2b2433" stroke-width="5" fill="none" stroke-linecap="round"/>
-  <!-- bóng sáng trên thân -->
-  <ellipse cx="88" cy="70" rx="14" ry="22" fill="#ffe4ec" opacity="0.8" transform="rotate(-25 88 70)"/>
+  <path d="M188 92 C214 132 214 196 168 230 C200 220 220 180 214 140 C210 120 202 104 188 92 Z" fill="#e898b4" opacity="0.5"/>
+  <ellipse cx="90" cy="60" rx="18" ry="10" fill="#fff" opacity="0.6" transform="rotate(-35 90 60)"/>
+  <ellipse cx="116" cy="136" rx="7" ry="11" fill="#fff"/>
+  <path d="M30 72 C40 74 52 76 60 80" fill="none" stroke="#c86a6e" stroke-width="3" stroke-linecap="round"/>
+  <path d="M226 72 C216 74 204 76 196 80" fill="none" stroke="#c86a6e" stroke-width="3" stroke-linecap="round"/>
+  <!-- face -->
+  <ellipse cx="108" cy="88" rx="5" ry="7" fill="#2b2433"/>
+  <ellipse cx="148" cy="88" rx="5" ry="7" fill="#2b2433"/>
+  <circle cx="107" cy="85" r="2" fill="#fff"/>
+  <circle cx="147" cy="85" r="2" fill="#fff"/>
+  <ellipse cx="92" cy="106" rx="9" ry="5" fill="#f08c9c" opacity="0.6"/>
+  <ellipse cx="164" cy="106" rx="9" ry="5" fill="#f08c9c" opacity="0.6"/>
+  <path d="M116 106 C122 113 134 113 140 106" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
 </svg>

@@ -150,7 +150,7 @@ export default class MartScene extends Phaser.Scene {
     }
   }
 
-  // ↑↓ tăng giảm 1, ←→ tăng giảm 10, Enter xác nhận, Esc huỷ (trả về 0)
+  // Phím lên / xuống tăng giảm 1, trái / phải tăng giảm 10, xác nhận để mua, quay lại thì huỷ (trả về 0)
   chooseQuantity(price, max, verb) {
     const box = this.add.container(0, 0).setDepth(30);
     box.add(drawPanel(this, 600, 426, 336, 110));
@@ -158,9 +158,8 @@ export default class MartScene extends Phaser.Scene {
     const qtyText = this.add.text(660, 446, '', textStyle(30, COLORS.text, { fontStyle: 'bold' }));
     const plus = this.add.text(742, 446, '▶', textStyle(30, COLORS.text, { fontStyle: 'bold' }));
     const totalText = this.add.text(880, 452, '', textStyle(24, '#3a4660')).setOrigin(1, 0);
-    const hint = this.add.text(626, 494, `↑↓ ±1  ←→ ±10  X: huỷ`, textStyle(15, '#8a92a6'));
     const ok = this.add.text(906, 494, verb.toUpperCase(), textStyle(18, '#ffffff', { fontStyle: 'bold', backgroundColor: '#40a060', padding: { x: 8, y: 2 } })).setOrigin(1, 0);
-    box.add([minus, qtyText, plus, totalText, hint, ok]);
+    box.add([minus, qtyText, plus, totalText, ok]);
 
     let qty = 1;
     const render = () => {

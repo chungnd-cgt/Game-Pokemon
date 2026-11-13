@@ -1,35 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <radialGradient id="steel" cx="36%" cy="30%" r="78%"><stop offset="0" stop-color="#c6d2e4"/><stop offset="0.55" stop-color="#94a4bc"/><stop offset="1" stop-color="#5e708e"/></radialGradient>
-    <linearGradient id="bar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c6d2e4"/><stop offset="0.5" stop-color="#94a4bc"/><stop offset="1" stop-color="#6a7c9a"/></linearGradient>
+    <radialGradient id="steel" cx="36%" cy="30%" r="78%"><stop offset="0" stop-color="#f0f8fc"/><stop offset="0.5" stop-color="#bcd2de"/><stop offset="1" stop-color="#84a0b4"/></radialGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8dce0"/><stop offset="0.5" stop-color="#a8adb4"/><stop offset="1" stop-color="#7c828c"/></linearGradient>
+    <linearGradient id="bolt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d0d4dc"/><stop offset="1" stop-color="#8c92a0"/></linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <g transform="rotate(145 128 128)">
-      <rect x="121.5" y="55" width="13.1" height="22.5" fill="#7c8ca6"/>
-      <path d="M114 56 C114 44.7 142 44.7 142 56 Z" fill="#b4c0d4"/>
+    <g transform="translate(128 52) scale(1.0)">
+      <rect x="-9" y="-2" width="18" height="24" fill="#9aa0ac"/>
+      <ellipse cx="0" cy="-4" rx="26" ry="9" fill="url(#bolt)"/>
     </g>
-    <g transform="rotate(-145 128 128)">
-      <rect x="121.5" y="55" width="13.1" height="22.5" fill="#7c8ca6"/>
-      <path d="M114 56 C114 44.7 142 44.7 142 56 Z" fill="#b4c0d4"/>
+    <g transform="translate(52 164) rotate(0) scale(1.15)">
+      <path d="M-34 -28 L4 -28 A28 28 0 0 1 4 28 L-34 28 L-34 10 L4 10 A10 10 0 0 0 4 -10 L-34 -10 Z" fill="url(#bar)"/>
+      <rect x="-36" y="-28" width="18" height="18" rx="2" fill="#e04848"/>
+      <rect x="-36" y="10" width="18" height="18" rx="2" fill="#4a86e0"/>
     </g>
-    <g>
-      <path d="M8.4 101.1 L45 101.1 A26.9 26.9 0 0 1 45 154.9 L8.4 154.9 L8.4 137.7 L45 137.7 A9.7 9.7 0 0 0 45 118.3 L8.4 118.3 Z" fill="url(#bar)"/>
-      <rect x="6.4" y="101.1" width="16" height="17.2" rx="2" fill="#e8403a"/>
-      <rect x="6.4" y="137.7" width="16" height="17.2" rx="2" fill="#3048e0"/>
+    <g transform="translate(204 92) rotate(180) scale(1.15)">
+      <path d="M-34 -28 L4 -28 A28 28 0 0 1 4 28 L-34 28 L-34 10 L4 10 A10 10 0 0 0 4 -10 L-34 -10 Z" fill="url(#bar)"/>
+      <rect x="-36" y="-28" width="18" height="18" rx="2" fill="#e04848"/>
+      <rect x="-36" y="10" width="18" height="18" rx="2" fill="#4a86e0"/>
     </g>
-    <g transform="translate(368.3 0) scale(-1 1)">
-      <path d="M120.7 101.1 L157.2 101.1 A26.9 26.9 0 0 1 157.2 154.9 L120.7 154.9 L120.7 137.7 L157.2 137.7 A9.7 9.7 0 0 0 157.2 118.3 L120.7 118.3 Z" fill="url(#bar)"/>
-      <rect x="118.7" y="101.1" width="16" height="17.2" rx="2" fill="#3048e0"/>
-      <rect x="118.7" y="137.7" width="16" height="17.2" rx="2" fill="#e8403a"/>
-    </g>
-    <circle cx="128" cy="128" r="58" fill="url(#steel)"/>
-    <g transform="rotate(0 128 128)">
-      <rect x="121.5" y="55" width="13.1" height="22.5" fill="#7c8ca6"/>
-      <path d="M114 56 C114 44.7 142 44.7 142 56 Z" fill="#b4c0d4"/>
-    </g>
+    <circle cx="128" cy="132" r="64" fill="url(#steel)"/>
   </g>
-  <circle cx="128" cy="129.9" r="21.5" fill="#fff" stroke="#2b2433" stroke-width="4.2"/>
-  <circle cx="128" cy="129.9" r="8" fill="#1a1622"/>
-  <circle cx="130.8" cy="127.1" r="2.8" fill="#fff"/>
-  <ellipse cx="103.6" cy="99" rx="17.4" ry="8.1" fill="#fff" opacity="0.45" transform="rotate(-35 103.6 99)"/>
+  <ellipse cx="101" cy="100" rx="19" ry="8" fill="#fff" opacity="0.7" transform="rotate(-35 101 100)"/>
+  <ellipse cx="118" cy="120" rx="27" ry="27" fill="#fff" stroke="#2b2433" stroke-width="4"/>
+  <circle cx="118" cy="120" r="3.5" fill="#1a1622"/>
+  <circle cx="160" cy="168" r="12" fill="url(#bolt)" stroke="#2b2433" stroke-width="3.5"/>
+  <path d="M154.0 168 L166.0 168 M160 162.0 L160 174.0" stroke="#2b2433" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="104" cy="182" r="12" fill="url(#bolt)" stroke="#2b2433" stroke-width="3.5"/>
+  <path d="M98.0 182 L110.0 182 M104 176.0 L104 188.0" stroke="#2b2433" stroke-width="3.5" stroke-linecap="round"/>
 </svg>

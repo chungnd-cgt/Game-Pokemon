@@ -20,7 +20,7 @@ const SLIDE_MS = 220;
 // Bảng nhỏ góc phải: bản đồ đang đứng có những Pokémon hoang dã nào, chỉ chia hai nhóm "Trên cạn" (mọi bãi cỏ; trong hang
 // là Pokémon của hang đó) và "Dưới nước" (lướt nước + mọi loại cần câu), không phụ thuộc đang đứng gần bãi nào.
 // Chỉ có hình Pokémon (tên bản đồ hiện dưới đồng hồ); rê chuột vào hình thì hiện tên loài (chưa gặp: "???"), cấp gặp và buổi.
-// Đã bắt thì hiện hình, chưa bắt thì bóng đen "?". Bấm vào Pokémon để mở đúng trang Pokédex.
+// Chưa gặp: bóng đen "?"; đã gặp: hiện hình; đã bắt: hiện hình + Poké Ball nhỏ góc dưới phải. Bấm vào Pokémon để mở đúng trang Pokédex.
 // Loài chỉ xuất hiện vào một buổi có biểu tượng buổi đó ở góc (☀ ngày, ◐ chạng vạng, ☾ đêm), ngoài buổi đó thì mờ đi.
 // Thu gọn thì trượt vào mép phải, chỉ chừa một tab nhỏ; bấm tab để mở lại.
 // info: { title, sections: [{ label, tables: [id bảng gặp], dim }] } hoặc null (không có Pokémon hoang dã)
@@ -42,7 +42,8 @@ export class AreaNav {
   // Vẽ lại khi khu vực / số loài đã bắt / cần câu đang có / buổi trong ngày thay đổi
   update(info) {
     this.info = info;
-    const caught = state.dex.caught.size;
+    // Vẽ lại khi Pokédex có thêm loài đã gặp / đã bắt
+    const caught = `${state.dex.seen.size}/${state.dex.caught.size}`;
     const key = info ? `${this.open}|${caught}|${timeOfDay()}|${info.title}|${info.sections.map((s) => `${s.tables.join('+')}${s.dim}`).join()}` : 'none';
     if (key === this.key || this.sliding) return;
     this.key = key;
@@ -174,7 +175,10 @@ export class AreaNav {
     const { scene } = this;
     const { time } = found;
     const dexId = SPECIES[speciesId].dexId;
-    const caught = state.dex.caught.has(dexId);
+    // Chưa gặp: bóng đen "?" • đã gặp: hiện hình • đã bắt: hiện hình + Poké Ball nhỏ góc dưới phải
+    const status = dexStatus(dexId);
+    const caught = status === 'caught';
+    const seen = status !== 'unknown';
     const slot = scene.add.graphics();
     const drawSlot = (hover) => {
       slot.clear();
@@ -190,20 +194,26 @@ export class AreaNav {
     const key = pixelMon(scene, speciesId, '', 28);
     const img = scene.add.image(cx, cy, key).setScale(fitScale(scene, key, ICON - 6));
     c.add(img);
-    if (!caught) {
+    if (!seen) {
       img.setTintFill(0x070a12);
       c.add(scene.add.text(cx, cy, '?', textStyle(16, '#c8d0e8', { fontStyle: 'bold' })).setOrigin(0.5));
+    }
+    let ball = null;
+    if (caught && scene.textures.exists('ball')) {
+      ball = scene.add.image(cx + ICON / 2 - 7, cy + ICON / 2 - 7, 'ball').setScale(fitScale(scene, 'ball', 11));
+      c.add(ball);
     }
     if (!now) {
       slot.setAlpha(0.45);
       img.setAlpha(0.35);
+      ball?.setAlpha(0.5);
     }
     if (time) {
       c.add(scene.add.text(cx + ICON / 2 - 2, cy - ICON / 2 + 1, PHASE_ICONS[time], textStyle(12, now ? '#ffd860' : '#8a94b0', { fontStyle: 'bold' })).setOrigin(1, 0));
     }
     const zone = scene.add.zone(cx, cy, ICON, ICON).setInteractive({ useHandCursor: true });
     // Rê chuột: tên loài (chưa gặp thì "???"), cấp gặp, buổi xuất hiện
-    const label = areaLabel(dexStatus(dexId) === 'unknown' ? '???' : SPECIES[speciesId].name, found);
+    const label = areaLabel(seen ? SPECIES[speciesId].name : '???', found);
     const hover = (on) => {
       drawSlot(on);
       if (on) this.showTip(c, label, cx, cy + ICON / 2 + 4);

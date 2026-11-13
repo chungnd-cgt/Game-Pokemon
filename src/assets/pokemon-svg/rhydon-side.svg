@@ -1,56 +1,44 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
     <linearGradient id="rock" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#bcc3d0"/>
-      <stop offset="1" stop-color="#8a92a6"/>
+      <stop offset="0" stop-color="#c0c8d8"/>
+      <stop offset="1" stop-color="#9ca4b8"/>
     </linearGradient>
-    <linearGradient id="horn" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#fffaf0"/>
-      <stop offset="1" stop-color="#d8ccae"/>
+    <linearGradient id="horn" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f6ecd0"/>
+      <stop offset="1" stop-color="#d8c494"/>
     </linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- đuôi to chạm đất -->
-    <path d="M146 166 C180 172 216 192 246 234 C216 246 178 240 150 222 Z" fill="#8a92a6"/>
-    <!-- tay và chân phía xa -->
-    <path d="M140 196 C146 216 148 232 146 246 L176 246 C178 230 174 212 166 196 Z" fill="#7a8296"/>
-    <path d="M96 130 C76 136 62 150 54 168 L68 176 C76 160 88 152 104 146 Z" fill="#7a8296"/>
-    <!-- thân -->
-    <path d="M82 116 C68 152 74 206 102 226 C128 240 160 232 172 206 C184 174 176 132 160 108 C140 88 96 92 82 116 Z" fill="url(#rock)"/>
-    <!-- bụng kem -->
-    <path d="M84 126 C72 160 78 204 104 222 C108 190 108 152 100 120 Z" fill="#ece0c4"/>
-    <!-- giáp lưng -->
-    <path d="M138 96 C164 94 186 118 186 150 C168 154 150 140 142 122 Z" fill="#9ca4b8"/>
-    <!-- chân phía gần -->
-    <path d="M102 196 C94 218 94 234 98 246 L140 246 C142 230 140 212 134 196 Z" fill="#9ca4b8"/>
-    <!-- tay phía gần -->
-    <path d="M116 132 C96 144 82 162 76 182 L92 190 C98 172 110 160 126 152 Z" fill="#9ca4b8"/>
-    <!-- giáp vai -->
-    <path d="M106 112 C112 92 140 90 152 106 C152 126 136 138 116 136 Z" fill="#9ca4b8"/>
-    <!-- gai tai -->
-    <path d="M118 52 L152 30 L132 70 Z" fill="#8a92a6"/>
-    <!-- đầu quay trái -->
-    <path d="M58 60 C62 40 90 30 112 36 C132 42 140 62 134 80 C128 96 112 104 94 104 C74 104 52 100 40 92 C28 86 30 72 42 68 Z" fill="url(#rock)"/>
-    <!-- sừng sau nhỏ -->
-    <path d="M84 40 L92 14 L104 38 Z" fill="#f4ecd8"/>
-    <!-- sừng khoan -->
-    <path d="M38 74 L24 8 L66 62 Z" fill="url(#horn)"/>
+    <!-- long tail out the back -->
+    <path d="M160 170 C198 176 228 196 250 228 C220 242 186 234 156 212 Z" fill="#8a92a8"/>
+    <!-- far arm -->
+    <path d="M130 108 C116 104 104 98 98 86 C96 78 104 74 110 80 C118 88 128 92 140 94 Z" fill="#8a92a8"/>
+    <path d="M150 190 C164 206 166 230 156 242 L120 242 C116 226 120 206 128 194 Z" fill="#8a92a8"/>
+    <!-- back spikes -->
+    <path d="M156 84 L176 62 L174 92 Z M174 112 L198 98 L188 126 Z M180 144 L204 140 L188 160 Z" fill="#b4bccc"/>
+    <!-- body -->
+    <path d="M118 80 C162 80 186 116 186 160 C186 200 160 222 118 222 C80 222 60 198 60 160 C60 116 80 80 118 80 Z" fill="url(#rock)"/>
+    <path d="M78 190 C66 208 66 230 78 242 L118 242 C122 226 118 206 110 194 Z" fill="#9ca4b8"/>
+    <!-- head facing left with snout -->
+    <path d="M124 22 C150 24 164 44 162 66 C160 88 144 102 122 104 L82 102 C62 100 46 90 44 76 C42 64 52 56 66 54 C80 34 100 20 124 22 Z" fill="url(#rock)"/>
+    <path d="M136 30 L150 0 L156 34 Z" fill="#b4bccc"/>
+    <path d="M150 44 L176 28 L164 58 Z" fill="#9ca4b8"/>
+    <!-- drill horn -->
+    <path d="M58 60 L36 18 L78 50 Z" fill="url(#horn)"/>
+    <!-- front arm reaching forward -->
+    <path d="M112 116 C92 114 74 106 62 92 C56 84 64 76 72 82 C84 92 98 98 120 100 Z" fill="#b4bccc"/>
   </g>
-  <g fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round">
-    <path d="M36 58 L54 50 M32 42 L46 36 M28 26 L36 22"/>
-    <path d="M80 150 Q92 152 104 148 M80 176 Q92 180 106 176 M86 200 Q96 204 106 202"/>
-    <path d="M150 112 C162 124 170 136 172 148"/>
-    <path d="M100 236 L138 236"/>
-  </g>
-  <path d="M76 182 l2 10 l6 -6 l4 10 l4 -8 Z" fill="#f4ecd8" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M100 246 l6 -10 l6 10 M118 246 l6 -10 l6 10" fill="#f4ecd8" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M168 150 C178 180 168 214 140 230 C158 204 166 178 168 150 Z" fill="#6e768a" opacity="0.6"/>
-  <ellipse cx="96" cy="46" rx="14" ry="5" fill="#fff" opacity="0.4" transform="rotate(-10 96 46)"/>
-  <!-- mắt -->
-  <ellipse cx="84" cy="64" rx="8" ry="7" fill="#d8303a" stroke="#2b2433" stroke-width="4"/>
-  <circle cx="82" cy="62" r="2.5" fill="#fff"/>
-  <path d="M70 54 L98 58" stroke="#2b2433" stroke-width="5" stroke-linecap="round"/>
-  <!-- miệng, nanh -->
-  <path d="M40 90 Q62 98 90 92" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
-  <path d="M52 93 L55 101 L59 95 Z" fill="#fff" stroke="#2b2433" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M62 132 C76 124 92 126 98 136 C104 170 96 200 74 214 C62 190 58 160 62 132 Z" fill="#e8d4a8" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M62 152 C74 152 88 154 100 158 M62 176 C74 176 88 178 98 182 M68 198 C76 198 84 200 90 202" fill="none" stroke="#b89a68" stroke-width="4" stroke-linecap="round"/>
+  <path d="M50 44 L62 38 M58 52 L68 46" stroke="#b89a68" stroke-width="3" stroke-linecap="round"/>
+  <path d="M188 196 C206 200 222 208 236 222 M176 214 C192 218 208 226 220 234" fill="none" stroke="#6a7088" stroke-width="4" stroke-linecap="round"/>
+  <path d="M164 104 C186 134 186 184 160 214 C184 196 196 140 178 112 Z" fill="#6a7088" opacity="0.5"/>
+  <ellipse cx="104" cy="36" rx="12" ry="6" fill="#fff" opacity="0.4" transform="rotate(-20 104 36)"/>
+  <path d="M90 58 C96 52 106 54 110 62 C104 68 94 66 90 58 Z" fill="#fff" stroke="#2b2433" stroke-width="3"/>
+  <circle cx="99" cy="60" r="3.5" fill="#d83a3a"/>
+  <path d="M48 82 C60 80 80 82 92 86 C88 98 60 98 48 88 Z" fill="#a0608a" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M56 83 l4 7 l4 -6 Z" fill="#fff"/>
+  <path d="M64 86 l-10 -4 l6 10 Z M60 94 l-10 0 l8 8 Z" fill="#fff" stroke="#2b2433" stroke-width="2"/>
+  <path d="M78 242 l2 -10 l8 10 Z M96 242 l2 -10 l8 10 Z" fill="#fff" stroke="#2b2433" stroke-width="2"/>
 </svg>

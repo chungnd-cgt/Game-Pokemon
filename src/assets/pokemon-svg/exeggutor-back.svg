@@ -29,9 +29,9 @@
   <path d="M92 112 C86 150 72 186 74 212 C76 232 180 232 182 212 C184 186 170 150 164 112 Z" fill="none" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
   <!-- ba đầu dừa nhìn từ sau -->
   <g stroke="#2b2433" stroke-width="5">
-    <circle cx="80" cy="100" r="31" fill="url(#nut)"/>
-    <circle cx="176" cy="100" r="31" fill="url(#nut)"/>
-    <circle cx="128" cy="90" r="32" fill="url(#nut)"/>
+    <circle cx="76" cy="102" r="37" fill="url(#nut)"/>
+    <circle cx="180" cy="102" r="37" fill="url(#nut)"/>
+    <circle cx="128" cy="88" r="38" fill="url(#nut)"/>
   </g>
   <!-- tàu lá phía trên, ngả ra trước -->
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">

@@ -2153,7 +2153,6 @@ Quên: ${detail(MOVES[value])}` : ''}`),
     });
     const total = STAT_KEYS.reduce((sum, s) => sum + mon.ivs[s], 0);
     text(x + w - 34, y + 280, `Tổng IV ${total}/${IV_MAX * 6}`, 14, '#4a5266', { fontStyle: 'bold' }).setOrigin(1, 0);
-    text(x + w / 2, y + h - 12, 'Enter / X / bấm chuột: đóng', 14, '#8a92a6').setOrigin(0.5, 1);
 
     c.setAlpha(0);
     this.tweens.add({ targets: c, alpha: 1, duration: 160 });

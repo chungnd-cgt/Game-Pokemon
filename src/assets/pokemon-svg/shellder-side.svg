@@ -1,17 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="shell" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#c4ace8"/><stop offset="0.5" stop-color="#9a7ad0"/><stop offset="1" stop-color="#6e50a8"/></linearGradient>
+    <linearGradient id="shell" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#c8b0f0"/><stop offset="0.5" stop-color="#9a7ad0"/><stop offset="1" stop-color="#6a4ea0"/></linearGradient>
+    <linearGradient id="tongue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffa8b8"/><stop offset="1" stop-color="#f06a88"/></linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M34 108 C20 136 24 164 38 184 L150 148 Z" fill="#241c30"/>
-    <path d="M226 152 C216 200 182 238 122 238 C72 238 38 210 36 176 Q48 178 52 168 Q64 174 70 164 Q82 170 88 160 Q100 166 106 156 C150 152 190 150 226 152 Z" fill="url(#shell)"/>
-    <path d="M226 144 C240 90 198 30 126 28 C68 28 30 64 28 112 Q40 106 48 118 Q56 106 66 118 Q76 106 86 120 Q96 108 106 124 C150 132 190 140 226 144 Z" fill="url(#shell)"/>
+    <!-- dark gap open toward the left -->
+    <path d="M20 112 C20 150 50 176 120 176 L200 160 L200 112 Z" fill="#1e1a26"/>
+    <!-- lower shell -->
+    <path d="M28 168 C40 214 84 238 136 236 C188 234 232 206 238 160 C200 176 160 184 120 184 C86 184 54 178 28 168 Z" fill="url(#shell)"/>
+    <!-- upper shell, ridges sweeping back -->
+    <path d="M8 122 C10 64 70 24 140 26 C204 28 250 70 244 140 C230 150 210 156 196 156 C190 138 170 126 150 124 C130 124 118 132 106 128 C94 134 82 124 70 130 C58 122 46 132 34 124 C24 130 14 120 8 122 Z" fill="url(#shell)"/>
   </g>
-  <path d="M222 146 L46 106 M222 146 L70 70 M222 146 L104 48 M222 146 L146 40 M222 146 L190 56" stroke="#6e50a8" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
-  <path d="M222 152 L60 184 M222 152 L86 216 M222 152 L124 230 M222 152 L166 226" stroke="#6e50a8" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
-  <ellipse cx="96" cy="54" rx="30" ry="11" fill="#fff" opacity="0.4" transform="rotate(-18 96 54)"/>
-  <ellipse cx="52" cy="138" rx="12" ry="14" fill="#fff" stroke="#2b2433" stroke-width="4"/>
-  <ellipse cx="47" cy="141" rx="6" ry="8" fill="#2b2433"/>
-  <circle cx="46" cy="137" r="2.5" fill="#fff"/>
-  <path d="M42 154 C22 160 8 178 14 196 C20 210 38 206 40 192 C42 180 48 172 58 166 Z" fill="#e8506a" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
+  <g fill="none" stroke="#5a3e8c" stroke-width="5" stroke-linecap="round">
+    <path d="M60 52 C120 50 190 70 234 112 M42 80 C110 76 180 96 220 140 M100 34 C150 36 200 56 236 84"/>
+    <path d="M60 196 C110 210 180 210 222 186"/>
+  </g>
+  <ellipse cx="90" cy="48" rx="30" ry="10" fill="#fff" opacity="0.35" transform="rotate(-12 90 48)"/>
+  <path d="M36 160 C22 184 10 206 16 226 C22 242 52 240 56 224 C60 204 64 184 74 164 Z" fill="url(#tongue)" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M42 140 C46 124 80 124 84 140 C80 156 46 156 42 140 Z" fill="#fff" stroke="#2b2433" stroke-width="3"/>
+  <circle cx="58" cy="143" r="6" fill="#1a1622"/>
+  <path d="M40 132 C52 126 74 126 86 132" stroke="#2b2433" stroke-width="5" stroke-linecap="round" fill="none"/>
 </svg>

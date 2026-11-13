@@ -11,10 +11,10 @@
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
     <!-- tai thỏ dài, trong tai đen -->
-    <path d="M86 94 C64 74 46 42 42 4 C76 16 102 46 112 76 Z" fill="#fcc8da"/>
-    <path d="M86 82 C72 66 60 44 56 22 C76 34 92 54 100 72 Z" fill="#3a2a36" stroke="none"/>
-    <path d="M170 94 C192 74 210 42 214 4 C180 16 154 46 144 76 Z" fill="#ee9cbe"/>
-    <path d="M170 82 C184 66 196 44 200 22 C180 34 164 54 156 72 Z" fill="#3a2a36" stroke="none"/>
+    <path d="M90 92 C74 68 64 36 66 2 C94 16 112 46 118 76 Z" fill="#fcc8da"/>
+    <path d="M92 80 C82 62 76 42 76 20 C94 34 104 54 108 72 Z" fill="#3a2a36" stroke="none"/>
+    <path d="M166 92 C182 68 192 36 190 2 C162 16 144 46 138 76 Z" fill="#ee9cbe"/>
+    <path d="M164 80 C174 62 180 42 180 20 C162 34 152 54 148 72 Z" fill="#3a2a36" stroke="none"/>
     <!-- chân -->
     <ellipse cx="94" cy="240" rx="28" ry="12" fill="#ee9cbe"/>
     <ellipse cx="162" cy="240" rx="28" ry="12" fill="#e48cb2"/>

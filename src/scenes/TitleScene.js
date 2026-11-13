@@ -64,7 +64,6 @@ export default class TitleScene extends Phaser.Scene {
       }
     }
 
-    this.add.text(width / 2, height - 24, 'Mũi tên để chọn  •  Enter để xác nhận', textStyle(17, '#c8d6f0')).setOrigin(0.5);
     this.router = new InputRouter(this);
     this.cameras.main.fadeIn(400);
     this.run().catch((err) => console.error('Lỗi màn hình chính:', err));
@@ -165,7 +164,6 @@ export default class TitleScene extends Phaser.Scene {
     c.add(this.add.rectangle(480, 360, 960, 720, 0x0a1430, 0.75));
     c.add(drawPanel(this, 230, 210, 500, 280, 18, true));
     c.add(this.add.text(480, 240, 'Tên của bạn là gì?', textStyle(28, COLORS.text, { fontStyle: 'bold' })).setOrigin(0.5, 0));
-    c.add(this.add.text(480, 364, `Tối đa ${NAME_MAX} ký tự, để trống thì tên là ${DEFAULT_NAMES[gender]}.\nEnter: xong  •  Backspace khi ô trống: quay lại`, textStyle(16, '#6a7286', { align: 'center' })).setOrigin(0.5, 0));
 
     const input = document.createElement('input');
     input.type = 'text';

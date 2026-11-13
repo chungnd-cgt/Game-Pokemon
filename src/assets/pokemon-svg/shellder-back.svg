@@ -1,13 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="shell" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#c4ace8"/><stop offset="0.5" stop-color="#9a7ad0"/><stop offset="1" stop-color="#6e50a8"/></linearGradient>
+    <linearGradient id="shell" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#c8b0f0"/><stop offset="0.5" stop-color="#9a7ad0"/><stop offset="1" stop-color="#6a4ea0"/></linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M40 150 Q55 162 70 150 Q85 162 99 150 Q114 162 128 150 Q142 162 157 150 Q171 162 186 150 Q201 162 216 150 C222 202 186 238 128 240 C70 238 34 202 40 150 Z" fill="url(#shell)"/>
-    <path d="M30 140 C20 84 60 22 128 20 C196 22 236 84 226 140 Q210 128 194 140 Q178 128 161 140 Q145 128 128 140 Q111 128 95 140 Q78 128 62 140 Q46 128 30 140 Z" fill="url(#shell)"/>
-    <ellipse cx="128" cy="150" rx="28" ry="14" fill="#6e50a8"/>
+    <path d="M36 150 C46 206 86 234 128 234 C170 234 210 206 220 150 Z" fill="#7a5cb0"/>
+    <path d="M14 140 C8 70 60 24 128 24 C196 24 248 70 242 140 C226 160 180 170 128 170 C76 170 30 160 14 140 Z" fill="url(#shell)"/>
+    <!-- hinge -->
+    <path d="M100 160 C110 176 146 176 156 160 C146 170 110 170 100 160 Z" fill="#5a3e8c"/>
   </g>
-  <path d="M128 140 L48 120 M128 140 L70 80 M128 140 L98 56 M128 140 L128 48 M128 140 L158 56 M128 140 L186 80 M128 140 L208 120" stroke="#6e50a8" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
-  <path d="M128 158 L66 190 M128 158 L96 222 M128 158 L128 230 M128 158 L160 222 M128 158 L190 190" stroke="#6e50a8" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
-  <ellipse cx="94" cy="46" rx="30" ry="11" fill="#fff" opacity="0.4" transform="rotate(-16 94 46)"/>
+  <g fill="none" stroke="#5a3e8c" stroke-width="5" stroke-linecap="round">
+    <path d="M128 32 L128 160 M96 36 C88 76 88 120 96 160 M160 36 C168 76 168 120 160 160 M64 50 C50 80 48 120 58 152 M192 50 C206 80 208 120 198 152"/>
+    <path d="M80 196 C100 206 156 206 176 196 M100 220 C118 226 138 226 156 220"/>
+  </g>
+  <ellipse cx="90" cy="56" rx="28" ry="10" fill="#fff" opacity="0.35" transform="rotate(-20 90 56)"/>
 </svg>

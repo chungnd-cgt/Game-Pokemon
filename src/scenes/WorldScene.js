@@ -38,13 +38,15 @@ import {
 import { resetLeague } from '../story/league.js';
 import { houseKnock } from '../story/villages.js';
 import { COLORS, cssColor, drawHpBar, drawPanel, fixToCamera, textStyle, tweenAsync, wait } from '../ui/helpers.js';
-import { InputRouter, directionOf, isCancel, isConfirm } from '../ui/input.js';
+import { HeldKeys, InputRouter, directionOf, isCancel, isConfirm } from '../ui/input.js';
+import { KeyBindings } from '../ui/KeyBindings.js';
+import { actionsForCode, hotbarSlotOf } from '../game/keybinds.js';
 import { Menu } from '../ui/Menu.js';
 import { MessageBox } from '../ui/MessageBox.js';
 import { typeBadges } from '../ui/TypeBadge.js';
 import { AreaNav } from '../ui/AreaNav.js';
 import { PartyPanel } from '../ui/PartyPanel.js';
-import { HOTBAR_SIZE, Hotbar } from '../ui/Hotbar.js';
+import { Hotbar } from '../ui/Hotbar.js';
 import { PcBox } from '../ui/PcBox.js';
 import { BagPanel } from '../ui/BagPanel.js';
 import { attachShinySparkle } from '../gfx/shinyFx.js';
@@ -115,13 +117,6 @@ function faceMonSprite(sprite, dir) {
   if (!sprite.texture.has(dir === 'up' ? 'up' : 'down')) return;
   sprite.setFrame(dir === 'left' || dir === 'right' ? 'side' : dir);
   sprite.setFlipX(dir === 'right');
-}
-
-// Phím 1-6 (hàng số hoặc bàn phím số): ô phím tắt 0-5, không phải thì null
-function hotkeySlot(e) {
-  const m = /^(?:Digit|Numpad)([1-9])$/.exec(e.code);
-  const slot = m ? Number(m[1]) - 1 : -1;
-  return slot >= 0 && slot < HOTBAR_SIZE ? slot : null;
 }
 
 // Đang đi xe / cưỡi thì ô phím tắt của món đó sáng viền
@@ -222,7 +217,6 @@ export default class WorldScene extends Phaser.Scene {
       .setDepth(HUD_DEPTH + 6)
       .setVisible(false);
     this.hud = new WorldHud(this, {
-      party: () => this.toggleParty(),
       bag: () => this.openBag(),
       dex: () => this.openPokedex(),
       trainer: () => this.openTrainerCard(),
@@ -256,29 +250,32 @@ export default class WorldScene extends Phaser.Scene {
       },
     });
 
-    this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D');
+    // Phím đang giữ (đi liên tục), theo bảng phím trong Cài đặt → Phím tắt (game/keybinds.js). Chặn phím mũi tên cuộn trang
+    this.held = new HeldKeys(this);
+    this.input.keyboard.addCapture('UP,DOWN,LEFT,RIGHT');
     this.input.keyboard.on('keydown', (e) => {
-      const slot = hotkeySlot(e);
+      const slot = hotbarSlotOf(e);
       if (slot !== null && !e.repeat) this.useHotbar(slot);
       else if (isConfirm(e)) this.interact();
       else this.tapTurn(directionOf(e), e.repeat);
     });
-    // Câu cá không có phím riêng: dùng cần câu trong túi đồ (bấm vào là dùng) hoặc ô phím tắt 1-6.
-    // Phím tắt chữ cái: nhận theo vị trí phím (e.code) chứ không theo mã ký tự, để bật bộ gõ tiếng Việt (Telex / VNI)
-    // vẫn dùng được (bộ gõ đổi mã phím của F, R, S, X, J... thành phím đang soạn). Giữ phím thì không bật / tắt liên tục.
+    // Câu cá không có phím riêng: dùng cần câu trong túi đồ (bấm vào là dùng) hoặc ô phím tắt.
+    // Phím nhận theo vị trí phím (e.code) chứ không theo mã ký tự, để bật bộ gõ tiếng Việt (Telex / VNI) vẫn dùng được
+    // (bộ gõ đổi mã phím của F, R, S, X, J... thành phím đang soạn). Giữ phím thì không bật / tắt liên tục.
     const shortcuts = {
-      KeyM: () => this.toggleParty(),
-      KeyP: () => this.openPokedex(),
-      KeyB: () => this.openBag(),
-      KeyC: () => this.toggleBike(),
-      KeyR: () => this.toggleRide(),
-      KeyN: () => this.openRegionMap(),
-      KeyT: () => this.openTrainerCard(),
-      KeyH: () => this.openHelp(),
-      Escape: () => this.toggleSettings(),
-      KeyX: () => this.toggleSettings(), // Esc không dùng được trên một số máy
+      party: () => this.toggleParty(),
+      dex: () => this.openPokedex(),
+      bag: () => this.openBag(),
+      bike: () => this.toggleBike(),
+      ride: () => this.toggleRide(),
+      map: () => this.openRegionMap(),
+      trainer: () => this.openTrainerCard(),
+      settings: () => this.toggleSettings(),
     };
-    this.input.keyboard.on('keydown', (e) => !e.repeat && shortcuts[e.code]?.());
+    this.input.keyboard.on('keydown', (e) => {
+      if (e.repeat) return;
+      for (const id of actionsForCode(e.code)) shortcuts[id]?.();
+    });
     const onWake = (_sys, wakeData) => this.onWake(wakeData);
     const onResume = () => this.onResume();
     this.events.on('wake', onWake);
@@ -295,18 +292,14 @@ export default class WorldScene extends Phaser.Scene {
 
     const start = data?.position ?? SPAWN;
     this.loadMap(start.map, start, start.facing);
-    // Lưu game lúc đang ở dưới nước thì tải lên vẫn ở dưới nước; đang đi xe đạp / cưỡi Arcanine ngoài trời thì tải lên
-    // vẫn đang đi xe / cưỡi như lúc lưu
-    // (chỗ đứng là mặt nước thì luôn xuống nước, kể cả bản lưu ghi sai cách đi: không bao giờ đứng trên mặt nước mà kẹt)
+    // Thoát game rồi vào lại: đang đi xe đạp / cưỡi Arcanine thì vào lại là đi bộ (xuống xe / xuống thú).
+    // Riêng đang ở dưới nước thì vào lại vẫn ở dưới nước (chỗ đứng là mặt nước thì luôn xuống nước, kể cả bản lưu ghi sai
+    // cách đi: không bao giờ đứng trên mặt nước mà kẹt)
     if (this.isWater(start.x, start.y)) {
       const lapras = start.vehicle !== 'surf' ? this.mountOf('waterRide') : null;
       const surfer = state.party.find((m) => m.uid === start.mount) ?? state.party.find((m) => this.canSurf(m)) ?? state.party[0];
       if (lapras || !surfer) this.setVehicle('waterRide', lapras ?? this.mountOf('waterRide'));
       else this.setVehicle('surf', surfer);
-    } else if (!this.map.indoor && start.vehicle === 'bike' && itemCount('bicycle')) {
-      this.setVehicle('bike');
-    } else if (!this.map.indoor && start.vehicle === 'ride' && this.mountOf('ride')) {
-      this.setVehicle('ride', this.mountOf('ride'));
     }
     this.cameras.main.fadeIn(500);
     if (state.pendingBattle) this.runEvent(() => this.resumeInterruptedBattle());
@@ -390,7 +383,7 @@ ${this.map.name}`, this.ambience.state.tod);
   runBlocked(fn) {
     this.runEvent(async () => {
       await fn();
-      this.input.keyboard.resetKeys();
+      this.resetHeldKeys();
     });
   }
 
@@ -426,11 +419,6 @@ ${this.map.name}`, this.ambience.state.tod);
     if (this.busy || this.moving || this.partyMenu || this.overlay) return;
     this.setFrame('stand');
     this.runEvent(() => showTrainerCard(this, this.router, this.playerTexture(false)));
-  }
-
-  openHelp() {
-    if (this.busy || this.moving || this.partyMenu || this.overlay) return;
-    this.runEvent(() => this.hud.showHelp(this.router));
   }
 
   // Game tự lưu nên không báo "Đã lưu game" mỗi lần; chỉ báo đỏ khi tab khác đang chơi (tab này thôi lưu)
@@ -1055,13 +1043,15 @@ ${this.map.name}`, this.ambience.state.tod);
     setCharFrame(this.player, this.facing, step);
   }
 
+  // Hướng đang giữ phím (phím hướng theo Cài đặt → Phím tắt)
   readDirection() {
-    const k = this.keys;
-    if (k.LEFT.isDown || k.A.isDown) return 'left';
-    if (k.RIGHT.isDown || k.D.isDown) return 'right';
-    if (k.UP.isDown || k.W.isDown) return 'up';
-    if (k.DOWN.isDown || k.S.isDown) return 'down';
-    return null;
+    return ['left', 'right', 'up', 'down'].find((d) => this.held.isDown(d)) ?? null;
+  }
+
+  // Bỏ mọi phím đang giữ (vd quay lại từ màn khác: phím nhả lúc bản đồ tạm dừng không được báo)
+  resetHeldKeys() {
+    this.input.keyboard.resetKeys();
+    this.held.reset();
   }
 
   npcAt(x, y, except = null) {
@@ -1610,7 +1600,7 @@ ${this.map.name}`, this.ambience.state.tod);
     this.tweens.killTweensOf(bobber);
     bobber.setY(bobber.y + 6);
     const alert = this.add.image(this.player.x, this.playerTop() - 2, 'fx-alert').setOrigin(0.5, 1).setScale(0.8).setDepth(HUD_DEPTH - 1);
-    this.msg.setText('Có gì đó cắn câu! Bấm Enter ngay!');
+    this.msg.setText('Có gì đó cắn câu! Bấm {key:confirm} ngay!');
     const caught = await new Promise((resolve) => {
       const timer = this.time.delayedCall(BITE_WINDOW_MS, () => resolve(false));
       const reel = () => {
@@ -2335,7 +2325,8 @@ ${this.map.name}`, this.ambience.state.tod);
       else if (obj.kind === 'gate') this.runEvent(() => this.say(null, [this.map.gateLine ?? 'Cổng tre đóng chặt. Hình như có công tắc ở đâu đó.']));
       else if (obj.kind === 'barrier') this.runEvent(() => this.say(null, [this.map.barrierLine ?? 'Hàng rào điện kêu rè rè... Không đi qua được.']));
       else if (obj.kind === 'lantern') this.runEvent(() => this.lightLantern(obj));
-      else this.runEvent(() => (obj.kind === 'berry' ? this.onFoot(() => this.pickBerryTree(obj)) : useObject(this, obj)));
+      // Cây quả mọng: hái luôn kể cả đang đi xe đạp / cưỡi thú (không phải xuống)
+      else this.runEvent(() => (obj.kind === 'berry' ? this.pickBerryTree(obj) : useObject(this, obj)));
       return;
     }
     if (this.isWater(target.x, target.y) && !this.onWater()) {
@@ -2560,7 +2551,7 @@ ${this.map.name}`, this.ambience.state.tod);
   // ---------- Poké Mart ----------
 
   onResume() {
-    this.input.keyboard.resetKeys();
+    this.resetHeldKeys();
     this.refreshFollower();
     if (this.returnToParty != null) {
       const index = this.returnToParty;
@@ -2628,7 +2619,7 @@ ${this.map.name}`, this.ambience.state.tod);
   }
 
   async onWake(data) {
-    this.input.keyboard.resetKeys();
+    this.resetHeldKeys();
     this.transition?.destroy();
     this.transition = null;
     const persisted = Boolean(state.pendingBattle);
@@ -2771,7 +2762,8 @@ ${this.map.name}`, this.ambience.state.tod);
     this.scene.pause();
   }
 
-  // Menu cài đặt: ánh sáng, về màn hình chính (game luôn tự động lưu)
+  // Menu cài đặt: bản đồ vùng, phím tắt, ánh sáng... (game luôn tự động lưu). Đóng bằng ✕, phím quay lại / cài đặt,
+  // hoặc bấm ra ngoài khung
   async toggleSettings() {
     if (this.settingsMenu) {
       this.settingsMenu.finish(null);
@@ -2782,40 +2774,36 @@ ${this.map.name}`, this.ambience.state.tod);
     this.setFrame('stand');
     let index = 0;
     for (;;) {
-      // Giá trị bật / tắt nằm riêng ở cột phải (sub) để chữ không tràn khung. Bản đồ vùng và Trợ giúp nằm trong Cài đặt
-      // (vẫn mở nhanh bằng phím N / H)
+      // Giá trị bật / tắt nằm riêng ở cột phải (sub) để chữ không tràn khung. Bản đồ vùng nằm trong Cài đặt
       const onOff = (on) => (on ? 'Bật' : 'Tắt');
       const items = [
-        ...(itemCount('townMap') ? [{ label: 'Bản đồ vùng', sub: 'N', value: 'map' }] : []),
-        { label: 'Trợ giúp, phím điều khiển', sub: 'H', value: 'help' },
+        ...(itemCount('townMap') ? [{ label: 'Bản đồ vùng', value: 'map' }] : []),
+        { label: 'Phím tắt', value: 'keys' },
         { label: 'Ánh sáng & thời tiết', sub: onOff(settings.ambience), value: 'ambience' },
         { label: 'Xem nhanh khi gửi vào PC', sub: onOff(settings.catchPreview), value: 'catchPreview' },
         { label: 'Đổi diện mạo', value: 'look' },
-        { label: 'Về màn hình chính', value: 'title' },
         // Bản 2D (index.html có nút sang bản 3D): chuyển sang bản 3D, chơi tiếp từ bản lưu
         ...(document.getElementById('link3d') ? [{ label: 'Chơi bản thử 3D', value: '3d' }] : []),
-        { label: 'Đóng', value: 'close' },
       ].map((item) => ({ ...item, fontSize: 22 }));
-      // Khung cao theo số mục, căn giữa màn hình; dòng ghi chú nằm sát đáy khung
+      // Khung cao theo số mục, căn giữa màn hình
       const rowHeight = 50;
-      const height = 120 + items.length * (rowHeight + 6);
+      const height = 84 + items.length * (rowHeight + 6);
       const top = Math.max(16, Math.round((this.scale.height - height) / 2));
       this.settingsMenu = new Menu(this, this.router, {
         x: 220, y: top, width: 520, height, title: 'Cài đặt', items, index, rowHeight, fixed: true, depth: HUD_DEPTH + 10,
       });
-      const note = fixToCamera(this.add.text(480, top + height - 26, 'Game tự động lưu sau mỗi sự kiện và mỗi lượt đấu.', textStyle(15, '#6a7286')).setOrigin(0.5))
-        .setDepth(HUD_DEPTH + 11);
       const choice = await this.settingsMenu.open();
-      note.destroy();
       this.settingsMenu = null;
       index = Math.max(0, items.findIndex((i) => i.value === choice));
 
-      if (choice === 'map' || choice === 'help') {
-        // Đóng Cài đặt rồi mới mở (hai màn này cần lúc không bận)
+      if (choice === 'map') {
+        // Đóng Cài đặt rồi mới mở (màn này cần lúc không bận)
         this.busy = false;
-        if (choice === 'map') this.openRegionMap();
-        else this.openHelp();
+        this.openRegionMap();
         return;
+      } else if (choice === 'keys') {
+        // Đổi phím: đóng thì quay lại Cài đặt (nhãn phím trên ô phím tắt tự vẽ lại theo phím mới)
+        await new KeyBindings(this, this.router, { depth: HUD_DEPTH + 20 }).open();
       } else if (choice === 'ambience') {
         setSetting('ambience', !settings.ambience);
         this.ambience.refresh(true);
@@ -2841,13 +2829,6 @@ ${this.map.name}`, this.ambience.state.tod);
         if (await this.ask('Lưu game và chuyển sang bản thử 3D?', null, { safe: true })) {
           this.save();
           window.location.href = document.getElementById('link3d').href;
-          return;
-        }
-      } else if (choice === 'title') {
-        if (await this.ask('Lưu game và về màn hình chính?', null, { safe: true })) {
-          this.save();
-          this.cameras.main.fadeOut(300);
-          this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('Title'));
           return;
         }
       } else {
@@ -2956,7 +2937,7 @@ ${this.map.name}`, this.ambience.state.tod);
         memory: this.bagMemory,
         title: assignSlot === null ? null : `Chọn đồ cho ô ${assignSlot + 1}`,
         hotbar: this.hotbar,
-        hotkey: hotkeySlot,
+        hotkey: hotbarSlotOf,
         onAssign: (slot, item) => {
           this.hud.showSaveNote(setHotbarSlot(slot, item));
           this.hotbar.flash(slot);
@@ -3011,7 +2992,7 @@ ${this.map.name}`, this.ambience.state.tod);
   async pickHotbarSlot(id) {
     const items = state.hotbar.map((cur, i) => ({
       label: `Ô ${i + 1}`,
-      sub: cur ? (cur === id ? 'đang gán (bấm để bỏ)' : ITEMS[cur].name) : '(trống)',
+      sub: cur ? (cur === id ? 'đang gán' : ITEMS[cur].name) : '(trống)',
       icon: cur ? ITEMS[cur].icon : null,
       value: i,
       fontSize: 23,
@@ -3225,20 +3206,6 @@ ${this.map.name}`, this.ambience.state.tod);
       const stage = berryStage(id);
       fruit.setVisible(stage !== 'bare');
       if (stage !== 'bare') fruit.setTexture(stage === 'unripe' ? texture.unripe : `${texture[stage]}${berry}`);
-    }
-  }
-
-  // Đang cưỡi Arcanine mà hái quả: thú cưỡi dài hơn 2 ô, đầu chồng lên cây. Xuống đứng cạnh cây hái bằng tay
-  // (Pokémon đi theo vẫn nấp), xong thì leo lên lưng lại
-  async onFoot(fn) {
-    const mon = this.vehicle === 'ride' ? this.mount : null;
-    if (!mon) return fn();
-    this.follower.tucked = true;
-    this.setVehicle(null, null, false);
-    try {
-      return await fn();
-    } finally {
-      if (!this.vehicle) this.setVehicle('ride', mon);
     }
   }
 

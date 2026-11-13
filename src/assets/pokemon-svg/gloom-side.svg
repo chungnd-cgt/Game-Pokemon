@@ -1,31 +1,49 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 256">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <radialGradient id="body" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#7a94e0"/><stop offset="0.6" stop-color="#4b68b8"/><stop offset="1" stop-color="#344c90"/></radialGradient>
-    <radialGradient id="petal" cx="50%" cy="30%" r="80%"><stop offset="0" stop-color="#f69060"/><stop offset="1" stop-color="#dc5e38"/></radialGradient>
-    <g id="pet">
-      <path d="M0 -6 C-50 -14 -58 -70 0 -86 C58 -70 50 -14 0 -6 Z" fill="url(#petal)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
-      <ellipse cx="0" cy="-52" rx="18" ry="16" fill="#f8c890"/>
-    </g>
+    <radialGradient id="body" cx="38%" cy="32%" r="75%">
+      <stop offset="0" stop-color="#7a8ad8"/>
+      <stop offset="0.6" stop-color="#4b5cb0"/>
+      <stop offset="1" stop-color="#34408a"/>
+    </radialGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f68848"/>
+      <stop offset="1" stop-color="#d0482c"/>
+    </linearGradient>
+    <radialGradient id="bud" cx="40%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#a84a48"/>
+      <stop offset="1" stop-color="#6e2a2c"/>
+    </radialGradient>
   </defs>
-  <g transform="translate(140 92) scale(1.32 0.6)">
-    <use xlink:href="#pet" href="#pet" transform="rotate(-36)"/>
-    <use xlink:href="#pet" href="#pet" transform="rotate(36)"/>
-    <use xlink:href="#pet" href="#pet" transform="rotate(-104)"/>
-    <use xlink:href="#pet" href="#pet" transform="rotate(104)"/>
-    <use xlink:href="#pet" href="#pet" transform="rotate(180)"/>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- lá phía xa (trước mặt) -->
+    <path d="M108 104 C82 92 50 96 32 120 C24 132 26 150 38 154 C36 140 42 128 54 122 C70 116 90 118 112 124 Z" fill="#c84a2c"/>
+    <ellipse cx="146" cy="238" rx="24" ry="12" fill="#34408a"/>
+    <!-- lá phía sau lưng -->
+    <path d="M150 100 C180 84 216 88 236 116 C246 130 242 150 228 154 C232 140 226 126 212 120 C196 114 174 116 150 122 Z" fill="url(#leaf)"/>
+    <path d="M156 116 C180 120 202 134 210 156 C214 170 208 184 198 186 C200 172 196 158 186 150 C176 142 164 138 150 136 Z" fill="#d85a34"/>
+    <!-- thân -->
+    <ellipse cx="124" cy="176" rx="64" ry="58" fill="url(#body)"/>
+    <ellipse cx="104" cy="238" rx="26" ry="12" fill="#4b5cb0"/>
+    <ellipse cx="100" cy="210" rx="16" ry="12" fill="#4b5cb0" transform="rotate(-20 100 210)"/>
+    <!-- nụ hoa -->
+    <circle cx="150" cy="70" r="30" fill="url(#bud)"/>
+    <circle cx="124" cy="52" r="30" fill="url(#bud)"/>
+    <circle cx="96" cy="80" r="30" fill="url(#bud)"/>
+    <circle cx="130" cy="92" r="32" fill="url(#bud)"/>
   </g>
-  <ellipse cx="140" cy="90" rx="26" ry="11" fill="#6a2a30" stroke="#2b2433" stroke-width="4"/>
-  <ellipse cx="134" cy="87" rx="10" ry="3.5" fill="#9a4a48"/>
-  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round">
-    <ellipse cx="152" cy="238" rx="26" ry="12" fill="#2a3f78"/>
-    <ellipse cx="194" cy="190" rx="18" ry="13" fill="#344c90" transform="rotate(30 194 190)"/>
-    <ellipse cx="128" cy="180" rx="64" ry="60" fill="url(#body)"/>
-    <ellipse cx="106" cy="238" rx="28" ry="13" fill="#344c90"/>
+  <g fill="#f4c4a8">
+    <circle cx="114" cy="42" r="5"/>
+    <circle cx="86" cy="72" r="4.5"/>
+    <circle cx="146" cy="62" r="4"/>
+    <circle cx="118" cy="84" r="5"/>
+    <circle cx="142" cy="104" r="3.5"/>
   </g>
-  <ellipse cx="102" cy="146" rx="18" ry="8" fill="#fff" opacity="0.3" transform="rotate(-25 102 146)"/>
-  <path d="M74 166 C76 154 98 152 100 166 C98 178 76 178 74 166 Z" fill="#e83c3c" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M72 164 C80 156 94 156 102 162" stroke="#2b2433" stroke-width="6" stroke-linecap="round" fill="none"/>
-  <circle cx="84" cy="168" r="3" fill="#fff"/>
-  <path d="M64 192 C70 186 88 188 92 194 C90 208 70 208 64 192 Z" fill="#8a2a3a" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M72 204 C74 214 72 224 78 228 C84 224 82 214 80 204 Z" fill="#f0b040" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+  <ellipse cx="86" cy="150" rx="16" ry="8" fill="#fff" opacity="0.3" transform="rotate(-25 86 150)"/>
+  <path d="M160 150 C182 182 172 214 140 230 C164 206 170 180 160 150 Z" fill="#283070" opacity="0.5"/>
+  <!-- mắt lim dim, miệng chảy dãi -->
+  <path d="M74 160 Q84 168 94 160" fill="none" stroke="#2b2433" stroke-width="5" stroke-linecap="round"/>
+  <path d="M76 150 L94 154" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+  <path d="M62 188 C70 182 80 186 88 190" fill="none" stroke="#2b2433" stroke-width="9" stroke-linecap="round"/>
+  <path d="M62 188 C70 182 80 186 88 190" fill="none" stroke="#9a6ad0" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M68 190 C66 200 66 210 72 216 C80 212 80 200 76 190 Z" fill="#ece4f4" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
 </svg>

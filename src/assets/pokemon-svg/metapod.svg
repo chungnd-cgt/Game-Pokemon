@@ -1,29 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="shell" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a4da70"/><stop offset="0.55" stop-color="#76b850"/><stop offset="1" stop-color="#4c8c36"/></linearGradient>
+    <linearGradient id="shell" x1="0" y1="0" x2="1" y2="0.6">
+      <stop offset="0" stop-color="#a8de72"/>
+      <stop offset="0.5" stop-color="#76b850"/>
+      <stop offset="1" stop-color="#4e8a38"/>
+    </linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- vỏ nhộng: chóp nhọn cong ra sau -->
-    <path d="M128 246 C80 246 54 214 54 166 C54 116 82 78 122 56 C150 42 180 30 212 12 C200 32 188 50 186 74 C184 92 204 112 206 142 C210 192 196 222 170 236 C158 244 144 246 128 246 Z" fill="url(#shell)"/>
+    <path d="M156 6 C128 30 88 56 64 92 L104 118 C74 138 62 176 82 212 C102 240 176 246 234 248 C206 222 192 192 188 150 C186 100 180 50 156 6 Z" fill="url(#shell)"/>
+    <path d="M64 92 C92 84 120 76 140 66 L156 6 M140 66 C152 96 168 120 188 134 M104 118 L140 66" fill="none" stroke-width="4"/>
+    <path d="M84 168 C116 172 156 166 188 152 M92 202 C124 206 166 198 196 184 M124 230 C156 230 192 222 212 214" fill="none" stroke-width="4"/>
   </g>
-  <!-- bóng phía sau & sáng -->
-  <path d="M190 52 C182 82 204 112 200 160 C196 204 178 228 150 242 C176 212 186 172 184 136 C182 108 176 80 190 52 Z" fill="#3e7a2c" opacity="0.5"/>
-  <ellipse cx="94" cy="88" rx="26" ry="12" fill="#fff" opacity="0.4" transform="rotate(-35 94 88)"/>
-  <!-- các mảnh giáp chữ V phía dưới -->
-  <g fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M66 174 L128 200 L200 168"/>
-    <path d="M74 206 L128 228 L190 202"/>
-    <path d="M128 200 L128 228"/>
-  </g>
-  <path d="M72 180 L126 204" stroke="#c8ec9a" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
-  <!-- mắt lim dim trên vỏ -->
-  <g stroke="#2b2433" stroke-width="3">
-    <path d="M86 128 C94 120 116 120 124 128 C118 140 94 142 86 128 Z" fill="#f4f6e6"/>
-    <path d="M140 128 C148 120 170 120 178 128 C172 140 148 142 140 128 Z" fill="#f4f6e6"/>
-  </g>
-  <circle cx="108" cy="131" r="7" fill="#1a1620"/>
-  <circle cx="160" cy="131" r="7" fill="#1a1620"/>
-  <circle cx="110" cy="128" r="2.4" fill="#fff"/>
-  <circle cx="162" cy="128" r="2.4" fill="#fff"/>
-  <path d="M84 124 C96 116 114 116 126 124 M138 124 C150 116 168 116 180 124" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+  <path d="M146 22 C124 46 96 68 80 88 C104 80 126 72 136 62 Z" fill="#c8f094" opacity="0.7"/>
+  <path d="M86 178 C84 196 92 210 104 220" fill="none" stroke="#c8f094" stroke-width="7" stroke-linecap="round" opacity="0.7"/>
+  <path d="M170 60 C178 100 182 140 196 180 C198 200 210 222 226 242 C200 236 188 200 184 160 C180 120 176 90 170 60 Z" fill="#3c6e2a" opacity="0.45"/>
+  <path d="M84 96 C88 84 110 80 120 92 C122 104 112 110 100 110 C90 110 84 104 84 96 Z" fill="#fff" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <ellipse cx="96" cy="99" rx="6" ry="7" fill="#1c1c2a"/>
+  <circle cx="98" cy="96" r="2.2" fill="#fff"/>
+  <path d="M80 92 C92 84 112 84 124 92" fill="none" stroke="#2b2433" stroke-width="6" stroke-linecap="round"/>
 </svg>

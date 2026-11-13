@@ -23,11 +23,11 @@
     <!-- head facing left -->
     <path d="M30 116 C28 84 52 66 86 66 C120 66 142 88 138 116 C134 144 112 158 86 158 C60 158 42 148 36 136 C28 132 26 124 30 116 Z" fill="url(#skin)"/>
     <!-- crest fin -->
-    <path d="M60 74 C64 50 80 32 96 22 C102 38 104 56 100 70 C88 66 74 68 60 74 Z" fill="url(#frill)"/>
+    <path d="M60 74 C64 50 80 32 96 22 C102 38 104 56 100 70 C88 66 74 68 60 74 Z" fill="#2c5c9c"/>
     <!-- ear fin swept back -->
-    <path d="M104 104 C112 74 136 52 170 44 C168 76 150 102 118 118 Z" fill="url(#frill)"/>
+    <path d="M104 104 C112 74 136 50 172 40 C166 50 168 58 178 64 C166 70 164 78 170 88 C156 88 148 96 146 106 C136 104 126 110 118 118 Z" fill="url(#frill)"/>
   </g>
-  <path d="M112 98 C124 76 142 62 162 54" fill="none" stroke="#2c5c9c" stroke-width="5" stroke-linecap="round"/>
+  <path d="M112 104 L166 46 M114 106 L172 66 M118 110 L164 88" fill="none" stroke="#5a9ad8" stroke-width="4" stroke-linecap="round"/>
   <path d="M120 84 C134 100 132 128 120 142 C110 152 98 156 86 156 C112 140 124 116 120 84 Z" fill="#2c5c9c" opacity="0.35"/>
   <ellipse cx="54" cy="84" rx="14" ry="6" fill="#fff" opacity="0.4" transform="rotate(-15 54 84)"/>
   <ellipse cx="66" cy="110" rx="11" ry="15" fill="#1e2238" stroke="#2b2433" stroke-width="4"/>

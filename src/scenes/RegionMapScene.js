@@ -3,6 +3,7 @@ import { PLACES, REGION_NAME, placeOf, placePoint } from '../data/region.js';
 import { state } from '../game/state.js';
 import { backToWorld, closeButton, gradientRect, textStyle } from '../ui/helpers.js';
 import { InputRouter, isCancel, isConfirm } from '../ui/input.js';
+import { matches } from '../game/keybinds.js';
 
 const LAND = 0x8cc870;
 const LAND_DARK = 0x6aa858;
@@ -36,7 +37,7 @@ export default class RegionMapScene extends Phaser.Scene {
     // Huy hiệu xem ở Thẻ Huấn luyện viên (ui/TrainerCard.js), bản đồ vùng chỉ còn bản đồ
 
     this.router = new InputRouter(this);
-    this.router.set((e) => (isCancel(e) || isConfirm(e) || e.code === 'KeyN') && !e.repeat && this.close(), (p) => p.rightButtonDown() && this.close());
+    this.router.set((e) => (isCancel(e) || isConfirm(e) || matches(e, 'map')) && !e.repeat && this.close(), (p) => p.rightButtonDown() && this.close());
     closeButton(this, width - 34, 34, () => this.close(), 36);
     this.cameras.main.fadeIn(200);
   }
@@ -118,10 +119,8 @@ export default class RegionMapScene extends Phaser.Scene {
   }
 
   drawHeader() {
-    const { width } = this.scale;
     const here = PLACES.find((p) => p.id === this.here);
     this.add.text(28, 18, REGION_NAME.toUpperCase(), textStyle(30, '#ffffff', { fontStyle: 'bold', stroke: '#1e3a68', strokeThickness: 6 }));
     this.add.text(30, 60, `Bạn đang ở: ${here ? here.name : '—'}`, textStyle(18, '#ffe9a0', { fontStyle: 'bold' }));
-    this.add.text(width - 76, 24, 'Esc / X / N: đóng', textStyle(15, '#d0e4ff')).setOrigin(1, 0);
   }
 }

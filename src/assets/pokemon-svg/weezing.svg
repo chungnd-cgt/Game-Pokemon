@@ -1,61 +1,58 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <radialGradient id="body" cx="38%" cy="32%" r="75%">
-      <stop offset="0" stop-color="#b098c8"/>
-      <stop offset="0.6" stop-color="#8a6aa8"/>
-      <stop offset="1" stop-color="#5e4480"/>
+    <radialGradient id="body" cx="38%" cy="32%" r="72%">
+      <stop offset="0" stop-color="#b09ad0"/>
+      <stop offset="1" stop-color="#8a6aa8"/>
     </radialGradient>
-    <g id="skull">
-      <path d="M108 168 C102 158 108 148 120 150 C120 140 136 140 136 150 C148 148 154 158 148 168 C150 176 144 184 136 182 L136 190 L120 190 L120 182 C112 184 106 176 108 168 Z" fill="#f4ecd0" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
-      <circle cx="121" cy="164" r="5.5" fill="#2b2433"/>
-      <circle cx="135" cy="164" r="5.5" fill="#2b2433"/>
-    </g>
   </defs>
-  <!-- khói -->
-  <g fill="#c8c0a0" opacity="0.8">
-    <circle cx="232" cy="150" r="16"/>
-    <circle cx="244" cy="128" r="10"/>
-    <circle cx="20" cy="96" r="13"/>
-    <circle cx="30" cy="74" r="8"/>
-    <circle cx="214" cy="20" r="10"/>
-  </g>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- mụn lồi ngắn quanh hai đầu -->
-    <path d="M24 130 l-12 -6 l4 16 Z M40 212 l-14 10 l18 2 Z M172 210 l14 10 l-2 -18 Z M186 136 l20 2 l-12 12 Z M150 40 l-10 -14 l18 6 Z M232 52 l12 -8 l-4 16 Z M60 84 l-8 -16 l18 6 Z" fill="#7a5a98"/>
-    <!-- ống nối hai đầu -->
-    <path d="M140 92 C150 82 160 86 166 96 L156 116 C150 108 144 104 136 106 Z" fill="#7a5a98"/>
-    <!-- đầu nhỏ -->
-    <circle cx="188" cy="76" r="50" fill="url(#body)"/>
-    <!-- đầu lớn -->
-    <circle cx="102" cy="156" r="80" fill="url(#body)"/>
+    <!-- gas puffs -->
+    <path d="M8 66 C4 52 20 44 30 50 C36 38 56 40 56 54 C68 56 68 74 54 76 C48 88 26 86 24 76 C12 78 4 72 8 66 Z" fill="#e4dc98"/>
+    <path d="M212 160 C214 148 230 146 236 156 C250 154 254 172 242 178 C240 192 220 192 216 182 C204 180 202 166 212 160 Z" fill="#e4dc98"/>
+    <path d="M10 228 C8 216 22 210 30 218 C40 210 56 216 54 228 C60 240 44 248 34 242 C24 248 10 240 10 228 Z" fill="#e4dc98"/>
+    <path d="M118 18 C118 8 132 4 138 12 C148 10 154 22 148 28 C152 38 140 44 132 38 C124 44 112 36 118 28 Z" fill="#e4dc98"/>
+    <!-- small connecting ball -->
+    <circle cx="176" cy="150" r="22" fill="#7a5c98"/>
+    <!-- small head, upper right -->
+    <circle cx="190" cy="40" r="10" fill="#8a6aa8"/>
+    <circle cx="232" cy="84" r="10" fill="#7a5c98"/>
+    <circle cx="186" cy="80" r="50" fill="url(#body)"/>
+    <!-- big head bumps -->
+    <circle cx="96" cy="64" r="13" fill="#8a6aa8"/>
+    <circle cx="36" cy="120" r="13" fill="#9a80bc"/>
+    <circle cx="40" cy="192" r="12" fill="#8a6aa8"/>
+    <circle cx="104" cy="236" r="12" fill="#7a5c98"/>
+    <circle cx="164" cy="210" r="12" fill="#7a5c98"/>
+    <!-- big head -->
+    <circle cx="104" cy="150" r="80" fill="url(#body)"/>
   </g>
-  <g stroke="#2b2433" stroke-width="3">
-    <circle cx="52" cy="176" r="9" fill="#9a7cb8"/>
-    <circle cx="150" cy="100" r="7" fill="#9a7cb8"/>
-    <circle cx="222" cy="92" r="6" fill="#9a7cb8"/>
+  <g fill="#7a5c98">
+    <ellipse cx="54" cy="128" rx="8" ry="6"/>
+    <ellipse cx="150" cy="200" rx="8" ry="6"/>
+    <ellipse cx="208" cy="64" rx="6" ry="5"/>
+    <ellipse cx="64" cy="196" rx="8" ry="6"/>
   </g>
-  <!-- đầu lớn: đầu lâu dưới cằm -->
-  <use href="#skull" transform="translate(104 200) scale(0.72) translate(-128 -166)"/>
-  <!-- mắt đầu lớn, lông mày cau -->
-  <path d="M60 104 C70 96 86 98 94 110 C84 114 70 112 60 104 Z M148 104 C138 96 122 98 114 110 C124 114 138 112 148 104 Z" fill="#2b2433"/>
-  <ellipse cx="80" cy="122" rx="12" ry="13" fill="#fff" stroke="#2b2433" stroke-width="3.5"/>
-  <ellipse cx="128" cy="122" rx="12" ry="13" fill="#fff" stroke="#2b2433" stroke-width="3.5"/>
-  <circle cx="82" cy="124" r="6" fill="#1a1010"/>
-  <circle cx="126" cy="124" r="6" fill="#1a1010"/>
-  <circle cx="84" cy="121" r="2" fill="#fff"/>
-  <circle cx="128" cy="121" r="2" fill="#fff"/>
-  <!-- miệng há, răng -->
-  <path d="M74 150 Q104 176 136 150 Q106 160 74 150 Z" fill="#7a2a3a" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M82 153 L88 162 L94 156 Z M126 153 L120 162 L114 156 Z" fill="#fff" stroke="#2b2433" stroke-width="2" stroke-linejoin="round"/>
-  <!-- đầu nhỏ: mặt -->
-  <path d="M160 56 C166 50 176 52 180 60 C172 62 166 62 160 56 Z M216 56 C210 50 200 52 196 60 C204 62 210 62 216 56 Z" fill="#2b2433"/>
-  <ellipse cx="174" cy="68" rx="8" ry="9" fill="#fff" stroke="#2b2433" stroke-width="3"/>
-  <ellipse cx="202" cy="68" rx="8" ry="9" fill="#fff" stroke="#2b2433" stroke-width="3"/>
-  <circle cx="175" cy="70" r="4.5" fill="#1a1010"/>
-  <circle cx="201" cy="70" r="4.5" fill="#1a1010"/>
-  <path d="M178 86 Q188 80 198 86" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
-  <use href="#skull" transform="translate(188 104) scale(0.48) translate(-128 -166)"/>
-  <!-- ánh sáng -->
-  <ellipse cx="68" cy="94" rx="22" ry="9" fill="#fff" opacity="0.3" transform="rotate(-30 68 94)"/>
-  <ellipse cx="172" cy="40" rx="14" ry="6" fill="#fff" opacity="0.3" transform="rotate(-25 172 40)"/>
+  <path d="M150 96 C190 132 186 196 140 222 C168 188 170 134 150 96 Z" fill="#6a4c88" opacity="0.5"/>
+  <ellipse cx="66" cy="102" rx="18" ry="9" fill="#fff" opacity="0.35" transform="rotate(-30 66 102)"/>
+  <ellipse cx="168" cy="52" rx="12" ry="6" fill="#fff" opacity="0.35" transform="rotate(-30 168 52)"/>
+  <!-- big head face: droopy eyes, fanged mouth -->
+  <g stroke="#2b2433" stroke-width="4">
+    <ellipse cx="78" cy="122" rx="15" ry="13" fill="#fff"/>
+    <ellipse cx="130" cy="122" rx="15" ry="13" fill="#fff"/>
+  </g>
+  <circle cx="80" cy="127" r="5" fill="#2b2433"/>
+  <circle cx="128" cy="127" r="5" fill="#2b2433"/>
+  <path d="M62 120 C68 108 90 108 94 120 Z M114 120 C118 108 140 108 146 120 Z" fill="#8a6aa8" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M64 152 C80 142 128 142 144 152 C140 172 70 174 64 152 Z" fill="#5a2a4a" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M72 150 l6 14 l6 -15 Z M124 149 l6 15 l6 -14 Z" fill="#fff" stroke="#2b2433" stroke-width="2"/>
+  <path d="M84 186 L124 208 M124 186 L84 208" stroke="#2b2433" stroke-width="12" stroke-linecap="round"/>
+  <path d="M84 186 L124 208 M124 186 L84 208" stroke="#f0e8c8" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="104" cy="186" r="10" fill="#f0e8c8" stroke="#2b2433" stroke-width="3"/>
+  <!-- small head face -->
+  <path d="M168 72 L184 76 M220 72 L204 76" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="176" cy="82" rx="8" ry="6" fill="#fff" stroke="#2b2433" stroke-width="3"/>
+  <ellipse cx="210" cy="82" rx="8" ry="6" fill="#fff" stroke="#2b2433" stroke-width="3"/>
+  <circle cx="177" cy="84" r="3" fill="#2b2433"/>
+  <circle cx="209" cy="84" r="3" fill="#2b2433"/>
+  <path d="M180 102 C188 98 200 98 206 102 C202 110 184 110 180 102 Z" fill="#5a2a4a" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
 </svg>

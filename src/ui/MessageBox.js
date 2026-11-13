@@ -1,9 +1,10 @@
 import { COLORS, drawPanel, textStyle } from './helpers.js';
 import { isCancel, isConfirm } from './input.js';
+import { fillKeyNames } from '../game/keybinds.js';
 
 const CHAR_DELAY = 18;
 
-// Hộp thoại chữ chạy. show() chờ người chơi bấm Enter/Space/click mới đi tiếp.
+// Hộp thoại chữ chạy. show() chờ người chơi bấm phím xác nhận / quay lại hoặc bấm chuột mới đi tiếp.
 export class MessageBox {
   constructor(scene, router, x, y, w, h) {
     this.scene = scene;
@@ -50,13 +51,14 @@ export class MessageBox {
   setText(text, narrow = false) {
     this.stopTyping();
     this.text.setWordWrapWidth(narrow ? 470 : this.wideWrap);
-    this.text.setText(text);
+    this.text.setText(fillKeyNames(text));
     this.arrow.setVisible(false);
   }
 
   // Hiện câu (chữ chạy), câu dài thì lần lượt từng trang; xong khi người chơi bấm qua trang cuối
+  // Lời nhắc phím dạng {key:dex} đổi thành tên phím người chơi đang dùng (game/keybinds.js)
   async show(text) {
-    for (const page of this.pages(text)) await this.showPage(page);
+    for (const page of this.pages(fillKeyNames(text))) await this.showPage(page);
   }
 
   showPage(text) {

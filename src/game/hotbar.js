@@ -15,7 +15,7 @@ export function setHotbarSlot(slot, id) {
   if (old >= 0) state.hotbar[old] = null;
   const replaced = state.hotbar[slot];
   state.hotbar[slot] = id;
-  return `Đã gán ${name} vào ô phím tắt ${slot + 1}${replaced ? ` (thay ${ITEMS[replaced].name})` : ''}. Bấm phím ${slot + 1} để dùng nhanh.`;
+  return `Đã gán ${name} vào ô phím tắt ${slot + 1}${replaced ? ` (thay ${ITEMS[replaced].name})` : ''}.`;
 }
 
 // Gán vào ô trống đầu tiên (đã gán sẵn thì thôi). Trả về ô đã gán, hoặc null nếu đã có / hết ô trống

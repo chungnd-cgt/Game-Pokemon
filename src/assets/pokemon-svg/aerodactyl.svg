@@ -1,54 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#c4b8d4"/>
-      <stop offset="0.5" stop-color="#a898b8"/>
-      <stop offset="1" stop-color="#8c7ca4"/>
-    </linearGradient>
-    <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#a494bc"/>
-      <stop offset="1" stop-color="#8676a0"/>
-    </linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d6cce2"/><stop offset="0.5" stop-color="#b4a6c6"/><stop offset="1" stop-color="#8c7ca4"/></linearGradient>
+    <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9474cc"/><stop offset="1" stop-color="#7656b0"/></linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- tail -->
-    <path d="M150 196 C182 214 212 216 234 202" fill="none" stroke-width="20"/>
-    <path d="M150 196 C182 214 212 216 234 202" fill="none" stroke="#9a8ab0" stroke-width="11"/>
-    <path d="M226 200 L252 186 L244 214 Z" fill="#9a8ab0"/>
-    <!-- wings -->
-    <path d="M148 128 L212 70 L252 38 C246 62 238 78 240 96 C224 98 214 112 216 130 C198 130 188 144 190 164 C174 162 162 172 158 186 Z" fill="url(#wing)"/>
-    <path d="M108 128 L44 70 L4 38 C10 62 18 78 16 96 C32 98 42 112 40 130 C58 130 68 144 66 164 C82 162 94 172 98 186 Z" fill="url(#wing)"/>
-    <!-- legs -->
-    <path d="M106 198 C98 212 96 226 98 236 L84 246 L104 244 L112 250 L116 238 C118 226 120 212 122 200 Z" fill="#9a8ab0"/>
-    <path d="M150 198 C158 212 160 226 158 236 L172 246 L152 244 L144 250 L140 238 C138 226 136 212 134 200 Z" fill="#9a8ab0"/>
+    <!-- wing membranes, spread up and out -->
+    <path d="M108 118 L62 40 L4 70 C20 82 22 96 18 108 C36 108 44 118 46 132 C64 128 76 136 80 150 C92 146 100 150 106 160 Z" fill="url(#wing)"/>
+    <path d="M148 118 L194 40 L252 70 C236 82 234 96 238 108 C220 108 212 118 210 132 C192 128 180 136 176 150 C164 146 156 150 150 160 Z" fill="#7656b0"/>
+    <!-- wing arms: grey bone along the leading edge, finger claws -->
+    <path d="M108 118 L62 40 L4 70" fill="none" stroke-width="16"/>
+    <path d="M108 118 L62 40 L4 70" fill="none" stroke="#a898b8" stroke-width="7"/>
+    <path d="M148 118 L194 40 L252 70" fill="none" stroke-width="16"/>
+    <path d="M148 118 L194 40 L252 70" fill="none" stroke="#a898b8" stroke-width="7"/>
+    <path d="M62 40 L50 22 L60 28 L62 14 L68 28 L76 22 Z" fill="#fff" stroke-width="3.5"/>
+    <path d="M194 40 L206 22 L196 28 L194 14 L188 28 L180 22 Z" fill="#fff" stroke-width="3.5"/>
+    <!-- tail with arrowhead tip -->
+    <path d="M140 186 C170 206 196 214 222 210" fill="none" stroke-width="16"/>
+    <path d="M140 186 C170 206 196 214 222 210" fill="none" stroke="#9a8ab0" stroke-width="7"/>
+    <path d="M214 196 L250 206 L216 226 L222 210 Z" fill="#9a8ab0"/>
+    <!-- legs with white claws -->
+    <path d="M114 182 L106 214 L110 234" fill="none" stroke-width="20"/>
+    <path d="M114 182 L106 214 L110 234" fill="none" stroke="#b4a6c6" stroke-width="10"/>
+    <path d="M144 182 L152 214 L148 234" fill="none" stroke-width="20"/>
+    <path d="M144 182 L152 214 L148 234" fill="none" stroke="#9a8ab0" stroke-width="10"/>
+    <path d="M110 232 L94 246 L104 244 L106 252 L114 242 L122 248 Z" fill="#fff" stroke-width="3.5"/>
+    <path d="M148 232 L164 246 L154 244 L152 252 L144 242 L136 248 Z" fill="#fff" stroke-width="3.5"/>
     <!-- body -->
-    <ellipse cx="128" cy="170" rx="38" ry="42" fill="url(#skin)"/>
-    <!-- crest horn -->
-    <path d="M146 52 L196 14 L170 76 Z" fill="url(#skin)"/>
-    <!-- lower jaw -->
-    <path d="M86 102 C88 132 106 150 128 150 C150 150 168 132 170 102 Z" fill="url(#skin)"/>
+    <path d="M104 120 C94 142 98 174 112 188 C122 196 136 196 146 188 C160 174 162 142 152 120 C142 108 114 108 104 120 Z" fill="url(#skin)"/>
+    <!-- crest swept back -->
+    <path d="M132 74 C150 62 168 56 186 56 C176 66 164 78 146 90 Z" fill="#a898b8"/>
+    <!-- long head, turned three-quarters to the left -->
+    <path d="M150 84 C150 66 136 56 118 58 C104 60 92 66 80 70 C66 74 54 76 44 80 C46 88 54 92 66 92 L92 96 C88 104 82 110 70 112 C60 114 52 116 50 122 C66 128 92 126 112 118 C132 112 150 104 150 84 Z" fill="url(#skin)"/>
+    <!-- open mouth: red inside -->
+    <path d="M52 86 C64 92 80 94 96 94 C92 104 84 110 70 112 C60 112 54 108 52 100 Z" fill="#c83040" stroke-width="4"/>
   </g>
-  <!-- open mouth -->
-  <path d="M96 104 C98 124 112 136 128 136 C144 136 158 124 160 104 Z" fill="#8a2848"/>
-  <path d="M104 130 L108 116 L114 132 Z M120 136 L124 120 L130 136 Z M136 134 L142 118 L146 132 Z" fill="#fff" stroke="#2b2433" stroke-width="2.5" stroke-linejoin="round"/>
-  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- skull and upper jaw -->
-    <path d="M70 70 C70 42 98 26 128 26 C158 26 186 42 186 70 C186 90 174 102 162 108 C140 102 116 102 94 108 C82 102 70 90 70 70 Z" fill="url(#skin)"/>
-  </g>
-  <path d="M100 106 L104 120 L110 104 Z M118 103 L123 118 L128 102 Z M134 102 L139 118 L144 103 Z M152 104 L156 120 L160 106 Z" fill="#fff" stroke="#2b2433" stroke-width="2.5" stroke-linejoin="round"/>
-  <!-- wing bones and claws -->
-  <path d="M44 70 C40 96 44 116 40 130 M44 70 C58 100 64 132 66 164 M212 70 C216 96 212 116 216 130 M212 70 C198 100 192 132 190 164" fill="none" stroke="#6e5e88" stroke-width="4" stroke-linecap="round"/>
-  <path d="M44 70 L36 54 L52 64 Z M212 70 L220 54 L204 64 Z" fill="#f4f0f8" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M150 140 C170 156 172 190 150 206 C140 212 132 212 124 212 C156 196 162 166 150 140 Z" fill="#6e5e88" opacity="0.4"/>
-  <ellipse cx="104" cy="44" rx="20" ry="7" fill="#fff" opacity="0.4" transform="rotate(-15 104 44)"/>
-  <!-- eyes -->
-  <path d="M84 60 L116 70 L114 78 L86 70 Z M172 60 L140 70 L142 78 L170 70 Z" fill="#2b2433"/>
-  <ellipse cx="102" cy="80" rx="10" ry="8" fill="#fff" stroke="#2b2433" stroke-width="3"/>
-  <ellipse cx="154" cy="80" rx="10" ry="8" fill="#fff" stroke="#2b2433" stroke-width="3"/>
-  <circle cx="104" cy="81" r="5" fill="#c83040"/>
-  <circle cx="152" cy="81" r="5" fill="#c83040"/>
-  <circle cx="105" cy="79" r="1.8" fill="#fff"/>
-  <circle cx="153" cy="79" r="1.8" fill="#fff"/>
-  <ellipse cx="120" cy="94" rx="3" ry="2.5" fill="#2b2433"/>
-  <ellipse cx="136" cy="94" rx="3" ry="2.5" fill="#2b2433"/>
+  <!-- teeth -->
+  <path d="M58 88 L61 96 L64 89 Z M68 90 L71 98 L74 91 Z M78 92 L81 99 L84 92 Z M60 110 L63 102 L66 110 Z M72 110 L75 102 L78 109 Z" fill="#fff" stroke="#2b2433" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- wing membrane folds -->
+  <path d="M62 40 L46 132 M62 40 L18 108 M194 40 L210 132 M194 40 L238 108" fill="none" stroke="#5a3e8c" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  <!-- belly plate and shading -->
+  <path d="M116 124 C110 146 114 172 124 184 C128 186 132 184 134 182 C130 160 130 140 134 122 Z" fill="#fff" opacity="0.25"/>
+  <path d="M148 122 C156 144 154 172 140 188 C134 192 128 194 122 194 C142 176 150 150 148 122 Z" fill="#5e4e78" opacity="0.4"/>
+  <path d="M146 72 C152 92 140 106 118 114 C134 102 144 90 146 72 Z" fill="#5e4e78" opacity="0.4"/>
+  <ellipse cx="104" cy="66" rx="12" ry="4" fill="#fff" opacity="0.6" transform="rotate(-10 104 66)"/>
+  <!-- fierce eye -->
+  <path d="M104 72 L124 70 C124 80 118 84 112 83 C106 82 104 78 104 72 Z" fill="#fff" stroke="#2b2433" stroke-width="3.5" stroke-linejoin="round"/>
+  <ellipse cx="114" cy="76" rx="3.5" ry="4" fill="#5a2a3a"/>
+  <circle cx="113" cy="74.5" r="1.4" fill="#fff"/>
+  <path d="M100 70 L126 66" stroke="#2b2433" stroke-width="4.5" stroke-linecap="round"/>
+  <!-- nostril -->
+  <circle cx="54" cy="80" r="1.8" fill="#2b2433"/>
 </svg>

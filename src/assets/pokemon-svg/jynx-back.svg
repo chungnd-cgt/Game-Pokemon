@@ -1,24 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe680"/><stop offset="1" stop-color="#e8a628"/></linearGradient>
-    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a87ad8"/><stop offset="1" stop-color="#6c44a6"/></linearGradient>
-    <linearGradient id="dress" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f05452"/><stop offset="1" stop-color="#b42232"/></linearGradient>
+    <linearGradient id="dress" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f05a64"/>
+      <stop offset="1" stop-color="#d8344a"/>
+    </linearGradient>
+    <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fcf0b0"/>
+      <stop offset="1" stop-color="#f4e08a"/>
+    </linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M98 118 C84 150 58 196 52 230 C50 244 62 249 76 249 L180 249 C194 249 206 244 204 230 C198 196 172 150 158 118 Z" fill="url(#dress)"/>
-    <path d="M100 128 C84 138 70 156 64 178 C62 186 70 192 78 186 C86 170 96 158 108 150 Z" fill="url(#skin)"/>
-    <path d="M156 128 C172 138 186 156 192 178 C194 186 186 192 178 186 C170 170 160 158 148 150 Z" fill="#7a50b4"/>
-    <ellipse cx="68" cy="186" rx="12" ry="10" fill="#9a6ccc"/>
-    <ellipse cx="188" cy="186" rx="12" ry="10" fill="#7a50b4"/>
-    <!-- long hair covering the back of the head -->
-    <path d="M60 84 C52 44 86 18 128 18 C170 18 204 44 196 84 C200 122 192 160 184 196 C172 208 156 206 148 196 C140 206 116 206 108 196 C100 206 84 208 72 196 C64 160 56 122 60 84 Z" fill="url(#hair)"/>
+    <path d="M86 150 L170 150 C190 182 214 210 230 236 C210 246 190 240 172 246 C154 238 140 248 128 244 C116 248 102 238 84 246 C66 240 46 246 26 236 C42 210 66 182 86 150 Z" fill="url(#dress)"/>
+    <path d="M86 134 C70 126 54 128 46 138 C52 150 70 154 88 150 Z" fill="#f4f2f8"/>
+    <path d="M170 134 C186 126 202 128 210 138 C204 150 186 154 168 150 Z" fill="#e2e0ec"/>
+    <path d="M48 126 L32 110 L40 128 L18 122 L36 136 L16 142 L38 146 L28 160 L50 150 C56 140 54 130 48 126 Z" fill="#7a50b4"/>
+    <path d="M208 126 L224 110 L216 128 L238 122 L220 136 L240 142 L218 146 L228 160 L206 150 C200 140 202 130 208 126 Z" fill="#6a42a2"/>
+    <!-- curtain of hair covering the whole back -->
+    <path d="M128 12 C176 12 200 46 198 96 C196 130 200 160 208 190 C188 196 168 192 128 194 C88 192 68 196 48 190 C56 160 60 130 58 96 C56 46 80 12 128 12 Z" fill="url(#hair)"/>
   </g>
-  <g fill="none" stroke="#c8861c" stroke-width="4" stroke-linecap="round" opacity="0.8">
-    <path d="M100 40 C88 80 86 140 96 190"/>
-    <path d="M128 30 C124 80 124 140 128 194"/>
-    <path d="M156 40 C168 80 170 140 160 190"/>
-  </g>
-  <path d="M174 60 C192 100 188 150 178 194 C172 198 166 198 160 194 C172 150 178 100 174 60 Z" fill="#c8861c" opacity="0.4"/>
-  <ellipse cx="100" cy="42" rx="22" ry="8" fill="#fff" opacity="0.5" transform="rotate(-20 100 42)"/>
-  <path d="M84 214 C80 226 76 236 74 244" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity="0.3"/>
+  <path d="M128 20 L128 190" stroke="#d8b85c" stroke-width="4" stroke-linecap="round"/>
+  <path d="M100 40 C92 80 92 140 96 186 M156 40 C164 80 164 140 160 186" fill="none" stroke="#d8b85c" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+  <path d="M168 30 C186 60 188 120 186 188 L204 188 C196 150 194 120 196 92 C196 60 186 40 168 30 Z" fill="#d8b85c" opacity="0.55"/>
+  <path d="M84 36 C74 60 72 110 76 160" fill="none" stroke="#fffbe0" stroke-width="7" stroke-linecap="round" opacity="0.7"/>
+  <path d="M150 196 C176 212 196 222 210 236 C190 236 176 236 172 242 C166 226 160 210 150 196 Z" fill="#b02a40" opacity="0.5"/>
 </svg>

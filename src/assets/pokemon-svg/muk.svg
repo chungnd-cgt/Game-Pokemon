@@ -1,28 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <radialGradient id="body" cx="38%" cy="28%" r="80%">
-      <stop offset="0" stop-color="#c8a2e4"/>
-      <stop offset="0.5" stop-color="#9468b8"/>
-      <stop offset="1" stop-color="#623c88"/>
-    </radialGradient>
+    <linearGradient id="goo" x1="0" y1="0" x2="0.5" y2="1"><stop offset="0" stop-color="#dcc6ec"/><stop offset="0.5" stop-color="#ae8ccc"/><stop offset="1" stop-color="#84649f"/></linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M60 160 C40 146 20 116 16 86 C4 80 4 62 18 62 C18 48 36 46 38 60 C48 54 58 66 50 78 C54 102 70 122 88 136 Z" fill="#8a5eae"/>
-    <path d="M196 160 C216 146 236 116 240 86 C252 80 252 62 238 62 C238 48 220 46 218 60 C208 54 198 66 206 78 C202 102 186 122 168 136 Z" fill="#7a50a0"/>
-    <path d="M10 240 C6 220 22 204 38 196 C30 160 46 128 70 116 C66 78 92 40 128 40 C164 40 190 78 186 116 C210 128 226 160 218 196 C234 204 250 220 246 240 C226 250 204 238 184 248 C160 256 142 242 120 250 C96 256 76 240 56 248 C36 254 14 250 10 240 Z" fill="url(#body)"/>
+    <!-- arm stretched to the right -->
+    <path d="M182 104 C206 106 234 116 248 134 C256 148 250 166 236 166 C232 176 218 178 212 170 C204 176 192 172 190 164 C184 160 180 156 176 152 Z" fill="url(#goo)"/>
+    <!-- body -->
+    <path d="M12 222 C2 200 14 180 30 170 C34 130 50 82 86 54 C116 30 168 26 194 54 C210 72 206 96 190 110 C186 130 190 150 200 168 C220 180 238 196 234 220 C230 238 210 242 190 238 C160 244 120 244 90 240 C60 244 30 242 18 236 C14 232 12 228 12 222 Z" fill="url(#goo)"/>
+    <!-- gaping mouth -->
+    <path d="M84 98 C88 76 116 64 146 70 C172 76 186 94 182 118 C178 146 158 166 128 168 C102 170 84 154 80 132 C78 118 80 106 84 98 Z" fill="#2a1e30"/>
   </g>
-  <path d="M20 96 C16 110 16 118 22 120 C28 118 26 110 20 96 Z M236 96 C232 110 232 118 238 120 C244 118 242 110 236 96 Z M112 44 C108 56 108 64 114 66 C120 64 118 56 112 44 Z M150 46 C147 54 147 60 152 62 C157 60 155 54 150 46 Z" fill="#8a5eae" stroke="#2b2433" stroke-width="3.5" stroke-linejoin="round"/>
-  <path d="M180 108 C210 140 222 196 200 232 C180 244 160 238 140 246 C192 214 206 160 180 108 Z" fill="#54327a" opacity="0.4"/>
-  <ellipse cx="98" cy="62" rx="20" ry="8" fill="#fff" opacity="0.45" transform="rotate(-35 98 62)"/>
-  <path d="M62 146 C72 120 184 120 194 146 C198 206 58 206 62 146 Z" fill="#b48cd2" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M74 148 C84 132 172 132 182 148 C184 192 72 192 74 148 Z" fill="#3a1e4a" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M96 182 C104 164 152 164 160 182 C150 190 106 190 96 182 Z" fill="#a0609c"/>
-  <g stroke="#2b2433" stroke-width="3.5">
-    <ellipse cx="104" cy="96" rx="11" ry="12" fill="#fff"/>
-    <ellipse cx="152" cy="96" rx="11" ry="12" fill="#fff"/>
+  <path d="M90 140 C98 160 116 166 132 166 C152 166 170 156 176 138 C160 130 108 130 90 140 Z" fill="#a8d0c8"/>
+  <path d="M112 74 C104 98 104 126 112 152" fill="none" stroke="#6a4488" stroke-width="12" stroke-linecap="round"/>
+  <g fill="none" stroke="#44285c" stroke-width="10" stroke-linecap="round">
+    <path d="M100 52 C118 44 140 42 160 46 M54 104 C62 96 70 92 78 92 M36 150 C48 142 62 138 76 140 M186 132 C192 140 196 150 198 160 M24 196 C50 186 80 184 108 190 M136 192 C162 186 190 186 216 196 M28 226 C60 218 100 218 130 224 M152 228 C178 222 200 222 222 226 M206 138 C218 134 230 136 240 144"/>
   </g>
-  <circle cx="106" cy="98" r="5" fill="#1a1010"/>
-  <circle cx="150" cy="98" r="5" fill="#1a1010"/>
-  <circle cx="108" cy="95" r="2" fill="#fff"/>
-  <circle cx="152" cy="95" r="2" fill="#fff"/>
+  <ellipse cx="96" cy="66" rx="20" ry="7" fill="#fff" opacity="0.35" transform="rotate(-35 96 66)"/>
+  <!-- small squinting eyes on top -->
+  <path d="M116 54 C124 46 138 46 146 54 C138 62 124 62 116 54 Z M152 54 C160 46 174 46 182 54 C174 62 160 62 152 54 Z" fill="#fff" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+  <circle cx="131" cy="55" r="3.5" fill="#1a1622"/>
+  <circle cx="165" cy="55" r="3.5" fill="#1a1622"/>
+  <path d="M114 46 L146 50 M152 50 L184 46" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
 </svg>

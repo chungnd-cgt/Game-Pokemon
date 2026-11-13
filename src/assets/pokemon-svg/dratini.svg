@@ -23,6 +23,9 @@
   </g>
   <path d="M176 50 C196 78 190 116 164 132 C150 140 136 142 124 141 C156 126 178 96 176 50 Z" fill="#4682d4" opacity="0.5"/>
   <ellipse cx="94" cy="44" rx="20" ry="9" fill="#fff" opacity="0.4" transform="rotate(-25 94 44)"/>
+  <!-- white muzzle -->
+  <path d="M92 116 C98 102 158 102 164 116 C162 132 146 140 128 140 C110 140 94 132 92 116 Z" fill="#f4f2fa"/>
+  <path d="M94 114 C100 104 156 104 162 114" fill="none" stroke="#9ab8dc" stroke-width="3" stroke-linecap="round"/>
   <!-- u trắng trên trán -->
   <ellipse cx="128" cy="52" rx="11" ry="9" fill="#f4f2fa" stroke="#2b2433" stroke-width="4"/>
   <!-- mắt -->

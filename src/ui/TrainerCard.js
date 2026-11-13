@@ -4,6 +4,7 @@ import { DEX } from '../data/pokedex.js';
 import { playerName, state } from '../game/state.js';
 import { closeButton, textStyle } from './helpers.js';
 import { isCancel } from './input.js';
+import { matches } from '../game/keybinds.js';
 
 const W = 640;
 const H = 380;
@@ -137,7 +138,7 @@ export function showTrainerCard(scene, router, playerKey) {
     const [btn, zone] = closeButton(scene, x0 + W - 28, y0 + 26, close, 30);
     for (const o of [btn, zone]) c.add(o.setScrollFactor(0));
     router.set(
-      (e) => e.timeStamp >= openedAt && (isCancel(e) || e.code === 'KeyT') && close(),
+      (e) => e.timeStamp >= openedAt && (isCancel(e) || matches(e, 'trainer')) && close(),
       (p) => {
         if (p.downTime < openedAt) return;
         const inside = p.x >= x0 && p.x <= x0 + W && p.y >= y0 && p.y <= y0 + H;

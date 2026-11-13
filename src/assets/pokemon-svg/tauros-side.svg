@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dca468"/><stop offset="1" stop-color="#a86c34"/></linearGradient>
-    <linearGradient id="mane" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a5846"/><stop offset="1" stop-color="#46302a"/></linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0c27e"/><stop offset="0.45" stop-color="#dca468"/><stop offset="1" stop-color="#b47a3c"/></linearGradient>
+    <linearGradient id="mane" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c6c62"/><stop offset="1" stop-color="#4a3c38"/></linearGradient>
     <linearGradient id="horn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0ecea"/><stop offset="1" stop-color="#a4a0a8"/></linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
     <!-- three tails -->
-    <path d="M206 140 C226 124 232 100 248 86 M208 132 C220 110 216 82 228 60 M202 128 C204 104 194 80 198 54" fill="none" stroke-width="15"/>
-    <path d="M206 140 C226 124 232 100 248 86 M208 132 C220 110 216 82 228 60 M202 128 C204 104 194 80 198 54" fill="none" stroke="#5c4a46" stroke-width="7"/>
-    <path d="M240 90 L254 76 L252 96 Z M222 64 L232 46 L236 66 Z M192 58 L196 38 L206 56 Z" fill="#5468a0" stroke-width="4"/>
+    <path d="M206 140 C232 150 252 140 246 112 M206 134 C230 120 240 98 230 74 M202 128 C210 104 204 82 186 64" fill="none" stroke-width="11"/>
+    <path d="M206 140 C232 150 252 140 246 112 M206 134 C230 120 240 98 230 74 M202 128 C210 104 204 82 186 64" fill="none" stroke="#5c4a46" stroke-width="5"/>
+    <path d="M246 116 C236 104 240 92 252 88 C256 100 254 110 246 116 Z M230 78 C222 66 226 54 238 50 C242 62 240 72 230 78 Z M188 66 C174 62 170 50 176 42 C188 44 192 56 188 66 Z" fill="#5468a0" stroke-width="4"/>
     <!-- far legs -->
     <path d="M100 180 C96 204 96 222 98 238 L124 238 C124 220 126 200 126 186 Z" fill="#a86c34"/>
     <path d="M188 176 C196 200 198 220 196 238 L170 238 C170 220 168 200 164 186 Z" fill="#a86c34"/>

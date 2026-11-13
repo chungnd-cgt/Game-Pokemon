@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dca468"/><stop offset="1" stop-color="#a86c34"/></linearGradient>
-    <linearGradient id="mane" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a5846"/><stop offset="1" stop-color="#46302a"/></linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0c27e"/><stop offset="0.45" stop-color="#dca468"/><stop offset="1" stop-color="#b47a3c"/></linearGradient>
+    <linearGradient id="mane" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c6c62"/><stop offset="1" stop-color="#4a3c38"/></linearGradient>
     <linearGradient id="horn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0ecea"/><stop offset="1" stop-color="#a4a0a8"/></linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">

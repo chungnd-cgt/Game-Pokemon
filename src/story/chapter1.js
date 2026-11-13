@@ -491,7 +491,7 @@ async function rivalPicksAndBattles(world) {
     'Nó tự ghi lại thông tin về mọi Pokémon cháu gặp và bắt được.',
   ]);
   setFlag(F.DEX);
-  await (world.showKeyGift ? world.showKeyGift('dex', 'Bạn đã nhận được Pokédex! (Bấm P để mở)') : world.say(null, ['Bạn đã nhận được Pokédex! (Bấm P để mở)']));
+  await (world.showKeyGift ? world.showKeyGift('dex', 'Bạn đã nhận được Pokédex! (Bấm {key:dex} để mở)') : world.say(null, ['Bạn đã nhận được Pokédex! (Bấm {key:dex} để mở)']));
   await world.say('Giáo sư Oak', ['Ta cho cháu thêm mấy quả Poké Ball để bắt Pokémon.']);
   await world.giveItem('ball', 5);
   await world.say('Giáo sư Oak', [
@@ -558,7 +558,7 @@ async function momGift(world) {
   world.facePlayerTo(mom);
   await world.say('Mẹ', ['Phù... may mà kịp! Giáo sư Oak gọi điện bảo con sắp lên đường rồi.', 'Đường đi xa lắm, mẹ có mấy thứ cho con đây.']);
   await world.giveItem('townMap');
-  await world.say('Mẹ', ['Bản đồ vùng Sơn Thủy đó. Lạc đường thì bấm N mà xem nhé.']);
+  await world.say('Mẹ', ['Bản đồ vùng Sơn Thủy đó. Lạc đường thì bấm {key:map} mà xem nhé.']);
   await world.giveItem('badgeCase');
   await world.say('Mẹ', ['Còn đây là hộp đựng huy hiệu. Thắng gym nào thì cất huy hiệu vào đây cho cẩn thận!', 'Đi đường cẩn thận nha con!']);
   setFlag(F.MOM_GIFT);

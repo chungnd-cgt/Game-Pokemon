@@ -14,9 +14,11 @@
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
     <path d="M182 170 C190 140 184 112 172 96" fill="none" stroke-width="40"/>
     <path d="M182 170 C190 140 184 112 172 96" fill="none" stroke="#a070c8" stroke-width="30"/>
-    <path d="M196 92 C202 56 174 34 144 36 C112 38 94 62 100 92 C106 120 130 132 152 132 C176 132 192 118 196 92 Z" fill="url(#skin)"/>
+    <path d="M166 144 C176 146 186 144 192 138" fill="none" stroke-width="12"/>
+    <path d="M166 144 C176 146 186 144 192 138" fill="none" stroke="#e8c840" stroke-width="6"/>
+    <path d="M150 30 C130 30 124 46 126 60 C108 66 100 82 104 98 C110 118 132 126 150 126 C168 126 190 118 196 98 C200 82 192 66 174 60 C176 46 170 30 150 30 Z" fill="url(#skin)"/>
   </g>
-  <path d="M170 42 C192 56 198 88 186 110 C178 124 164 130 150 132 C176 112 184 80 170 42 Z" fill="#7a4aa0" opacity="0.5"/>
+  <path d="M178 66 C196 76 198 100 184 114 C174 122 162 126 150 126 C172 110 182 90 178 66 Z" fill="#7a4aa0" opacity="0.5"/>
   <path d="M174 132 C178 144 178 156 176 166" fill="none" stroke="#7a4aa0" stroke-width="6" stroke-linecap="round" opacity="0.6"/>
-  <ellipse cx="132" cy="52" rx="18" ry="7" fill="#fff" opacity="0.35" transform="rotate(-20 132 52)"/>
+  <ellipse cx="128" cy="78" rx="14" ry="6" fill="#fff" opacity="0.35" transform="rotate(-20 132 52)"/>
 </svg>

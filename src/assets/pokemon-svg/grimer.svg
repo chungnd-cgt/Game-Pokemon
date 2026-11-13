@@ -1,29 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <radialGradient id="body" cx="38%" cy="28%" r="80%">
-      <stop offset="0" stop-color="#d4b0ec"/>
-      <stop offset="0.5" stop-color="#a476c6"/>
-      <stop offset="1" stop-color="#6e4494"/>
-    </radialGradient>
+    <linearGradient id="goo" x1="0" y1="0" x2="0.5" y2="1"><stop offset="0" stop-color="#e6d4f2"/><stop offset="0.5" stop-color="#bc9ad6"/><stop offset="1" stop-color="#9270b2"/></linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M86 152 C66 140 44 112 42 86 C30 82 28 64 42 64 C42 52 58 50 60 62 C70 58 78 70 70 80 C74 100 90 120 106 134 Z" fill="#9468b8"/>
-    <path d="M170 152 C190 140 212 112 214 86 C226 82 228 64 214 64 C214 52 198 50 196 62 C186 58 178 70 186 80 C182 100 166 120 150 134 Z" fill="#865aaa"/>
-    <path d="M30 238 C24 220 40 206 56 200 C50 170 64 144 82 134 C74 100 92 58 128 56 C164 58 182 100 174 134 C192 144 206 170 200 200 C216 206 232 220 226 238 C206 248 186 236 168 246 C148 254 132 240 112 248 C90 256 72 238 54 246 C42 250 32 246 30 238 Z" fill="url(#body)"/>
+    <!-- puddle -->
+    <path d="M20 226 C10 214 22 200 40 202 C60 194 90 198 110 196 C140 194 180 192 210 198 C236 198 252 212 244 226 C238 238 220 240 200 236 C180 242 150 240 128 242 C100 244 70 240 50 240 C30 242 22 236 20 226 Z" fill="url(#goo)"/>
+    <!-- far arm reaching left -->
+    <path d="M80 140 C60 130 34 128 16 138 C4 146 6 162 20 164 C14 172 22 182 34 178 C42 186 56 182 60 174 C70 172 80 172 88 172 Z" fill="url(#goo)"/>
+    <!-- body / head column -->
+    <path d="M52 214 C42 170 64 132 92 108 C94 72 104 30 140 24 C176 18 196 46 192 82 C190 110 198 140 212 168 C224 196 216 216 196 222 C150 230 96 230 52 214 Z" fill="url(#goo)"/>
+    <!-- mouth -->
+    <path d="M106 86 C104 72 126 64 150 70 C172 76 178 100 170 130 C162 158 136 166 120 152 C104 138 102 108 106 86 Z" fill="#3a2440"/>
+    <!-- near arm -->
+    <path d="M150 160 C170 152 200 150 214 164 C226 170 226 186 214 188 C214 198 202 204 192 198 C182 204 170 198 168 190 C160 190 152 190 144 188 Z" fill="url(#goo)"/>
   </g>
-  <path d="M44 98 C40 110 40 118 46 120 C52 118 50 110 44 98 Z M212 98 C208 110 208 118 214 120 C220 118 218 110 212 98 Z M120 60 C116 72 116 80 122 82 C128 80 126 72 120 60 Z" fill="#9468b8" stroke="#2b2433" stroke-width="3.5" stroke-linejoin="round"/>
-  <path d="M168 120 C190 150 196 196 178 230 C160 240 140 236 124 242 C170 214 184 166 168 120 Z" fill="#5e3a84" opacity="0.4"/>
-  <ellipse cx="102" cy="78" rx="18" ry="8" fill="#fff" opacity="0.45" transform="rotate(-35 102 78)"/>
-  <circle cx="70" cy="184" r="6" fill="#fff" opacity="0.3"/>
-  <ellipse cx="128" cy="164" rx="38" ry="30" fill="#bc94d8" stroke="#2b2433" stroke-width="4"/>
-  <ellipse cx="128" cy="166" rx="28" ry="21" fill="#3a1e4a" stroke="#2b2433" stroke-width="3"/>
-  <ellipse cx="128" cy="178" rx="15" ry="7" fill="#8a4a8a"/>
-  <g stroke="#2b2433" stroke-width="3.5">
-    <ellipse cx="106" cy="110" rx="12" ry="14" fill="#fff"/>
-    <ellipse cx="150" cy="110" rx="12" ry="14" fill="#fff"/>
+  <path d="M116 134 C124 148 148 152 160 138 C156 128 124 124 116 134 Z" fill="#b8c8dc"/>
+  <g fill="none" stroke="#4a2c68" stroke-width="8" stroke-linecap="round">
+    <path d="M72 168 C82 160 92 158 100 162 M186 120 C192 126 196 132 198 140 M68 196 C90 186 110 188 126 196 M162 196 C176 192 190 194 204 202 M24 152 C36 146 48 146 60 152 M184 176 C196 172 206 172 214 178 M40 220 C60 214 80 214 96 220 M140 224 C160 218 180 218 200 222"/>
+    <path d="M120 40 C130 36 140 36 150 40 M176 64 C182 70 186 76 188 84"/>
   </g>
-  <circle cx="108" cy="112" r="5.5" fill="#1a1010"/>
-  <circle cx="148" cy="112" r="5.5" fill="#1a1010"/>
-  <circle cx="110" cy="109" r="2" fill="#fff"/>
-  <circle cx="150" cy="109" r="2" fill="#fff"/>
+  <ellipse cx="124" cy="40" rx="16" ry="6" fill="#fff" opacity="0.4" transform="rotate(-20 124 40)"/>
+  <g stroke="#2b2433" stroke-width="4">
+    <circle cx="122" cy="50" r="14" fill="#fff"/>
+    <circle cx="166" cy="48" r="15" fill="#fff"/>
+  </g>
+  <circle cx="122" cy="50" r="3.5" fill="#1a1622"/>
+  <circle cx="164" cy="48" r="3.5" fill="#1a1622"/>
 </svg>

@@ -1,49 +1,46 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe680"/><stop offset="1" stop-color="#e8a628"/></linearGradient>
-    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a87ad8"/><stop offset="1" stop-color="#6c44a6"/></linearGradient>
-    <linearGradient id="dress" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f05452"/><stop offset="1" stop-color="#b42232"/></linearGradient>
+    <linearGradient id="dress" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f05a64"/>
+      <stop offset="1" stop-color="#d8344a"/>
+    </linearGradient>
+    <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fcf0b0"/>
+      <stop offset="1" stop-color="#f4e08a"/>
+    </linearGradient>
+    <radialGradient id="face" cx="40%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#9a74d0"/>
+      <stop offset="1" stop-color="#7a50b4"/>
+    </radialGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- long golden hair behind -->
-    <path d="M58 84 C50 44 86 18 128 18 C170 18 206 44 198 84 C204 122 214 160 208 194 C198 204 182 200 174 190 L82 190 C74 200 58 204 48 194 C42 160 52 122 58 84 Z" fill="url(#hair)"/>
-    <!-- red dress -->
-    <path d="M98 118 C84 150 58 196 52 230 C50 244 62 249 76 249 L180 249 C194 249 206 244 204 230 C198 196 172 150 158 118 Z" fill="url(#dress)"/>
-    <!-- arms -->
-    <path d="M100 128 C84 138 70 156 64 178 C62 186 70 192 78 186 C86 170 96 158 108 150 Z" fill="url(#skin)"/>
-    <path d="M156 128 C172 138 186 156 192 178 C194 186 186 192 178 186 C170 170 160 158 148 150 Z" fill="#7a50b4"/>
-    <ellipse cx="68" cy="186" rx="12" ry="10" fill="#9a6ccc"/>
-    <ellipse cx="188" cy="186" rx="12" ry="10" fill="#7a50b4"/>
-    <!-- face -->
-    <ellipse cx="128" cy="86" rx="40" ry="42" fill="url(#skin)"/>
-    <!-- bangs -->
-    <path d="M84 82 C82 46 104 30 128 30 C152 30 174 46 172 82 C162 66 146 58 128 66 C110 58 94 66 84 82 Z" fill="url(#hair)"/>
+    <!-- flared dress -->
+    <path d="M90 150 L166 150 C188 182 212 210 230 236 C210 246 190 240 172 246 C154 238 140 248 128 244 C116 248 102 238 84 246 C66 240 46 246 26 236 C44 210 68 182 90 150 Z" fill="url(#dress)"/>
+    <!-- white sleeves + purple hands -->
+    <path d="M84 132 C66 124 48 124 38 134 C44 148 64 152 86 150 Z" fill="#f4f2f8"/>
+    <path d="M172 132 C190 124 208 124 218 134 C212 148 192 152 170 150 Z" fill="#e2e0ec"/>
+    <path d="M40 124 L26 104 L32 124 L10 116 L26 132 L6 138 L28 142 L18 158 L40 148 C48 138 46 128 40 124 Z" fill="#7a50b4"/>
+    <path d="M216 124 L230 104 L224 124 L246 116 L230 132 L250 138 L228 142 L238 158 L216 148 C208 138 210 128 216 124 Z" fill="#6a42a2"/>
+    <!-- hair: smooth curtain that flares out at the bottom -->
+    <path d="M128 10 C168 10 190 40 190 82 C190 112 196 140 212 168 C196 178 176 176 166 168 L90 168 C80 176 60 178 44 168 C60 140 66 112 66 82 C66 40 88 10 128 10 Z" fill="url(#hair)"/>
+    <!-- red top -->
+    <path d="M92 130 C98 116 118 116 126 132 C128 140 128 150 128 158 L88 158 C84 148 86 138 92 130 Z" fill="#e04050"/>
+    <path d="M164 130 C158 116 138 116 130 132 C128 140 128 150 128 158 L168 158 C172 148 170 138 164 130 Z" fill="#cc3446"/>
+    <!-- big face -->
+    <path d="M128 34 C156 34 170 56 168 86 C166 114 150 130 128 130 C106 130 90 114 88 86 C86 56 100 34 128 34 Z" fill="url(#face)"/>
+    <!-- fringe parted in the middle -->
+    <path d="M128 16 C104 18 88 34 86 60 C96 52 116 38 128 22 C140 38 160 52 170 60 C168 34 152 18 128 16 Z" fill="#f8e898"/>
   </g>
-  <!-- hair strands + shading -->
-  <g fill="none" stroke="#c8861c" stroke-width="4" stroke-linecap="round" opacity="0.8">
-    <path d="M66 110 C62 138 60 164 62 186"/>
-    <path d="M190 110 C194 138 196 164 194 186"/>
-    <path d="M128 36 C120 44 114 52 110 60"/>
-  </g>
-  <ellipse cx="104" cy="40" rx="18" ry="7" fill="#fff" opacity="0.5" transform="rotate(-20 104 40)"/>
-  <path d="M160 92 C162 110 152 124 134 128 C150 116 158 104 160 92 Z" fill="#4e2e80" opacity="0.5"/>
-  <path d="M128 132 C126 170 124 210 120 246" fill="none" stroke="#9a1c2a" stroke-width="5" stroke-linecap="round"/>
-  <path d="M100 150 C90 176 80 204 74 236" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity="0.3"/>
+  <path d="M84 40 C74 70 74 120 70 150" fill="none" stroke="#fffbe0" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
+  <path d="M176 50 C184 80 186 130 200 162" fill="none" stroke="#d8b85c" stroke-width="7" stroke-linecap="round" opacity="0.7"/>
+  <path d="M150 156 C176 186 196 212 210 236 C190 236 176 236 172 242 C166 214 160 186 150 156 Z" fill="#b02a40" opacity="0.5"/>
+  <path d="M74 172 C66 188 56 204 44 222" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity="0.35"/>
   <!-- eyes -->
-  <g stroke="#2b2433" stroke-width="4" stroke-linejoin="round">
-    <path d="M96 84 C102 76 114 76 120 84 C114 92 102 92 96 84 Z" fill="#fff"/>
-    <path d="M160 84 C154 76 142 76 136 84 C142 92 154 92 160 84 Z" fill="#fff"/>
-  </g>
-  <circle cx="109" cy="85" r="4.5" fill="#2b2433"/>
-  <circle cx="147" cy="85" r="4.5" fill="#2b2433"/>
-  <circle cx="110.5" cy="83.5" r="1.5" fill="#fff"/>
-  <circle cx="148.5" cy="83.5" r="1.5" fill="#fff"/>
-  <g fill="none" stroke="#2b2433" stroke-width="5" stroke-linecap="round">
-    <path d="M92 82 C100 74 114 74 122 82"/>
-    <path d="M164 82 C156 74 142 74 134 82"/>
-  </g>
-  <!-- big pink lips -->
-  <path d="M106 108 C114 100 122 102 128 106 C134 102 142 100 150 108 C144 122 112 122 106 108 Z" fill="#f878a8" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M108 108 Q128 114 148 108" fill="none" stroke="#2b2433" stroke-width="3" stroke-linecap="round"/>
-  <ellipse cx="118" cy="105" rx="4" ry="2" fill="#fff" opacity="0.7"/>
+  <ellipse cx="112" cy="74" rx="9" ry="10" fill="#fff" stroke="#2b2433" stroke-width="3"/>
+  <ellipse cx="144" cy="74" rx="9" ry="10" fill="#fff" stroke="#2b2433" stroke-width="3"/>
+  <circle cx="113" cy="76" r="4.5" fill="#2b2433"/>
+  <circle cx="143" cy="76" r="4.5" fill="#2b2433"/>
+  <!-- big lips -->
+  <path d="M106 104 C112 94 122 96 128 99 C134 96 144 94 150 104 C146 118 110 118 106 104 Z" fill="#f46aa0" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M111 105 C120 108 136 108 145 105" fill="none" stroke="#2b2433" stroke-width="3" stroke-linecap="round"/>
 </svg>

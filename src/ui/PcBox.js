@@ -10,7 +10,7 @@ import { BOX_SLOTS, boxCount, monAt, moveMon, releaseMon, releaseProblem } from 
 import { PARTY_SIZE, state } from '../game/state.js';
 import { fitScale, pixelMon } from '../gfx/textures.js';
 import { GENDER, closeButton, cssColor, drawHpBar, drawPanel, fitText, fixToCamera, hpColor, hpLabel, monTag, textStyle } from './helpers.js';
-import { isCancel, isConfirm } from './input.js';
+import { directionOf, isCancel, isConfirm } from './input.js';
 import { typeBadges } from './TypeBadge.js';
 import { shinyGap, shinyMark } from './shinyMark.js';
 
@@ -116,8 +116,6 @@ export class PcBox {
     drawTrashCan(g, TRASH.x + 34, TRASH.y + TRASH.h / 2);
     add(scene.add.text(TRASH.x + 64, TRASH.y + TRASH.h / 2, 'Thả Pokémon', textStyle(18, '#c04040', { fontStyle: 'bold' })).setOrigin(0, 0.5));
     add(scene.add.text(PARTY.x + 4, PANEL.y + 22, 'Đội hình', textStyle(22, '#3a4660', { fontStyle: 'bold' })));
-    add(scene.add.text(GRID.x + (GRID.cols * GRID.cell) / 2, TRASH.y + TRASH.h - 4, 'Kéo thả để đổi chỗ  ·  Enter: nhấc / đặt  ·  Q E: đổi hộp',
-      textStyle(13, '#9aa4b8')).setOrigin(0.5, 1));
     add(closeButton(scene, PANEL.x + PANEL.w - 34, PANEL.y + 34, () => !this.locked && !this.press && this.close()));
     // Mũi tên đổi hộp
     for (const [dx, label, dir] of [[26, '◀', -1], [GRID.cols * GRID.cell - 26, '▶', 1]]) {
@@ -490,7 +488,7 @@ export class PcBox {
       }
       return;
     }
-    const dir = { ArrowUp: [0, -1], KeyW: [0, -1], ArrowDown: [0, 1], KeyS: [0, 1], ArrowLeft: [-1, 0], KeyA: [-1, 0], ArrowRight: [1, 0], KeyD: [1, 0] }[e.code];
+    const dir = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] }[directionOf(e)];
     if (!dir) return;
     this.cursor = this.stepCursor(this.cursor, dir);
     this.drawCursor();

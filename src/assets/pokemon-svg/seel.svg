@@ -1,25 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="fur" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.5" stop-color="#e6eef8"/><stop offset="1" stop-color="#b4c4d8"/></linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="0.5" y2="1"><stop offset="0" stop-color="#f6f9fe"/><stop offset="0.5" stop-color="#e6eef8"/><stop offset="1" stop-color="#bccae4"/></linearGradient>
+    <linearGradient id="muzzle" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcecb4"/><stop offset="1" stop-color="#e8c878"/></linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M98 226 C72 222 48 232 40 246 C64 252 92 246 108 236 Z" fill="#c4d2e4"/>
-    <path d="M158 226 C184 222 208 232 216 246 C192 252 164 246 148 236 Z" fill="#c4d2e4"/>
-    <ellipse cx="128" cy="190" rx="66" ry="54" fill="url(#fur)"/>
-    <path d="M74 178 C46 184 26 204 22 228 C46 234 70 220 84 200 Z" fill="#e6eef8"/>
-    <path d="M182 178 C210 184 230 204 234 228 C210 234 186 220 172 200 Z" fill="#c4d2e4"/>
-    <path d="M116 50 C110 32 118 14 134 4 C136 18 144 34 142 50 Z" fill="#f6eed8"/>
-    <ellipse cx="128" cy="100" rx="72" ry="60" fill="url(#fur)"/>
-    <ellipse cx="128" cy="130" rx="36" ry="22" fill="#e8cfa0"/>
+    <!-- tail flukes -->
+    <path d="M168 100 C156 82 130 74 116 52 C108 36 120 22 138 26 C156 30 168 52 180 70 C188 50 202 28 222 22 C240 18 252 32 244 50 C234 70 210 84 196 104 Z" fill="url(#body)"/>
+    <!-- body -->
+    <path d="M168 96 C200 94 226 128 226 170 C226 210 198 234 152 234 C112 234 96 204 104 172 C112 142 148 124 168 96 Z" fill="url(#body)"/>
+    <!-- back flipper -->
+    <path d="M196 200 C222 198 246 210 252 228 C242 240 214 236 194 222 Z" fill="url(#body)"/>
+    <!-- head -->
+    <path d="M86 116 L96 84 L108 116 Z" fill="url(#body)"/>
+    <path d="M34 170 C32 134 58 110 94 110 C130 110 154 134 152 170 C150 204 126 226 92 226 C58 226 36 204 34 170 Z" fill="url(#body)"/>
+    <!-- front flipper -->
+    <path d="M46 190 C26 186 6 194 4 210 C14 222 40 218 58 206 Z" fill="url(#body)"/>
+    <!-- mouth + muzzle -->
+    <path d="M64 200 C66 240 120 240 122 200 Z" fill="#f0708e"/>
+    <path d="M46 186 C46 174 68 168 93 168 C118 168 140 174 140 186 C140 198 122 204 93 204 C64 204 46 198 46 186 Z" fill="url(#muzzle)"/>
   </g>
-  <path d="M114 150 L120 166 L126 151 Z M130 151 L136 166 L142 150 Z" fill="#fff" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
-  <ellipse cx="128" cy="117" rx="8" ry="5.5" fill="#2b2433"/>
-  <path d="M112 134 Q128 142 144 134" fill="none" stroke="#2b2433" stroke-width="3.5" stroke-linecap="round"/>
-  <path d="M180 64 C204 88 206 126 186 148 C176 158 162 160 150 160 C180 136 190 100 180 64 Z" fill="#c4d2e4" opacity="0.6"/>
-  <path d="M176 170 C196 190 194 222 172 238 C184 214 184 192 176 170 Z" fill="#c4d2e4" opacity="0.6"/>
-  <ellipse cx="96" cy="60" rx="26" ry="10" fill="#fff" opacity="0.8" transform="rotate(-18 96 60)"/>
-  <ellipse cx="94" cy="94" rx="9" ry="13" fill="#2b2433"/>
-  <circle cx="96.7" cy="88.8" r="4.1" fill="#fff"/>
-  <ellipse cx="162" cy="94" rx="9" ry="13" fill="#2b2433"/>
-  <circle cx="164.7" cy="88.8" r="4.1" fill="#fff"/>
+  <path d="M58 196 L64 216 L72 200 Z M128 196 L122 216 L114 200 Z" fill="#fff" stroke="#2b2433" stroke-width="3" stroke-linejoin="round"/>
+  <ellipse cx="93" cy="178" rx="7" ry="5" fill="#2b2433"/>
+  <ellipse cx="72" cy="128" rx="22" ry="8" fill="#fff" opacity="0.6" transform="rotate(-20 72 128)"/>
+  <ellipse cx="190" cy="130" rx="8" ry="22" fill="#fff" opacity="0.5" transform="rotate(-20 190 130)"/>
+  <g stroke="#2b2433" stroke-width="3">
+    <ellipse cx="70" cy="148" rx="8" ry="10" fill="#1e5a5c"/>
+    <ellipse cx="116" cy="148" rx="8" ry="10" fill="#1e5a5c"/>
+  </g>
+  <circle cx="72" cy="145" r="3" fill="#fff"/>
+  <circle cx="118" cy="145" r="3" fill="#fff"/>
+  <path d="M60 132 L76 134 M126 132 L110 134" stroke="#2b2433" stroke-width="3" stroke-linecap="round"/>
 </svg>

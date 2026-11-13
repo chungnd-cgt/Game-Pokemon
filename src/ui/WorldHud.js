@@ -2,10 +2,9 @@ import { formatMoney } from '../data/items.js';
 import { setSetting, settings } from '../game/settings.js';
 import { state } from '../game/state.js';
 import { HUD_PHASE_ICON } from '../gfx/textures.js';
-import { COLORS, closeButton, drawPanel, textStyle } from './helpers.js';
+import { textStyle } from './helpers.js';
 import { HOTBAR_RIGHT, MONEY_W } from './Hotbar.js';
 import { drawCardIcon } from './TrainerCard.js';
-import { isCancel, isConfirm } from './input.js';
 
 const DEPTH = 100;
 const BTN = 46; // nút ≡ vuông cạnh thanh phím tắt (cùng cỡ ô phím tắt)
@@ -77,18 +76,19 @@ function drawIcon(g, type, cx, cy) {
   }
 }
 
-// ring: màu viền nút tròn
+// Màu viền nút tròn theo chức năng
+const RINGS = { party: 0xe85050, bag: 0xe8a030, dex: 0xd84848, trainer: 0x48b878, settings: 0x9aa4bc };
+// Cột nút tròn bên trái (Đội hình mở bằng cột Pokémon góc trái trên nên không có nút riêng)
 const MENU_ITEMS = [
-  { id: 'party', label: 'Đội hình', key: 'M', ring: 0xe85050 },
-  { id: 'bag', label: 'Túi đồ', key: 'B', ring: 0xe8a030 },
-  { id: 'dex', label: 'Pokédex', key: 'P', ring: 0xd84848 },
-  { id: 'trainer', label: 'Thẻ HLV', key: 'T', ring: 0x48b878 },
-  { id: 'settings', label: 'Cài đặt', key: 'X', ring: 0x9aa4bc },
-];
+  { id: 'bag', label: 'Túi đồ' },
+  { id: 'dex', label: 'Pokédex' },
+  { id: 'trainer', label: 'Thẻ HLV' },
+  { id: 'settings', label: 'Cài đặt' },
+].map((item) => ({ ...item, ring: RINGS[item.id] }));
 
 // Biểu tượng tròn giống nút ở cột nút bên trái (nền tối, viền màu theo chức năng), vd khi nhận Pokédex hiện trên đầu
 export function drawRoundIcon(g, type, cx, cy) {
-  const ring = MENU_ITEMS.find((i) => i.id === type)?.ring ?? 0xffd860;
+  const ring = RINGS[type] ?? 0xffd860;
   g.fillStyle(0x000000, 0.3);
   g.fillCircle(cx + 1, cy + 3, ROUND);
   g.fillStyle(DARK, 0.95);
@@ -101,10 +101,10 @@ export function drawRoundIcon(g, type, cx, cy) {
 }
 
 // Giao diện trên bản đồ: giờ & tên bản đồ (trên phải; bảng Pokémon trong khu ngay dưới, ui/AreaNav.js), cột đội hình
-// (trên trái, ui/PartyPanel.js), cột nút tròn có nhãn bên trái ngay trên thanh phím tắt (Đội hình / Túi đồ / Pokédex /
-// Cài đặt; Bản đồ vùng và Trợ giúp nằm trong Cài đặt), nút ≡ cạnh thanh phím tắt ẩn / hiện cột nút, khung nhiệm vụ ở góc
+// (trên trái, ui/PartyPanel.js), cột nút tròn có nhãn bên trái ngay trên thanh phím tắt (Túi đồ / Pokédex / Thẻ HLV /
+// Cài đặt; Bản đồ vùng và Phím tắt nằm trong Cài đặt), nút ≡ cạnh thanh phím tắt ẩn / hiện cột nút, khung nhiệm vụ ở góc
 // phải dưới (bấm tiêu đề để thu gọn / mở ra). Trạng thái thu gọn nhớ trong cài đặt.
-// actions: { party, bag, dex, settings } – hàm gọi khi bấm nút
+// actions: { bag, dex, trainer, settings } – hàm gọi khi bấm nút
 export class WorldHud {
   constructor(scene, actions) {
     this.scene = scene;
@@ -189,17 +189,16 @@ export class WorldHud {
     return { g, zone, draw };
   }
 
-  // Nút tròn có biểu tượng, nhãn dạng viên thuốc chìa sang phải (tên + phím tắt)
+  // Nút tròn có biểu tượng, nhãn tên dạng viên thuốc chìa sang phải
   makeRoundButton(item, onClick) {
     const { scene } = this;
     const g = scene.add.graphics().setScrollFactor(0).setDepth(DEPTH);
     const label = scene.add.text(0, 0, item.label, textStyle(15, '#ffffff', { fontStyle: 'bold' })).setOrigin(0, 0.5).setScrollFactor(0).setDepth(DEPTH + 1);
-    const key = scene.add.text(0, 0, item.key, textStyle(11, '#ffd860', { fontStyle: 'bold' })).setOrigin(0, 0.5).setScrollFactor(0).setDepth(DEPTH + 1);
-    const btn = { item, g, label, key, zone: null, cx: 0, cy: 0, hover: false };
+    const btn = { item, g, label, zone: null, cx: 0, cy: 0, hover: false };
     btn.draw = (hover = btn.hover) => {
       btn.hover = hover;
       const { cx, cy } = btn;
-      const pillW = ROUND + 10 + label.width + 8 + key.width + 12;
+      const pillW = ROUND + 10 + label.width + 14;
       g.clear();
       // Viên nhãn phía sau nút tròn
       g.fillStyle(DARK, hover ? 0.92 : 0.72);
@@ -215,7 +214,6 @@ export class WorldHud {
       g.strokeCircle(cx, cy, ROUND - 5);
       drawIcon(g, item.id, cx, cy);
       label.setPosition(cx + ROUND + 10, cy);
-      key.setPosition(cx + ROUND + 10 + label.width + 8, cy);
       const w = pillW + ROUND;
       if (!btn.zone) {
         btn.zone = scene.add.zone(cx - ROUND + w / 2, cy, w, ROUND * 2).setScrollFactor(0).setInteractive({ useHandCursor: true });
@@ -252,7 +250,7 @@ export class WorldHud {
   applyMenuVisibility() {
     const show = this.expanded && this.visible !== false;
     for (const b of this.buttons) {
-      for (const o of [b.g, b.label, b.key, b.zone]) o.setVisible(show);
+      for (const o of [b.g, b.label, b.zone]) o.setVisible(show);
       if (show) b.zone.setInteractive();
       else {
         b.zone.disableInteractive();
@@ -356,68 +354,5 @@ export class WorldHud {
       note.setPosition(width / 2, top - 10);
     }
     scene.tweens.add({ targets: note, alpha: 0, delay: warn ? 6000 : Math.max(1200, text.length * 45), duration: 400 });
-  }
-
-  // Bảng phím điều khiển, đóng khi bấm phím bất kỳ, bấm chuột hoặc nút ✕
-  showHelp(router) {
-    const { scene } = this;
-    const { width } = scene.scale;
-    const c = scene.add.container(0, 0).setDepth(DEPTH + 20);
-    const top = 56;
-    const rows = [
-      [['Mũi tên', 'WASD'], 'Đi (chạm nhẹ để xoay người)'],
-      [['Enter', 'Space'], 'Nói chuyện, đọc biển, xác nhận'],
-      [['Enter'], 'Ở bờ nước: xuống nước (cưỡi Lapras / Surf)'],
-      [['X', 'Esc'], 'Quay lại, mở Cài đặt'],
-      [['M'], 'Đội hình (kéo thả hoặc Shift + ↑↓ để đổi chỗ)'],
-      [['B'], 'Túi đồ (gõ chữ để tìm vật phẩm)'],
-      [['P'], 'Pokédex'],
-      [['N'], 'Bản đồ vùng'],
-      [['T'], 'Thẻ Huấn luyện viên: thời gian chơi, huy hiệu, tiền'],
-      [['C'], 'Lên / xuống xe đạp'],
-      [['R'], 'Cưỡi Arcanine / đổi cách bơi (cần thú cưỡi)'],
-      [['1 - 6'], 'Dùng đồ ở ô phím tắt (kéo đồ trong túi thả vào ô)'],
-      [['H'], 'Bảng trợ giúp này'],
-      [['Chuột'], 'Bấm Pokémon ở cột trái: xem đội hình • bấm Pokémon hoang dã ở góc phải: mở Pokédex'],
-    ];
-    const pitch = 36;
-    const h = 112 + rows.length * pitch + 30;
-    c.add(drawPanel(scene, width / 2 - 350, top, 700, h, 18, true));
-    c.add(scene.add.text(width / 2, top + 24, 'Phím điều khiển', textStyle(28, COLORS.text, { fontStyle: 'bold' })).setOrigin(0.5, 0));
-    const chips = scene.add.graphics();
-    c.add(chips);
-    rows.forEach(([keys, desc], i) => {
-      const y = top + 92 + i * pitch;
-      // Phím dạng viên tối, các phím thay thế cách nhau bằng "/"
-      let x = width / 2 - 320;
-      keys.forEach((k, j) => {
-        if (j) {
-          c.add(scene.add.text(x + 2, y, '/', textStyle(16, '#8a92a6', { fontStyle: 'bold' })).setOrigin(0, 0.5));
-          x += 16;
-        }
-        const t = scene.add.text(x + 9, y, k, textStyle(15, '#ffffff', { fontStyle: 'bold' })).setOrigin(0, 0.5);
-        chips.fillStyle(0x000000, 0.18);
-        chips.fillRoundedRect(x, y - 13 + 3, t.width + 18, 26, 7);
-        chips.fillStyle(DARK);
-        chips.fillRoundedRect(x, y - 13, t.width + 18, 26, 7);
-        c.add(t);
-        x += t.width + 18 + 6;
-      });
-      c.add(scene.add.text(width / 2 - 120, y, desc, textStyle(17, '#4a5266', { wordWrap: { width: 450, useAdvancedWrap: true }, lineSpacing: -2 })).setOrigin(0, 0.5));
-    });
-    c.add(scene.add.text(width / 2, top + h - 30, 'Bấm phím bất kỳ hoặc bấm chuột để đóng', textStyle(15, '#8a92a6')).setOrigin(0.5, 0));
-    const openedAt = performance.now();
-    return new Promise((resolve) => {
-      const close = () => {
-        if (!c.active) return;
-        router.clear();
-        c.destroy();
-        resolve();
-      };
-      c.add(closeButton(scene, width / 2 + 350 - 34, top + 38, close));
-      c.setScrollFactor(0);
-      c.list.forEach((o) => o.setScrollFactor(0));
-      router.set((e) => e.timeStamp >= openedAt && (isConfirm(e) || isCancel(e) || !e.repeat) && close(), (p) => p.downTime >= openedAt && close());
-    });
   }
 }

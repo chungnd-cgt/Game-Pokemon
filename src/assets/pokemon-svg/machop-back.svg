@@ -1,32 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <radialGradient id="skin" cx="36%" cy="28%" r="80%">
-      <stop offset="0" stop-color="#a8bcd8"/>
-      <stop offset="0.6" stop-color="#7d97b8"/>
-      <stop offset="1" stop-color="#566e90"/>
-    </radialGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#bcdcdc"/>
+      <stop offset="1" stop-color="#9cc4c4"/>
+    </linearGradient>
+    <linearGradient id="crest" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ecdcb0"/>
+      <stop offset="1" stop-color="#c8b080"/>
+    </linearGradient>
   </defs>
-  <g stroke-linecap="round" fill="none">
-    <path d="M94 140 C72 148 60 164 56 186" stroke="#2b2433" stroke-width="34"/>
-    <path d="M94 140 C72 148 60 164 56 186" stroke="#7d97b8" stroke-width="24"/>
-    <path d="M162 140 C184 148 196 164 200 186" stroke="#2b2433" stroke-width="34"/>
-    <path d="M162 140 C184 148 196 164 200 186" stroke="#647ea2" stroke-width="24"/>
-  </g>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M92 192 C84 210 82 226 84 236 L120 236 C122 222 122 206 120 194 Z" fill="#7d97b8"/>
-    <path d="M164 192 C172 210 174 226 172 236 L136 236 C134 222 134 206 136 194 Z" fill="#647ea2"/>
-    <ellipse cx="100" cy="239" rx="25" ry="10" fill="#647ea2"/>
-    <ellipse cx="156" cy="239" rx="25" ry="10" fill="#566e90"/>
-    <path d="M90 128 C78 150 80 184 92 204 C110 212 146 212 164 204 C176 184 178 150 166 128 C150 118 106 118 90 128 Z" fill="url(#skin)"/>
-    <ellipse cx="128" cy="86" rx="58" ry="50" fill="url(#skin)"/>
-    <!-- ba gờ chạy dọc đỉnh đầu -->
-    <path d="M114 74 C112 40 120 10 128 6 C136 10 144 40 142 74 Z" fill="#7d97b8"/>
-    <path d="M86 78 C82 50 90 26 100 18 C106 30 110 52 110 74 Z" fill="#7d97b8"/>
-    <path d="M170 78 C174 50 166 26 156 18 C150 30 146 52 146 74 Z" fill="#647ea2"/>
-    <circle cx="54" cy="194" r="18" fill="#7d97b8"/>
-    <circle cx="202" cy="194" r="18" fill="#647ea2"/>
+    <path d="M96 182 C86 200 76 218 70 234 C70 244 104 246 106 238 C108 222 114 206 120 194 Z" fill="#9cc4c4"/>
+    <path d="M160 182 C170 200 180 218 186 234 C186 244 152 246 150 238 C148 222 142 206 136 194 Z" fill="#80a8ac"/>
+    <path d="M86 140 C82 120 100 110 128 110 C156 110 174 120 170 140 L166 192 C150 208 106 208 90 192 Z" fill="url(#skin)"/>
+    <path d="M94 124 C70 120 50 132 44 150 L72 164 C78 152 86 148 98 148 Z" fill="#9cc4c4"/>
+    <path d="M162 124 C186 120 206 132 212 150 L184 164 C178 152 170 148 158 148 Z" fill="#80a8ac"/>
+    <circle cx="46" cy="164" r="22" fill="url(#skin)"/>
+    <circle cx="210" cy="164" r="22" fill="#9cc4c4"/>
+    <!-- sau đầu -->
+    <path d="M72 80 C70 50 96 34 128 34 C160 34 186 50 184 80 C182 110 160 128 128 128 C96 128 74 110 72 80 Z" fill="url(#skin)"/>
+    <!-- mào kéo dài ra sau đầu -->
+    <path d="M100 74 C94 40 106 8 128 4 C150 8 162 40 156 74 C146 66 110 66 100 74 Z" fill="url(#crest)"/>
   </g>
-  <path d="M128 140 L128 196 M104 146 C110 156 120 160 128 158 C136 160 146 156 152 146" fill="none" stroke="#566e90" stroke-width="4" stroke-linecap="round"/>
-  <path d="M174 70 C190 96 184 120 166 132 C152 138 136 138 124 136 C156 122 176 100 174 70 Z" fill="#566e90" opacity="0.5"/>
-  <ellipse cx="88" cy="96" rx="18" ry="8" fill="#fff" opacity="0.3" transform="rotate(-22 88 96)"/>
+  <g fill="none" stroke="#8a7c66" stroke-width="3.5" stroke-linecap="round">
+    <path d="M116 66 C114 44 116 24 122 10"/>
+    <path d="M140 66 C142 44 140 24 134 10"/>
+  </g>
+  <path d="M174 70 C182 98 168 120 138 128 C164 126 184 108 184 82 Z" fill="#80a8ac"/>
+  <path d="M160 140 C164 166 160 184 150 198 L166 192 C170 172 170 154 160 140 Z" fill="#80a8ac"/>
+  <ellipse cx="90" cy="70" rx="12" ry="6" fill="#fff" opacity="0.5" transform="rotate(-35 90 70)"/>
+  <!-- rãnh lưng -->
+  <g fill="none" stroke="#6e989c" stroke-width="3.5" stroke-linecap="round">
+    <path d="M128 136 L128 190"/>
+    <path d="M104 140 Q114 150 122 146 M152 140 Q142 150 134 146"/>
+  </g>
 </svg>

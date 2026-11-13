@@ -84,7 +84,6 @@ export class CharacterCreator {
     const by = ROW_Y + ROWS.length * ROW_H + 6;
     c.add(this.button(580, by, 190, 'Ngẫu nhiên', 0x7a62c8, () => this.randomize()));
     c.add(this.button(782, by, 150, this.opts.okLabel ?? 'OK', 0x40b060, () => this.finish(this.value)));
-    c.add(scene.add.text(480, 622, '↑/↓: chọn dòng  •  ←/→: đổi  •  R: ngẫu nhiên  •  Enter: xong  •  X: quay lại', textStyle(15, '#6a7286')).setOrigin(0.5));
 
     this.refresh();
     this.selectRow(0);
@@ -134,7 +133,6 @@ export class CharacterCreator {
     const zone = scene.add.zone(330, 440, 150, 220).setInteractive({ useHandCursor: true });
     zone.on('pointerdown', () => this.turn(1));
     c.add(zone);
-    c.add(scene.add.text(274, 572, 'Bấm vào nhân vật để xoay', textStyle(14, '#4a5878')).setOrigin(0.5, 0));
 
     this.facing = 0;
     this.tick = 0;

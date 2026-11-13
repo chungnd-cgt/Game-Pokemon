@@ -1,43 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <radialGradient id="flame" cx="50%" cy="80%" r="75%">
-      <stop offset="0" stop-color="#fff7b0"/>
-      <stop offset="0.4" stop-color="#ffc63a"/>
-      <stop offset="1" stop-color="#f06a24"/>
-    </radialGradient>
-    <linearGradient id="coat" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#fffaea"/>
-      <stop offset="1" stop-color="#ecdcb4"/>
-    </linearGradient>
+    <linearGradient id="flame" x1="0" y1="0" x2="0.2" y2="1"><stop offset="0" stop-color="#ffc63a"/><stop offset="0.55" stop-color="#f88a2c"/><stop offset="1" stop-color="#e2481c"/></linearGradient>
+    <linearGradient id="coat" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#fffbe8"/><stop offset="0.6" stop-color="#f8eebe"/><stop offset="1" stop-color="#e0cc94"/></linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- lửa cổ chân trước -->
-    <path d="M62 226 C46 222 40 208 44 190 C50 200 56 202 58 198 Z M194 226 C210 222 216 208 212 190 C206 200 200 202 198 198 Z" fill="url(#flame)"/>
-    <!-- chân trước ló hai bên -->
-    <path d="M62 176 C58 202 58 220 60 232 L78 232 C78 216 80 198 84 180 Z" fill="#e2cfa0"/>
-    <path d="M194 176 C198 202 198 220 196 232 L178 232 C178 216 176 198 172 180 Z" fill="#e2cfa0"/>
-    <path d="M56 230 L80 230 L82 246 L54 246 Z M200 230 L176 230 L174 246 L202 246 Z" fill="#4a4250"/>
-    <!-- thân -->
-    <ellipse cx="128" cy="154" rx="68" ry="48" fill="url(#coat)"/>
-    <!-- lửa cổ chân sau -->
-    <path d="M84 230 C68 226 62 212 66 194 C72 204 78 206 80 202 Z M172 230 C188 226 194 212 190 194 C184 204 178 206 176 202 Z" fill="url(#flame)"/>
-    <!-- chân sau -->
-    <path d="M84 176 C78 202 80 220 84 234 L110 234 C110 216 112 198 114 182 Z" fill="url(#coat)"/>
-    <path d="M172 176 C178 202 176 220 172 234 L146 234 C146 216 144 198 142 182 Z" fill="#ecdcb4"/>
-    <path d="M80 230 L112 230 L114 248 L78 248 Z" fill="#5a5262"/>
-    <path d="M176 230 L144 230 L142 248 L178 248 Z" fill="#4a4250"/>
-    <!-- bờm lửa lớn dọc gáy -->
-    <path d="M128 140 C104 124 88 100 92 70 C98 82 106 84 110 78 C102 54 110 30 128 12 C126 30 134 40 144 42 C146 30 156 22 168 20 C160 36 162 50 168 60 C174 56 182 56 186 50 C190 80 174 106 158 120 C148 128 138 134 128 140 Z" fill="url(#flame)"/>
-    <!-- chóp sừng ló lên -->
-    <path d="M120 40 L128 4 L136 40 Z" fill="#d8d4e0"/>
-    <!-- tai -->
-    <path d="M100 60 L86 24 L120 44 Z" fill="url(#coat)"/>
-    <path d="M156 60 L170 24 L136 44 Z" fill="#ecdcb4"/>
-    <!-- đầu từ sau -->
-    <path d="M96 76 C94 52 110 38 128 38 C146 38 162 52 160 76 C158 96 146 108 128 108 C110 108 98 96 96 76 Z" fill="url(#coat)"/>
-    <!-- đuôi lửa dài -->
-    <path d="M128 150 C104 166 96 196 104 228 C110 216 118 214 122 216 C120 228 126 240 134 250 C140 236 144 226 152 222 C160 196 154 166 128 150 Z" fill="url(#flame)"/>
+    <!-- far front leg -->
+    <path d="M76 140 C78 170 80 190 80 220 L87 220 C87 190 90 170 92 140 Z" fill="#e2d09a"/>
+    <path d="M77 220 L76 232 L90 232 L88 220 Z" fill="#3e4c8c"/>
+    <!-- neck + head from behind -->
+    <path d="M66 110 C62 88 62 70 68 54 L106 60 C108 80 106 100 102 122 Z" fill="url(#coat)"/>
+    <path d="M58 58 C54 40 64 26 84 24 C104 24 114 38 110 56 C106 70 70 72 58 58 Z" fill="url(#coat)"/>
+    <path d="M62 34 L58 8 L78 28 Z M100 28 L112 6 L112 34 Z" fill="url(#coat)"/>
+    <path d="M78 30 L80 2 L90 28 Z" fill="#f6f0e4"/>
+    <!-- mane streaming right -->
+    <path d="M76 40 C88 24 108 16 130 18 C126 26 132 30 142 26 C156 20 172 22 184 32 C176 36 178 42 188 44 C204 46 218 40 230 30 C228 48 216 60 198 64 C210 70 224 72 238 66 C228 86 206 92 186 88 C190 98 200 104 212 104 C196 116 172 114 156 104 C142 96 128 104 116 116 C108 98 98 80 90 64 C86 56 80 48 76 40 Z" fill="url(#flame)"/>
+    <!-- rump -->
+    <path d="M78 136 C74 110 102 98 140 98 C182 98 210 114 208 148 C206 174 184 184 150 184 L106 184 C88 182 80 160 78 136 Z" fill="url(#coat)"/>
+    <!-- tail -->
+    <path d="M150 116 C168 102 184 92 184 70 C198 82 208 80 214 64 C224 82 228 98 222 112 C234 110 244 102 248 90 C256 120 244 146 220 158 C234 160 246 158 254 150 C248 176 222 184 196 174 C176 166 160 152 152 140 Z" fill="url(#flame)"/>
+    <!-- hind legs -->
+    <path d="M111 168 C113 198 114 198 114 228 L126 228 C126 198 129 200 131 170 Z" fill="url(#coat)"/>
+    <path d="M169 168 C171 198 172 198 172 228 L184 228 C184 198 187 196 189 166 Z" fill="url(#coat)"/>
+    <path d="M112 228 L111 240 L129 240 L128 228 Z M170 228 L169 240 L187 240 L186 228 Z" fill="#46549a"/>
+    <path d="M132 150 C146 156 148 172 140 182 C142 190 136 196 130 198 C132 188 128 182 130 174 Z" fill="url(#flame)"/>
+    <path d="M192 146 C206 152 210 170 200 182 C204 190 198 196 192 198 C194 188 188 182 190 174 Z" fill="url(#flame)"/>
+    <path d="M130 200 C142 204 144 216 136 222 C138 228 134 232 128 232 C130 224 126 220 128 214 Z" fill="url(#flame)"/>
   </g>
-  <path d="M186 132 C200 156 190 186 166 198 C180 180 188 156 186 132 Z" fill="#d9cbae"/>
-  <ellipse cx="82" cy="130" rx="18" ry="7" fill="#fff" opacity="0.7" transform="rotate(-30 82 130)"/>
+  <path d="M76 40 C88 24 108 16 130 18 C126 26 132 30 142 26 C156 20 172 22 184 32 C176 36 178 42 188 44 C204 46 218 40 230 30 C228 48 216 60 198 64 C210 70 224 72 238 66 C228 86 206 92 186 88 C190 98 200 104 212 104 C196 116 172 114 156 104 C142 96 128 104 116 116 C108 98 98 80 90 64 C86 56 80 48 76 40 Z" fill="#ffd84a" transform="translate(157 66) scale(0.55) translate(-157 -66)"/>
+  <path d="M150 116 C168 102 184 92 184 70 C198 82 208 80 214 64 C224 82 228 98 222 112 C234 110 244 102 248 90 C256 120 244 146 220 158 C234 160 246 158 254 150 C248 176 222 184 196 174 C176 166 160 152 152 140 Z" fill="#ffd84a" transform="translate(203 124) scale(0.55) translate(-203 -124)"/>
+  <path d="M132 150 C146 156 148 172 140 182 C142 190 136 196 130 198 C132 188 128 182 130 174 Z" fill="#ffd84a" transform="translate(138 174) scale(0.5) translate(-138 -174)"/>
+  <path d="M192 146 C206 152 210 170 200 182 C204 190 198 196 192 198 C194 188 188 182 190 174 Z" fill="#ffd84a" transform="translate(199 172) scale(0.5) translate(-199 -172)"/>
+  <path d="M130 200 C142 204 144 216 136 222 C138 228 134 232 128 232 C130 224 126 220 128 214 Z" fill="#ffd84a" transform="translate(135 216) scale(0.5) translate(-135 -216)"/>
+  <path d="M66 30 L64 18 L72 28 Z M104 30 L108 20 L108 32 Z" fill="#e8a8a0"/>
+  <ellipse cx="108" cy="116" rx="18" ry="7" fill="#fff" opacity="0.5" transform="rotate(-20 108 116)"/>
+  <path d="M150 176 C170 178 192 174 204 158" fill="none" stroke="#e0cc94" stroke-width="6" stroke-linecap="round"/>
 </svg>

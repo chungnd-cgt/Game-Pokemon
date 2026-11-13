@@ -1,53 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffda6c"/><stop offset="1" stop-color="#e4a92c"/></linearGradient>
-    <linearGradient id="ruff" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d6d2ca"/></linearGradient>
-    <radialGradient id="coin" cx="38%" cy="32%" r="72%"><stop offset="0" stop-color="#ffffff"/><stop offset="0.55" stop-color="#cdd2dc"/><stop offset="1" stop-color="#8a90a2"/></radialGradient>
+    <linearGradient id="yel" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="#fff8b0"/><stop offset="0.5" stop-color="#fae050"/><stop offset="1" stop-color="#e2b62c"/></linearGradient>
+    <radialGradient id="coin" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#f0f2f6"/><stop offset="1" stop-color="#8a8e9a"/></radialGradient>
   </defs>
-  <!-- far arm + leg -->
-  <g fill="none" stroke-linecap="round">
-    <path d="M168 150 C184 162 194 178 194 196" stroke="#2b2433" stroke-width="26"/>
-    <path d="M168 150 C184 162 194 178 194 196" stroke="#d89e30" stroke-width="17"/>
-    <path d="M146 210 C150 222 154 230 156 236" stroke="#2b2433" stroke-width="28"/>
-    <path d="M146 210 C150 222 154 230 156 236" stroke="#e4a92c" stroke-width="19"/>
-  </g>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <circle cx="194" cy="200" r="13" fill="#d89e30"/>
-    <ellipse cx="150" cy="240" rx="26" ry="10" fill="#e4a92c"/>
-    <path d="M104 44 C96 30 98 16 106 6 C120 14 128 28 126 42 Z" fill="#d89e30"/>
-    <path d="M98 150 C88 180 94 210 114 222 C128 228 148 226 160 218 C176 204 180 176 170 150 Z" fill="url(#skin)"/>
-  </g>
-  <g fill="none" stroke-linecap="round">
-    <path d="M116 210 C112 222 108 230 106 236" stroke="#2b2433" stroke-width="28"/>
-    <path d="M116 210 C112 222 108 230 106 236" stroke="#f2c450" stroke-width="19"/>
-  </g>
-  <ellipse cx="98" cy="240" rx="28" ry="10" fill="#f2c450" stroke="#2b2433" stroke-width="5"/>
-  <!-- pendulum held forward -->
-  <path d="M42 140 L40 184" stroke="#2b2433" stroke-width="3" fill="none"/>
-  <circle cx="40" cy="200" r="18" fill="url(#coin)" stroke="#2b2433" stroke-width="5"/>
-  <circle cx="40" cy="200" r="9" fill="none" stroke="#8a90a2" stroke-width="3"/>
-  <ellipse cx="34" cy="192" rx="4" ry="6" fill="#fff"/>
-  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- far leg -->
+    <path d="M140 186 C152 202 160 218 162 236 L134 240 L134 226 C130 214 124 204 118 198 Z" fill="#d8b030"/>
+    <!-- far arm -->
+    <path d="M150 140 C170 132 184 120 188 104 L170 98 C166 110 158 118 146 122 Z" fill="#d8b030"/>
+    <!-- torso -->
+    <path d="M104 130 C96 160 98 186 110 196 C124 206 144 204 156 194 C166 182 168 158 160 130 Z" fill="url(#yel)"/>
+    <!-- near leg -->
+    <path d="M114 186 C96 198 84 212 80 228 L76 242 L108 242 L108 228 C114 216 124 208 136 200 Z" fill="url(#yel)"/>
     <!-- ruff -->
-    <path d="M78 130 C70 116 82 102 96 108 C100 96 118 96 124 106 C132 96 150 96 156 106 C170 100 186 114 178 128 C190 138 182 156 166 152 C162 166 144 168 136 158 C128 168 110 168 104 158 C96 168 78 164 76 150 C64 150 62 136 78 130 Z" fill="url(#ruff)"/>
+    <path d="M88 130 L96 120 L104 128 L112 116 L120 126 L128 114 L136 124 L144 114 L152 126 L160 116 L168 128 L174 120 L178 134 L170 142 L174 152 L160 150 L152 160 L142 152 L132 160 L122 150 L110 158 L104 148 L90 148 L96 138 Z" fill="#f6f6fa"/>
+    <!-- ears -->
+    <path d="M136 52 L150 4 L162 66 Z" fill="url(#yel)"/>
     <!-- head -->
-    <path d="M70 84 C66 58 86 34 120 32 C152 30 176 50 174 80 C172 106 152 120 122 120 C98 120 74 108 70 84 Z" fill="url(#skin)"/>
-    <!-- big nose -->
-    <path d="M76 76 C58 82 46 96 48 112 C50 120 62 122 68 116 C72 104 80 96 92 92 Z" fill="url(#skin)"/>
-    <!-- near ear -->
-    <path d="M126 42 C126 26 136 12 150 6 C160 18 160 34 152 46 Z" fill="url(#skin)"/>
+    <path d="M92 92 C90 64 108 46 130 46 C152 46 168 64 166 92 C164 116 150 130 130 130 C108 130 94 116 92 92 Z" fill="url(#yel)"/>
+    <!-- long nose pointing forward-down -->
+    <path d="M100 86 L54 120 C54 130 66 132 74 126 L108 104 Z" fill="url(#yel)"/>
+    <!-- near arm swinging the pendulum forward -->
+    <path d="M110 140 C88 138 70 130 60 116 L74 102 C82 112 94 118 112 120 Z" fill="url(#yel)"/>
+    <path d="M44 112 C40 98 48 86 62 86 C76 86 82 100 76 112 C70 122 50 122 44 112 Z" fill="url(#yel)"/>
+    <circle cx="58" cy="184" r="15" fill="url(#coin)"/>
   </g>
-  <!-- near arm reaching forward with the string -->
-  <g fill="none" stroke-linecap="round">
-    <path d="M116 146 C96 150 70 148 50 136" stroke="#2b2433" stroke-width="26"/>
-    <path d="M116 146 C96 150 70 148 50 136" stroke="#f2c450" stroke-width="17"/>
-  </g>
-  <circle cx="44" cy="134" r="13" fill="#ffda6c" stroke="#2b2433" stroke-width="5"/>
-  <path d="M138 18 C144 24 146 32 144 40 L136 42 C134 34 134 26 138 18 Z" fill="#c88a3a" opacity="0.6"/>
-  <path d="M164 52 C174 76 168 100 148 112 C140 116 132 118 124 118 C150 104 164 82 164 52 Z" fill="#cc9426" opacity="0.5"/>
-  <ellipse cx="98" cy="48" rx="20" ry="8" fill="#fff" opacity="0.45" transform="rotate(-18 98 48)"/>
-  <path d="M78 66 C86 76 100 76 106 66 Z" fill="#fff" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
-  <ellipse cx="90" cy="69" rx="5" ry="4" fill="#2b2433"/>
-  <path d="M74 64 L110 64" fill="none" stroke="#2b2433" stroke-width="6" stroke-linecap="round"/>
-  <ellipse cx="54" cy="116" rx="6" ry="3.5" fill="#2b2433" opacity="0.6" transform="rotate(-25 54 116)"/>
+  <path d="M58 118 L58 169" stroke="#e8e8ee" stroke-width="2.5"/>
+  <circle cx="58" cy="184" r="5" fill="#e8eef2" stroke="#2b2433" stroke-width="3"/>
+  <path d="M151 22 L156 58 L146 52 Z" fill="#a07850"/>
+  <ellipse cx="124" cy="60" rx="16" ry="6" fill="#fff" opacity="0.5" transform="rotate(-30 124 60)"/>
+  <path d="M100 82 C104 74 116 74 120 82 C114 88 104 88 100 82 Z" fill="#fff" stroke="#2b2433" stroke-width="3"/>
+  <circle cx="106" cy="83" r="3" fill="#1a1622"/>
+  <path d="M96 78 C104 74 116 74 124 80" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
 </svg>

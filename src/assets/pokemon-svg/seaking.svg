@@ -1,57 +1,47 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="skin" x1="0" y1="0" x2="0.6" y2="1">
-      <stop offset="0" stop-color="#f8a060"/>
-      <stop offset="0.5" stop-color="#f07838"/>
-      <stop offset="1" stop-color="#d05a28"/>
+    <radialGradient id="body" cx="38%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#f89a68"/>
+      <stop offset="1" stop-color="#e8603c"/>
+    </radialGradient>
+    <linearGradient id="fin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbfbff"/>
+      <stop offset="1" stop-color="#d4d2e4"/>
     </linearGradient>
-    <linearGradient id="fin" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#f07838"/>
-      <stop offset="0.5" stop-color="#f8a060"/>
-      <stop offset="1" stop-color="#f6f2f4"/>
-    </linearGradient>
-    <clipPath id="body">
-      <path d="M30 140 C30 92 78 60 132 60 C182 60 212 96 212 140 C212 182 180 212 130 212 C76 212 30 186 30 140 Z"/>
-    </clipPath>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- vây đuôi to -->
-    <path d="M198 124 C212 96 232 74 254 62 C250 92 242 114 228 134 C242 152 250 176 250 208 C230 192 212 170 198 150 Z" fill="url(#fin)"/>
-    <!-- vây lưng lớn -->
-    <path d="M96 66 C110 30 146 6 196 4 C182 26 178 48 186 80 C160 66 128 62 96 66 Z" fill="url(#fin)"/>
-    <!-- vây dưới -->
-    <path d="M160 198 C170 218 186 232 212 236 C206 214 194 198 178 188 Z" fill="#f07838"/>
-    <!-- thân cam -->
-    <path d="M30 140 C30 92 78 60 132 60 C182 60 212 96 212 140 C212 182 180 212 130 212 C76 212 30 186 30 140 Z" fill="url(#skin)"/>
+    <!-- big butterfly-like tail fins -->
+    <path d="M178 120 C186 86 206 56 236 44 C232 66 252 80 244 102 C254 118 244 140 226 144 C210 148 192 140 178 120 Z" fill="url(#fin)"/>
+    <path d="M176 160 C200 158 226 170 238 196 C224 200 228 222 212 228 C196 234 180 222 176 206 C172 190 172 174 176 160 Z" fill="url(#fin)"/>
+    <!-- dorsal fin -->
+    <path d="M110 66 C112 40 128 18 152 10 C150 26 166 34 176 30 C172 48 166 66 156 80 Z" fill="url(#fin)"/>
+    <!-- round body -->
+    <path d="M124 60 C170 60 196 96 196 138 C196 182 166 210 124 210 C82 210 50 184 48 140 C46 96 78 60 124 60 Z" fill="url(#body)"/>
+    <!-- white lower face/belly -->
+    <path d="M50 150 C62 190 96 210 130 208 C110 196 92 176 86 150 Z" fill="#f4f2f8"/>
+    <!-- pectoral fins -->
+    <path d="M100 196 C90 216 70 230 46 236 C48 218 60 202 78 192 Z" fill="url(#fin)"/>
+    <path d="M152 200 C160 218 172 230 190 238 C192 222 182 206 168 196 Z" fill="#d4d2e4"/>
+    <!-- horn -->
+    <path d="M72 82 C64 62 60 42 62 22 C76 38 86 58 90 76 Z" fill="#f4eee0"/>
+    <!-- lips -->
+    <path d="M52 134 C38 128 26 136 28 148 C30 160 44 162 54 154 Z" fill="#f8a8b8"/>
   </g>
-  <!-- mảng trắng mặt, bụng và lưng có chấm đen -->
-  <g clip-path="url(#body)">
-    <path d="M20 140 C40 136 70 150 90 172 C110 194 150 200 200 190 L200 230 L20 230 Z" fill="#f6f2f4"/>
-    <path d="M118 78 C134 68 160 70 172 84 C176 100 160 112 142 112 C124 112 112 96 118 78 Z" fill="#f6f2f4"/>
-    <path d="M168 120 C180 110 200 112 210 124 C214 140 200 152 186 150 C172 148 164 134 168 120 Z" fill="#f6f2f4"/>
-    <g fill="#2b2433">
-      <circle cx="100" cy="74" r="5"/><circle cx="184" cy="100" r="5"/><circle cx="150" cy="138" r="5"/>
-    </g>
-  </g>
-  <path d="M30 140 C30 92 78 60 132 60 C182 60 212 96 212 140 C212 182 180 212 130 212 C76 212 30 186 30 140 Z" fill="none" stroke="#2b2433" stroke-width="5"/>
-  <path d="M192 118 C204 156 184 198 140 210 C182 208 212 180 212 140 Z" fill="#a83a18" opacity="0.4"/>
-  <ellipse cx="96" cy="84" rx="22" ry="8" fill="#fff" opacity="0.4" transform="rotate(-20 96 84)"/>
-  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- vây ngực -->
-    <path d="M98 196 C100 220 116 238 142 250 C144 226 136 208 122 196 Z" fill="url(#fin)"/>
-    <!-- sừng xoắn lớn -->
-    <path d="M52 100 L10 6 L100 76 Z" fill="#f6eedc"/>
-    <!-- môi -->
-    <path d="M34 124 C18 120 12 136 22 142 C12 150 18 164 34 162 C46 160 48 148 42 142 C48 134 46 126 34 124 Z" fill="#f07888"/>
-  </g>
-  <path d="M30 46 L52 38 M40 64 L68 52 M52 82 L84 66" stroke="#c8b898" stroke-width="5" stroke-linecap="round"/>
-  <path d="M24 142 L42 142" stroke="#2b2433" stroke-width="3.5" stroke-linecap="round"/>
-  <!-- mắt -->
-  <g stroke="#2b2433" stroke-width="4">
-    <ellipse cx="70" cy="118" rx="13" ry="14" fill="#22203a"/>
-    <ellipse cx="108" cy="110" rx="11" ry="12" fill="#22203a"/>
-  </g>
-  <path d="M54 102 L84 110 M96 98 L122 100" stroke="#2b2433" stroke-width="5" stroke-linecap="round"/>
-  <ellipse cx="74" cy="113" rx="5" ry="5" fill="#fff"/>
-  <ellipse cx="111" cy="106" rx="4" ry="4" fill="#fff"/>
+  <!-- black stripes over the back -->
+  <path d="M112 64 C130 60 150 64 164 72 C150 92 130 96 112 90 C116 82 116 72 112 64 Z" fill="#2b2433"/>
+  <path d="M164 80 C178 92 188 108 192 124 C176 128 160 122 152 110 C160 104 164 92 164 80 Z" fill="#2b2433"/>
+  <path d="M140 110 C148 114 156 122 158 132 C150 136 142 132 138 124 Z" fill="#2b2433"/>
+  <circle cx="120" cy="114" r="5" fill="#2b2433"/>
+  <circle cx="172" cy="148" r="5" fill="#2b2433"/>
+  <circle cx="150" cy="160" r="4" fill="#2b2433"/>
+  <circle cx="134" cy="140" r="4" fill="#2b2433"/>
+  <!-- spots on the fins -->
+  <path d="M214 74 l8 -4 l2 8 Z M226 114 l8 2 l-4 8 Z M200 100 l6 -2 l0 7 Z M208 190 l8 0 l-2 8 Z M196 210 l6 2 l-4 6 Z M144 30 l6 -4 l2 7 Z M66 222 l8 -2 l-2 7 Z" fill="#2b2433"/>
+  <path d="M168 150 C176 176 160 200 136 206 C170 206 192 180 188 150 Z" fill="#c04a2c" opacity="0.5"/>
+  <ellipse cx="96" cy="84" rx="16" ry="8" fill="#fff" opacity="0.5" transform="rotate(-30 96 84)"/>
+  <path d="M38 142 L52 140" stroke="#2b2433" stroke-width="3" stroke-linecap="round"/>
+  <!-- big eye -->
+  <circle cx="86" cy="120" r="17" fill="#fff" stroke="#2b2433" stroke-width="4"/>
+  <circle cx="84" cy="121" r="11" fill="#2b2433"/>
+  <circle cx="80" cy="116" r="4" fill="#fff"/>
 </svg>

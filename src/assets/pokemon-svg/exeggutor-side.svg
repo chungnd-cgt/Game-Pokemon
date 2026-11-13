@@ -39,6 +39,7 @@
     <circle cx="84" cy="242" r="6"/><circle cx="98" cy="246" r="6"/><circle cx="140" cy="244" r="5.5"/>
   </g>
   <path d="M124 60 C94 44 54 44 18 72 M124 56 C108 30 80 14 44 8" fill="none" stroke="#2e6e2a" stroke-width="3.5" stroke-linecap="round"/>
+  <g transform="translate(130 96) scale(1.2) translate(-130 -96)">
   <!-- ba đầu quay trái -->
   <g stroke="#2b2433" stroke-width="5">
     <circle cx="170" cy="98" r="29" fill="#e8bc44"/>
@@ -57,4 +58,5 @@
   <path d="M64 116 Q72 124 80 116" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
   <ellipse cx="152" cy="100" rx="4.5" ry="6" fill="#2b2433"/>
   <path d="M144 90 L158 94" stroke="#2b2433" stroke-width="4.5" stroke-linecap="round"/>
+  </g>
 </svg>

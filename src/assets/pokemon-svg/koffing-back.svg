@@ -1,27 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <radialGradient id="body" cx="38%" cy="32%" r="75%">
-      <stop offset="0" stop-color="#b098c8"/>
-      <stop offset="0.6" stop-color="#8a6aa8"/>
-      <stop offset="1" stop-color="#5e4480"/>
+    <radialGradient id="body" cx="38%" cy="32%" r="72%">
+      <stop offset="0" stop-color="#b09ad0"/>
+      <stop offset="1" stop-color="#8a6aa8"/>
     </radialGradient>
   </defs>
-  <g fill="#c8c0a0" opacity="0.75">
-    <circle cx="56" cy="70" r="16"/>
-    <circle cx="38" cy="52" r="10"/>
-    <circle cx="212" cy="96" r="12"/>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M14 58 C10 42 26 32 38 38 C44 26 64 28 66 42 C78 44 80 62 66 66 C60 78 38 78 34 68 C20 72 10 66 14 58 Z" fill="#e4dc98"/>
+    <path d="M196 34 C196 20 214 14 224 24 C236 18 250 30 244 42 C254 52 244 66 232 62 C226 72 206 70 204 58 C192 56 188 42 196 34 Z" fill="#e4dc98"/>
+    <path d="M14 212 C12 198 28 192 36 200 C44 190 62 196 60 210 C68 220 56 234 44 228 C34 236 16 228 14 212 Z" fill="#e4dc98"/>
+    <path d="M208 206 C210 194 226 192 232 202 C246 200 252 218 240 224 C238 238 218 238 214 228 C202 226 200 212 208 206 Z" fill="#e4dc98"/>
+    <circle cx="128" cy="38" r="13" fill="#8a6aa8"/>
+    <circle cx="70" cy="58" r="12" fill="#9a80bc"/>
+    <circle cx="186" cy="58" r="12" fill="#8a6aa8"/>
+    <circle cx="40" cy="128" r="13" fill="#9a80bc"/>
+    <circle cx="216" cy="128" r="13" fill="#7a5c98"/>
+    <circle cx="62" cy="196" r="12" fill="#8a6aa8"/>
+    <circle cx="194" cy="196" r="12" fill="#7a5c98"/>
+    <circle cx="128" cy="222" r="13" fill="#7a5c98"/>
+    <circle cx="128" cy="130" r="90" fill="url(#body)"/>
   </g>
-  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round">
-    <path d="M172 70 l6 -22 l-18 12 Z M128 52 l0 -24 l-12 20 Z M82 70 l-10 -20 l-2 24 Z M56 120 l-22 -6 l12 18 Z M198 128 l22 -4 l-16 16 Z M180 192 l14 18 l-22 -6 Z M76 192 l-16 16 l4 -22 Z" fill="#8a6aa8"/>
-    <circle cx="128" cy="134" r="84" fill="url(#body)"/>
+  <g fill="#7a5c98">
+    <ellipse cx="96" cy="96" rx="12" ry="9"/>
+    <ellipse cx="160" cy="88" rx="10" ry="7"/>
+    <ellipse cx="128" cy="134" rx="13" ry="10"/>
+    <ellipse cx="80" cy="166" rx="10" ry="8"/>
+    <ellipse cx="172" cy="160" rx="12" ry="9"/>
+    <ellipse cx="128" cy="196" rx="10" ry="7"/>
   </g>
-  <g stroke="#2b2433" stroke-width="3">
-    <circle cx="186" cy="110" r="10" fill="#9a7cb8"/>
-    <circle cx="70" cy="104" r="8" fill="#9a7cb8"/>
-    <circle cx="80" cy="186" r="9" fill="#9a7cb8"/>
-    <circle cx="140" cy="168" r="11" fill="#9a7cb8"/>
-    <circle cx="124" cy="92" r="7" fill="#9a7cb8"/>
-  </g>
-  <path d="M176 76 C214 100 224 150 200 186 C184 208 158 218 132 218 C186 190 204 134 176 76 Z" fill="#5e4480" opacity="0.45"/>
-  <ellipse cx="96" cy="74" rx="20" ry="9" fill="#fff" opacity="0.3" transform="rotate(-25 96 74)"/>
+  <path d="M190 70 C226 110 224 170 176 206 C206 170 210 116 190 70 Z" fill="#6a4c88" opacity="0.5"/>
+  <ellipse cx="88" cy="74" rx="20" ry="10" fill="#fff" opacity="0.35" transform="rotate(-30 88 74)"/>
 </svg>

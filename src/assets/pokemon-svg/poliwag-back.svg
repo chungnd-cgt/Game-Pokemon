@@ -6,8 +6,10 @@
     <ellipse cx="94" cy="240" rx="26" ry="11" fill="#3f64b0"/>
     <ellipse cx="162" cy="240" rx="26" ry="11" fill="#3f64b0"/>
     <ellipse cx="128" cy="160" rx="82" ry="76" fill="url(#body)"/>
-    <path d="M128 176 C96 150 82 120 104 104 C116 96 124 108 128 118 C132 108 140 96 152 104 C174 120 160 150 128 176 Z" fill="#e8eefc" fill-opacity="0.95"/>
+    <!-- đuôi trong suốt mọc từ lưng, vắt sang trái -->
+    <path d="M118 196 C90 196 56 186 30 160 C12 142 20 120 40 124 C60 128 76 156 100 170 C112 176 124 178 132 176 Z" fill="#e8eefc" fill-opacity="0.95"/>
   </g>
-  <path d="M128 168 L128 124 M114 150 C108 136 106 122 112 112 M142 150 C148 136 150 122 144 112" fill="none" stroke="#b8c4e8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M40 136 C56 144 72 162 96 176 M52 128 C66 142 80 158 106 170" fill="none" stroke="#b8c4e8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M190 120 C206 146 204 190 176 218 C200 200 214 160 198 120 Z" fill="#3f64b0" opacity="0.6"/>
   <ellipse cx="92" cy="104" rx="24" ry="11" fill="#fff" opacity="0.3" transform="rotate(-25 92 104)"/>
 </svg>

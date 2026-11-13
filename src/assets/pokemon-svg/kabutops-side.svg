@@ -2,47 +2,49 @@
   <defs>
     <linearGradient id="shell" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d89a58"/><stop offset="1" stop-color="#8a5226"/></linearGradient>
     <linearGradient id="blade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbfbfd"/><stop offset="1" stop-color="#aeaebe"/></linearGradient>
-    <linearGradient id="chest" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#cac6d2"/></linearGradient>
+    <linearGradient id="chest" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d8d2c8"/></linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- tail -->
-    <path d="M146 186 C168 204 196 218 228 224" fill="none" stroke-width="18"/>
-    <path d="M146 186 C168 204 196 218 228 224" fill="none" stroke="#a46632" stroke-width="9"/>
-    <path d="M222 214 L252 228 L222 236 Z" fill="#8a5226"/>
-    <!-- far arm + scythe -->
-    <path d="M146 148 C158 154 164 162 166 172" fill="none" stroke-width="16"/>
-    <path d="M146 148 C158 154 164 162 166 172" fill="none" stroke="#8a5226" stroke-width="8"/>
-    <path d="M158 164 C194 168 214 192 220 232 C202 208 182 196 154 190 Z" fill="#c4c4d0"/>
+    <!-- far arm and blade sticking out behind -->
+    <path d="M140 140 L174 126 L188 142" fill="none" stroke-width="18"/>
+    <path d="M140 140 L174 126 L188 142" fill="none" stroke="#8a5226" stroke-width="9"/>
+    <path d="M180 128 C218 132 246 168 234 236 C228 194 214 166 184 150 Z" fill="#c8c8d4"/>
+    <!-- tail spike -->
+    <path d="M146 188 C170 204 190 212 214 214 L196 200" fill="none" stroke-width="16"/>
+    <path d="M146 188 C170 204 190 212 214 214" fill="none" stroke="#8a5226" stroke-width="8"/>
+    <!-- back fins -->
+    <path d="M148 150 L196 160 L152 170 Z M146 170 L186 192 L146 188 Z" fill="#6e4020"/>
     <!-- far leg -->
-    <path d="M138 188 C148 204 154 216 150 230 L170 248 L136 248 L134 232 C132 218 128 206 126 194 Z" fill="#8a5226"/>
-    <!-- dorsal fins -->
-    <path d="M140 122 L196 98 L152 148 Z" fill="#b0743c"/>
-    <path d="M150 148 L204 138 L154 172 Z" fill="#8a5226"/>
-    <!-- torso leaning forward -->
-    <ellipse cx="128" cy="156" rx="28" ry="38" fill="url(#shell)" transform="rotate(-18 128 156)"/>
-    <path d="M106 128 C98 150 102 176 116 190 C112 170 112 148 118 130 Z" fill="url(#chest)" stroke-width="4"/>
-    <!-- near leg -->
-    <path d="M112 186 C102 200 94 214 98 228 L76 248 L112 248 L114 232 C116 218 122 204 126 192 Z" fill="url(#shell)"/>
-    <!-- neck -->
-    <path d="M78 106 L100 136 L118 126 L100 98 Z" fill="#a46632"/>
-    <!-- face below the crest -->
-    <path d="M30 104 C34 120 52 132 78 132 C96 132 108 122 112 106 Z" fill="url(#shell)"/>
-    <!-- head: sickle-shaped crest, front point hooks down over the face, long point sweeps back -->
-    <path d="M22 116 C18 90 34 64 66 54 C112 42 186 40 248 22 C226 54 186 80 136 94 C104 102 64 104 40 100 C34 104 28 110 22 116 Z" fill="url(#shell)"/>
-    <!-- near arm + scythe -->
-    <path d="M108 142 C96 148 88 154 82 164" fill="none" stroke-width="18"/>
-    <path d="M108 142 C96 148 88 154 82 164" fill="none" stroke="#c2844a" stroke-width="9"/>
-    <path d="M94 152 C56 152 28 176 16 222 C38 196 62 184 96 180 Z" fill="url(#blade)"/>
+    <path d="M136 192 L150 216 L136 238" fill="none" stroke-width="18"/>
+    <path d="M136 192 L150 216 L136 238" fill="none" stroke="#8a5226" stroke-width="9"/>
+    <path d="M138 236 L118 248 L146 246 Z" fill="#e8e8ee" stroke-width="4"/>
+    <!-- slim torso leaning forward -->
+    <path d="M96 134 C88 160 98 188 118 198 C134 204 152 196 156 178 C160 156 150 132 132 124 C116 118 102 122 96 134 Z" fill="url(#shell)"/>
+    <!-- cream ribbed chest on the front -->
+    <path d="M98 136 C92 160 100 184 116 196 C110 174 108 152 114 130 Z" fill="url(#chest)" stroke-width="4"/>
+    <!-- near leg: knee forward, white claws -->
+    <path d="M124 192 L100 214 L114 238" fill="none" stroke-width="18"/>
+    <path d="M124 192 L100 214 L114 238" fill="none" stroke="#c08446" stroke-width="9"/>
+    <path d="M116 236 L90 246 L104 248 L100 254 L116 248 L126 250 Z" fill="#fff" stroke-width="4"/>
+    <!-- face and neck under the helmet -->
+    <path d="M76 100 C78 118 90 130 104 130 C116 130 124 122 126 108 Z" fill="url(#shell)"/>
+    <!-- helmet: hooked front tip over the face, long point swept back -->
+    <path d="M56 108 C56 78 80 56 114 52 C150 48 186 42 214 28 C204 58 178 82 146 96 C128 104 110 106 96 104 C82 106 66 112 56 108 Z" fill="url(#shell)"/>
+    <!-- near arm and scythe blade in front -->
+    <path d="M114 144 L82 130 L66 148" fill="none" stroke-width="18"/>
+    <path d="M114 144 L82 130 L66 148" fill="none" stroke="#c08446" stroke-width="9"/>
+    <path d="M74 134 C38 140 14 178 30 240 C34 200 46 172 76 158 Z" fill="url(#blade)"/>
   </g>
-  <!-- blade edge, chest ribs -->
-  <path d="M28 206 C42 188 62 176 90 170" fill="none" stroke="#8c8c9c" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
-  <path d="M106 146 L114 146 M104 162 L112 162 M108 178 L114 178" stroke="#2b2433" stroke-width="3.5" stroke-linecap="round"/>
-  <!-- shading and gloss -->
-  <path d="M148 130 C160 154 156 180 136 192 C130 194 124 194 118 194 C142 178 150 156 148 130 Z" fill="#5e3416" opacity="0.4"/>
-  <path d="M120 56 C160 52 206 44 240 30 C222 56 186 76 140 90 C142 76 136 64 120 56 Z" fill="#5e3416" opacity="0.4"/>
-  <path d="M34 82 C44 66 62 58 86 54" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
-  <!-- eye: white with black pupil -->
-  <path d="M46 108 L68 110 C68 120 62 124 56 123 C50 122 46 116 46 108 Z" fill="#fff" stroke="#2b2433" stroke-width="3.5" stroke-linejoin="round"/>
-  <ellipse cx="54" cy="115" rx="3.8" ry="4.8" fill="#2b2433"/>
-  <circle cx="53" cy="113" r="1.5" fill="#fff"/>
+  <path d="M28 212 C30 184 42 166 64 152" fill="none" stroke="#8c8c9c" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <!-- chest ribs -->
+  <path d="M100 150 L110 152 M100 164 L110 166 M104 178 L112 180" stroke="#2b2433" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- helmet ridge, shading, gloss -->
+  <path d="M120 58 C150 56 184 46 210 32" fill="none" stroke="#2b2433" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M150 54 C172 50 194 42 214 28 C204 58 178 82 146 96 C136 100 126 102 116 104 C140 90 152 72 150 54 Z" fill="#5e3416" opacity="0.4"/>
+  <path d="M68 90 C74 72 90 62 112 58" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
+  <path d="M148 140 C156 160 152 184 136 198 C130 200 124 200 120 198 C140 186 150 164 148 140 Z" fill="#5e3416" opacity="0.4"/>
+  <!-- fierce eye under the brim -->
+  <path d="M76 106 L100 110 C100 120 94 125 87 124 C80 122 76 116 76 106 Z" fill="#fff" stroke="#2b2433" stroke-width="3.5" stroke-linejoin="round"/>
+  <ellipse cx="86" cy="115" rx="4.5" ry="5" fill="#2b2433"/>
+  <circle cx="85" cy="113" r="1.6" fill="#fff"/>
 </svg>

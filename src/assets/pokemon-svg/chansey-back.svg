@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="skin" cx="38%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#fde0ea"/>
+      <stop offset="1" stop-color="#f8c0d4"/>
+    </radialGradient>
+  </defs>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="90" cy="238" rx="26" ry="11" fill="#e898b4"/>
+    <ellipse cx="166" cy="238" rx="26" ry="11" fill="#e898b4"/>
+    <!-- arms peeking out at the sides -->
+    <path d="M44 150 C30 148 22 158 28 166 C34 172 44 168 50 162 Z" fill="#fbd0dc"/>
+    <path d="M212 150 C226 148 234 158 228 166 C222 172 212 168 206 162 Z" fill="#f2b4c8"/>
+    <path d="M128 26 C186 26 222 92 220 156 C218 212 182 238 128 238 C74 238 38 212 36 156 C34 92 70 26 128 26 Z" fill="url(#skin)"/>
+    <path d="M62 66 C40 54 16 54 4 66 C16 70 18 74 8 80 C20 84 22 88 12 94 C30 100 50 96 66 90 Z" fill="#f08c8c"/>
+    <path d="M194 66 C216 54 240 54 252 66 C240 70 238 74 248 80 C236 84 234 88 244 94 C226 100 206 96 190 90 Z" fill="#f08c8c"/>
+    <!-- little pointed tail -->
+    <path d="M110 206 C116 224 128 236 150 240 C146 226 140 214 142 204 Z" fill="#f2b4c8"/>
+  </g>
+  <path d="M188 92 C214 132 214 196 168 230 C200 220 220 180 214 140 C210 120 202 104 188 92 Z" fill="#e898b4" opacity="0.5"/>
+  <ellipse cx="96" cy="66" rx="22" ry="12" fill="#fff" opacity="0.6" transform="rotate(-35 96 66)"/>
+  <path d="M30 72 C40 74 52 76 60 80" fill="none" stroke="#c86a6e" stroke-width="3" stroke-linecap="round"/>
+  <path d="M226 72 C216 74 204 76 196 80" fill="none" stroke="#c86a6e" stroke-width="3" stroke-linecap="round"/>
+</svg>

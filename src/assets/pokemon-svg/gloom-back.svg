@@ -1,27 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 256">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <radialGradient id="body" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#7a94e0"/><stop offset="0.6" stop-color="#4b68b8"/><stop offset="1" stop-color="#344c90"/></radialGradient>
-    <radialGradient id="petal" cx="50%" cy="30%" r="80%"><stop offset="0" stop-color="#f69060"/><stop offset="1" stop-color="#dc5e38"/></radialGradient>
-    <g id="pet">
-      <path d="M0 -6 C-50 -14 -58 -70 0 -86 C58 -70 50 -14 0 -6 Z" fill="url(#petal)" stroke="#2b2433" stroke-width="5" stroke-linejoin="round"/>
-      <ellipse cx="0" cy="-52" rx="18" ry="16" fill="#f8c890"/>
-    </g>
+    <radialGradient id="body" cx="38%" cy="32%" r="75%">
+      <stop offset="0" stop-color="#7a8ad8"/>
+      <stop offset="0.6" stop-color="#4b5cb0"/>
+      <stop offset="1" stop-color="#34408a"/>
+    </radialGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f68848"/>
+      <stop offset="1" stop-color="#d0482c"/>
+    </linearGradient>
+    <radialGradient id="bud" cx="40%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#a84a48"/>
+      <stop offset="1" stop-color="#6e2a2c"/>
+    </radialGradient>
   </defs>
-  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round">
-    <ellipse cx="96" cy="238" rx="26" ry="13" fill="#344c90"/>
-    <ellipse cx="160" cy="238" rx="26" ry="13" fill="#344c90"/>
-    <ellipse cx="62" cy="186" rx="18" ry="14" fill="#4b68b8" transform="rotate(-30 62 186)"/>
-    <ellipse cx="194" cy="186" rx="18" ry="14" fill="#344c90" transform="rotate(30 194 186)"/>
-    <ellipse cx="128" cy="180" rx="66" ry="60" fill="url(#body)"/>
+  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="98" cy="238" rx="24" ry="12" fill="#34408a"/>
+    <ellipse cx="158" cy="238" rx="24" ry="12" fill="#34408a"/>
+    <ellipse cx="64" cy="188" rx="16" ry="12" fill="#4b5cb0" transform="rotate(-30 64 188)"/>
+    <ellipse cx="192" cy="188" rx="16" ry="12" fill="#34408a" transform="rotate(30 192 188)"/>
+    <ellipse cx="128" cy="176" rx="66" ry="58" fill="url(#body)"/>
+    <!-- lá cam đỏ cong xuống hai bên (nhìn từ sau) -->
+    <path d="M100 96 C70 82 36 86 18 112 C10 126 14 146 28 150 C24 136 30 122 42 116 C58 110 80 112 104 118 Z" fill="url(#leaf)"/>
+    <path d="M156 96 C186 82 220 86 238 112 C246 126 242 146 228 150 C232 136 226 122 214 116 C198 110 176 112 152 118 Z" fill="#d85a34"/>
+    <path d="M100 112 C78 116 58 130 50 152 C46 166 52 180 62 182 C60 168 64 154 74 146 C84 138 96 134 112 132 Z" fill="#e06a3a"/>
+    <path d="M156 112 C178 116 198 130 206 152 C210 166 204 180 194 182 C196 168 192 154 182 146 C172 138 160 134 144 132 Z" fill="#c84a2c"/>
+    <!-- nụ hoa -->
+    <circle cx="88" cy="70" r="30" fill="url(#bud)"/>
+    <circle cx="168" cy="70" r="30" fill="url(#bud)"/>
+    <circle cx="128" cy="92" r="32" fill="url(#bud)"/>
+    <circle cx="128" cy="54" r="32" fill="url(#bud)"/>
   </g>
-  <ellipse cx="96" cy="176" rx="20" ry="9" fill="#fff" opacity="0.25" transform="rotate(-25 96 176)"/>
-  <g transform="translate(128 98) scale(1.38 0.78)">
-    <use xlink:href="#pet" href="#pet" transform="rotate(-36)"/>
-    <use xlink:href="#pet" href="#pet" transform="rotate(36)"/>
-    <use xlink:href="#pet" href="#pet" transform="rotate(-104)"/>
-    <use xlink:href="#pet" href="#pet" transform="rotate(104)"/>
-    <use xlink:href="#pet" href="#pet" transform="rotate(180)"/>
+  <g fill="#f4c4a8">
+    <circle cx="118" cy="42" r="5"/>
+    <circle cx="142" cy="60" r="3.5"/>
+    <circle cx="78" cy="62" r="4.5"/>
+    <circle cx="160" cy="60" r="4"/>
+    <circle cx="116" cy="88" r="5"/>
+    <circle cx="140" cy="104" r="3.5"/>
   </g>
-  <ellipse cx="128" cy="96" rx="28" ry="15" fill="#6a2a30" stroke="#2b2433" stroke-width="4"/>
-  <ellipse cx="122" cy="92" rx="10" ry="4" fill="#9a4a48"/>
+  <ellipse cx="96" cy="160" rx="18" ry="8" fill="#fff" opacity="0.3" transform="rotate(-25 96 160)"/>
+  <path d="M168 150 C188 182 178 214 146 230 C170 206 176 180 168 150 Z" fill="#283070" opacity="0.5"/>
 </svg>

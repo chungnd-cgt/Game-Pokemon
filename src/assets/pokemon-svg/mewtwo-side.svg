@@ -1,51 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
     <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#faf4fc"/><stop offset="1" stop-color="#c2aed0"/></linearGradient>
-    <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c088e0"/><stop offset="1" stop-color="#7c40a6"/></linearGradient>
+    <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b678dc"/><stop offset="1" stop-color="#7c40a6"/></linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- tail -->
-    <path d="M144 200 C188 222 226 208 232 170 C236 148 224 130 208 128" fill="none" stroke-width="30"/>
-    <path d="M144 200 C188 222 226 208 232 170 C236 148 224 130 208 128" fill="none" stroke="#9a5cc4" stroke-width="20"/>
-    <!-- back arm -->
-    <path d="M140 136 C152 152 156 168 154 186" fill="none" stroke-width="20"/>
-    <path d="M140 136 C152 152 156 168 154 186" fill="none" stroke="#c0aecc" stroke-width="10"/>
-    <circle cx="150" cy="196" r="8" fill="#c0aecc" stroke-width="4"/>
-    <!-- back leg -->
-    <path d="M144 204 C156 216 160 230 156 242 L166 250 L132 250 L132 238 C128 228 126 216 128 206 Z" fill="#c0aecc"/>
-    <ellipse cx="140" cy="206" rx="20" ry="18" fill="#c8b6d4"/>
-    <!-- abdomen -->
-    <path d="M100 160 C96 180 100 196 110 208 L142 208 C150 196 152 178 148 160 Z" fill="url(#purple)"/>
-    <!-- front leg -->
-    <path d="M100 206 C88 218 86 234 92 246 L80 251 L120 251 L118 238 C122 226 124 214 120 204 Z" fill="url(#skin)"/>
-    <ellipse cx="110" cy="210" rx="22" ry="18" fill="url(#skin)"/>
+    <!-- thick tail behind, curling up -->
+    <path d="M138 180 C190 204 232 190 238 152 C242 124 228 106 208 108" fill="none" stroke-width="28"/>
+    <path d="M138 180 C190 204 232 190 238 152 C242 124 228 106 208 108" fill="none" stroke="#9a5cc4" stroke-width="18"/>
+    <!-- far arm hanging -->
+    <path d="M140 106 C150 120 154 134 154 150" fill="none" stroke-width="18"/>
+    <path d="M140 106 C150 120 154 134 154 150" fill="none" stroke="#c8b6d4" stroke-width="9"/>
+    <circle cx="150" cy="160" r="7" fill="#c8b6d4" stroke-width="4"/>
+    <circle cx="160" cy="158" r="7" fill="#c8b6d4" stroke-width="4"/>
+    <!-- far leg -->
+    <path d="M132 196 C138 214 140 226 138 236" fill="none" stroke-width="20"/>
+    <path d="M132 196 C138 214 140 226 138 236" fill="none" stroke="#c8b6d4" stroke-width="10"/>
+    <path d="M140 232 C126 230 112 236 112 246 L148 246 C150 238 148 234 140 232 Z" fill="#c8b6d4"/>
+    <!-- tube from the back of the head -->
+    <path d="M132 54 C156 60 160 82 146 102" fill="none" stroke-width="14"/>
+    <path d="M132 54 C156 60 160 82 146 102" fill="none" stroke="#d8cade" stroke-width="6"/>
     <!-- chest -->
-    <path d="M80 132 C84 112 142 108 156 124 C166 138 160 156 146 164 L104 168 C88 162 78 148 80 132 Z" fill="url(#skin)"/>
-    <!-- tube from head to spine -->
-    <path d="M110 74 C134 80 146 100 142 126" fill="none" stroke-width="16"/>
-    <path d="M110 74 C134 80 146 100 142 126" fill="none" stroke="#e0d2e8" stroke-width="7"/>
+    <path d="M98 102 C104 92 146 92 150 104 C154 124 148 142 140 152 L112 152 C104 140 96 122 98 102 Z" fill="url(#skin)"/>
+    <!-- purple belly and thigh -->
+    <path d="M120 160 C100 168 98 194 108 206 C116 214 130 208 134 196 C138 182 136 168 128 160 Z" fill="url(#skin)"/>
+    <path d="M110 144 C100 158 100 178 112 188 C120 192 128 190 132 184 L140 146 Z" fill="url(#purple)"/>
+    <!-- near leg -->
+    <path d="M114 198 C110 214 108 226 110 236" fill="none" stroke-width="20"/>
+    <path d="M114 198 C110 214 108 226 110 236" fill="none" stroke="#e4d8ea" stroke-width="10"/>
+    <path d="M112 232 C98 230 84 236 84 246 L120 246 C122 238 120 234 112 232 Z" fill="#eee4f2"/>
     <!-- neck -->
-    <path d="M86 96 L96 126 L114 120 L106 94 Z" fill="#e4d8ea"/>
-    <!-- horns -->
-    <path d="M96 50 C102 34 110 20 122 12 C124 28 120 42 112 54 Z" fill="#cdbcd8"/>
-    <path d="M78 46 C80 30 86 16 96 6 C100 22 98 36 92 48 Z" fill="url(#skin)"/>
-    <!-- head -->
-    <path d="M40 74 C40 52 58 40 80 40 C100 40 116 52 116 72 C116 90 102 102 84 104 C68 106 54 100 46 92 C40 86 38 80 40 74 Z" fill="url(#skin)"/>
-    <!-- front arm -->
-    <path d="M98 134 C84 146 72 158 62 172" fill="none" stroke-width="20"/>
-    <path d="M98 134 C84 146 72 158 62 172" fill="none" stroke="#e4d8ea" stroke-width="10"/>
-    <circle cx="50" cy="178" r="7" fill="#eee4f2" stroke-width="4"/>
-    <circle cx="58" cy="186" r="7" fill="#eee4f2" stroke-width="4"/>
-    <circle cx="56" cy="172" r="8" fill="#eee4f2" stroke-width="4"/>
+    <path d="M108 72 L110 98 L128 98 L126 72 Z" fill="#e4d8ea"/>
+    <!-- blunt horn swept back -->
+    <path d="M114 34 C116 22 124 10 136 6 C140 16 138 30 130 40 Z" fill="url(#skin)"/>
+    <!-- small head, short muzzle -->
+    <path d="M86 54 C88 38 100 28 116 28 C132 28 142 40 140 56 C138 70 128 80 112 82 C100 80 92 72 90 64 C86 62 84 58 86 54 Z" fill="url(#skin)"/>
+    <!-- near arm reaching forward -->
+    <path d="M114 106 C100 120 86 124 64 120" fill="none" stroke-width="18"/>
+    <path d="M114 106 C100 120 86 124 64 120" fill="none" stroke="#e4d8ea" stroke-width="9"/>
+    <circle cx="50" cy="112" r="7" fill="#eee4f2" stroke-width="4"/>
+    <circle cx="48" cy="126" r="7" fill="#eee4f2" stroke-width="4"/>
+    <circle cx="58" cy="120" r="9" fill="#eee4f2" stroke-width="4"/>
   </g>
-  <!-- shading -->
-  <path d="M146 122 C160 136 156 156 140 164 C130 166 120 168 110 168 C136 156 148 142 146 122 Z" fill="#8a74a0" opacity="0.4"/>
-  <path d="M104 52 C116 66 114 86 100 98 C94 102 88 104 82 104 C102 88 108 70 104 52 Z" fill="#8a74a0" opacity="0.4"/>
-  <ellipse cx="66" cy="52" rx="12" ry="5" fill="#fff" opacity="0.7" transform="rotate(-15 66 52)"/>
-  <path d="M96 128 C110 122 124 124 132 132" fill="none" stroke="#a894b8" stroke-width="4" stroke-linecap="round"/>
-  <!-- eye -->
-  <path d="M48 64 L70 72 C70 80 64 84 58 84 C52 84 48 78 48 64 Z" fill="#fff" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
-  <ellipse cx="57" cy="76" rx="4.5" ry="5" fill="#8a3ab8"/>
-  <circle cx="55" cy="74" r="1.8" fill="#fff"/>
-  <path d="M42 92 Q50 96 60 94" fill="none" stroke="#2b2433" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M134 40 C142 56 136 72 122 80 C118 82 114 82 112 82 C128 70 136 58 134 40 Z" fill="#8a74a0" opacity="0.4"/>
+  <path d="M146 110 C150 128 146 142 138 150 C134 152 128 152 124 152 C140 140 146 126 146 110 Z" fill="#8a74a0" opacity="0.4"/>
+  <ellipse cx="104" cy="36" rx="9" ry="4" fill="#fff" opacity="0.7" transform="rotate(-20 104 36)"/>
+  <ellipse cx="112" cy="162" rx="4" ry="8" fill="#fff" opacity="0.3"/>
+  <!-- narrow eye, purple iris -->
+  <path d="M94 48 L112 54 C111 61 106 64 101 63 C96 62 94 56 94 48 Z" fill="#fff" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <ellipse cx="102" cy="57" rx="3.5" ry="4.5" fill="#8a3ab8"/>
+  <circle cx="101" cy="55.5" r="1.5" fill="#fff"/>
+  <path d="M92 70 Q98 72 104 70" fill="none" stroke="#2b2433" stroke-width="3" stroke-linecap="round"/>
 </svg>

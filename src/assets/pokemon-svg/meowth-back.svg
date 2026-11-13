@@ -1,28 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
     <linearGradient id="fur" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#fbf0cc"/>
-      <stop offset="1" stop-color="#f6e6b8"/>
+      <stop offset="0" stop-color="#fbeec6"/>
+      <stop offset="1" stop-color="#f2dca0"/>
     </linearGradient>
   </defs>
   <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
     <!-- chân -->
-    <ellipse cx="104" cy="242" rx="20" ry="10" fill="#f6e6b8"/>
-    <ellipse cx="152" cy="242" rx="20" ry="10" fill="#f6e6b8"/>
+    <ellipse cx="104" cy="242" rx="20" ry="10" fill="#9a6a3a"/>
+    <ellipse cx="152" cy="242" rx="20" ry="10" fill="#9a6a3a"/>
     <!-- thân -->
     <path d="M96 168 C84 200 90 240 128 242 C166 240 172 200 160 168 C150 154 106 154 96 168 Z" fill="url(#fur)"/>
     <!-- tai nhìn từ sau: mặt lưng tai màu kem -->
     <path d="M70 84 C56 58 46 30 42 6 C70 18 98 38 112 60 Z" fill="url(#fur)"/>
-    <path d="M186 84 C200 58 210 30 214 6 C186 18 158 38 144 60 Z" fill="#f6e6b8"/>
+    <path d="M186 84 C200 58 210 30 214 6 C186 18 158 38 144 60 Z" fill="#f2dca0"/>
     <!-- đầu -->
     <ellipse cx="128" cy="110" rx="72" ry="58" fill="url(#fur)"/>
   </g>
   <!-- đuôi cong chữ S vắt lên trước lưng, chóp nâu -->
   <path d="M128 226 C150 236 196 226 206 196 C214 172 196 160 184 172 C176 180 184 192 194 186" fill="none" stroke="#2b2433" stroke-width="17" stroke-linecap="round"/>
-  <path d="M128 226 C150 236 196 226 206 196 C214 172 196 160 184 172 C176 180 184 192 194 186" fill="none" stroke="#f6e6b8" stroke-width="9" stroke-linecap="round"/>
+  <path d="M128 226 C150 236 196 226 206 196 C214 172 196 160 184 172 C176 180 184 192 194 186" fill="none" stroke="#f2dca0" stroke-width="9" stroke-linecap="round"/>
   <circle cx="194" cy="184" r="9" fill="#8a5a32" stroke="#2b2433" stroke-width="4"/>
   <!-- bóng lưng phải và gáy -->
-  <path d="M184 82 C202 104 200 140 176 156 C160 166 140 168 124 166 C160 152 186 124 184 82 Z" fill="#e8d098" opacity="0.6"/>
+  <path d="M184 82 C202 104 200 140 176 156 C160 166 140 168 124 166 C160 152 186 124 184 82 Z" fill="#d8bc7c" opacity="0.6"/>
   <ellipse cx="96" cy="80" rx="24" ry="10" fill="#fff" opacity="0.5" transform="rotate(-18 96 80)"/>
   <path d="M112 160 C120 166 136 166 144 160" fill="none" stroke="#d8c088" stroke-width="4" stroke-linecap="round"/>
   <!-- ria thò ra hai bên đầu -->

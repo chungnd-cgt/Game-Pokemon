@@ -29,8 +29,10 @@
   <path d="M150 150 C170 170 172 204 160 222 C154 230 146 234 134 236 C156 212 162 180 150 150 Z" fill="#c8601e" opacity="0.45"/>
   <path d="M122 30 C134 46 132 70 118 82 C110 90 100 94 88 94 C112 78 124 58 122 30 Z" fill="#c8601e" opacity="0.45"/>
   <ellipse cx="78" cy="30" rx="16" ry="6" fill="#fff" opacity="0.4" transform="rotate(-20 78 30)"/>
-  <path d="M62 44 L88 54 C88 64 82 70 76 70 C68 70 62 64 62 56 Z" fill="#22304e" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
-  <ellipse cx="78" cy="62" rx="4" ry="5" fill="#4f86d6"/>
+  <path d="M60 46 L90 54 C90 64 84 70 76 70 C66 70 60 62 60 46 Z" fill="#fff" stroke="#2b2433" stroke-width="4" stroke-linejoin="round"/>
+  <ellipse cx="74" cy="61" rx="6" ry="7" fill="#2e7ad0"/>
+  <ellipse cx="73" cy="62" rx="3" ry="4.5" fill="#14203a"/>
+  <path d="M56 42 L94 54" fill="none" stroke="#2b2433" stroke-width="5" stroke-linecap="round"/>
   <ellipse cx="70" cy="53" rx="3" ry="3.5" fill="#fff"/>
   <path d="M30 56 l0 4" stroke="#2b2433" stroke-width="3" stroke-linecap="round"/>
   <path d="M26 76 Q54 88 84 80" fill="none" stroke="#2b2433" stroke-width="4" stroke-linecap="round"/>
