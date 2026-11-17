@@ -93,7 +93,7 @@ export const SHINY = {
   vaporeon: { rules: [['#58b0e0', '#a888d0', { hue: 12, light: 0.2 }], ['#2c5c9c', '#6a3c9c', { hue: 10, light: 0.2 }]] },
   jolteon: { rules: [['#ecbc30', '#c4dc4c', { hue: 14, light: 0.25 }]] },
   flareon: { rules: [['#ea6c30', '#f0b848', { hue: 12, light: 0.2 }]] },
-  aerodactyl: { rules: [['#b4a6c6', '#d8a8d8', { hue: 25, light: 0.2 }], ['#7656b0', '#3a50d8', { hue: 14, light: 0.12 }]] },
+  aerodactyl: { rules: [['#9888ac', '#b473b4', { light: 0.2 }], ['#b0acd4', '#dea4d5', { hue: 12, light: 0.2 }], ['#765498', '#1c30c8', { hue: 14, light: 0.3 }]] },
 
   abra: { rules: [['#f6d03c', '#f6dc7c', { hue: 12, light: 0.24 }], ['#5a4236', '#8a3a5a', { hue: 12, light: 0.2 }]] },
   kadabra: { rules: [['#f6d03c', '#f6dc7c', { hue: 12, light: 0.24 }], ['#5a4236', '#8a3a5a', { hue: 12, light: 0.2 }]] },

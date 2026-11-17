@@ -1,53 +1,77 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d6cce2"/><stop offset="0.5" stop-color="#b4a6c6"/><stop offset="1" stop-color="#8c7ca4"/></linearGradient>
-    <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9474cc"/><stop offset="1" stop-color="#7656b0"/></linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b0acd4"/><stop offset="0.5" stop-color="#9888ac"/><stop offset="1" stop-color="#7a6a98"/></linearGradient>
+    <linearGradient id="belly" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8e6f0"/><stop offset="1" stop-color="#c8c4d6"/></linearGradient>
+    <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a3a8a"/><stop offset="0.75" stop-color="#765498"/><stop offset="1" stop-color="#9464cc"/></linearGradient>
   </defs>
-  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- wing membranes, spread up and out -->
-    <path d="M108 118 L62 40 L4 70 C20 82 22 96 18 108 C36 108 44 118 46 132 C64 128 76 136 80 150 C92 146 100 150 106 160 Z" fill="url(#wing)"/>
-    <path d="M148 118 L194 40 L252 70 C236 82 234 96 238 108 C220 108 212 118 210 132 C192 128 180 136 176 150 C164 146 156 150 150 160 Z" fill="#7656b0"/>
-    <!-- wing arms: grey bone along the leading edge, finger claws -->
-    <path d="M108 118 L62 40 L4 70" fill="none" stroke-width="16"/>
-    <path d="M108 118 L62 40 L4 70" fill="none" stroke="#a898b8" stroke-width="7"/>
-    <path d="M148 118 L194 40 L252 70" fill="none" stroke-width="16"/>
-    <path d="M148 118 L194 40 L252 70" fill="none" stroke="#a898b8" stroke-width="7"/>
-    <path d="M62 40 L50 22 L60 28 L62 14 L68 28 L76 22 Z" fill="#fff" stroke-width="3.5"/>
-    <path d="M194 40 L206 22 L196 28 L194 14 L188 28 L180 22 Z" fill="#fff" stroke-width="3.5"/>
-    <!-- tail with arrowhead tip -->
-    <path d="M140 186 C170 206 196 214 222 210" fill="none" stroke-width="16"/>
-    <path d="M140 186 C170 206 196 214 222 210" fill="none" stroke="#9a8ab0" stroke-width="7"/>
-    <path d="M214 196 L250 206 L216 226 L222 210 Z" fill="#9a8ab0"/>
-    <!-- legs with white claws -->
-    <path d="M114 182 L106 214 L110 234" fill="none" stroke-width="20"/>
-    <path d="M114 182 L106 214 L110 234" fill="none" stroke="#b4a6c6" stroke-width="10"/>
-    <path d="M144 182 L152 214 L148 234" fill="none" stroke-width="20"/>
-    <path d="M144 182 L152 214 L148 234" fill="none" stroke="#9a8ab0" stroke-width="10"/>
-    <path d="M110 232 L94 246 L104 244 L106 252 L114 242 L122 248 Z" fill="#fff" stroke-width="3.5"/>
-    <path d="M148 232 L164 246 L154 244 L152 252 L144 242 L136 248 Z" fill="#fff" stroke-width="3.5"/>
-    <!-- body -->
-    <path d="M104 120 C94 142 98 174 112 188 C122 196 136 196 146 188 C160 174 162 142 152 120 C142 108 114 108 104 120 Z" fill="url(#skin)"/>
-    <!-- crest swept back -->
-    <path d="M132 74 C150 62 168 56 186 56 C176 66 164 78 146 90 Z" fill="#a898b8"/>
-    <!-- long head, turned three-quarters to the left -->
-    <path d="M150 84 C150 66 136 56 118 58 C104 60 92 66 80 70 C66 74 54 76 44 80 C46 88 54 92 66 92 L92 96 C88 104 82 110 70 112 C60 114 52 116 50 122 C66 128 92 126 112 118 C132 112 150 104 150 84 Z" fill="url(#skin)"/>
-    <!-- open mouth: red inside -->
-    <path d="M52 86 C64 92 80 94 96 94 C92 104 84 110 70 112 C60 112 54 108 52 100 Z" fill="#c83040" stroke-width="4"/>
+  <g transform="translate(1.5 54) scale(0.4)">
+  <g stroke="#2b2433" stroke-width="12.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- đuôi cong vòng qua lưng, mũi tên chĩa trái trên đỉnh -->
+    <path d="M396 304 C458 250 464 156 420 94 C386 46 322 16 236 14 L236 52 C306 56 350 82 376 118 C404 162 400 226 356 280 Z" fill="url(#skin)"/>
+    <path d="M152 34 L238 -6 L222 34 L238 74 Z" fill="#9888ac"/>
+    <!-- cánh phải: màng tím, mép ngoài gần thẳng đứng -->
+    <path d="M462 42 L574 22 C584 90 586 160 584 232 C530 238 470 246 420 264 L438 150 Z" fill="url(#wing)"/>
+    <path d="M410 286 L438 160 L462 42" fill="none" stroke-width="28"/>
+    <path d="M410 286 L438 160 L462 42" fill="none" stroke="#a8a3bb" stroke-width="13"/>
+    <path d="M462 42 L574 22" fill="none" stroke-width="22"/>
+    <path d="M462 42 L574 22" fill="none" stroke="#a8a3bb" stroke-width="9"/>
+    <path d="M462 42 L436 12 M462 42 L458 2 M462 42 L484 10" fill="none" stroke-width="26"/>
+    <path d="M462 42 L436 12 M462 42 L458 2 M462 42 L484 10" fill="none" stroke="#e6e3ee" stroke-width="11"/>
+
+    <!-- cánh trái -->
+    <path d="M112 32 L6 46 C24 100 40 160 56 218 C100 224 150 232 206 240 Z" fill="url(#wing)"/>
+    <path d="M262 270 L206 240 L112 32" fill="none" stroke-width="28"/>
+    <path d="M262 270 L206 240 L112 32" fill="none" stroke="#9888ac" stroke-width="13"/>
+    <path d="M112 32 L6 46" fill="none" stroke-width="22"/>
+    <path d="M112 32 L6 46" fill="none" stroke="#9888ac" stroke-width="9"/>
+    <path d="M112 32 L88 10 M112 32 L108 0 M112 32 L132 6" fill="none" stroke-width="26"/>
+    <path d="M112 32 L88 10 M112 32 L108 0 M112 32 L132 6" fill="none" stroke="#e6e3ee" stroke-width="11"/>
+
+    <!-- chân: đùi to, cẳng thon, 3 vuốt -->
+    <path d="M346 404 L352 446" fill="none" stroke-width="34"/>
+    <path d="M346 404 L352 446" fill="none" stroke="#a8a3bb" stroke-width="18"/>
+    <path d="M352 440 L330 470 L346 466 L348 480 L358 464 L374 470 Z" fill="#eeecf4" stroke-width="9"/>
+    <ellipse cx="346" cy="392" rx="26" ry="28" fill="#a8a3bb"/>
+    <!-- thân + gai lưng -->
+    <path d="M318 236 L334 182 L356 232 Z" fill="url(#skin)"/>
+    <path d="M282 240 C320 220 384 222 422 248 C448 268 448 332 422 370 C400 400 344 410 312 394 C280 378 266 302 282 240 Z" fill="url(#skin)"/>
+    <path d="M432 384 L476 448" fill="none" stroke-width="36"/>
+    <path d="M432 384 L476 448" fill="none" stroke="#a8a3bb" stroke-width="20"/>
+    <path d="M476 440 L452 468 L470 464 L472 480 L482 462 L500 470 Z" fill="#eeecf4" stroke-width="9"/>
+    <ellipse cx="428" cy="370" rx="32" ry="34" fill="url(#skin)"/>
   </g>
-  <!-- teeth -->
-  <path d="M58 88 L61 96 L64 89 Z M68 90 L71 98 L74 91 Z M78 92 L81 99 L84 92 Z M60 110 L63 102 L66 110 Z M72 110 L75 102 L78 109 Z" fill="#fff" stroke="#2b2433" stroke-width="1.5" stroke-linejoin="round"/>
-  <!-- wing membrane folds -->
-  <path d="M62 40 L46 132 M62 40 L18 108 M194 40 L210 132 M194 40 L238 108" fill="none" stroke="#5a3e8c" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
-  <!-- belly plate and shading -->
-  <path d="M116 124 C110 146 114 172 124 184 C128 186 132 184 134 182 C130 160 130 140 134 122 Z" fill="#fff" opacity="0.25"/>
-  <path d="M148 122 C156 144 154 172 140 188 C134 192 128 194 122 194 C142 176 150 150 148 122 Z" fill="#5e4e78" opacity="0.4"/>
-  <path d="M146 72 C152 92 140 106 118 114 C134 102 144 90 146 72 Z" fill="#5e4e78" opacity="0.4"/>
-  <ellipse cx="104" cy="66" rx="12" ry="4" fill="#fff" opacity="0.6" transform="rotate(-10 104 66)"/>
-  <!-- fierce eye -->
-  <path d="M104 72 L124 70 C124 80 118 84 112 83 C106 82 104 78 104 72 Z" fill="#fff" stroke="#2b2433" stroke-width="3.5" stroke-linejoin="round"/>
-  <ellipse cx="114" cy="76" rx="3.5" ry="4" fill="#5a2a3a"/>
-  <circle cx="113" cy="74.5" r="1.4" fill="#fff"/>
-  <path d="M100 70 L126 66" stroke="#2b2433" stroke-width="4.5" stroke-linecap="round"/>
-  <!-- nostril -->
-  <circle cx="54" cy="80" r="1.8" fill="#2b2433"/>
+  <!-- bụng sáng, bóng -->
+  <path d="M300 300 C300 340 318 380 350 392 C380 398 404 384 412 360 C380 366 330 340 300 300 Z" fill="url(#belly)"/>
+  <path d="M430 262 C446 290 444 340 420 372 C410 384 396 392 380 398 C414 368 432 318 430 262 Z" fill="#5e5874" opacity="0.4"/>
+  <path d="M398 116 C420 160 420 220 386 270 C402 220 404 162 384 120 Z" fill="#5e5874" opacity="0.35"/>
+  <!-- điểm sáng -->
+  <path d="M300 250 C330 238 370 238 400 252" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" opacity="0.45"/>
+  <path d="M400 70 C380 52 340 40 290 34" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" opacity="0.45"/>
+  <!-- gân màng cánh -->
+  <path d="M112 32 L40 180 M112 32 L120 226 M462 42 L540 236 M462 42 L582 150" fill="none" stroke="#5e3e98" stroke-width="7" stroke-linecap="round" opacity="0.55"/>
+  <g transform="translate(266 300) scale(0.9) translate(-266 -300)">
+  <g stroke="#2b2433" stroke-width="15" stroke-linejoin="round" stroke-linecap="round">
+    <!-- hàm dưới: chĩa xuống trái -->
+    <path d="M300 316 C302 360 282 412 252 448 C238 464 214 474 196 468 C184 462 184 448 194 438 C214 414 230 382 236 344 Z" fill="url(#skin)"/>
+    <!-- trong miệng -->
+    <path d="M132 342 C170 342 210 336 244 330 L240 346 C232 382 216 414 198 438 C168 420 144 386 132 342 Z" fill="#e0485e"/>
+    <!-- sọ + hàm trên: mõm chĩa trái -->
+    <path d="M226 232 L246 174 L274 230 Z" fill="url(#skin)"/>
+    <path d="M304 300 C310 268 292 234 258 224 C232 216 204 224 184 238 C158 256 130 280 114 300 C102 314 106 336 124 342 C150 348 200 336 242 330 C266 326 292 318 304 300 Z" fill="url(#skin)"/>
+  </g>
+  <!-- lưỡi, họng, răng -->
+  <path d="M160 404 C176 380 200 364 226 360 C218 392 206 418 196 432 C182 424 168 414 160 404 Z" fill="#f78a9c"/>
+  <path d="M214 336 C228 334 238 334 242 334 C238 352 234 366 228 376 C220 362 216 350 214 336 Z" fill="#9a2038"/>
+  <path d="M142 340 L155 365 L161 338 Z M165 338 L178 363 L184 336 Z M188 336 L201 361 L207 334 Z M211 334 L224 359 L230 332 Z M207 426 L186 410 L215 405 Z M217 400 L196 385 L225 380 Z M227 375 L206 360 L235 354 Z" fill="#fbfaff"/>
+  <path d="M296 320 C292 370 274 414 246 448 C270 412 284 370 286 326 Z" fill="#5e5874" opacity="0.45"/>
+  <path d="M302 296 C296 316 276 326 250 330 C276 318 292 302 296 284 Z" fill="#5e5874" opacity="0.4"/>
+  <path d="M250 236 C228 232 206 238 186 250" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" opacity="0.6"/>
+  <!-- mắt, chân mày, lỗ mũi -->
+  <path d="M200 276 L236 268 C240 284 232 298 220 300 C208 302 200 292 200 276 Z" fill="#fff" stroke="#2b2433" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="220" cy="285" r="8.5" fill="#2e7a3e"/>
+  <circle cx="218" cy="281" r="3.2" fill="#fff"/>
+  <path d="M190 268 L244 254" stroke="#2b2433" stroke-width="12" stroke-linecap="round"/>
+  <ellipse cx="130" cy="304" rx="6" ry="4" fill="#2b2433"/>
+  </g>
+  </g>
 </svg>

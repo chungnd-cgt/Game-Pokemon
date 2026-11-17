@@ -1,5 +1,6 @@
 import { startGame } from '../startGame.js';
 import { View3D } from './view3d.js';
+import { monImagesReady } from '../gfx/monImages.js';
 
 // Bản 3D: chạy nguyên game 2D (cốt truyện, trận đấu, menu, lưu game) với nền trong suốt,
 // còn thế giới (bản đồ, nhân vật, vật phẩm) được View3D dựng lại bằng 3D phía sau.
@@ -30,9 +31,10 @@ if (import.meta.env.DEV && params.get('map')) {
     game.events.off('poststep', jump);
     const map = params.get('map');
     game.scene.stop('Title');
-    game.scene.start('World', {
+    // Hình Pokémon nạp ngầm (gfx/monImages.js): chờ xong mới vào bản đồ
+    monImagesReady().then(() => game.scene.start('World', {
       position: { map, x: Number(params.get('x') ?? 5), y: Number(params.get('y') ?? 5), facing: params.get('facing') ?? 'down' },
-    });
+    }));
   };
   game.events.on('poststep', jump);
 }

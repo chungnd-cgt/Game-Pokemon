@@ -1349,35 +1349,57 @@ function clearedTile(map, ch) {
   return ch;
 }
 
-export function buildWorldTextures(scene) {
-  for (const map of Object.values(MAPS)) {
-    const W = map.width * TILE;
-    const H = map.height * TILE;
-    const ground = makeCanvas(W, H);
-    const objects = makeCanvas(W, H);
-    const over = makeCanvas(W, H);
-    const anim = Array.from({ length: ANIM_FRAMES }, () => makeCanvas(W, H));
-    if (map.indoor) drawInterior(map, ground.ctx, objects.ctx);
-    else if (map.cave) drawCave(map, ground.ctx, objects.ctx, anim.map((a) => a.ctx));
-    else drawOutdoor(map, ground.ctx, objects.ctx, over.ctx, anim.map((a) => a.ctx));
+// Texture của một bản đồ: nền, vật thể, lớp trên (ngọn cây), 3 khung động (nước, hoa) và bản "đã thắng" của gym.
+// Vẽ khi người chơi bước vào bản đồ (ensureMapTextures), không vẽ sẵn cả trăm bản đồ lúc khởi động (trước kia mất
+// hàng chục giây và ~300MB bộ nhớ trên điện thoại)
+const MAP_LAYERS = ['ground', 'objects', 'over', 'anim', 'ground-cleared', 'objects-cleared'];
+const KEEP_MAPS = 6; // giữ texture của chừng này bản đồ đi qua gần nhất (đi ra vào nhà / tuyến đường không phải vẽ lại)
+const recentMaps = [];
 
-    addCanvasTexture(scene, `${map.id}-ground`, ground.canvas);
-    addCanvasTexture(scene, `${map.id}-objects`, objects.canvas);
-    addCanvasTexture(scene, `${map.id}-over`, over.canvas);
-    addSheetTexture(scene, `${map.id}-anim`, anim.map((a) => a.canvas), anim.map((_, i) => String(i)));
+function buildMapTextures(scene, map) {
+  const W = map.width * TILE;
+  const H = map.height * TILE;
+  const ground = makeCanvas(W, H);
+  const objects = makeCanvas(W, H);
+  const over = makeCanvas(W, H);
+  const anim = Array.from({ length: ANIM_FRAMES }, () => makeCanvas(W, H));
+  if (map.indoor) drawInterior(map, ground.ctx, objects.ctx);
+  else if (map.cave) drawCave(map, ground.ctx, objects.ctx, anim.map((a) => a.ctx));
+  else drawOutdoor(map, ground.ctx, objects.ctx, over.ctx, anim.map((a) => a.ctx));
 
-    // Gym đã có huy hiệu (GameMap.cleared): bản vẽ riêng, ô gió (gym gió tắt quạt), sàn băng, miệng lò thành sàn thường.
-    // WorldScene dùng `${id}-ground-cleared` / `${id}-objects-cleared` khi gym đã thắng
-    if (map.badge && map.indoor) {
-      const calm = Object.create(map, { tileAt: { value: (x, y) => clearedTile(map, map.tileAt(x, y)) } });
-      const g2 = makeCanvas(W, H);
-      const o2 = makeCanvas(W, H);
-      drawInterior(calm, g2.ctx, o2.ctx);
-      addCanvasTexture(scene, `${map.id}-ground-cleared`, g2.canvas);
-      addCanvasTexture(scene, `${map.id}-objects-cleared`, o2.canvas);
-    }
+  addCanvasTexture(scene, `${map.id}-ground`, ground.canvas);
+  addCanvasTexture(scene, `${map.id}-objects`, objects.canvas);
+  addCanvasTexture(scene, `${map.id}-over`, over.canvas);
+  addSheetTexture(scene, `${map.id}-anim`, anim.map((a) => a.canvas), anim.map((_, i) => String(i)));
+
+  // Gym đã có huy hiệu (GameMap.cleared): bản vẽ riêng, ô gió (gym gió tắt quạt), sàn băng, miệng lò thành sàn thường.
+  // WorldScene dùng `${id}-ground-cleared` / `${id}-objects-cleared` khi gym đã thắng
+  if (map.badge && map.indoor) {
+    const calm = Object.create(map, { tileAt: { value: (x, y) => clearedTile(map, map.tileAt(x, y)) } });
+    const g2 = makeCanvas(W, H);
+    const o2 = makeCanvas(W, H);
+    drawInterior(calm, g2.ctx, o2.ctx);
+    addCanvasTexture(scene, `${map.id}-ground-cleared`, g2.canvas);
+    addCanvasTexture(scene, `${map.id}-objects-cleared`, o2.canvas);
   }
+}
 
+// Gọi trước khi dùng texture `${id}-ground`... (WorldScene.loadMap, sau khi đã gỡ hình của bản đồ cũ).
+// Bản đồ đi qua lâu nhất bị xoá texture khi đã giữ quá KEEP_MAPS bản đồ
+export function ensureMapTextures(scene, id) {
+  const map = MAPS[id];
+  if (!scene.textures.exists(`${id}-ground`)) buildMapTextures(scene, map);
+  const i = recentMaps.indexOf(id);
+  if (i >= 0) recentMaps.splice(i, 1);
+  recentMaps.push(id);
+  while (recentMaps.length > KEEP_MAPS) {
+    const old = recentMaps.shift();
+    for (const layer of MAP_LAYERS) if (scene.textures.exists(`${old}-${layer}`)) scene.textures.remove(`${old}-${layer}`);
+  }
+}
+
+// Texture dùng chung cho mọi bản đồ (vẽ lúc khởi động)
+export function buildWorldTextures(scene) {
   for (const [key, pal] of [['grass-front', TALL], ['grass-front-deep', TALL_DEEP]]) {
     const front = makeCanvas(TILE, TILE);
     drawTallGrass(front.ctx, 0, 0, pal, 'front');

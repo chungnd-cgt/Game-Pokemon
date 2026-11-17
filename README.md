@@ -366,20 +366,41 @@ Mở game ở hai tab cùng lúc: tab nào lưu sau thì tab còn lại thôi l�
 - Thủ lĩnh gym, Tứ Thiên Vương, Nhà vô địch, trận trong cốt truyện: thách đấu lại được ngay (trận cốt truyện thì xem lại cảnh từ đầu).
 - Nếu lúc tắt cả đội đã gục thì như thua trận bình thường.
 
-Mở **Cài đặt** bằng phím **Esc** / **X**, hoặc nút tròn bánh răng ở cột nút bên trái. Đóng bằng nút ✕, phím Cài đặt / Quay lại
-hoặc bấm ra ngoài khung (không còn mục "Đóng" hay "Về màn hình chính"):
+Mở **Cài đặt** bằng phím **Esc** / **X**, nút tròn bánh răng ở cột nút bên trái, hoặc nút **B** cảm ứng trên bản đồ
+(`src/ui/SettingsPanel.js`). Bảng kiểu game PC: cột thẻ bên trái, nội dung bên phải, đáy là **Huỷ / Áp dụng / OK**. Đổi gì cũng
+chỉ là nháp, bấm Áp dụng / OK mới có tác dụng; Huỷ, phím quay lại hoặc bấm ra ngoài khung là bỏ nháp. Chuột / cảm ứng: bấm thẻ,
+bấm nút, kéo thanh trượt; bàn phím: ↑ / ↓ chọn dòng, ← / → đổi giá trị, xác nhận để bật / tắt, Tab đổi thẻ.
 
-- **Bản đồ vùng** (khi đã có bản đồ).
-- **Phím tắt**: đổi phím cho mọi hành động (xem mục Phím tắt bên dưới).
-- **Đổi diện mạo**: mở lại bảng tạo nhân vật (giới tính, kiểu tóc, màu tóc, màu da, trang phục, màu mắt), đổi xong nhân vật trên bản đồ đổi ngay.
-- **Ánh sáng & thời tiết**: bật/tắt hình ảnh ngày đêm và thời tiết (mưa, tuyết, mưa đá, bão cát).
-- **Xem nhanh Pokémon gửi vào PC** (mặc định bật): đội đã đủ 6 mà bắt thêm thì Pokémon tự vào hộp PC; khi bật, ngay sau khi bắt
-  hiện bảng nhỏ cho biết cấp, giới tính, hệ, tính cách, đặc tính (đặc tính ẩn tô tím) và IV từng chỉ số; bấm phím xác nhận /
-  quay lại hoặc bấm chuột để đóng.
-- **Chơi bản thử 3D** (chỉ ở bản 2D): lưu rồi chuyển sang bản 3D.
+- **Đồ hoạ**: **Chế độ hiển thị** Cửa sổ / Toàn màn hình (điện thoại: khoá màn hình ngang; iPhone Safari không hỗ trợ, dùng
+  "Thêm vào Màn hình chính"), **Giới hạn FPS** 30 / 60 / Theo màn hình (30 đỡ tốn pin, `src/game/display.js`),
+  **Ánh sáng ngày đêm** và **Hiệu ứng thời tiết** (mưa, tuyết, mưa đá, bão cát) bật / tắt riêng.
+- **Chung**: **Xem nhanh Pokémon gửi vào PC** (mặc định bật): đội đã đủ 6 mà bắt thêm thì Pokémon tự vào hộp PC; khi bật, ngay
+  sau khi bắt hiện bảng nhỏ cho biết cấp, giới tính, hệ, tính cách, đặc tính (đặc tính ẩn tô tím) và IV từng chỉ số; bấm phím
+  xác nhận / quay lại hoặc bấm chuột để đóng. **Bản đồ vùng** (khi đã có bản đồ), **Đổi diện mạo** (mở lại bảng tạo nhân vật,
+  đổi xong nhân vật trên bản đồ đổi ngay), **Chơi bản thử 3D** (chỉ khi bật bản 3D).
+- **Điều khiển**: **Nút cảm ứng** Tự động (máy cảm ứng thì hiện) / Bật / Tắt, **cỡ nút**, **độ đậm nút**, **rung khi bấm**,
+  **Phím tắt bàn phím** (xem mục Phím tắt bên dưới).
+
+### Chơi trên điện thoại
+
+Mở game bằng trình duyệt điện thoại (chạy dev cho máy khác trong mạng LAN: `npm run dev -- --host`). Nên xoay ngang: khung
+game nằm giữa, **phím hướng** ở dải đen bên trái, **A** (xác nhận / nói chuyện) và **B** (quay lại; trên bản đồ là mở Cài đặt)
+bên phải (`src/ui/TouchControls.js`). Nút cảm ứng giả lập đúng phím đang gán trong Phím tắt nên dùng được ở mọi màn hình: giữ
+phím hướng là đi liên tục, trượt ngón tay sang hướng khác là đổi hướng ngay, giữ lâu trong menu thì con trỏ tự chạy. Các nút
+khác trên màn hình (cột Pokémon, Túi đồ, ô phím tắt, menu trận đấu...) chạm trực tiếp. Trang không cuộn / phóng to khi chạm.
 
 Màn hình chính có **Tiếp tục** (chơi tiếp bản lưu), **Chơi mới** (chọn nhân vật, đặt tên; bản lưu cũ bị thay) và **Xoá dữ liệu** (xoá bản lưu, có hỏi lại).
 Bản lưu nằm trong trình duyệt đang dùng, đổi trình duyệt hoặc xoá dữ liệu trang web là mất.
+
+### Tải game nhanh
+
+Mở link là có ngay màn hình **Đang tải** (Poké Ball quay + thanh tiến độ, `#loading` trong `index.html`) thay vì màn đen.
+Màn hình chính hiện sau khi nạp đúng vài hình nó cần (3 Pokémon trên màn hình chính, loài làm icon thú cưỡi); 453 hình SVG
+Pokémon còn lại nạp ngầm trong lúc người chơi ở màn hình chính (`src/gfx/monImages.js`, mặt trước trước, rồi lưng, rồi
+nghiêng). Hình chỉ giữ dạng ảnh trong bộ nhớ, không đẩy lên GPU, tới lúc cần mới thu thành sprite GBA. Bấm Tiếp tục / Chơi
+mới khi chưa nạp xong thì hiện "Đang tải hình Pokémon… %" chờ nốt. Bản đồ chỉ được vẽ khi bước vào (`ensureMapTextures` trong
+`src/gfx/world.js`), giữ 6 bản đồ gần nhất, bản đồ cũ hơn được giải phóng (trước kia vẽ sẵn cả 101 bản đồ lúc khởi động,
+~300MB bộ nhớ).
 
 ## Cách chơi
 
@@ -498,7 +519,7 @@ vượt đội:
   80% **tuyết rơi**, 20% **mưa đá**; vùng núi đá (Tuyến đường 8, Bản Vách Đá, Thành phố Núi Đá) 80% **bão cát**.
   Gặp trận đấu ngoài trời thì thời tiết theo vào trận và kéo dài suốt trận: mưa (tăng chiêu hệ Nước, giảm hệ Lửa),
   mưa đá và bão cát (cuối mỗi lượt gây sát thương Pokémon không chịu được). Tuyết rơi chỉ là cảnh, không ảnh hưởng trận đấu.
-  Tắt "Ánh sáng & thời tiết" trong Cài đặt chỉ tắt phần hình ảnh, thời tiết vẫn có tác dụng trong trận.
+  Tắt "Ánh sáng ngày đêm" / "Hiệu ứng thời tiết" trong Cài đặt chỉ tắt phần hình ảnh, thời tiết vẫn có tác dụng trong trận.
 - **Vật phẩm rơi** (quả Poké Ball nằm trên đất): đứng cạnh, quay mặt vào và bấm Enter để nhặt. Mỗi món chỉ nhặt được một lần
   (Rare Candy thì 3 ngày sau có lại). Vật phẩm giấu ở chỗ khuất để đi khám phá: **sau ngọn cây thông** (chỉ ló ra một nửa),
   trong hốc giữa các hàng cây / vách đá, cuối ngõ cụt, xa đường chính; có món nằm **giữa bụi cỏ** (Pallet, tuyến 2, 4, 7, 9)
@@ -627,6 +648,9 @@ Phong cách pixel art kiểu Gen 5 (giống PRO), toàn bộ vẽ bằng code:
   vẽ lại cho đúng dáng (Nidoran / Nidorina / Nidorino đi bốn chân, Growlithe / Arcanine / Persian / Ponyta / Rhyhorn bốn chân,
   Machamp đủ 4 tay, Graveler 4 tay, Kabutops mũ nhọn, Magmar, Golduck, Gloom, Victreebel, Sandshrew, Geodude xám...),
   Chansey có thêm mặt sau và mặt nghiêng; màu shiny cập nhật theo bảng màu mới. Hình là vector tự vẽ, không dùng ảnh gốc.
+  **Aerodactyl** dùng sprite pixel vẽ tay 64×64 (`src/assets/pokemon/aerodactyl.png`, `aerodactyl-back.png`): tư thế như sprite
+  Gen 5 (đầu cúi há miệng, cánh giơ cao, đuôi cong qua lưng), viền 1px, dải 3–5 sắc độ mỗi phần, không bị nhoè như hình vector
+  thu nhỏ; mặt nghiêng (Pokémon đi theo) vẫn dùng SVG cùng bảng màu. Shiny đổi thân hồng, cánh xanh.
 - **Pokémon shiny** (`src/data/shiny.js`): mỗi loài có bảng màu shiny riêng theo game gốc (Charizard đen cánh đỏ,
   Gyarados đỏ, Pikachu vàng cam, Magikarp vàng kim, Ponyta lửa xanh...), chỉ đổi phần thân / bụng / cánh / mai / hoa,
   mắt và lửa đuôi giữ nguyên. Hình vẽ bằng code thì vẽ lại bằng màu shiny; hình SVG / PNG thì đổi màu theo vùng sắc độ

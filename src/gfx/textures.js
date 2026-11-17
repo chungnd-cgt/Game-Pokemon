@@ -8,6 +8,7 @@ import { makeBerryTextures } from './berries.js';
 import { makeFieldTextures } from './fieldObjects.js';
 import { makeGymObjects } from './gymObjects.js';
 import { makeItemIcons } from './itemIcons.js';
+import { hasMonSvg, monImage } from './monImages.js';
 import { makeMoveTextures } from './moveFx.js';
 import { PixelBuffer, addCanvasTexture, hexToHsl, recolorHues, shiftHue, spriteFromImage } from './pixel.js';
 import { makePlayerTexture } from './player.js';
@@ -25,16 +26,24 @@ const SHINY_HUE = 150;
 export const GBA_MON = 64;
 export function pixelMon(scene, speciesId, view = '', size = GBA_MON, shiny = false) {
   const wanted = `mon-${speciesId}${view}`;
-  const base = scene.textures.exists(wanted) ? wanted : `mon-${speciesId}`;
+  const base = monSourceExists(scene, wanted) ? wanted : `mon-${speciesId}`;
   const png = scene.registry.get('pngSprites')?.includes(base);
   if (png && !shiny) return base;
   const key = png ? `${base}-shiny` : `px${size}-${base}${shiny ? '-shiny' : ''}`;
   if (!scene.textures.exists(key)) {
-    const image = shiny ? shinyImage(scene, base, speciesId) : scene.textures.get(base).getSourceImage();
+    // Hình SVG chưa nạp xong (không xảy ra trong game: TitleScene chờ nạp hết mới vào): hình trống, không lưu lại
+    if (!monSourceReady(scene, base)) return '__DEFAULT';
+    const image = shiny ? shinyImage(scene, base, speciesId) : monSource(scene, base);
     addCanvasTexture(scene, key, png ? image : spriteFromImage(image, size));
   }
   return key;
 }
+
+// Ảnh gốc hình Pokémon theo key 'mon-<loài>[-back|-side]': SVG (gfx/monImages.js, không nằm trong bộ texture của Phaser),
+// PNG thật do người dùng thêm (BootScene) hoặc hình vẽ dự phòng bằng code (makeMonsters)
+export const monSourceExists = (scene, key) => hasMonSvg(key) || scene.textures.exists(key);
+const monSourceReady = (scene, key) => Boolean(monImage(key)) || scene.textures.exists(key);
+export const monSource = (scene, key) => monImage(key) ?? scene.textures.get(key).getSourceImage();
 
 // Hệ số phóng to để cạnh dài nhất của texture bằng `size` px
 export function fitScale(scene, key, size) {
@@ -234,7 +243,9 @@ function makeMonsters(scene) {
   for (const p of DEX) {
     const sp = SPECIES[p.slug] ?? { color: TYPES[p.types[0]].color, features: [] };
     const key = `mon-${p.slug}`;
-    if (!scene.textures.exists(key)) DRAWN.add(key);
+    // Loài đã có hình SVG (nạp ngầm sau, gfx/monImages.js) hoặc PNG thì không cần hình vẽ dự phòng
+    if (monSourceExists(scene, key)) continue;
+    DRAWN.add(key);
     make(scene, key, 64, 64, (g) => drawMonster(g, sp), Phaser.Textures.FilterMode.NEAREST);
   }
 }
@@ -250,7 +261,7 @@ export function shinyImage(scene, key, speciesId) {
     make(scene, drawnKey, 64, 64, (g) => drawMonster(g, { ...sp, ...shiny }), Phaser.Textures.FilterMode.NEAREST);
     return scene.textures.get(drawnKey).getSourceImage();
   }
-  const image = scene.textures.get(key).getSourceImage();
+  const image = monSource(scene, key);
   const rules = shinyRules(speciesId);
   return rules.length ? recolorHues(image, rules) : shiftHue(image, SHINY_HUE);
 }
@@ -488,7 +499,7 @@ export function generateTextures(scene) {
   makeMonsters(scene);
   makeEffects(scene);
   makeBerryTextures(scene);
-  // Icon thú cưỡi dùng hình nhỏ của chính Pokémon đó (đã tạo ở makeMonsters)
+  // Icon thú cưỡi dùng hình nhỏ của chính Pokémon đó: BootScene nạp trước hình các loài này (MOUNT_SPECIES)
   makeItemIcons(scene, (speciesId) => scene.textures.get(pixelMon(scene, speciesId, '', 28)).getSourceImage());
   makeGymObjects(scene);
   makeFieldTextures(scene);

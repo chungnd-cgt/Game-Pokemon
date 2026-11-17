@@ -99,11 +99,20 @@ export function calcDamage(attacker, defender, move, rng = Math.random, ctx = {}
   const special = isSpecial(move);
   const atkKey = special ? 'spAtk' : 'atk';
   const defKey = special ? 'spDef' : 'def';
+  // Đặc tính đã làm thay đổi đòn này (để trận đấu hiện tên đặc tính lên màn hình): mỗi bên tối đa một đặc tính
+  let atkUsed = null;
+  let defUsed = null;
+  const atkMark = (id) => (atkUsed = id);
+  const defMark = (id) => (defUsed = id);
   // Shell Armor / Battle Armor: không bao giờ bị chí mạng
-  const crit = rng() < (move.highCrit ? HIGH_CRIT_CHANCE : CRIT_CHANCE) && !noCrit(abilityOf(defender, ctx));
+  const critRoll = rng() < (move.highCrit ? HIGH_CRIT_CHANCE : CRIT_CHANCE);
+  const crit = critRoll && !noCrit(abilityOf(defender, ctx));
+  if (critRoll && !crit) defMark(abilityOf(defender, ctx));
   // Unaware: phớt lờ bậc chỉ số của đối thủ (bên đánh có Unaware thì bỏ qua bậc phòng thủ của bên đỡ và ngược lại)
   let atkStage = abilityOf(defender, ctx) === 'unaware' ? 0 : stageOf(attacker, atkKey);
   let defStage = abilityOf(attacker, ctx) === 'unaware' ? 0 : stageOf(defender, defKey);
+  if (abilityOf(defender, ctx) === 'unaware' && stageOf(attacker, atkKey) !== 0) defMark('unaware');
+  if (abilityOf(attacker, ctx) === 'unaware' && stageOf(defender, defKey) !== 0) atkMark('unaware');
   // Chí mạng bỏ qua bậc giảm chỉ số của bên đánh và bậc tăng của bên đỡ
   if (crit) {
     atkStage = Math.max(0, atkStage);
@@ -115,56 +124,100 @@ export function calcDamage(attacker, defender, move, rng = Math.random, ctx = {}
   // Bão cát: Pokémon hệ Đá tăng 50% Phòng thủ ĐB
   if (special && weatherOf(ctx) === 'sand' && SPECIES[defender.speciesId].types.includes('rock')) def *= 1.5;
   // Marvel Scale: đang bị trạng thái xấu thì Phòng thủ tăng 50%
-  if (!special && defender.status && abilityOf(defender, ctx) === 'marvelScale') def *= 1.5;
-  if (!special && (ability === 'hustle' || (ability === 'guts' && attacker.status))) atk *= 1.5;
-  if (special && ability === 'solarPower' && weatherOf(ctx) === 'sun') atk *= 1.5;
+  if (!special && defender.status && abilityOf(defender, ctx) === 'marvelScale') {
+    def *= 1.5;
+    defMark('marvelScale');
+  }
+  if (!special && (ability === 'hustle' || (ability === 'guts' && attacker.status))) {
+    atk *= 1.5;
+    atkMark(ability);
+  }
+  if (special && ability === 'solarPower' && weatherOf(ctx) === 'sun') {
+    atk *= 1.5;
+    atkMark(ability);
+  }
 
   // Low Kick: sức mạnh theo cân nặng của bên đỡ
   let power = move.weightPower ? lowKickPower(weightOf(defender)) : move.power;
   // Knock Off: mạnh hơn 50% khi đối thủ đang cầm đồ (kể cả khi Sticky Hold giữ được đồ)
   if (move.knockOff && canLoseItem(defender)) power *= 1.5;
   // Technician: chiêu sức mạnh 60 trở xuống mạnh hơn 50% (Struggle thì không)
-  if (ability === 'technician' && power <= 60 && move.id !== 'struggle') power *= 1.5;
-  if (PINCH[ability] === move.type && attacker.hp <= attacker.maxHp / 3) power *= 1.5;
+  if (ability === 'technician' && power <= 60 && move.id !== 'struggle') {
+    power *= 1.5;
+    atkMark(ability);
+  }
+  if (PINCH[ability] === move.type && attacker.hp <= attacker.maxHp / 3) {
+    power *= 1.5;
+    atkMark(ability);
+  }
   // Sheer Force: chiêu có hiệu ứng phụ mạnh hơn 30% (hiệu ứng phụ bị bỏ, xem secondaryFactor)
-  if (ability === 'sheerForce' && hasSecondary(move)) power *= 1.3;
+  if (ability === 'sheerForce' && hasSecondary(move)) {
+    power *= 1.3;
+    atkMark(ability);
+  }
   // Sand Force: bão cát làm chiêu hệ Đá / Đất / Thép mạnh hơn 30%
-  if (ability === 'sandForce' && weatherOf(ctx) === 'sand' && ['rock', 'ground', 'steel'].includes(move.type)) power *= 1.3;
+  if (ability === 'sandForce' && weatherOf(ctx) === 'sand' && ['rock', 'ground', 'steel'].includes(move.type)) {
+    power *= 1.3;
+    atkMark(ability);
+  }
   // Rivalry: cùng giới mạnh hơn 25%, khác giới yếu đi 25%, không có giới tính thì như thường
-  if (ability === 'rivalry' && attacker.gender && defender.gender) power *= attacker.gender === defender.gender ? 1.25 : 0.75;
-  if (ability === 'flashFire' && attacker.flashFire && move.type === 'fire') power *= 1.5;
-  if (ability === 'analytic' && ctx.lastMover === attacker) power *= 1.3;
-  if ((ability === 'reckless' && move.recoil && move.id !== 'struggle') || (ability === 'ironFist' && move.punch)) power *= 1.2;
+  if (ability === 'rivalry' && attacker.gender && defender.gender) {
+    power *= attacker.gender === defender.gender ? 1.25 : 0.75;
+    atkMark(ability);
+  }
+  if (ability === 'flashFire' && attacker.flashFire && move.type === 'fire') {
+    power *= 1.5;
+    atkMark(ability);
+  }
+  if (ability === 'analytic' && ctx.lastMover === attacker) {
+    power *= 1.3;
+    atkMark(ability);
+  }
+  if ((ability === 'reckless' && move.recoil && move.id !== 'struggle') || (ability === 'ironFist' && move.punch)) {
+    power *= 1.2;
+    atkMark(ability);
+  }
   // Đồ cầm tăng sức mạnh theo hệ (Charcoal, Mystic Water...)
   const held = ITEMS[attacker.heldItem];
   if (held?.held === 'boost' && held.boostType === move.type) power *= 1.2;
 
   // Cùng hệ x1.5, Adaptability x2
   const stab = SPECIES[attacker.speciesId].types.includes(move.type) ? (ability === 'adaptability' ? 2 : 1.5) : 1;
+  if (stab === 2) atkMark(ability);
   let weather = 1;
   if (weatherOf(ctx) === 'rain') weather = move.type === 'water' ? 1.5 : move.type === 'fire' ? 0.5 : 1;
   if (weatherOf(ctx) === 'sun') weather = move.type === 'fire' ? 1.5 : move.type === 'water' ? 0.5 : 1;
   // Bỏng làm giảm một nửa sát thương vật lý (Guts thì không)
   const burn = attacker.status === 'brn' && !special && ability !== 'guts' ? 0.5 : 1;
+  if (attacker.status === 'brn' && !special && ability === 'guts') atkMark(ability);
   // Đặc tính bên đỡ: Thick Fat chịu Lửa / Băng một nửa, Dry Skin bị Lửa đánh đau hơn 25%
   const defAbility = abilityOf(defender, ctx);
   let guard = 1;
   if (defAbility === 'thickFat' && ['fire', 'ice'].includes(move.type)) guard = 0.5;
   if (defAbility === 'drySkin' && move.type === 'fire') guard = 1.25;
   if (defAbility === 'multiscale' && defender.hp === defender.maxHp) guard *= 0.5;
+  if (guard !== 1) defMark(defAbility);
   // Filter: chiêu rất hiệu quả giảm 25% • Tinted Lens (bên đánh): chiêu không hiệu quả lắm gây gấp đôi
-  if (defAbility === 'filter' && effectiveness > 1) guard *= 0.75;
-  if (ability === 'tintedLens' && effectiveness < 1) guard *= 2;
+  if (defAbility === 'filter' && effectiveness > 1) {
+    guard *= 0.75;
+    defMark(defAbility);
+  }
+  if (ability === 'tintedLens' && effectiveness < 1) {
+    guard *= 2;
+    atkMark(ability);
+  }
   // Reflect / Light Screen phía bên đỡ: giảm một nửa sát thương vật lý / đặc biệt (chí mạng và Infiltrator xuyên qua)
   const screen = special ? ctx.screens?.lightScreen : ctx.screens?.reflect;
   if (screen && !crit && ability !== 'infiltrator') guard *= 0.5;
+  if (screen && !crit && ability === 'infiltrator') atkMark(ability);
   const levelFactor = Math.floor((2 * attacker.level) / 5) + 2;
   const base = Math.floor(Math.floor((levelFactor * power * atk) / def) / 50) + 2;
   const random = 0.85 + rng() * 0.15;
   // Chí mạng x1.5, Sniper x2.25
   const critMult = crit ? (ability === 'sniper' ? 2.25 : 1.5) : 1;
+  if (crit && ability === 'sniper') atkMark(ability);
   const damage = Math.max(1, Math.floor(base * weather * critMult * random * stab * effectiveness * burn * guard));
-  return { damage, effectiveness, crit, absorbedBy: null };
+  return { damage, effectiveness, crit, absorbedBy: null, atkAbility: atkUsed, defAbility: defUsed };
 }
 
 // Trúng hay trượt, tính cả bậc độ chính xác của bên đánh và né tránh của bên đỡ

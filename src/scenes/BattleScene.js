@@ -35,7 +35,8 @@ import { playMoveFx } from '../gfx/moveFx.js';
 import { attachShinySparkle, shinyBurst } from '../gfx/shinyFx.js';
 import { hash } from '../gfx/pixel.js';
 import { BATTLE_CHAR_SCALE } from '../gfx/player.js';
-import { GBA_MON, fitScale, pixelMon } from '../gfx/textures.js';
+import { GBA_MON, fitScale, monSourceExists, pixelMon } from '../gfx/textures.js';
+import { AbilityBanner } from '../ui/AbilityBanner.js';
 import { BagPanel } from '../ui/BagPanel.js';
 import { ButtonGrid, commandIcons, paintCommand, paintMove, renderCommand, renderMove } from '../ui/BattleMenus.js';
 import { GENDER, drawPanel, fitText, gradientRect, shade, textStyle, tweenAsync, wait } from '../ui/helpers.js';
@@ -194,6 +195,8 @@ export default class BattleScene extends Phaser.Scene {
     this.playerInfo = new MonsterInfo(this, 520, 356, true);
     this.playerInfo.setVisible(false);
     this.msg = new MessageBox(this, this.router, 12, 548, 936, 164);
+    // Tên đặc tính bật lên khi đặc tính có tác dụng (Sturdy, Magic Guard, Intimidate...)
+    this.abilityBanner = new AbilityBanner(this);
     commandIcons(this);
     // Lấp lánh định kỳ quanh Pokémon shiny đang trên sân (bật / tắt khi đổi Pokémon, xem updateShinyFx)
     this.shinyFx = {
@@ -424,6 +427,7 @@ export default class BattleScene extends Phaser.Scene {
   async trapped(action) {
     const by = trappedBy(this.active, this.enemy, this.ctx);
     if (!by) return false;
+    if (ABILITIES[by]) this.showAbility(this.enemy, by);
     if (by === 'arenaTrap') await this.msg.show(`${this.enemyLabel()} có Arena Trap! ${this.active.name} bị sa vào hố cát, không thể ${action}!`);
     else if (ABILITIES[by]) await this.msg.show(`${this.enemyLabel()} có ${ABILITIES[by].name}! ${this.active.name} bị hút chặt, không thể ${action}!`);
     else await this.msg.show(`${this.active.name} đang bị ${MOVES[by].name} trói chặt, không thể ${action}!`);
@@ -628,7 +632,10 @@ export default class BattleScene extends Phaser.Scene {
       case 'run':
         this.runAttempts++;
         if (Math.random() < escapeChance(this.active, this.enemy, this.runAttempts, this.ctx)) {
-          if (this.abilityActive(this.active, 'runAway')) await this.msg.show(`${this.active.name} có Run Away!`);
+          if (this.abilityActive(this.active, 'runAway')) {
+            this.showAbility(this.active, 'runAway');
+            await this.msg.show(`${this.active.name} có Run Away!`);
+          }
           await this.msg.show('Bạn đã chạy thoát an toàn!');
           return this.endBattle('run');
         }
@@ -658,7 +665,8 @@ export default class BattleScene extends Phaser.Scene {
         this.naturalCure(this.active);
         clearVolatile(this.active);
         // Regenerator: rút về thì hồi 1/3 HP
-        if (this.abilityActive(this.active, 'regenerator')) {
+        if (this.abilityActive(this.active, 'regenerator') && this.active.hp < this.active.maxHp) {
+          this.showAbility(this.active, 'regenerator');
           this.active.hp = Math.min(this.active.maxHp, this.active.hp + Math.floor(this.active.maxHp / 3));
         }
         this.playerSprite.setTintFill(0xffffff);
@@ -746,6 +754,13 @@ export default class BattleScene extends Phaser.Scene {
     return mon.hp > 0 && abilityOf(mon, this.ctx) === ability;
   }
 
+  // Hiện bảng tên đặc tính của mon lên màn hình (không chặn trận đấu). ability: id đặc tính, mặc định đặc tính đang có tác dụng
+  showAbility(mon, ability = abilityOf(mon, this.ctx) ?? mon?.ability) {
+    const info = ABILITIES[ability];
+    if (!mon || !info) return;
+    this.abilityBanner.show(mon === this.enemy ? 'enemy' : 'player', this.label(mon), info.name);
+  }
+
   // Pokémon có Damp trên sân (chặn chiêu tự nổ và Aftermath), hoặc undefined
   dampOnField() {
     return [this.active, this.enemy].find((m) => m && this.abilityActive(m, 'damp'));
@@ -791,6 +806,7 @@ export default class BattleScene extends Phaser.Scene {
       disrupted();
       await this.msg.show(`${name} chùn bước, không ra đòn được!`);
       if (this.abilityActive(attacker, 'steadfast')) {
+        this.showAbility(attacker, 'steadfast');
         await this.msg.show(`${name} có Steadfast!`);
         await this.applyStage(attacker, 'speed', 1, false);
       }
@@ -827,6 +843,7 @@ export default class BattleScene extends Phaser.Scene {
     // Pressure: chiêu nhắm vào nó tốn thêm 1 PP (chiêu tự dùng lên mình, đổi thời tiết thì không)
     const ppCost = this.abilityActive(defender, 'pressure') && !move.self && !move.weather ? 2 : 1;
     if (move !== STRUGGLE && !rampaging) attacker.pp[move.id] = Math.max(0, attacker.pp[move.id] - ppCost);
+    if (ppCost > 1 && move !== STRUGGLE && !rampaging) this.showAbility(defender, 'pressure');
     if (move.rampage && !rampaging) startRampage(attacker, move.id);
     await this.msg.show(`${name} dùng ${move.name}!`);
     await this.checkHeldBerry(attacker);
@@ -846,6 +863,7 @@ export default class BattleScene extends Phaser.Scene {
       // Damp: không ai tự nổ được khi nó còn trên sân (người dùng không bị gục)
       const damp = this.dampOnField();
       if (damp) {
+        this.showAbility(damp, 'damp');
         await this.msg.show(`${this.label(damp)} có Damp! ${name} không thể dùng ${move.name}!`);
         return;
       }
@@ -877,7 +895,11 @@ export default class BattleScene extends Phaser.Scene {
 
   // High Jump Kick trượt / không có tác dụng: người dùng ngã, mất 1/2 HP tối đa (Magic Guard thì không)
   async crash(mon, move) {
-    if (!move.crash || mon.hp <= 0 || this.abilityActive(mon, 'magicGuard')) return;
+    if (!move.crash || mon.hp <= 0) return;
+    if (this.abilityActive(mon, 'magicGuard')) {
+      this.showAbility(mon, 'magicGuard');
+      return;
+    }
     mon.hp = Math.max(0, mon.hp - Math.max(1, Math.floor(mon.maxHp * move.crash)));
     this.impact(this.spriteOf(mon), 0xffffff);
     await Promise.all([
@@ -933,6 +955,7 @@ export default class BattleScene extends Phaser.Scene {
     // Chiêu đánh nhiều lần: mỗi đòn tính sát thương riêng, dừng khi một bên gục
     const hits = hitCount(move, abilityOf(attacker, this.ctx));
     const multi = hits > 1;
+    if (Array.isArray(move.hits) && abilityOf(attacker, this.ctx) === 'skillLink') this.showAbility(attacker, 'skillLink');
     let damage = 0;
     let landed = 0;
     let effectiveness = 1;
@@ -951,6 +974,9 @@ export default class BattleScene extends Phaser.Scene {
       }
       ({ effectiveness } = hit);
       landed++;
+      // Đặc tính làm thay đổi sát thương đòn này (Thick Fat, Technician, Blaze...): chỉ hiện bảng tên, không báo thành lời
+      if (hit.atkAbility) this.showAbility(attacker, hit.atkAbility);
+      if (hit.defAbility) this.showAbility(defender, hit.defAbility);
       // Sturdy: đang đầy HP thì trụ lại với 1 HP
       const endured = this.abilityActive(defender, 'sturdy') && defender.hp === defender.maxHp && hit.damage >= defender.hp;
       const before = defender.hp;
@@ -963,9 +989,13 @@ export default class BattleScene extends Phaser.Scene {
         tweenAsync(this, { targets: defSprite, alpha: 0.15, duration: 70, yoyo: true, repeat: 2 }),
         this.infoOf(defender).animateHp(),
       ]);
-      if (endured) await this.msg.show(`${this.label(defender)} trụ vững nhờ Sturdy!`);
+      if (endured) {
+        this.showAbility(defender, 'sturdy');
+        await this.msg.show(`${this.label(defender)} trụ vững nhờ Sturdy!`);
+      }
       if (hit.crit) await this.msg.show('Đòn chí mạng!');
       if (hit.crit && this.abilityActive(defender, 'angerPoint')) {
+        this.showAbility(defender, 'angerPoint');
         await this.msg.show(`${this.label(defender)} có Anger Point! Nó nổi giận đùng đùng!`);
         await this.applyStage(defender, 'atk', 12, false);
       }
@@ -978,8 +1008,14 @@ export default class BattleScene extends Phaser.Scene {
 
     const drained = Math.max(1, Math.floor(damage * (move.drain ?? 0)));
     const guarded = this.abilityActive(attacker, 'magicGuard');
-    if (move.drain && attacker.hp > 0 && abilityOf(defender, this.ctx) === 'liquidOoze' && !guarded) {
+    // Magic Guard đỡ được sát thương gián tiếp (Liquid Ooze, Aftermath, phản đòn): hiện bảng tên đặc tính
+    const guard = () => this.showAbility(attacker, 'magicGuard');
+    if (move.drain && attacker.hp > 0 && abilityOf(defender, this.ctx) === 'liquidOoze' && guarded) {
+      this.showAbility(defender, 'liquidOoze');
+      guard();
+    } else if (move.drain && attacker.hp > 0 && abilityOf(defender, this.ctx) === 'liquidOoze') {
       // Liquid Ooze: hút phải chất nhờn, kẻ hút mất máu thay vì được hồi
+      this.showAbility(defender, 'liquidOoze');
       attacker.hp = Math.max(0, attacker.hp - drained);
       await this.infoOf(attacker).animateHp();
       await this.msg.show(`${name} hút phải chất nhờn độc của Liquid Ooze!`);
@@ -990,12 +1026,17 @@ export default class BattleScene extends Phaser.Scene {
     }
     // Aftermath: Damp trên sân thì không nổ được
     const aftermath = abilityOf(defender, this.ctx) === 'aftermath' && !this.dampOnField();
-    if (defender.hp <= 0 && move.contact && attacker.hp > 0 && aftermath && !guarded) {
+    const exploded = defender.hp <= 0 && move.contact && attacker.hp > 0 && aftermath;
+    if (exploded) this.showAbility(defender, 'aftermath');
+    if (exploded && guarded) guard();
+    if (exploded && !guarded) {
       attacker.hp = Math.max(0, attacker.hp - Math.max(1, Math.floor(attacker.maxHp / 4)));
       await this.infoOf(attacker).animateHp();
       await this.msg.show(`${this.label(defender)} có Aftermath! ${name} bị vụ nổ làm mất HP!`);
     }
     const rockHead = this.abilityActive(attacker, 'rockHead') && move !== STRUGGLE;
+    if (move.recoil && attacker.hp > 0 && guarded) guard();
+    else if (move.recoil && attacker.hp > 0 && rockHead) this.showAbility(attacker, 'rockHead');
     if (move.recoil && attacker.hp > 0 && !guarded && !rockHead) {
       // Struggle mất 1/4 HP tối đa; chiêu khác (Double-Edge) mất theo tỉ lệ sát thương gây ra
       const recoil = move === STRUGGLE ? attacker.maxHp * move.recoil : damage * move.recoil;
@@ -1027,6 +1068,7 @@ export default class BattleScene extends Phaser.Scene {
     const id = defender.heldItem;
     const item = ITEMS[id].name;
     if (this.abilityActive(defender, 'stickyHold')) {
+      this.showAbility(defender, 'stickyHold');
       await this.msg.show(`${this.label(defender)} có Sticky Hold! ${item} dính chặt, không lấy đi được!`);
       return;
     }
@@ -1064,7 +1106,10 @@ export default class BattleScene extends Phaser.Scene {
     const trigger = heldBerryTrigger(mon, abilityOf(mon, this.ctx));
     if (!trigger) return;
     const foe = mon === this.enemy ? this.active : this.enemy;
-    if (this.abilityActive(foe, 'unnerve')) return;
+    if (this.abilityActive(foe, 'unnerve')) {
+      this.showAbility(foe, 'unnerve');
+      return;
+    }
     const id = mon.heldItem;
     mon.heldItem = null;
     rememberBerry(mon, id);
@@ -1101,37 +1146,48 @@ export default class BattleScene extends Phaser.Scene {
     if (move.stages && staged.hp > 0 && chance(move.chance ?? 100, stageOdds)) {
       for (const [stat, delta] of Object.entries(move.stages)) await this.applyStage(staged, stat, delta, !move.self, true);
     }
-    const flinch = (move.flinch && chance(move.flinch)) || (!move.flinch && this.abilityActive(attacker, 'stench') && chance(10));
-    if (alive && flinch && !this.abilityActive(defender, 'innerFocus')) {
+    const stench = !move.flinch && this.abilityActive(attacker, 'stench') && chance(10);
+    const flinch = (move.flinch && chance(move.flinch)) || stench;
+    if (alive && flinch && this.abilityActive(defender, 'innerFocus')) {
+      this.showAbility(defender, 'innerFocus');
+    } else if (alive && flinch) {
+      if (stench) this.showAbility(attacker, 'stench');
       defender.flinched = true;
     }
     // Bị đánh bằng đòn tiếp xúc: Static, Flame Body, Poison Point, Effect Spore (gây trạng thái), Cute Charm (say mê)
     const contact = contactAbility(attacker, defender, move, this.ctx);
     if (contact?.status && !this.statusBlocked(attacker, contact.status, contact.ability === 'effectSpore' ? { powder: true } : null)) {
+      this.showAbility(defender, contact.ability);
       await this.msg.show(`${this.label(defender)} có ${ABILITIES[contact.ability].name}!`);
       await this.tryInflict(attacker, contact.status, null, true);
     } else if (contact?.attract && !attractBlocked(attacker, defender, abilityOf(attacker, this.ctx))) {
+      this.showAbility(defender, 'cuteCharm');
       await this.msg.show(`${this.label(defender)} có Cute Charm!`);
       await this.infatuate(attacker, defender);
     }
     if (alive && move.category === 'physical' && this.abilityActive(defender, 'weakArmor')) {
+      this.showAbility(defender, 'weakArmor');
       await this.msg.show(`${this.label(defender)} có Weak Armor!`);
       await this.applyStage(defender, 'def', -1, false);
       await this.applyStage(defender, 'speed', 2, false);
     }
     if (alive && move.contact && this.abilityActive(attacker, 'poisonTouch') && roll(30) && !this.statusBlocked(defender, 'psn')) {
+      this.showAbility(attacker, 'poisonTouch');
       await this.msg.show(`${this.label(attacker)} có Poison Touch!`);
       await this.tryInflict(defender, 'psn', null, true);
     }
     if (move !== STRUGGLE && attacker.hp > 0 && !attacker.disabled && holds('cursedBody') && roll(30)) {
       attacker.disabled = { move: move.id, turns: 5 };
+      this.showAbility(defender, 'cursedBody');
       await this.msg.show(`${this.label(defender)} có Cursed Body! ${move.name} của ${this.label(attacker)} bị phong ấn!`);
     }
     if (alive && ['bug', 'ghost', 'dark'].includes(move.type) && this.abilityActive(defender, 'rattled')) {
+      this.showAbility(defender, 'rattled');
       await this.msg.show(`${this.label(defender)} có Rattled!`);
       await this.applyStage(defender, 'speed', 1, false);
     }
     if (alive && move.type === 'dark' && this.abilityActive(defender, 'justified')) {
+      this.showAbility(defender, 'justified');
       await this.msg.show(`${this.label(defender)} có Justified!`);
       await this.applyStage(defender, 'atk', 1, false);
     }
@@ -1140,6 +1196,7 @@ export default class BattleScene extends Phaser.Scene {
   // Đặc tính chặn chiêu (Water Absorb, Lightning Rod, Flash Fire, Levitate)
   async absorbMove(mon, ability) {
     const name = this.label(mon);
+    this.showAbility(mon, ability);
     await this.msg.show(`${name} có ${ABILITIES[ability].name}!`);
     if (['waterAbsorb', 'drySkin', 'voltAbsorb'].includes(ability)) {
       if (mon.hp >= mon.maxHp) {
@@ -1169,6 +1226,7 @@ export default class BattleScene extends Phaser.Scene {
         return;
       }
       if (move.sound && this.abilityActive(defender, 'soundproof')) {
+        this.showAbility(defender, 'soundproof');
         await this.msg.show(`${this.label(defender)} có Soundproof, không nghe thấy gì cả!`);
         return;
       }
@@ -1224,6 +1282,7 @@ export default class BattleScene extends Phaser.Scene {
   // Lý do Rest thất bại, hoặc null
   restFails(mon) {
     const ability = abilityOf(mon, this.ctx);
+    if (['insomnia', 'vitalSpirit'].includes(ability) || (ability === 'leafGuard' && this.weather === 'sun')) this.showAbility(mon, ability);
     if (['insomnia', 'vitalSpirit'].includes(ability)) return `${this.label(mon)} có ${ABILITIES[ability].name}, không ngủ được!`;
     if (ability === 'leafGuard' && this.weather === 'sun') return `${this.label(mon)} có Leaf Guard, không ngủ được dưới nắng!`;
     if (mon.hp >= mon.maxHp) return 'Nhưng không có tác dụng!';
@@ -1246,6 +1305,7 @@ export default class BattleScene extends Phaser.Scene {
     const blocked = confuseBlocked(mon, abilityOf(mon, this.ctx));
     if (blocked) {
       if (quiet || blocked === 'fainted') return;
+      if (blocked === 'immune') this.showAbility(mon, 'ownTempo');
       await this.msg.show(blocked === 'already' ? `${this.label(mon)} đang bị rối loạn rồi!` : `${this.label(mon)} có Own Tempo, không bị rối loạn!`);
       return;
     }
@@ -1259,6 +1319,7 @@ export default class BattleScene extends Phaser.Scene {
   // Attract: đối thủ khác giới say mê người dùng
   async tryAttract(source, mon) {
     const blocked = attractBlocked(mon, source, abilityOf(mon, this.ctx));
+    if (blocked === 'immune') this.showAbility(mon, 'oblivious');
     if (blocked === 'immune') await this.msg.show(`${this.label(mon)} có Oblivious, chẳng để ý gì cả!`);
     else if (blocked) await this.msg.show('Nhưng không có tác dụng!');
     if (blocked) return;
@@ -1277,6 +1338,7 @@ export default class BattleScene extends Phaser.Scene {
   // Taunt: 3 lượt không dùng được chiêu trạng thái (đối thủ đã ra đòn trong lượt này thì tính thêm lượt này)
   async tryTaunt(mon) {
     const blocked = tauntBlocked(mon, abilityOf(mon, this.ctx));
+    if (blocked === 'immune') this.showAbility(mon, 'oblivious');
     if (blocked === 'immune') await this.msg.show(`${this.label(mon)} có Oblivious, chẳng để ý gì cả!`);
     else if (blocked) await this.msg.show('Nhưng không có tác dụng!');
     if (blocked) return;
@@ -1292,6 +1354,12 @@ export default class BattleScene extends Phaser.Scene {
       let text = 'Nhưng không có tác dụng!';
       if (blocked === 'already' && mon.status === status) text = `${this.label(mon)} đang bị ${STATUS_INFO[status].name} rồi!`;
       else if (blocked === 'immune') text = `Không có tác dụng với ${this.label(mon)}...`;
+      // Bị chặn nhờ đặc tính (Limber, Immunity, Insomnia, Water Veil, Leaf Guard, Overcoat) chứ không phải nhờ hệ
+      const ability = abilityOf(mon, this.ctx);
+      if (blocked === 'immune' && ability && !statusBlocked(mon, status, move, this.weather, null)) {
+        this.showAbility(mon, ability);
+        text = `${this.label(mon)} có ${ABILITIES[ability].name}! Không có tác dụng với ${this.label(mon)}...`;
+      }
       await this.msg.show(text);
       return;
     }
@@ -1303,6 +1371,7 @@ export default class BattleScene extends Phaser.Scene {
     // Synchronize: bị gây bỏng / độc / tê liệt thì đối thủ cũng bị y như vậy
     const foe = mon === this.enemy ? this.active : this.enemy;
     if (['brn', 'psn', 'par'].includes(status) && this.abilityActive(mon, 'synchronize') && foe?.hp > 0 && !this.statusBlocked(foe, status)) {
+      this.showAbility(mon, 'synchronize');
       await this.msg.show(`${this.label(mon)} có Synchronize!`);
       await this.tryInflict(foe, status, null, true);
     }
@@ -1313,6 +1382,7 @@ export default class BattleScene extends Phaser.Scene {
   async applyStage(mon, stat, delta, byFoe, quiet = false) {
     const guard = stageGuarded(stat, delta, abilityOf(mon, this.ctx), byFoe);
     if (guard) {
+      this.showAbility(mon, guard);
       if (!quiet) await this.msg.show(`${this.label(mon)} có ${ABILITIES[guard].name}, ${STAGE_SHORT[stat]} không bị giảm!`);
       return;
     }
@@ -1326,6 +1396,7 @@ export default class BattleScene extends Phaser.Scene {
     // Defiant / Competitive: bị đối thủ giảm chỉ số thì nổi máu
     const reaction = mon.hp > 0 && stageDropReaction(abilityOf(mon, this.ctx), changed, byFoe);
     if (reaction) {
+      this.showAbility(mon);
       await this.msg.show(`${this.label(mon)} có ${ABILITIES[mon.ability].name}!`);
       await this.applyStage(mon, reaction.stat, reaction.delta, false);
     }
@@ -1336,43 +1407,57 @@ export default class BattleScene extends Phaser.Scene {
     const foe = mon === this.enemy ? this.active : this.enemy;
     this.updateGas();
     if (this.abilityActive(mon, 'cloudNine')) {
+      this.showAbility(mon, 'cloudNine');
       await this.msg.show(`${this.label(mon)} có Cloud Nine! Thời tiết mất tác dụng.`);
       return;
     }
     if (mon.ability === 'neutralizingGas' && this.ctx.gas) {
+      this.showAbility(mon, 'neutralizingGas');
       await this.msg.show(`${this.label(mon)} có Neutralizing Gas!`);
       await this.msg.show('Khí trung hoà bao trùm chiến trường!');
       return;
     }
     const weather = ENTRY_WEATHER[abilityOf(mon, this.ctx)];
     if (weather && mon.hp > 0) {
+      this.showAbility(mon);
       await this.msg.show(`${this.label(mon)} có ${ABILITIES[mon.ability].name}!`);
       await this.setWeather(weather);
     } else if (this.abilityActive(mon, 'intimidate') && foe?.hp > 0) {
+      this.showAbility(mon, 'intimidate');
       await this.msg.show(`${this.label(mon)} có Intimidate!`);
       await this.applyStage(foe, 'atk', -1, true);
     } else if (this.abilityActive(mon, 'forewarn') && foe?.hp > 0) {
+      this.showAbility(mon, 'forewarn');
       const strongest = foe.moves.map((m) => MOVES[m]).reduce((a, b) => ((b.power ?? 0) > (a.power ?? 0) ? b : a));
       await this.msg.show(`${this.label(mon)} có Forewarn! Nó đoán được chiêu ${strongest.name} của ${this.label(foe)}.`);
     } else if (this.abilityActive(mon, 'unnerve')) {
+      this.showAbility(mon, 'unnerve');
       await this.msg.show(`${this.label(mon)} có Unnerve! Phe đối thủ quá căng thẳng, không dám ăn quả mọng!`);
     } else if (this.abilityActive(mon, 'imposter') && foe?.hp > 0) {
       // Imposter: biến hình ngay thành đối thủ (đối thủ đang biến hình thì không được)
-      if (imposterTransform(mon, foe, this.ctx)) await this.showTransform(mon, foe, 'Imposter');
+      if (imposterTransform(mon, foe, this.ctx)) await this.showTransform(mon, foe, 'imposter');
     } else if (this.abilityActive(mon, 'trace') && foe?.hp > 0 && traceable(abilityOf(foe, this.ctx))) {
       // Trace: sao chép đặc tính của đối thủ tới khi rời sân; đặc tính chép được mà có tác dụng khi vào sân thì kích hoạt luôn
       const copied = foe.ability;
       setBattleAbility(mon, copied);
+      this.showAbility(mon, 'trace');
       await this.msg.show(`${this.label(mon)} có Trace! Nó sao chép ${ABILITIES[copied].name} của ${this.label(foe)}!`);
       await this.entryAbility(mon);
     } else if (this.abilityActive(mon, 'download') && foe?.hp > 0) {
+      this.showAbility(mon, 'download');
       await this.msg.show(`${this.label(mon)} có Download!`);
       await this.applyStage(mon, downloadStat(foe), 1, false);
     } else if (this.abilityActive(mon, 'frisk') && foe?.hp > 0 && foe.heldItem && ITEMS[foe.heldItem]) {
+      this.showAbility(mon, 'frisk');
       await this.msg.show(`${this.label(mon)} có Frisk! Nó phát hiện ${this.label(foe)} đang cầm ${ITEMS[foe.heldItem].name}.`);
     } else if (this.abilityActive(mon, 'anticipation') && foe?.hp > 0 && anticipates(mon, foe)) {
+      this.showAbility(mon, 'anticipation');
       await this.msg.show(`${this.label(mon)} có Anticipation! Nó rùng mình vì linh cảm thấy nguy hiểm!`);
+    } else if (this.abilityActive(mon, 'pressure') && foe?.hp > 0) {
+      this.showAbility(mon, 'pressure');
+      await this.msg.show(`${this.label(mon)} đang gây áp lực!`);
     } else if (this.abilityActive(mon, 'moldBreaker')) {
+      this.showAbility(mon, 'moldBreaker');
       await this.msg.show(`${this.label(mon)} có Mold Breaker! Nó phá vỡ mọi khuôn phép!`);
     }
   }
@@ -1390,7 +1475,10 @@ export default class BattleScene extends Phaser.Scene {
 
   // Hiệu ứng biến hình: sáng trắng, bóp dẹt rồi bung ra thành hình của đối thủ (mặt trước / mặt sau tuỳ phe), kèm thông báo
   async showTransform(user, target, ability = null) {
-    if (ability) await this.msg.show(`${this.label(user)} có ${ability}!`);
+    if (ability) {
+      this.showAbility(user, ability);
+      await this.msg.show(`${this.label(user)} có ${ABILITIES[ability].name}!`);
+    }
     const sprite = this.spriteOf(user);
     const { x, y } = this.centerOf(sprite);
     this.burstSparks(x, y, 0xc4a0ec, 10, 90);
@@ -1415,7 +1503,7 @@ export default class BattleScene extends Phaser.Scene {
       this.enemySprite.setTexture(key);
       return this.enemyScale;
     }
-    const hasBack = this.textures.exists(`mon-${mon.speciesId}-back`);
+    const hasBack = monSourceExists(this, `mon-${mon.speciesId}-back`);
     const key = pixelMon(this, mon.speciesId, hasBack ? '-back' : '', 80, shiny);
     this.playerSprite.setTexture(key).setFlipX(!hasBack);
     return fitScale(this, key, PLAYER_SIZE);
@@ -1431,7 +1519,11 @@ export default class BattleScene extends Phaser.Scene {
     this.ctx.weatherTurns = 5;
     this.showWeather();
     await this.msg.show(WEATHER_START[weather]);
-    if (this.ctx.cloudNine) await this.msg.show('Nhưng Cloud Nine làm thời tiết mất tác dụng.');
+    if (this.ctx.cloudNine) {
+      const nine = [this.active, this.enemy].find((m) => m && this.abilityActive(m, 'cloudNine'));
+      if (nine) this.showAbility(nine, 'cloudNine');
+      await this.msg.show('Nhưng Cloud Nine làm thời tiết mất tác dụng.');
+    }
   }
 
   showWeather() {
@@ -1474,17 +1566,20 @@ export default class BattleScene extends Phaser.Scene {
         mon.hp += change;
         if (change < 0) await tweenAsync(this, { targets: this.spriteOf(mon), alpha: 0.4, duration: 90, yoyo: true, repeat: 1 });
         else this.sparkle(this.spriteOf(mon), 0xc0e8ff);
+        if (change > 0) this.showAbility(mon, 'iceBody');
         await this.infoOf(mon).animateHp();
         await this.msg.show(change > 0 ? `${name} có Ice Body, hồi phục HP!` : `${name} ${WEATHER_HURT[this.weather]}!`);
         if (mon.hp <= 0) continue;
       }
       if (this.weather === 'rain' && this.abilityActive(mon, 'rainDish') && mon.hp < mon.maxHp) {
+        this.showAbility(mon, 'rainDish');
         mon.hp = Math.min(mon.maxHp, mon.hp + Math.max(1, Math.floor(mon.maxHp / 16)));
         await this.infoOf(mon).animateHp();
         await this.msg.show(`${name} hứng nước mưa, hồi phục HP!`);
       }
       const guarded = this.abilityActive(mon, 'magicGuard');
       if (this.weather === 'sun' && this.abilityActive(mon, 'solarPower') && !guarded) {
+        this.showAbility(mon, 'solarPower');
         mon.hp = Math.max(0, mon.hp - Math.max(1, Math.floor(mon.maxHp / 8)));
         await this.infoOf(mon).animateHp();
         await this.msg.show(`${name} bị nắng gắt đốt mất HP!`);
@@ -1494,11 +1589,14 @@ export default class BattleScene extends Phaser.Scene {
       const hydrated = this.abilityActive(mon, 'hydration') && this.weather === 'rain';
       if (mon.status && (shed || hydrated)) {
         const { cured } = STATUS_INFO[mon.status];
+        this.showAbility(mon, shed ? 'shedSkin' : 'hydration');
         cureStatus(mon);
         this.infoOf(mon).refresh();
         await this.msg.show(`${name} có ${shed ? 'Shed Skin' : 'Hydration'}! ${name} ${cured}`);
       }
       const status = mon.status;
+      // Magic Guard: không mất máu vì bỏng / độc
+      if (guarded && ['brn', 'psn'].includes(status)) this.showAbility(mon, 'magicGuard');
       if (!guarded && statusDamage(mon) > 0) {
         await tweenAsync(this, { targets: this.spriteOf(mon), alpha: 0.4, duration: 90, yoyo: true, repeat: 1 });
         await this.infoOf(mon).animateHp();
@@ -1516,6 +1614,7 @@ export default class BattleScene extends Phaser.Scene {
         mon.heldItem = harvested;
         delete mon.lastBerry;
         this.sparkle(this.spriteOf(mon), 0x88e070);
+        this.showAbility(mon, 'harvest');
         await this.msg.show(`${name} có Harvest! ${name} thu hoạch được ${ITEMS[harvested].name}!`);
       }
       await this.checkHeldBerry(mon);
@@ -1562,7 +1661,10 @@ export default class BattleScene extends Phaser.Scene {
       return;
     }
     mon.bound.turns--;
-    if (guarded) return;
+    if (guarded) {
+      this.showAbility(mon, 'magicGuard');
+      return;
+    }
     mon.hp -= bindDamage(mon);
     await Promise.all([
       tweenAsync(this, { targets: this.spriteOf(mon), alpha: 0.4, duration: 90, yoyo: true, repeat: 1 }),
@@ -1693,6 +1795,7 @@ export default class BattleScene extends Phaser.Scene {
     const ko = this.knockout;
     if (fainted === ko?.target) this.knockout = null;
     if (ko?.by !== winner || ko.target !== fainted || !this.abilityActive(winner, 'moxie')) return;
+    this.showAbility(winner, 'moxie');
     await this.msg.show(`${this.label(winner)} có Moxie!`);
     await this.applyStage(winner, 'atk', 1, false);
   }
@@ -1842,7 +1945,7 @@ export default class BattleScene extends Phaser.Scene {
     clearVolatile(mon);
     this.participants.add(mon);
     // Có ảnh mặt sau thì dùng, không thì lật ngang ảnh mặt trước
-    const hasBack = this.textures.exists(`mon-${mon.speciesId}-back`);
+    const hasBack = monSourceExists(this, `mon-${mon.speciesId}-back`);
     const key = pixelMon(this, mon.speciesId, hasBack ? '-back' : '', 80, mon.shiny);
     this.playerSprite
       .setTexture(key)

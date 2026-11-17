@@ -1,40 +1,71 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d6cce2"/><stop offset="0.5" stop-color="#b4a6c6"/><stop offset="1" stop-color="#8c7ca4"/></linearGradient>
-    <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9474cc"/><stop offset="1" stop-color="#7656b0"/></linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b0acd4"/><stop offset="0.5" stop-color="#9888ac"/><stop offset="1" stop-color="#7a6a98"/></linearGradient>
+    <linearGradient id="belly" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8e6f0"/><stop offset="1" stop-color="#c8c4d6"/></linearGradient>
+    <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a3a8a"/><stop offset="0.75" stop-color="#765498"/><stop offset="1" stop-color="#9464cc"/></linearGradient>
+    <linearGradient id="wingBack" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#b4a6d8"/><stop offset="1" stop-color="#9a86c8"/></linearGradient>
   </defs>
-  <g stroke="#2b2433" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- wings seen from behind -->
-    <path d="M108 118 L62 40 L4 70 C20 82 22 96 18 108 C36 108 44 118 46 132 C64 128 76 136 80 150 C92 146 100 150 106 160 Z" fill="url(#wing)"/>
-    <path d="M148 118 L194 40 L252 70 C236 82 234 96 238 108 C220 108 212 118 210 132 C192 128 180 136 176 150 C164 146 156 150 150 160 Z" fill="#7656b0"/>
-    <path d="M108 118 L62 40 L4 70" fill="none" stroke-width="16"/>
-    <path d="M108 118 L62 40 L4 70" fill="none" stroke="#a898b8" stroke-width="7"/>
-    <path d="M148 118 L194 40 L252 70" fill="none" stroke-width="16"/>
-    <path d="M148 118 L194 40 L252 70" fill="none" stroke="#a898b8" stroke-width="7"/>
-    <path d="M62 40 L50 22 L60 28 L62 14 L68 28 L76 22 Z" fill="#fff" stroke-width="3.5"/>
-    <path d="M194 40 L206 22 L196 28 L194 14 L188 28 L180 22 Z" fill="#fff" stroke-width="3.5"/>
-    <!-- legs -->
-    <path d="M114 182 L106 214 L110 234" fill="none" stroke-width="20"/>
-    <path d="M114 182 L106 214 L110 234" fill="none" stroke="#b4a6c6" stroke-width="10"/>
-    <path d="M144 182 L152 214 L148 234" fill="none" stroke-width="20"/>
-    <path d="M144 182 L152 214 L148 234" fill="none" stroke="#9a8ab0" stroke-width="10"/>
-    <path d="M110 232 L96 248 L120 246 Z M148 232 L162 248 L138 246 Z" fill="#fff" stroke-width="3.5"/>
-    <!-- back -->
-    <path d="M104 120 C94 142 98 174 112 188 C122 196 136 196 146 188 C160 174 162 142 152 120 C142 108 114 108 104 120 Z" fill="url(#skin)"/>
-    <!-- tail hanging down the middle, arrowhead tip -->
-    <path d="M128 180 C122 202 110 216 92 226" fill="none" stroke-width="16"/>
-    <path d="M128 180 C122 202 110 216 92 226" fill="none" stroke="#9a8ab0" stroke-width="7"/>
-    <path d="M102 222 L64 236 L98 244 L94 228 Z" fill="#9a8ab0"/>
-    <!-- head turned to the right: back of the skull and crest -->
-    <g transform="translate(256 0) scale(-1 1)">
-      <path d="M132 74 C150 62 168 56 186 56 C176 66 164 78 146 90 Z" fill="#a898b8"/>
-      <path d="M150 84 C150 66 136 56 118 58 C104 60 92 66 80 70 C66 74 54 76 44 80 C46 88 54 92 66 92 L92 96 C88 104 82 110 70 112 C60 114 52 116 50 122 C66 128 92 126 112 118 C132 112 150 104 150 84 Z" fill="url(#skin)"/>
-    </g>
+  <g transform="translate(1.5 34) scale(0.4)">
+  <g stroke="#2b2433" stroke-width="12.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- cánh xa (phải): màng tím, nhìn xiên -->
+    <path d="M470 48 L590 6 C584 100 548 200 506 296 L444 282 L452 160 Z" fill="url(#wing)"/>
+    <path d="M444 282 L452 160 L470 48" fill="none" stroke-width="28"/>
+    <path d="M444 282 L452 160 L470 48" fill="none" stroke="#a8a3bb" stroke-width="13"/>
+    <path d="M470 48 L590 6" fill="none" stroke-width="22"/>
+    <path d="M470 48 L590 6" fill="none" stroke="#a8a3bb" stroke-width="9"/>
+    <path d="M470 48 L446 20 M470 48 L470 8 M470 48 L494 16" fill="none" stroke-width="26"/>
+    <path d="M470 48 L446 20 M470 48 L470 8 M470 48 L494 16" fill="none" stroke="#e6e3ee" stroke-width="11"/>
+
+    <!-- chân thõng -->
+    <path d="M240 392 L216 470" fill="none" stroke-width="34"/>
+    <path d="M240 392 L216 470" fill="none" stroke="#a8a3bb" stroke-width="18"/>
+    <path d="M216 462 L196 492 L212 488 L214 502 L222 486 L238 492 Z" fill="#eeecf4" stroke-width="9"/>
+    <path d="M364 414 L354 498" fill="none" stroke-width="34"/>
+    <path d="M364 414 L354 498" fill="none" stroke="#a8a3bb" stroke-width="18"/>
+    <path d="M354 490 L334 520 L350 516 L352 530 L360 514 L376 520 Z" fill="#eeecf4" stroke-width="9"/>
+    <ellipse cx="248" cy="374" rx="30" ry="32" fill="#a8a3bb"/>
+    <ellipse cx="362" cy="394" rx="30" ry="32" fill="url(#skin)"/>
+    <!-- lưng + gai -->
+    <path d="M300 200 L316 158 L336 196 Z M352 190 L370 150 L388 192 Z M404 200 L424 166 L436 212 Z" fill="url(#skin)"/>
+    <path d="M248 206 C300 180 404 180 452 212 C492 242 484 330 444 368 C404 400 300 402 260 372 C220 334 218 244 248 206 Z" fill="url(#skin)"/>
+    <!-- cánh gần (trái): mặt lưng màng cánh, dang rộng -->
+    <path d="M252 52 L2 36 C30 112 90 192 168 250 C210 280 252 300 294 318 L304 250 Z" fill="url(#wingBack)"/>
+    <path d="M304 250 L252 52" fill="none" stroke-width="30"/>
+    <path d="M304 250 L252 52" fill="none" stroke="#9888ac" stroke-width="15"/>
+    <path d="M252 52 L2 36" fill="none" stroke-width="24"/>
+    <path d="M252 52 L2 36" fill="none" stroke="#9888ac" stroke-width="11"/>
+    <path d="M252 52 L232 22 M252 52 L258 12 M252 52 L282 22" fill="none" stroke-width="26"/>
+    <path d="M252 52 L232 22 M252 52 L258 12 M252 52 L282 22" fill="none" stroke="#e6e3ee" stroke-width="11"/>
+
   </g>
-  <!-- spine ridge and shading -->
-  <path d="M128 118 L128 176" stroke="#7a6a94" stroke-width="4" stroke-linecap="round"/>
-  <path d="M148 122 C156 144 154 172 140 188 C134 192 128 194 122 194 C142 176 150 150 148 122 Z" fill="#5e4e78" opacity="0.4"/>
-  <path d="M62 40 L46 132 M62 40 L18 108 M194 40 L210 132 M194 40 L238 108" fill="none" stroke="#5a3e8c" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
-  <path d="M110 72 C104 92 116 106 138 114 C122 102 112 90 110 72 Z" fill="#5e4e78" opacity="0.35"/>
-  <ellipse cx="150" cy="66" rx="14" ry="4" fill="#fff" opacity="0.5" transform="rotate(10 150 66)"/>
+  <!-- gờ sống lưng, bóng, điểm sáng -->
+  <path d="M300 220 C340 236 400 238 440 226" fill="none" stroke="#5e5874" stroke-width="9" stroke-linecap="round" opacity="0.4"/>
+  <path d="M452 236 C474 280 466 330 436 362 C420 378 400 388 380 394 C420 360 446 310 452 236 Z" fill="#5e5874" opacity="0.4"/>
+  <path d="M270 230 C300 214 350 208 392 210" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" opacity="0.45"/>
+  <path d="M252 52 L60 120 M252 52 L150 222 M470 48 L540 150" fill="none" stroke="#5e3e98" stroke-width="7" stroke-linecap="round" opacity="0.5"/>
+  <g transform="translate(486 252) scale(-0.78 0.78) translate(-266 -300)">
+  <g stroke="#2b2433" stroke-width="15" stroke-linejoin="round" stroke-linecap="round">
+    <!-- hàm dưới: chĩa xuống trái -->
+    <path d="M300 316 C302 360 282 412 252 448 C238 464 214 474 196 468 C184 462 184 448 194 438 C214 414 230 382 236 344 Z" fill="url(#skin)"/>
+    <!-- trong miệng -->
+    <path d="M132 342 C170 342 210 336 244 330 L240 346 C232 382 216 414 198 438 C168 420 144 386 132 342 Z" fill="#e0485e"/>
+    <!-- sọ + hàm trên: mõm chĩa trái -->
+    <path d="M226 232 L246 174 L274 230 Z" fill="url(#skin)"/>
+    <path d="M304 300 C310 268 292 234 258 224 C232 216 204 224 184 238 C158 256 130 280 114 300 C102 314 106 336 124 342 C150 348 200 336 242 330 C266 326 292 318 304 300 Z" fill="url(#skin)"/>
+  </g>
+  <!-- lưỡi, họng, răng -->
+  <path d="M160 404 C176 380 200 364 226 360 C218 392 206 418 196 432 C182 424 168 414 160 404 Z" fill="#f78a9c"/>
+  <path d="M214 336 C228 334 238 334 242 334 C238 352 234 366 228 376 C220 362 216 350 214 336 Z" fill="#9a2038"/>
+  <path d="M142 340 L155 365 L161 338 Z M165 338 L178 363 L184 336 Z M188 336 L201 361 L207 334 Z M211 334 L224 359 L230 332 Z M207 426 L186 410 L215 405 Z M217 400 L196 385 L225 380 Z M227 375 L206 360 L235 354 Z" fill="#fbfaff"/>
+  <path d="M296 320 C292 370 274 414 246 448 C270 412 284 370 286 326 Z" fill="#5e5874" opacity="0.45"/>
+  <path d="M302 296 C296 316 276 326 250 330 C276 318 292 302 296 284 Z" fill="#5e5874" opacity="0.4"/>
+  <path d="M250 236 C228 232 206 238 186 250" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" opacity="0.6"/>
+  <!-- mắt, chân mày, lỗ mũi -->
+  <path d="M200 276 L236 268 C240 284 232 298 220 300 C208 302 200 292 200 276 Z" fill="#fff" stroke="#2b2433" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="220" cy="285" r="8.5" fill="#2e7a3e"/>
+  <circle cx="218" cy="281" r="3.2" fill="#fff"/>
+  <path d="M190 268 L244 254" stroke="#2b2433" stroke-width="12" stroke-linecap="round"/>
+  <ellipse cx="130" cy="304" rx="6" ry="4" fill="#2b2433"/>
+  </g>
+  </g>
 </svg>

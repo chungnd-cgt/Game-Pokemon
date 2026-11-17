@@ -3,6 +3,7 @@ import { formatMoney } from '../data/items.js';
 import { MAPS, SPAWN, resumePosition } from '../data/map.js';
 import { deleteSave, loadGame, saveSummary } from '../game/save.js';
 import { DEFAULT_NAMES, resetState, state } from '../game/state.js';
+import { monImagesReady } from '../gfx/monImages.js';
 import { applyPlayerLook } from '../gfx/player.js';
 import { fitScale, pixelMon } from '../gfx/textures.js';
 import { CharacterCreator } from '../ui/CharacterCreator.js';
@@ -14,6 +15,8 @@ import { Menu } from '../ui/Menu.js';
 const NAME_MAX = 12;
 // Bản đồ trong nhà trước kia thuộc Pallet, giờ thuộc Thị trấn Lục Bình (xem bước tải bản lưu)
 const OLD_PALLET_SHOPS = ['center', 'mart'];
+// 3 Pokémon trên màn hình chính [loài, x, lật ngang]. BootScene nạp hình các loài này trước khi hiện màn hình chính
+export const TITLE_MONS = [['charmander', 210, false], ['pikachu', 480, false], ['squirtle', 750, true]];
 
 export default class TitleScene extends Phaser.Scene {
   constructor() {
@@ -51,7 +54,7 @@ export default class TitleScene extends Phaser.Scene {
     this.add.text(width / 2, 140, 'PHIÊN BẢN DEMO', textStyle(24, '#c8d8ff', { fontStyle: 'bold' })).setOrigin(0.5);
     this.add.text(width / 2, 176, 'Hành trình vùng Sơn Thủy', textStyle(22, '#ffffff')).setOrigin(0.5);
 
-    const mons = [['charmander', 210, false], ['pikachu', 480, false], ['squirtle', 750, true]];
+    const mons = TITLE_MONS;
     if (this.stage3d) {
       this.stage3d.enter(this, mons.map(([id, , flip]) => ({ key: pixelMon(this, id), flip })));
       this.events.once('shutdown', () => this.stage3d.leave());
@@ -234,9 +237,27 @@ export default class TitleScene extends Phaser.Scene {
     return ok === true;
   }
 
-  go(data) {
+  async go(data) {
     this.router.clear();
+    await this.waitForMons();
     this.cameras.main.fadeOut(400);
     this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('World', data));
+  }
+
+  // Hình Pokémon nạp ngầm từ lúc mở game (gfx/monImages.js). Bấm vào game sớm quá thì chờ nốt, có hiện %
+  async waitForMons() {
+    let box = null;
+    let label = null;
+    await monImagesReady((ratio) => {
+      if (ratio >= 1) return;
+      if (!box) {
+        box = this.add.container(0, 0).setDepth(50);
+        box.add(this.add.rectangle(0, 0, 960, 720, 0x0a1430, 0.7).setOrigin(0));
+        label = this.add.text(480, 360, '', textStyle(26, '#ffffff', { fontStyle: 'bold' })).setOrigin(0.5);
+        box.add(label);
+      }
+      label.setText(`Đang tải hình Pokémon… ${Math.floor(ratio * 100)}%`);
+    });
+    box?.destroy();
   }
 }

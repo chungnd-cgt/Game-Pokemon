@@ -2,16 +2,38 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Điện thoại: không cho phóng to bằng hai ngón / chạm hai lần, vẽ tràn cả vùng tai thỏ (nút cảm ứng tự chừa lề an toàn) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="theme-color" content="#111111" />
     <title>Pokémon Demo</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='7' fill='white' stroke='black'/><path d='M1 8a7 7 0 0 1 14 0z' fill='%23e53935'/><circle cx='8' cy='8' r='2' fill='white' stroke='black'/></svg>" />
     <style>
-      html, body { margin: 0; height: 100%; background: #111; overflow: hidden; }
-      #game { width: 100vw; height: 100vh; }
+      html, body { margin: 0; height: 100%; background: #111; overflow: hidden; overscroll-behavior: none; }
+      /* Chạm trên điện thoại: không cuộn / phóng to trang, không nháy nền khi chạm, không bôi chọn chữ khi nhấn giữ */
+      body { touch-action: none; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+      input { -webkit-user-select: text; user-select: text; }
+      /* dvh: chiều cao thật trên điện thoại (100vh tính cả thanh địa chỉ nên đáy game bị che) */
+      #game { width: 100vw; height: 100vh; height: 100dvh; }
+      /* Màn hình đang tải (ẩn đi khi màn hình chính sẵn sàng, src/ui/loading.js) */
+      #loading { position: fixed; inset: 0; z-index: 30; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 18px; background: linear-gradient(#1d2b53, #3b6ea5); color: #fff; font: 800 20px 'Nunito', 'Segoe UI', Tahoma, Arial, sans-serif;
+        transition: opacity .35s; }
+      #loading.done { opacity: 0; pointer-events: none; }
+      #loading .ball { width: 64px; height: 64px; border-radius: 50%; border: 4px solid #1a1a22; box-sizing: border-box; position: relative;
+        background: linear-gradient(#e53935 0 46%, #1a1a22 46% 54%, #f4f4f4 54%); animation: spin 1s linear infinite; }
+      #loading .ball::after { content: ''; position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; margin: -9px; border-radius: 50%;
+        background: #f4f4f4; border: 4px solid #1a1a22; box-sizing: border-box; }
+      #loading .bar { width: min(260px, 60vw); height: 10px; border-radius: 5px; background: rgba(255,255,255,.2); overflow: hidden; }
+      #loading-bar { display: block; width: 0; height: 100%; background: #ffe066; border-radius: 5px; transition: width .2s; }
+      @keyframes spin { to { transform: rotate(360deg); } }
     </style>
   </head>
   <body>
     <div id="game"></div>
+    <div id="loading"><div class="ball"></div><div id="loading-text">Đang tải game…</div><div class="bar"><i id="loading-bar"></i></div></div>
     <!-- Bản thử 3D đang TẠM ẨN (code vẫn ở src/three/ và 3d.html). Bật lại: bỏ chú thích thẻ <a id="link3d"> dưới đây (hiện nút
          "Xem bản thử 3D" ở màn hình chính và mục "Chơi bản thử 3D" trong Cài đặt) và thêm lại proto3d: '3d.html' trong vite.config.js.
     <a id="link3d" href="./3d.html" style="display:none;position:fixed;top:10px;right:10px;padding:6px 12px;border-radius:999px;background:rgba(20,24,40,.8);color:#f8d878;font:800 13px 'Nunito',sans-serif;text-decoration:none;z-index:10">Xem bản thử 3D →</a>

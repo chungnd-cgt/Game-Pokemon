@@ -145,15 +145,17 @@ export class Ambience {
   }
 
   refresh(force = false) {
-    const on = settings.ambience !== false;
-    const outdoor = on && !this.indoor;
+    // Cài đặt → Đồ hoạ: ánh sáng theo buổi và hình ảnh thời tiết bật / tắt riêng (chỉ là hình ảnh, không đổi luật trận đấu)
+    const light = settings.lighting !== false;
+    const showWeather = settings.weather !== false;
+    const outdoor = (light || showWeather) && !this.indoor;
     const tod = timeOfDay();
-    const weather = !outdoor ? null : this.forcedWeather !== undefined ? this.forcedWeather : weatherOf(this.climate);
+    const weather = !outdoor || !showWeather ? null : this.forcedWeather !== undefined ? this.forcedWeather : weatherOf(this.climate);
     if (!force && tod === this.state.tod && weather === this.state.weather && outdoor === this.state.outdoor) return;
     this.state = { tod, weather, rain: weather === 'rain', outdoor };
 
-    let tint = outdoor ? TINTS[tod] : null;
-    if (this.cave && on) tint = CAVE_TINT;
+    let tint = outdoor && light ? TINTS[tod] : null;
+    if (this.cave && light) tint = CAVE_TINT;
     const wt = WEATHER_TINT[weather];
     if (wt) tint = tint ? [weather === 'rain' ? tint[0] : wt[0], Math.min(0.75, tint[1] + 0.12)] : wt;
     this.overlay.setVisible(Boolean(tint));
@@ -161,7 +163,7 @@ export class Ambience {
 
     this.lights.forEach((l) => l.destroy());
     this.lights = [];
-    if (outdoor && (tod === 'night' || tod === 'dusk')) this.lightWindows();
+    if (outdoor && light && (tod === 'night' || tod === 'dusk')) this.lightWindows();
     this.setPrecip(weather);
   }
 

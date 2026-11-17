@@ -19,7 +19,6 @@ import { repelBlocks, startRepel, stepRepel } from '../game/repel.js';
 import { applyItem, escapeProblem, itemProblem, needsMove } from '../game/itemUse.js';
 import { saveBlocked, saveGame } from '../game/save.js';
 import { forfeitable, rematchDef, trainerBeaten, trainerForfeit, trainerReady } from '../game/trainers.js';
-import { setSetting, settings } from '../game/settings.js';
 import { addItem, blackoutLoss, hasFlag, healParty, itemCount, setFlag, state, swapParty, useItem } from '../game/state.js';
 import { Ambience } from '../gfx/ambience.js';
 import { mapWeather } from '../game/weather.js';
@@ -29,8 +28,8 @@ import { CharacterCreator } from '../ui/CharacterCreator.js';
 import { showTrainerCard } from '../ui/TrainerCard.js';
 import { currentLook } from '../data/playerCustom.js';
 import { addSheetTexture, spriteFromImage, upscaleCanvas } from '../gfx/pixel.js';
-import { GBA_MON, fitScale, pixelMon, shinyImage } from '../gfx/textures.js';
-import { ANIM_FRAMES, doorGlass } from '../gfx/world.js';
+import { GBA_MON, fitScale, monSource, monSourceExists, pixelMon, shinyImage } from '../gfx/textures.js';
+import { ANIM_FRAMES, doorGlass, ensureMapTextures } from '../gfx/world.js';
 import { MOUNT_SHADOW, RIDE_SEAT, hasRideArt, puffTextures, rideTexture } from '../gfx/mounts.js';
 import {
   STORY_NPCS, WALKABLE_OBJECTS, clerkTalk, hasPokedex, intro, objective, objectVisible, stepBlocker, stepTrigger, useObject,
@@ -42,6 +41,7 @@ import { HeldKeys, InputRouter, directionOf, isCancel, isConfirm } from '../ui/i
 import { KeyBindings } from '../ui/KeyBindings.js';
 import { actionsForCode, hotbarSlotOf } from '../game/keybinds.js';
 import { Menu } from '../ui/Menu.js';
+import { SettingsPanel } from '../ui/SettingsPanel.js';
 import { MessageBox } from '../ui/MessageBox.js';
 import { typeBadges } from '../ui/TypeBadge.js';
 import { AreaNav } from '../ui/AreaNav.js';
@@ -450,6 +450,7 @@ ${this.map.name}`, this.ambience.state.tod);
 
     const map = MAPS[id];
     this.map = map;
+    ensureMapTextures(this, id); // vẽ bản đồ lúc bước vào (gfx/world.js)
     const layer = (suffix, depth, frame) => this.add.image(0, 0, `${id}-${suffix}`, frame).setOrigin(0).setScale(WORLD_SCALE).setDepth(depth);
     this.animLayer = layer('anim', 0.5, '0');
     // Gym đã có huy hiệu: nền vẽ bản "đã thắng" (ô gió tắt, sàn băng / miệng lò thành sàn thường, gfx/world.js)
@@ -1811,8 +1812,8 @@ ${this.map.name}`, this.ambience.state.tod);
     if (!this.textures.exists(key)) {
       const view = (suffix) => {
         const k = `mon-${speciesId}${suffix}`;
-        const key = this.textures.exists(k) ? k : `mon-${speciesId}`;
-        const image = shiny ? shinyImage(this, key, speciesId) : this.textures.get(key).getSourceImage();
+        const key = monSourceExists(this, k) ? k : `mon-${speciesId}`;
+        const image = shiny ? shinyImage(this, key, speciesId) : monSource(this, key);
         // Lấy màu đa số khi thu nhỏ (crisp): mảng màu sạch, không đục / xám như trộn màu
         return upscaleCanvas(spriteFromImage(image, size, undefined, { crisp: true }), WORLD_SCALE);
       };
@@ -2762,8 +2763,10 @@ ${this.map.name}`, this.ambience.state.tod);
     this.scene.pause();
   }
 
-  // Menu cài đặt: bản đồ vùng, phím tắt, ánh sáng... (game luôn tự động lưu). Đóng bằng ✕, phím quay lại / cài đặt,
-  // hoặc bấm ra ngoài khung
+  // Bảng Cài đặt (ui/SettingsPanel.js): Đồ hoạ (toàn màn hình, giới hạn FPS, ánh sáng, thời tiết), Chung (xem nhanh khi
+  // gửi vào PC, bản đồ vùng, đổi diện mạo), Điều khiển (nút cảm ứng, phím tắt). Game luôn tự động lưu.
+  // Đóng bằng Huỷ / OK, phím quay lại / cài đặt hoặc bấm ra ngoài khung. Nút mở màn hình khác (phím tắt, đổi diện mạo)
+  // thì đóng bảng, mở màn đó, xong mở lại bảng đúng thẻ cũ (giữ cả phần chưa áp dụng)
   async toggleSettings() {
     if (this.settingsMenu) {
       this.settingsMenu.finish(null);
@@ -2772,44 +2775,33 @@ ${this.map.name}`, this.ambience.state.tod);
     if (this.busy || this.moving || this.partyMenu || this.overlay) return;
     this.busy = true;
     this.setFrame('stand');
-    let index = 0;
+    let panelState = null;
     for (;;) {
-      // Giá trị bật / tắt nằm riêng ở cột phải (sub) để chữ không tràn khung. Bản đồ vùng nằm trong Cài đặt
-      const onOff = (on) => (on ? 'Bật' : 'Tắt');
-      const items = [
-        ...(itemCount('townMap') ? [{ label: 'Bản đồ vùng', value: 'map' }] : []),
-        { label: 'Phím tắt', value: 'keys' },
-        { label: 'Ánh sáng & thời tiết', sub: onOff(settings.ambience), value: 'ambience' },
-        { label: 'Xem nhanh khi gửi vào PC', sub: onOff(settings.catchPreview), value: 'catchPreview' },
-        { label: 'Đổi diện mạo', value: 'look' },
+      this.settingsMenu = new SettingsPanel(this, this.router, {
+        depth: HUD_DEPTH + 10,
+        state: panelState,
+        hasMap: itemCount('townMap') > 0,
         // Bản 2D (index.html có nút sang bản 3D): chuyển sang bản 3D, chơi tiếp từ bản lưu
-        ...(document.getElementById('link3d') ? [{ label: 'Chơi bản thử 3D', value: '3d' }] : []),
-      ].map((item) => ({ ...item, fontSize: 22 }));
-      // Khung cao theo số mục, căn giữa màn hình
-      const rowHeight = 50;
-      const height = 84 + items.length * (rowHeight + 6);
-      const top = Math.max(16, Math.round((this.scale.height - height) / 2));
-      this.settingsMenu = new Menu(this, this.router, {
-        x: 220, y: top, width: 520, height, title: 'Cài đặt', items, index, rowHeight, fixed: true, depth: HUD_DEPTH + 10,
+        has3d: Boolean(document.getElementById('link3d')),
+        onApplied: (keys) => {
+          if (keys.includes('lighting') || keys.includes('weather')) this.ambience.refresh(true);
+        },
       });
-      const choice = await this.settingsMenu.open();
+      const result = await this.settingsMenu.open();
       this.settingsMenu = null;
-      index = Math.max(0, items.findIndex((i) => i.value === choice));
+      if (!result) break;
+      panelState = result.state;
+      const { action } = result;
 
-      if (choice === 'map') {
+      if (action === 'map') {
         // Đóng Cài đặt rồi mới mở (màn này cần lúc không bận)
         this.busy = false;
         this.openRegionMap();
         return;
-      } else if (choice === 'keys') {
+      } else if (action === 'keys') {
         // Đổi phím: đóng thì quay lại Cài đặt (nhãn phím trên ô phím tắt tự vẽ lại theo phím mới)
         await new KeyBindings(this, this.router, { depth: HUD_DEPTH + 20 }).open();
-      } else if (choice === 'ambience') {
-        setSetting('ambience', !settings.ambience);
-        this.ambience.refresh(true);
-      } else if (choice === 'catchPreview') {
-        setSetting('catchPreview', !settings.catchPreview);
-      } else if (choice === 'look') {
+      } else if (action === 'look') {
         // currentLook: bản lưu cũ chưa có diện mạo thì là diện mạo cũ (mũ lưỡi trai đỏ / nón rộng vành)
         const { gender, ...look } = currentLook(state.player);
         const picked = await new CharacterCreator(this, this.router, {
@@ -2825,14 +2817,12 @@ ${this.map.name}`, this.ambience.state.tod);
           this.setFrame('stand');
           this.save();
         }
-      } else if (choice === '3d') {
+      } else if (action === '3d') {
         if (await this.ask('Lưu game và chuyển sang bản thử 3D?', null, { safe: true })) {
           this.save();
           window.location.href = document.getElementById('link3d').href;
           return;
         }
-      } else {
-        break;
       }
     }
     this.busy = false;
