@@ -103,7 +103,7 @@ const MAP_DEFS = {
     ],
     // Thảm trải sàn dưới bộ sofa: [x1, y1, x2, y2, màu nền, màu viền] (tính cả hai đầu)
     rugs: [[2, 3, 8, 6, '#c8604a', '#f0d8a8']],
-    // Đồ treo tường sau (bản 3D): { cột x: loại }
+    // Đồ treo tường sau (gfx/interior.js: drawWallDecor): { cột x: loại }
     wallDecor: { 5: 'photo', 8: 'clock' },
     warps: [{ x: 10, y: 2, to: 'home2f', tx: 10, ty: 3, facing: 'down' }],
     // Đứng trước đồ đạc bấm Enter: lời mô tả (cùng cơ chế với biển báo)
@@ -137,7 +137,6 @@ const MAP_DEFS = {
       'p.........p',
     ],
     rugs: [[3, 3, 7, 5, '#4a78c8', '#f0e0b0']],
-    tvConsole: true, // TV phòng ngủ có máy chơi game (bản 3D)
     wallDecor: { 3: 'poster', 7: 'calendar' },
     warps: [{ x: 10, y: 2, to: 'home', tx: 10, ty: 3, facing: 'down' }],
     signs: {
@@ -197,7 +196,6 @@ const MAP_DEFS = {
     ],
     rugs: [[3, 3, 7, 5, '#c84848', '#f0e0b0']],
     bedColor: '#d04848', // chăn đỏ của Gary
-    tvConsole: true,
     wallDecor: { 3: 'poster', 7: 'photo' },
     warps: [{ x: 10, y: 2, to: 'garyHome', tx: 10, ty: 3, facing: 'down' }],
     signs: {

@@ -24,47 +24,25 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   create() {
-    // Nút "Xem bản thử 3D" (index.html) chỉ hiện ở màn hình chính: trong game nó che đồng hồ / nút đóng góc phải trên
-    const link3d = document.getElementById('link3d');
-    if (link3d) {
-      link3d.style.display = '';
-      this.events.once('shutdown', () => { link3d.style.display = 'none'; });
-    }
     const { width, height } = this.scale;
-    // Bản 3D (three/title3d.js): đồi cỏ 3D vẽ phía sau, Pokémon dựng đứng trong cảnh 3D, nhân vật 3D ở màn chọn nhân vật
-    this.stage3d = this.registry.get('title3d') ?? null;
     const bg = this.add.graphics();
-    if (this.stage3d) {
-      // nền trong suốt cho cảnh 3D hiện ra; dải tối mờ trên / dưới để chữ dễ đọc
-      bg.fillGradientStyle(0x0a1430, 0x0a1430, 0x0a1430, 0x0a1430, 0.55, 0.55, 0, 0);
-      bg.fillRect(0, 0, width, 230);
-      bg.fillGradientStyle(0x0a1430, 0x0a1430, 0x0a1430, 0x0a1430, 0, 0, 0.6, 0.6);
-      bg.fillRect(0, height - 70, width, 70);
-    } else {
-      gradientRect(bg, 0, 0, width, height, 0x1d2b53, 0x3b6ea5);
-      bg.lineStyle(14, 0xffffff, 0.05);
-      for (const [cx, cy, r] of [[110, 600, 170], [870, 140, 130]]) {
-        bg.strokeCircle(cx, cy, r);
-        bg.lineBetween(cx - r, cy, cx + r, cy);
-        bg.strokeCircle(cx, cy, r * 0.28);
-      }
+    gradientRect(bg, 0, 0, width, height, 0x1d2b53, 0x3b6ea5);
+    bg.lineStyle(14, 0xffffff, 0.05);
+    for (const [cx, cy, r] of [[110, 600, 170], [870, 140, 130]]) {
+      bg.strokeCircle(cx, cy, r);
+      bg.lineBetween(cx - r, cy, cx + r, cy);
+      bg.strokeCircle(cx, cy, r * 0.28);
     }
 
     this.add.text(width / 2, 70, 'Pokémon', textStyle(84, '#ffe066', { fontStyle: 'bold', stroke: '#2a4a9a', strokeThickness: 14 })).setOrigin(0.5);
     this.add.text(width / 2, 140, 'PHIÊN BẢN DEMO', textStyle(24, '#c8d8ff', { fontStyle: 'bold' })).setOrigin(0.5);
     this.add.text(width / 2, 176, 'Hành trình vùng Sơn Thủy', textStyle(22, '#ffffff')).setOrigin(0.5);
 
-    const mons = TITLE_MONS;
-    if (this.stage3d) {
-      this.stage3d.enter(this, mons.map(([id, , flip]) => ({ key: pixelMon(this, id), flip })));
-      this.events.once('shutdown', () => this.stage3d.leave());
-    } else {
-      for (const [id, x, flip] of mons) {
-        const key = pixelMon(this, id);
-        const sprite = this.add.image(x, 400, key).setOrigin(0.5, 1).setScale(fitScale(this, key, 192)).setFlipX(flip);
-        this.add.ellipse(x, 404, 140, 22, 0x000000, 0.2);
-        this.tweens.add({ targets: sprite, y: 388, duration: 900 + x, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
-      }
+    for (const [id, x, flip] of TITLE_MONS) {
+      const key = pixelMon(this, id);
+      const sprite = this.add.image(x, 400, key).setOrigin(0.5, 1).setScale(fitScale(this, key, 192)).setFlipX(flip);
+      this.add.ellipse(x, 404, 140, 22, 0x000000, 0.2);
+      this.tweens.add({ targets: sprite, y: 388, duration: 900 + x, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
     }
 
     this.router = new InputRouter(this);

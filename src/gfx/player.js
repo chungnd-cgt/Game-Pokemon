@@ -81,7 +81,7 @@ export function makePlayerTexture(scene) {
 }
 
 // Áp diện mạo người chơi tự chọn (data/playerCustom.js) vào nhân vật: vẽ lại texture đi bộ + đạp xe của giới tính đó
-// và cập nhật LOOKS (bản 3D dựng mô hình theo LOOKS). Giới tính còn lại trở về diện mạo có sẵn (PLAYER_BASE_LOOKS).
+// và cập nhật LOOKS. Giới tính còn lại trở về diện mạo có sẵn (PLAYER_BASE_LOOKS).
 // Gọi khi bắt đầu chơi mới, khi tải bản lưu và khi đổi diện mạo / giới tính trong game. player = { gender, look } (state.player);
 // chưa có look (bản lưu cũ) thì vẽ diện mạo cũ (data/playerCustom.js: LEGACY_CUSTOM)
 export function applyPlayerLook(scene, player) {

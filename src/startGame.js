@@ -15,9 +15,8 @@ import WorldScene from './scenes/WorldScene.js';
 import { initTouchControls } from './ui/TouchControls.js';
 import './cheats/chung.js'; // cheat tên "Chung" (gỡ: xoá dòng này + file src/cheats/chung.js)
 
-// Khởi động game Phaser. Bản 2D (main.js) và bản 3D (three/main3d.js) dùng chung;
-// transparent: nền trong suốt để thế giới 3D vẽ phía sau hiện ra.
-export async function startGame({ transparent = false } = {}) {
+// Khởi động game Phaser (gọi từ main.js)
+export async function startGame() {
   // Chờ font tải xong để chữ trong game không bị vẽ bằng font dự phòng
   await Promise.all([
     document.fonts.load('700 20px Nunito', 'Tiếng Việt'),
@@ -30,7 +29,6 @@ export async function startGame({ transparent = false } = {}) {
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
     backgroundColor: '#000000',
-    transparent,
     // Chuột phải = huỷ / đóng menu (Menu, Summary, bản đồ vùng): không hiện menu chuột phải của trình duyệt
     disableContextMenu: true,
     scale: {

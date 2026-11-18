@@ -718,7 +718,7 @@ ${this.map.name}`, this.ambience.state.tod);
   }
 
   // Hiệu ứng vòng tròn: close = thu nhỏ quanh người chơi tới khi tối hẳn, ngược lại mở rộng ra
-  // Giữa người chơi trên màn hình (toạ độ game 960x720). Bản 3D thay hàm này bằng vị trí trên cảnh 3D (view3d.js)
+  // Giữa người chơi trên màn hình (toạ độ game 960x720)
   playerScreenPoint() {
     const cam = this.cameras.main;
     return { x: this.player.x - cam.scrollX, y: this.player.y - CHAR_HEIGHT / 2 - cam.scrollY };
@@ -2781,8 +2781,6 @@ ${this.map.name}`, this.ambience.state.tod);
         depth: HUD_DEPTH + 10,
         state: panelState,
         hasMap: itemCount('townMap') > 0,
-        // Bản 2D (index.html có nút sang bản 3D): chuyển sang bản 3D, chơi tiếp từ bản lưu
-        has3d: Boolean(document.getElementById('link3d')),
         onApplied: (keys) => {
           if (keys.includes('lighting') || keys.includes('weather')) this.ambience.refresh(true);
         },
@@ -2816,12 +2814,6 @@ ${this.map.name}`, this.ambience.state.tod);
           this.player.setTexture(this.playerTexture(this.vehicle === 'bike'));
           this.setFrame('stand');
           this.save();
-        }
-      } else if (action === '3d') {
-        if (await this.ask('Lưu game và chuyển sang bản thử 3D?', null, { safe: true })) {
-          this.save();
-          window.location.href = document.getElementById('link3d').href;
-          return;
         }
       }
     }
