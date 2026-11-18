@@ -64,11 +64,13 @@ const WINDOWS = {
 };
 
 export class Ambience {
+  // area: { y, h } dải màn hình được phủ (mặc định cả màn hình). Phủ hết chiều ngang màn hình, đổi cỡ màn hình thì tự giãn theo
   constructor(scene, { depth = 50, rainDepth = 52, area = null } = {}) {
     this.scene = scene;
     const { width, height } = scene.scale;
-    const a = area ?? { x: 0, y: 0, w: width, h: height };
-    this.overlay = scene.add.rectangle(a.x, a.y, a.w, a.h, 0xffffff).setOrigin(0).setScrollFactor(0)
+    const a = { y: area?.y ?? 0, h: area?.h ?? height, full: !area };
+    this.area = a;
+    this.overlay = scene.add.rectangle(0, a.y, width, a.h, 0xffffff).setOrigin(0).setScrollFactor(0)
       .setDepth(depth).setBlendMode(Phaser.BlendModes.MULTIPLY).setVisible(false);
     this.lights = [];
     this.lightDepth = depth + 1;
@@ -116,6 +118,22 @@ export class Ambience {
       speedY: { min: 10, max: 50 }, scale: { min: 3, max: 6 }, alpha: { start: 0.9, end: 0.4 }, quantity: 1, frequency: 70, emitting: false,
     }).setScrollFactor(0).setDepth(rainDepth - 0.5);
     this.state = { tod: timeOfDay(), weather: null, rain: false, outdoor: false };
+    const onResize = () => this.resize();
+    scene.scale.on('resize', onResize);
+    scene.events.once('shutdown', () => scene.scale.off('resize', onResize));
+  }
+
+  // Màn hình đổi cỡ (đổi độ phân giải, xoay máy, bật toàn màn hình): lớp phủ và vùng sinh hạt thời tiết giãn theo
+  resize() {
+    const { width, height } = this.scene.scale;
+    const a = this.area;
+    if (a.full) a.h = height;
+    this.overlay.setSize(width, a.h);
+    this.rain.updateConfig({ x: { min: -120, max: width + 40 } });
+    this.splash.updateConfig({ x: { min: 0, max: width }, y: { min: a.y + 60, max: a.y + a.h } });
+    for (const e of [this.snow, this.hail]) e.updateConfig({ x: { min: -60, max: width + 60 } });
+    this.sand.updateConfig({ x: width + 40 });
+    this.dust.updateConfig({ x: width + 120 });
   }
 
   // Bật đúng loại hạt thời tiết (null: tắt hết). Trận đấu cũng gọi khi thời tiết trong trận đổi

@@ -230,6 +230,15 @@ export class WorldHud {
     return btn;
   }
 
+  // Màn hình đổi cỡ (chỉ đổi chiều ngang, game luôn cao 720): dời các phần bám mép phải
+  relayout() {
+    const { width, height } = this.scene.scale;
+    this.clock.setX(width - 16);
+    this.clockIcon.setPosition(this.clock.x - this.clock.width + 12 + CLOCK_ICON / 2, this.clock.y + 6 + 11);
+    this.saveNote.setPosition(width / 2 + 60, height - 16);
+    this.drawQuest();
+  }
+
   // Xếp cột nút tròn ngay trên nút ≡ / thanh phím tắt
   layoutMenu() {
     const bottom = this.scene.scale.height - 16 - BTN - 12 - ROUND;

@@ -4,7 +4,7 @@ import { dexStatus, state } from '../game/state.js';
 import { DexDetail } from '../ui/dex/DexDetail.js';
 import { DexGrid, GRID_COLS, GRID_ROWS } from '../ui/dex/DexGrid.js';
 import { filterDex } from '../ui/dex/dexData.js';
-import { COLORS, backToWorld, closeButton, gradientRect, hideWorldHud, textStyle } from '../ui/helpers.js';
+import { BLEED, COLORS, backToWorld, centerStage, closeButton, gradientRect, hideWorldHud, textStyle } from '../ui/helpers.js';
 import { InputRouter, directionOf, isCancel, isConfirm, isTyping } from '../ui/input.js';
 import { matches } from '../game/keybinds.js';
 
@@ -35,9 +35,9 @@ export default class PokedexScene extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.scale;
     hideWorldHud(this); // bản đồ phía sau chỉ còn làm nền
-    this.add.rectangle(0, 0, width, height, 0x05070d, 0.55).setOrigin(0).setInteractive();
+    centerStage(this); // màn hình rộng: khung 960x720 nằm giữa (toạ độ chuột: p.worldX)
+    this.add.rectangle(-BLEED, 0, 960 + BLEED * 2, 720, 0x05070d, 0.55).setOrigin(0).setInteractive();
     this.drawWindow();
 
     // Mở từ bảng khu vực vào loài chưa gặp: bỏ lọc để thấy được ô đó
@@ -222,13 +222,13 @@ export default class PokedexScene extends Phaser.Scene {
 
   handlePointer(p) {
     const { x, y, w, h } = SEARCH;
-    const inSearch = p.x >= x && p.x <= x + w && p.y >= y && p.y <= y + h;
+    const inSearch = p.worldX >= x && p.worldX <= x + w && p.y >= y && p.y <= y + h;
     this.setSearching(inSearch);
   }
 
   handleWheel(p, dy) {
-    if (this.detail.wheel(p.x, p.y, dy)) return;
-    if (this.grid.contains(p.x, p.y)) this.grid.scrollTo(this.grid.top + Math.sign(dy));
+    if (this.detail.wheel(p.worldX, p.y, dy)) return;
+    if (this.grid.contains(p.worldX, p.y)) this.grid.scrollTo(this.grid.top + Math.sign(dy));
   }
 
   handleKey(e) {

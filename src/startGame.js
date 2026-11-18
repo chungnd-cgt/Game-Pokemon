@@ -1,8 +1,7 @@
 import '@fontsource/nunito/700.css';
 import '@fontsource/nunito/800.css';
 import Phaser from 'phaser';
-import { GAME_HEIGHT, GAME_WIDTH } from './config.js';
-import { applyFpsLimit, applyScreenSize } from './game/display.js';
+import { applyFpsLimit, applyResolution, gameSizeFor, watchResolution } from './game/display.js';
 import { state } from './game/state.js';
 import BattleScene from './scenes/BattleScene.js';
 import BootScene from './scenes/BootScene.js';
@@ -23,11 +22,13 @@ export async function startGame() {
     document.fonts.load('800 20px Nunito', 'Tiếng Việt'),
   ]).catch(() => {});
 
+  // Cỡ game theo độ phân giải đang chọn (Theo màn hình: theo tỉ lệ cửa sổ) ngay từ đầu, các màn hình dựng đúng cỡ luôn
+  const { width, height } = gameSizeFor();
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
-    width: GAME_WIDTH,
-    height: GAME_HEIGHT,
+    width,
+    height,
     backgroundColor: '#000000',
     // Chuột phải = huỷ / đóng menu (Menu, Summary, bản đồ vùng): không hiện menu chuột phải của trình duyệt
     disableContextMenu: true,
@@ -38,10 +39,11 @@ export async function startGame() {
     scene: [BootScene, TitleScene, WorldScene, BattleScene, PokedexScene, MartScene, SummaryScene, RegionMapScene],
   });
 
-  // Giới hạn FPS và kích thước khung game đã chọn trong Cài đặt → Đồ hoạ; nút cảm ứng cho điện thoại (Cài đặt → Điều khiển)
+  // Giới hạn FPS và độ phân giải đã chọn trong Cài đặt → Đồ hoạ; nút cảm ứng cho điện thoại (Cài đặt → Điều khiển)
   game.events.once(Phaser.Core.Events.READY, () => {
     applyFpsLimit(game);
-    applyScreenSize(game);
+    applyResolution(game);
+    watchResolution(game);
   });
   initTouchControls();
 

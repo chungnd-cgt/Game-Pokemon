@@ -35,6 +35,8 @@ trình duyệt vẫn chơi tiếp được.
 xong vào game luôn: tài khoản có bản lưu thì chơi tiếp, chưa có thì tạo nhân vật rồi chơi mới (không còn menu Tiếp tục / Chơi
 mới / Xoá dữ liệu). Đăng ký khi bật "Confirm email": bấm link trong email là game tự đăng nhập. Đăng nhập lần đầu mà máy này
 còn bản lưu từ trước khi có tài khoản thì game hỏi có dùng bản đó cho tài khoản không. **Đăng xuất**: Cài đặt → Chung.
+Ô **Ghi nhớ đăng nhập** (mặc định bật): mở lại game là vào thẳng, email điền sẵn; bỏ tích thì đóng tab / trình duyệt là phải
+đăng nhập lại (phiên đăng nhập cất trong sessionStorage thay vì localStorage, `src/online/supabase.js`).
 
 **Lưu game** vẫn như cũ (tự lưu vào máy sau mỗi sự kiện, mỗi lượt đánh...), rồi `src/online/cloudSave.js` gửi bản mới nhất
 lên Supabase vài giây sau lần lưu và ngay khi ẩn / đóng tab. Tắt ngang, văng game, mất mạng: bản trên máy vẫn còn, lần mở game
@@ -373,7 +375,11 @@ chỉ là nháp, bấm Áp dụng / OK mới có tác dụng; Huỷ, phím quay 
 bấm nút, kéo thanh trượt; bàn phím: ↑ / ↓ chọn dòng, ← / → đổi giá trị, xác nhận để bật / tắt, Tab đổi thẻ.
 
 - **Đồ hoạ**: **Chế độ hiển thị** Cửa sổ / Toàn màn hình (điện thoại: khoá màn hình ngang; iPhone Safari không hỗ trợ, dùng
-  "Thêm vào Màn hình chính"), **Kích thước khung hình** Vừa màn hình (giữ tỉ lệ 4:3) / Kéo giãn (lấp đầy, hình hơi méo) / Gốc 960×720,
+  "Thêm vào Màn hình chính"), **Độ phân giải** (danh sách xổ xuống): **Theo màn hình** (mặc định, game lấp kín màn hình, không viền đen) hoặc
+  một cỡ cố định 16:9 / 16:10 / 21:9 / 4:3 (1280×720 … 3840×2160, cửa sổ nhỏ hơn thì thu nhỏ cho vừa). Game luôn cao 720 (chữ,
+  nút giữ nguyên cỡ), rộng theo tỉ lệ màn hình từ 960 (4:3) tới 1680 (21:9): bản đồ thấy rộng hơn, nút trên bản đồ bám mép màn
+  hình, còn trận đấu / menu / Pokédex vẽ theo khung 960×720 đặt giữa với nền tràn ra hai bên (`uiX`, `centerStage` trong
+  `src/ui/helpers.js`). Đổi cỡ cửa sổ, xoay máy, bật / tắt toàn màn hình thì game tự bố trí lại,
   **Giới hạn FPS** 30 / 60 / Theo màn hình (30 đỡ tốn pin, `src/game/display.js`),
   **Ánh sáng ngày đêm** và **Hiệu ứng thời tiết** (mưa, tuyết, mưa đá, bão cát) bật / tắt riêng.
 - **Chung**: **Xem nhanh Pokémon gửi vào PC** (mặc định bật): đội đã đủ 6 mà bắt thêm thì Pokémon tự vào hộp PC; khi bật, ngay

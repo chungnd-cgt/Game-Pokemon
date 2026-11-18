@@ -2,7 +2,7 @@ import {
   CUSTOM_ROWS, GENDERS, normalizeCustom, optionIds, optionInfo, randomCustom, resolveLook, stepOption, switchGender,
 } from '../data/playerCustom.js';
 import { makeCharacterTexture } from '../gfx/player.js';
-import { COLORS, closeButton, drawPanel, fixToCamera, shade, textStyle } from './helpers.js';
+import { BLEED, COLORS, closeButton, drawPanel, fixToCamera, shade, textStyle, uiX } from './helpers.js';
 import { directionOf, isCancel, isConfirm } from './input.js';
 
 // Bảng "Bạn trông thế nào?": chọn giới tính, tuỳ chỉnh kiểu tóc, màu tóc, màu da, trang phục, màu mắt của người chơi.
@@ -55,7 +55,7 @@ export class CharacterCreator {
     const { scene } = this;
     const c = scene.add.container(0, 0).setDepth(this.opts.depth ?? 30);
     this.container = c;
-    c.add(scene.add.rectangle(480, 360, 960, 720, 0x0a1430, 0.75).setInteractive()); // chặn bấm xuyên xuống dưới
+    c.add(scene.add.rectangle(480, 360, 960 + BLEED * 2, 720, 0x0a1430, 0.75).setInteractive()); // chặn bấm xuyên xuống dưới
     c.add(drawPanel(scene, 70, 60, 820, 600, 18, true));
     c.add(scene.add.text(480, 86, this.opts.title ?? 'Bạn trông thế nào?', textStyle(28, COLORS.text, { fontStyle: 'bold' })).setOrigin(0.5, 0));
     c.add(closeButton(scene, 856, 98, () => this.finish(null)));
@@ -87,7 +87,7 @@ export class CharacterCreator {
 
     this.refresh();
     this.selectRow(0);
-    if (this.opts.fixed) fixToCamera(c);
+    if (this.opts.fixed) fixToCamera(c).setX(uiX(scene)); // trên bản đồ: dời vào giữa màn hình rộng
 
     this.router.set((e) => {
       const dir = directionOf(e);

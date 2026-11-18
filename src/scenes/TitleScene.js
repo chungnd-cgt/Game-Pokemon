@@ -11,7 +11,7 @@ import { monImagesReady } from '../gfx/monImages.js';
 import { applyPlayerLook } from '../gfx/player.js';
 import { fitScale, pixelMon } from '../gfx/textures.js';
 import { CharacterCreator } from '../ui/CharacterCreator.js';
-import { COLORS, closeButton, drawPanel, gradientRect, textStyle } from '../ui/helpers.js';
+import { BLEED, COLORS, centerStage, closeButton, drawPanel, gradientRect, textStyle, uiX } from '../ui/helpers.js';
 import { InputRouter } from '../ui/input.js';
 import { Menu } from '../ui/Menu.js';
 
@@ -28,9 +28,12 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.scale;
+    // Màn hình rộng: khung 960x720 nằm giữa, nền tràn ra hai bên (ui/helpers.js: centerStage)
+    centerStage(this);
+    const width = 960;
+    const height = 720;
     const bg = this.add.graphics();
-    gradientRect(bg, 0, 0, width, height, 0x1d2b53, 0x3b6ea5);
+    gradientRect(bg, -BLEED, 0, width + BLEED * 2, height, 0x1d2b53, 0x3b6ea5);
     bg.lineStyle(14, 0xffffff, 0.05);
     for (const [cx, cy, r] of [[110, 600, 170], [870, 140, 130]]) {
       bg.strokeCircle(cx, cy, r);
@@ -188,7 +191,7 @@ export default class TitleScene extends Phaser.Scene {
   // Trả về tên, hoặc null nếu quay lại bảng tuỳ chỉnh nhân vật
   enterName(gender) {
     const c = this.add.container(0, 0).setDepth(30);
-    c.add(this.add.rectangle(480, 360, 960, 720, 0x0a1430, 0.75));
+    c.add(this.add.rectangle(480, 360, 960 + BLEED * 2, 720, 0x0a1430, 0.75));
     c.add(drawPanel(this, 230, 210, 500, 280, 18, true));
     c.add(this.add.text(480, 240, 'Tên của bạn là gì?', textStyle(28, COLORS.text, { fontStyle: 'bold' })).setOrigin(0.5, 0));
 
@@ -201,7 +204,7 @@ export default class TitleScene extends Phaser.Scene {
       const r = this.game.canvas.getBoundingClientRect();
       const k = r.width / this.scale.width;
       Object.assign(input.style, {
-        position: 'fixed', left: `${r.left + 300 * k}px`, top: `${r.top + 300 * k}px`, width: `${360 * k}px`, height: `${54 * k}px`,
+        position: 'fixed', left: `${r.left + (uiX(this) + 300) * k}px`, top: `${r.top + 300 * k}px`, width: `${360 * k}px`, height: `${54 * k}px`,
         fontSize: `${26 * k}px`, fontFamily: 'Nunito, sans-serif', fontWeight: '700', textAlign: 'center', boxSizing: 'border-box',
         border: `${3 * k}px solid #4a88e0`, borderRadius: `${12 * k}px`, outline: 'none', color: '#2a3248', background: '#ffffff', zIndex: 10,
       });
@@ -250,7 +253,7 @@ export default class TitleScene extends Phaser.Scene {
   // Hỏi Có / Không (mặc định chọn Không). items: thay hai lựa chọn mặc định
   async confirm(question, items = [{ label: 'Có', value: true }, { label: 'Không', value: false }]) {
     const c = this.add.container(0, 0).setDepth(30);
-    c.add(this.add.rectangle(480, 360, 960, 720, 0x000000, 0.5));
+    c.add(this.add.rectangle(480, 360, 960 + BLEED * 2, 720, 0x000000, 0.5));
     c.add(drawPanel(this, 210, 250, 540, 110, 16, true));
     c.add(this.add.text(480, 280, question, textStyle(22, COLORS.text, { wordWrap: { width: 500 }, align: 'center' })).setOrigin(0.5, 0));
     const ok = await new Menu(this, this.router, {
@@ -276,7 +279,7 @@ export default class TitleScene extends Phaser.Scene {
       if (ratio >= 1) return;
       if (!box) {
         box = this.add.container(0, 0).setDepth(50);
-        box.add(this.add.rectangle(0, 0, 960, 720, 0x0a1430, 0.7).setOrigin(0));
+        box.add(this.add.rectangle(-BLEED, 0, 960 + BLEED * 2, 720, 0x0a1430, 0.7).setOrigin(0));
         label = this.add.text(480, 360, '', textStyle(26, '#ffffff', { fontStyle: 'bold' })).setOrigin(0.5);
         box.add(label);
       }

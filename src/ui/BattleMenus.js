@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { fitScale } from '../gfx/textures.js';
-import { cssColor, shade, textStyle } from './helpers.js';
+import { cssColor, localX, shade, textStyle } from './helpers.js';
 import { directionOf, isCancel, isConfirm } from './input.js';
 
 // Giao diện trong trận kiểu MMO: khay nút lớn (ButtonGrid: bảng lệnh 2x2 có icon, bảng chiêu theo màu hệ).
@@ -186,7 +186,7 @@ export class ButtonGrid {
         (e) => e.timeStamp >= openedAt && this.handleKey(e),
         (p) => {
           if (p.downTime < openedAt || !this.cancelable) return;
-          if (p.rightButtonDown() || !this.bounds.contains(p.x, p.y)) this.finish(null);
+          if (p.rightButtonDown() || !this.bounds.contains(localX(this.scene, p), p.y)) this.finish(null);
         },
       );
     });

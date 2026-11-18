@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { TYPES } from '../data/types.js';
-import { tweenAsync, wait } from '../ui/helpers.js';
+import { BLEED, tweenAsync, wait } from '../ui/helpers.js';
 
 // Hiệu ứng chiêu thức trong trận đấu, kiểu pixel GBA:
 //  - texture pixel art nhỏ (nắm đấm, lá, giọt nước, ngọn lửa, đá, bông tuyết...) phóng to x3 như sprite Pokémon
@@ -647,7 +647,7 @@ const KINDS = {
 
   // Tự nổ: chớp trắng cả màn hình, quả cầu lửa toả ra
   async explode(fx, o) {
-    const flash = fx.scene.add.rectangle(0, 0, 960, 548, 0xffffff, 0).setOrigin(0).setDepth(DEPTH + 1);
+    const flash = fx.scene.add.rectangle(-BLEED, 0, 960 + BLEED * 2, 548, 0xffffff, 0).setOrigin(0).setDepth(DEPTH + 1);
     fx.objs.add(flash);
     await fx.tween({ targets: flash, fillAlpha: 0.9, duration: 120, yoyo: true });
     fx.scene.cameras.main.shake(400, o.big ? 0.02 : 0.012);
@@ -713,7 +713,7 @@ const KINDS = {
 
   // Night Shade: màn hình tối sầm, mục tiêu nhuốm bóng đen
   async shade(fx) {
-    const dark = fx.scene.add.rectangle(0, 0, 960, 548, 0x100818, 0).setOrigin(0).setDepth(DEPTH - 1);
+    const dark = fx.scene.add.rectangle(-BLEED, 0, 960 + BLEED * 2, 548, 0x100818, 0).setOrigin(0).setDepth(DEPTH - 1);
     fx.objs.add(dark);
     await fx.tween({ targets: dark, fillAlpha: 0.6, duration: 200 });
     fx.def.setTintFill(0x3a2050);
@@ -939,7 +939,7 @@ const KINDS = {
 
   // Thunder: sét giáng từ trời xuống mục tiêu
   async skyBolt(fx) {
-    const flash = fx.scene.add.rectangle(0, 0, 960, 548, 0xffffff, 0).setOrigin(0).setDepth(DEPTH - 1);
+    const flash = fx.scene.add.rectangle(-BLEED, 0, 960 + BLEED * 2, 548, 0xffffff, 0).setOrigin(0).setDepth(DEPTH - 1);
     fx.objs.add(flash);
     fx.tween({ targets: flash, fillAlpha: 0.6, duration: 60, yoyo: true, repeat: 1 });
     await fx.bolt({ x: fx.B.x + rnd(-30, 30), y: 0 }, fx.B, { width: 12, times: 6, segs: 9, jitter: 30 });

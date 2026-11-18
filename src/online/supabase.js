@@ -22,6 +22,43 @@ export function clearLinkError() {
   history.replaceState(null, '', location.pathname);
 }
 
+// "Ghi nhớ đăng nhập" (bảng đăng nhập, mặc định bật): phiên đăng nhập lưu trong localStorage, mở lại game là vào luôn.
+// Tắt thì lưu trong sessionStorage: đóng tab / trình duyệt là phải đăng nhập lại
+const REMEMBER_KEY = 'pokemon-demo-remember';
+const EMAIL_KEY = 'pokemon-demo-last-email';
+const safe = (fn, fallback = null) => {
+  try {
+    return fn();
+  } catch {
+    return fallback; // trình duyệt chặn localStorage / sessionStorage
+  }
+};
+export const rememberLogin = () => safe(() => localStorage.getItem(REMEMBER_KEY) !== '0', true);
+export function setRememberLogin(on) {
+  safe(() => localStorage.setItem(REMEMBER_KEY, on ? '1' : '0'));
+}
+// Email đăng nhập lần trước (điền sẵn khi Ghi nhớ đăng nhập đang bật)
+export const lastEmail = () => (rememberLogin() ? safe(() => localStorage.getItem(EMAIL_KEY) ?? '', '') : '');
+export function setLastEmail(email) {
+  safe(() => (rememberLogin() && email ? localStorage.setItem(EMAIL_KEY, email) : localStorage.removeItem(EMAIL_KEY)));
+}
+
+// Chỗ supabase-js cất phiên đăng nhập: theo Ghi nhớ đăng nhập, xoá bản ở chỗ còn lại để không sót phiên cũ
+const sessionStore = {
+  getItem: (k) => safe(() => localStorage.getItem(k) ?? sessionStorage.getItem(k)),
+  setItem: (k, v) => safe(() => {
+    const [keep, drop] = rememberLogin() ? [localStorage, sessionStorage] : [sessionStorage, localStorage];
+    keep.setItem(k, v);
+    drop.removeItem(k);
+  }),
+  removeItem: (k) => safe(() => {
+    localStorage.removeItem(k);
+    sessionStorage.removeItem(k);
+  }),
+};
+
 export const supabase = URL && KEY
-  ? createClient(URL, KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } })
+  ? createClient(URL, KEY, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: sessionStore },
+  })
   : null;

@@ -1,8 +1,27 @@
 import Phaser from 'phaser';
 import { STATUS_INFO } from '../battle/status.js';
-import { FONT } from '../config.js';
+import { FONT, GAME_WIDTH, MAX_WIDTH } from '../config.js';
 
 const { Color } = Phaser.Display;
+
+// Khung thiết kế 960x720 nằm giữa màn hình rộng: lệch sang phải chừng này px (0 khi màn hình 4:3).
+// Bảng / menu vẽ theo toạ độ trong khung: đặt container ở x = uiX(scene), đổi toạ độ chuột: p.x - uiX(scene)
+export const uiX = (scene) => Math.round((scene.scale.width - GAME_WIDTH) / 2);
+// Toạ độ x của con trỏ trong khung thiết kế (dùng để so với vị trí nút / ô trong bảng)
+export const localX = (scene, p) => p.x - uiX(scene);
+
+// Lề thừa tối đa mỗi bên (màn hình rộng nhất, MAX_WIDTH): nền của màn hình toàn khung vẽ tràn ra chừng này để luôn kín
+export const BLEED = (MAX_WIDTH - GAME_WIDTH) / 2;
+
+// Màn hình toàn khung (trận đấu, Pokédex, cửa hàng...): toạ độ vẽ theo khung 960x720, camera dịch để khung nằm giữa.
+// Nền vẽ tràn BLEED px mỗi bên. Đổi cỡ màn hình giữa chừng thì dịch lại camera
+export function centerStage(scene) {
+  const cam = scene.cameras.main;
+  const place = () => cam.setScroll(-uiX(scene), 0);
+  place();
+  scene.scale.on('resize', place);
+  scene.events.once('shutdown', () => scene.scale.off('resize', place));
+}
 
 export const COLORS = {
   ink: 0x2c3550, // viền khung

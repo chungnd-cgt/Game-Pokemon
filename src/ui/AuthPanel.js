@@ -1,6 +1,7 @@
 import {
   PASSWORD_MIN, onSignedIn, resendConfirmation, sendPasswordReset, setNewPassword, signIn, signUp,
 } from '../online/account.js';
+import { lastEmail, rememberLogin, setLastEmail, setRememberLogin } from '../online/supabase.js';
 
 // Bảng đăng nhập / đăng ký / quên mật khẩu / đặt mật khẩu mới. Là HTML đặt đè lên game (không vẽ trong Phaser) để gõ
 // được tiếng Việt, trình duyệt gợi ý lưu mật khẩu và bàn phím điện thoại hiện đúng kiểu (email / mật khẩu).
@@ -33,6 +34,8 @@ const CSS = `
 #auth .msg.err { background: #4a1e26; color: #ffb4b4; }
 #auth .msg.ok { background: #1e4a32; color: #b4f0c8; }
 #auth .msg:empty { display: none; }
+#auth .remember { display: flex; align-items: center; gap: 8px; margin: 12px 0 0; font-size: 15px; cursor: pointer; }
+#auth .remember input { width: 18px; height: 18px; margin: 0; accent-color: #40b060; cursor: pointer; }
 `;
 
 const VIEWS = {
@@ -54,7 +57,7 @@ export class AuthPanel {
       document.head.appendChild(style);
     }
     this.firstError = opts.error ?? null;
-    this.email = '';
+    this.email = lastEmail();
   }
 
   open() {
@@ -112,6 +115,8 @@ export class AuthPanel {
             autocomplete="${view === 'login' ? 'current-password' : 'new-password'}">` : ''}
         ${view === 'register' || view === 'newPassword' ? `<label for="auth-pass2">Nhập lại mật khẩu</label>
           <input id="auth-pass2" type="password" autocomplete="new-password" maxlength="72">` : ''}
+        ${view === 'login' ? `<label class="remember"><input id="auth-remember" type="checkbox" ${rememberLogin() ? 'checked' : ''}>
+          Ghi nhớ đăng nhập</label>` : ''}
         <button class="main" type="submit">${v.button}</button>
         <div class="msg"></div>
         ${view === 'login' ? '<div class="row"><button type="button" class="link" data-go="forgot">Quên mật khẩu?</button></div>' : ''}
@@ -171,11 +176,14 @@ export class AuthPanel {
     this.busy(true);
     this.say('');
     if (view === 'login') {
+      // Đặt trước khi đăng nhập: supabase-js cất phiên vào đúng chỗ (localStorage / sessionStorage)
+      setRememberLogin(this.root.querySelector('#auth-remember')?.checked ?? true);
       const res = await signIn(email, password);
       if (!this.root) return; // tab khác vừa đăng nhập xong
       this.busy(false);
       if (res.code === 'email_not_confirmed') return this.say(res.error, true, this.resendAction(email));
       if (res.error) return this.say(res.error);
+      setLastEmail(email);
       this.finish(res.data.user);
     } else if (view === 'register') {
       const res = await signUp(email, password);
