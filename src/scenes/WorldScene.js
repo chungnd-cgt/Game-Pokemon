@@ -17,7 +17,9 @@ import { giveHeldItem } from '../game/heldItems.js';
 import { assignHotbar, setHotbarSlot, swapHotbarSlots } from '../game/hotbar.js';
 import { repelBlocks, startRepel, stepRepel } from '../game/repel.js';
 import { applyItem, escapeProblem, itemProblem, needsMove } from '../game/itemUse.js';
-import { saveBlocked, saveGame } from '../game/save.js';
+import { saveBlockMessage, saveBlocked, saveGame } from '../game/save.js';
+import { signOut } from '../online/account.js';
+import { stopCloudSave } from '../online/cloudSave.js';
 import { forfeitable, rematchDef, trainerBeaten, trainerForfeit, trainerReady } from '../game/trainers.js';
 import { addItem, blackoutLoss, hasFlag, healParty, itemCount, setFlag, state, swapParty, useItem } from '../game/state.js';
 import { Ambience } from '../gfx/ambience.js';
@@ -429,7 +431,7 @@ ${this.map.name}`, this.ambience.state.tod);
     });
     if (!ok && saveBlocked() && !this.warnedStale) {
       this.warnedStale = true;
-      this.hud.showSaveNote('Game đang chơi ở tab khác, tab này không lưu nữa', true);
+      this.hud.showSaveNote(saveBlockMessage() ?? 'Game đang chơi ở tab khác, tab này không lưu nữa', true);
     }
     return ok;
   }
@@ -2781,6 +2783,7 @@ ${this.map.name}`, this.ambience.state.tod);
         depth: HUD_DEPTH + 10,
         state: panelState,
         hasMap: itemCount('townMap') > 0,
+        account: this.registry.get('user')?.email ?? null,
         onApplied: (keys) => {
           if (keys.includes('lighting') || keys.includes('weather')) this.ambience.refresh(true);
         },
@@ -2814,6 +2817,15 @@ ${this.map.name}`, this.ambience.state.tod);
           this.player.setTexture(this.playerTexture(this.vehicle === 'bike'));
           this.setFrame('stand');
           this.save();
+        }
+      } else if (action === 'logout') {
+        if (await this.ask('Đăng xuất khỏi tài khoản? Tiến độ đã được lưu.', null, { safe: true })) {
+          // Lưu và gửi nốt bản lưu lên mạng rồi mới đăng xuất; tải lại trang để về màn đăng nhập với trạng thái sạch
+          this.save();
+          await stopCloudSave();
+          await signOut();
+          window.location.reload();
+          return;
         }
       }
     }

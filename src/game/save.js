@@ -5,25 +5,90 @@ import { MOVES } from '../data/moves.js';
 import { restUntil } from './trainers.js';
 import { addItem, resetState, state } from './state.js';
 
-// Lưu game vào localStorage của trình duyệt (mỗi trình duyệt / máy một bản lưu)
-const KEY = 'pokemon-demo-save-v1';
+// Lưu game vào localStorage của trình duyệt. Đã đăng nhập thì mỗi tài khoản một bản lưu riêng trên máy (setSaveOwner),
+// rồi online/cloudSave.js gửi bản đó lên Supabase (nghe qua onSaved). File này không gọi mạng, để test chạy bằng Node được
+const BASE_KEY = 'pokemon-demo-save-v1';
+let KEY = BASE_KEY; // chưa đăng nhập (test, bản lưu cũ trước khi có tài khoản): khoá chung
 // Phiên bản bản lưu: 2 = có quà của mẹ / HM Surf trong cốt truyện (bản lưu cũ hơn được bổ sung khi tải)
 const VERSION = 2;
 // Mỗi tab một phiên: tab khác đã lưu mới hơn thì tab này thôi lưu (không ghi đè tiến độ của tab kia)
 const SESSION = Math.random().toString(36).slice(2);
 let lastWrite = 0;
 let blocked = false;
+let blockMessage = null;
 export const saveBlocked = () => blocked;
+// Câu báo khi thôi lưu (null: do tab khác trong cùng trình duyệt)
+export const saveBlockMessage = () => blockMessage;
 
-function read() {
+// Thôi lưu hẳn (vd tài khoản vừa được lưu từ máy khác): không ghi đè tiến độ mới hơn ở nơi khác
+export function blockSaves(message) {
+  blocked = true;
+  blockMessage = message;
+}
+
+// Bản lưu trên máy của tài khoản này (uid Supabase)
+export function setSaveOwner(uid) {
+  KEY = uid ? `${BASE_KEY}:${uid}` : BASE_KEY;
+  lastPosition = null;
+  lastWrite = 0;
+  blocked = false;
+  blockMessage = null;
+}
+
+// Gọi sau mỗi lần ghi bản lưu thành công, với đúng dữ liệu vừa ghi
+const savedListeners = [];
+export const onSaved = (fn) => savedListeners.push(fn);
+
+function readKey(key) {
   try {
-    return JSON.parse(localStorage.getItem(KEY));
+    return JSON.parse(localStorage.getItem(key));
   } catch {
     return null;
   }
 }
 
+const read = () => readKey(KEY);
+
 export const hasSave = () => Boolean(read());
+
+// Bản lưu thô (đúng như trong localStorage) của tài khoản hiện tại, hoặc null
+export const readSave = () => read();
+
+// Ghi đè bản lưu trên máy bằng dữ liệu thô (bản tải từ Supabase). Không báo onSaved (không cần gửi lại lên mạng)
+export function writeSave(data) {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(data));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Bản lưu cũ trên máy từ trước khi có tài khoản (khoá chung), để chuyển vào tài khoản lần đăng nhập đầu
+export const legacySave = () => (KEY === BASE_KEY ? null : readKey(BASE_KEY));
+export function clearLegacySave() {
+  try {
+    localStorage.removeItem(BASE_KEY);
+  } catch {
+    // trình duyệt chặn localStorage
+  }
+}
+
+// Tóm tắt một bản lưu thô (tên, Pokémon đầu đội, giờ chơi...) để hiện cho người chơi
+export function summarize(data) {
+  if (!data) return null;
+  return {
+    name: data.player?.name ?? '',
+    gender: data.player?.gender ?? 'male',
+    look: data.player?.look ? normalizeCustom(data.player.gender, data.player.look) : null,
+    lead: data.party?.[0] ?? null,
+    partySize: data.party?.length ?? 0,
+    caught: data.dex?.caught?.length ?? 0,
+    money: data.money ?? 0,
+    playTime: data.playTime ?? 0,
+    savedAt: data.savedAt,
+  };
+}
 
 // Vị trí lần lưu gần nhất: trong trận đấu lưu lại (sau mỗi lượt) mà không cần biết người chơi đứng đâu
 let lastPosition = null;
@@ -66,6 +131,7 @@ export function saveGame(position = lastPosition) {
   try {
     localStorage.setItem(KEY, JSON.stringify(data));
     lastWrite = data.savedAt;
+    for (const fn of savedListeners) fn(data);
     return true;
   } catch {
     return false;
@@ -149,17 +215,5 @@ export function deleteSave() {
 
 // Thông tin ngắn để hiện ở màn hình chính
 export function saveSummary() {
-  const data = read();
-  if (!data) return null;
-  return {
-    name: data.player?.name ?? '',
-    gender: data.player?.gender ?? 'male',
-    look: data.player?.look ? normalizeCustom(data.player.gender, data.player.look) : null,
-    lead: data.party?.[0] ?? null,
-    partySize: data.party?.length ?? 0,
-    caught: data.dex?.caught?.length ?? 0,
-    money: data.money ?? 0,
-    playTime: data.playTime ?? 0,
-    savedAt: data.savedAt,
-  };
+  return summarize(read());
 }

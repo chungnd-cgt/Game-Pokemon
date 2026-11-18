@@ -68,7 +68,7 @@ function currentValues() {
   };
 }
 
-// Các thẻ và dòng trong thẻ. opts: { hasMap, game }
+// Các thẻ và dòng trong thẻ. opts: { hasMap, account (email đang đăng nhập), game }
 function buildTabs(opts) {
   const fsNote = fullscreen.available ? null
     : isTouchDevice() ? 'Máy này không hỗ trợ. Mẹo: "Thêm vào Màn hình chính" để chơi toàn màn hình.' : 'Trình duyệt không hỗ trợ.';
@@ -94,6 +94,10 @@ function buildTabs(opts) {
         { type: 'check', key: 'catchPreview', label: 'Xem nhanh Pokémon gửi vào PC' },
         ...(opts.hasMap ? [{ type: 'button', label: 'Bản đồ vùng', action: 'map' }] : []),
         { type: 'button', label: 'Đổi diện mạo', action: 'look' },
+        ...(opts.account ? [
+          { type: 'info', text: () => `Tài khoản: ${opts.account}` },
+          { type: 'button', label: 'Đăng xuất', action: 'logout' },
+        ] : []),
       ],
     },
     {
@@ -114,7 +118,7 @@ function buildTabs(opts) {
 const focusable = (row) => row.type !== 'info' && !row.disabled;
 
 export class SettingsPanel {
-  // opts: { depth, hasMap, state (từ lần mở trước), onApplied(keys) }
+  // opts: { depth, hasMap, account, state (từ lần mở trước), onApplied(keys) }
   constructor(scene, router, opts = {}) {
     this.scene = scene;
     this.router = router;

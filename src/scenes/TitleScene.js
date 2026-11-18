@@ -1,7 +1,11 @@
 import Phaser from 'phaser';
 import { formatMoney } from '../data/items.js';
 import { MAPS, SPAWN, resumePosition } from '../data/map.js';
-import { deleteSave, loadGame, saveSummary } from '../game/save.js';
+import { clearLegacySave, deleteSave, legacySave, loadGame, summarize, writeSave } from '../game/save.js';
+import { currentUser } from '../online/account.js';
+import { markDirty, startCloudSave } from '../online/cloudSave.js';
+import { clearLinkError, emailLink, supabase } from '../online/supabase.js';
+import { AuthPanel } from '../ui/AuthPanel.js';
 import { DEFAULT_NAMES, resetState, state } from '../game/state.js';
 import { monImagesReady } from '../gfx/monImages.js';
 import { applyPlayerLook } from '../gfx/player.js';
@@ -11,7 +15,7 @@ import { COLORS, closeButton, drawPanel, gradientRect, textStyle } from '../ui/h
 import { InputRouter } from '../ui/input.js';
 import { Menu } from '../ui/Menu.js';
 
-// Màn hình chính: Tiếp tục (nếu có bản lưu) / Chơi mới (chọn giới tính + tuỳ chỉnh diện mạo, đặt tên) / Xoá dữ liệu
+// Màn hình chính: đăng nhập / đăng ký rồi vào game luôn (có bản lưu thì chơi tiếp, chưa có thì tạo nhân vật)
 const NAME_MAX = 12;
 // Bản đồ trong nhà trước kia thuộc Pallet, giờ thuộc Thị trấn Lục Bình (xem bước tải bản lưu)
 const OLD_PALLET_SHOPS = ['center', 'mart'];
@@ -50,61 +54,103 @@ export default class TitleScene extends Phaser.Scene {
     this.run().catch((err) => console.error('Lỗi màn hình chính:', err));
   }
 
+  // Đăng nhập (ui/AuthPanel.js) rồi vào game luôn: có bản lưu thì chơi tiếp, chưa có thì tạo nhân vật và chơi mới.
+  // Không còn menu Tiếp tục / Chơi mới / Xoá dữ liệu: mỗi tài khoản đúng 1 bản lưu (online/cloudSave.js)
   async run() {
+    if (!supabase) {
+      this.status('Chưa cấu hình Supabase: tạo file .env.local theo .env.example rồi chạy lại.', true);
+      return;
+    }
+    let user = await currentUser();
+    // Link "đặt lại mật khẩu" trong email: đã có phiên tạm, đặt mật khẩu mới rồi vào game
+    if (user && emailLink.recovery) user = await new AuthPanel().openNewPassword();
+    if (!user) {
+      const linkError = emailLink.errorCode
+        ? 'Link trong email đã hết hạn hoặc đã dùng rồi. Hãy đăng nhập, hoặc gửi lại email.' : null;
+      clearLinkError();
+      user = await new AuthPanel({ error: linkError }).open();
+    }
+
+    this.registry.set('user', { id: user.id, email: user.email });
     for (;;) {
-      const summary = saveSummary();
-      const items = [];
-      if (summary) items.push({ label: 'Tiếp tục', value: 'continue', color: 0x40b060 });
-      items.push({ label: 'Chơi mới', value: 'new', color: 0x4a88e0 });
-      if (summary) items.push({ label: 'Xoá dữ liệu', value: 'delete', color: 0xc84848 });
-
-      const info = summary ? this.showSummary(summary) : null;
-      const choice = await new Menu(this, this.router, {
-        x: 330, y: 420, width: 300, height: 30 + items.length * 64, variant: 'buttons', items, cancelable: false,
-      }).open();
-      info?.destroy();
-
-      if (choice === 'delete') {
-        if (await this.confirm('Xoá vĩnh viễn bản lưu hiện tại? Không thể khôi phục.')) deleteSave();
+      this.status('Đang tải bản lưu…');
+      const { hasSave, offline } = await startCloudSave(user);
+      this.status(offline && hasSave ? 'Không kết nối được máy chủ: chơi bằng bản lưu trên máy, có mạng sẽ tự gửi lên.' : '');
+      if (offline && !hasSave) {
+        // Chưa có gì trên máy mà cũng không tải được bản trên mạng: không được chơi mới (sẽ ghi đè bản lưu trên mạng)
+        this.status('Không kết nối được máy chủ để tải bản lưu.', true);
+        await this.confirm('Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.', [{ label: 'Thử lại', value: true }]);
         continue;
       }
-
-      if (choice === 'continue') {
-        let position = null;
-        try {
-          position = loadGame();
-        } catch (err) {
-          console.error('Bản lưu bị lỗi:', err);
-        }
-        // Nơi hồi phục trong bản lưu không còn (bản đồ cũ đã đổi tên): về nhà khi thua / dùng Escape Rope
-        if (state.lastCenter && !MAPS[state.lastCenter.map]) state.lastCenter = null;
-        // Bản lưu cũ: Pokémon Center / Poké Mart trước kia ở Pallet, giờ thuộc Thị trấn Lục Bình. Chưa tới Lục Bình thì
-        // không tỉnh dậy / đứng ở đó (đi tắt qua cổng Pallet): thua thì về nhà, đang đứng trong cửa hàng thì ra Pallet
-        if (!state.visited.has('town1')) {
-          if (OLD_PALLET_SHOPS.includes(state.lastCenter?.map)) state.lastCenter = null;
-          if (OLD_PALLET_SHOPS.includes(position?.map)) position = { map: 'route1', x: 13, y: 11, facing: 'down' };
-        }
-        if (position) {
-          applyPlayerLook(this, state.player);
-          const start = resumePosition(position);
-          this.go({ position: start });
-          return;
-        }
-        const warn = this.add.text(480, 412, 'Bản lưu bị lỗi, không tải được. Hãy chọn Chơi mới.', textStyle(18, '#ffb0b0')).setOrigin(0.5);
-        this.time.delayedCall(3000, () => warn.destroy());
-        continue;
-      }
-      if (!summary || (await this.confirm('Bản lưu cũ sẽ bị xoá. Chơi lại từ đầu?'))) {
-        const player = await this.createCharacter();
-        if (!player) continue;
-        deleteSave();
-        resetState();
-        state.player = player;
-        applyPlayerLook(this, state.player);
-        this.go({ position: SPAWN, newGame: true });
+      if (hasSave) {
+        if (this.continueGame()) return;
+        // Bản lưu hỏng không tải được: không tự xoá, để người chơi báo lỗi (bản trên mạng vẫn còn nguyên)
+        this.status('Bản lưu bị lỗi, không tải được. Hãy liên hệ người làm game.', true);
         return;
       }
+      if (await this.adoptLegacySave()) {
+        markDirty();
+        if (this.continueGame()) return;
+      }
+      await this.newGame();
+      return;
     }
+  }
+
+  // Dòng trạng thái dưới màn hình chính (đang tải, lỗi kết nối...)
+  status(text, error = false) {
+    this.statusText ??= this.add.text(480, 560, '', textStyle(20, '#ffffff', {
+      fontStyle: 'bold', align: 'center', wordWrap: { width: 820 }, stroke: '#0a1430', strokeThickness: 4,
+    })).setOrigin(0.5, 0);
+    this.statusText.setText(text).setColor(error ? '#ffb0b0' : '#ffffff');
+  }
+
+  // Tải bản lưu trên máy (đã đồng bộ với bản trên mạng) rồi vào game. false nếu bản lưu hỏng
+  continueGame() {
+    let position = null;
+    try {
+      position = loadGame();
+    } catch (err) {
+      console.error('Bản lưu bị lỗi:', err);
+    }
+    // Nơi hồi phục trong bản lưu không còn (bản đồ cũ đã đổi tên): về nhà khi thua / dùng Escape Rope
+    if (state.lastCenter && !MAPS[state.lastCenter.map]) state.lastCenter = null;
+    // Bản lưu cũ: Pokémon Center / Poké Mart trước kia ở Pallet, giờ thuộc Thị trấn Lục Bình. Chưa tới Lục Bình thì
+    // không tỉnh dậy / đứng ở đó (đi tắt qua cổng Pallet): thua thì về nhà, đang đứng trong cửa hàng thì ra Pallet
+    if (!state.visited.has('town1')) {
+      if (OLD_PALLET_SHOPS.includes(state.lastCenter?.map)) state.lastCenter = null;
+      if (OLD_PALLET_SHOPS.includes(position?.map)) position = { map: 'route1', x: 13, y: 11, facing: 'down' };
+    }
+    if (!position) return false;
+    applyPlayerLook(this, state.player);
+    this.go({ position: resumePosition(position) });
+    return true;
+  }
+
+  // Tài khoản chưa có bản lưu mà máy này còn bản lưu từ trước khi có tài khoản: hỏi có dùng bản đó không (chỉ hỏi
+  // khi tài khoản chưa có gì). Đồng ý thì chép vào tài khoản và xoá bản cũ khỏi máy
+  async adoptLegacySave() {
+    const old = summarize(legacySave());
+    if (!old) return false;
+    const info = this.showSummary(old);
+    const yes = await this.confirm('Máy này có bản lưu từ trước khi có tài khoản. Dùng bản lưu đó cho tài khoản này?');
+    info.destroy();
+    if (!yes) return false;
+    writeSave(legacySave());
+    clearLegacySave();
+    return true;
+  }
+
+  // Chơi mới: tạo nhân vật (bấm quay lại thì mở lại bảng tạo nhân vật, không có màn nào khác để về)
+  async newGame() {
+    this.status('');
+    let player = null;
+    while (!player) player = await this.createCharacter();
+    deleteSave();
+    resetState();
+    state.player = player;
+    applyPlayerLook(this, state.player);
+    this.go({ position: SPAWN, newGame: true });
   }
 
   // Khung thông tin bản lưu bên cạnh nút Tiếp tục
@@ -201,15 +247,15 @@ export default class TitleScene extends Phaser.Scene {
     return result;
   }
 
-  // Hỏi lại trước khi xoá bản lưu (mặc định chọn Không)
-  async confirm(question) {
+  // Hỏi Có / Không (mặc định chọn Không). items: thay hai lựa chọn mặc định
+  async confirm(question, items = [{ label: 'Có', value: true }, { label: 'Không', value: false }]) {
     const c = this.add.container(0, 0).setDepth(30);
     c.add(this.add.rectangle(480, 360, 960, 720, 0x000000, 0.5));
     c.add(drawPanel(this, 210, 250, 540, 110, 16, true));
     c.add(this.add.text(480, 280, question, textStyle(22, COLORS.text, { wordWrap: { width: 500 }, align: 'center' })).setOrigin(0.5, 0));
     const ok = await new Menu(this, this.router, {
-      x: 380, y: 370, width: 200, height: 140, depth: 40,
-      items: [{ label: 'Có', value: true }, { label: 'Không', value: false }], index: 1,
+      x: 380, y: 370, width: 200, height: 30 + items.length * 55, depth: 40, items, index: items.length - 1,
+      cancelable: items.length > 1,
     }).open();
     c.destroy();
     return ok === true;

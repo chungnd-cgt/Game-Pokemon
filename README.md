@@ -14,6 +14,33 @@ npm run dev      # mở http://localhost:5173 trên trình duyệt
 
 Sửa code xong, trình duyệt tự tải lại.
 
+## Tài khoản & bản lưu trên mạng (Supabase)
+
+Phải đăng nhập mới chơi được. Mỗi tài khoản đúng **1 bản lưu**, nằm trên [Supabase](https://supabase.com) nên đổi máy /
+trình duyệt vẫn chơi tiếp được.
+
+**Cài đặt lần đầu** (người làm game, một lần cho mỗi project Supabase):
+
+1. Tạo project Supabase. Authentication → Sign In / Providers → **Email**: bật. "Confirm email" bật thì người chơi phải bấm
+   link trong email mới đăng nhập được. Dịch vụ gửi mail có sẵn của Supabase chỉ gửi được rất ít mail; cho người khác chơi thì
+   cấu hình SMTP riêng (Authentication → Emails → SMTP Settings).
+2. Authentication → URL Configuration: **Site URL** = địa chỉ game (chạy dev: `http://localhost:5173`); thêm địa chỉ thật vào
+   **Redirect URLs** khi deploy. Link trong email (xác nhận, đặt lại mật khẩu) mở lại đúng địa chỉ này.
+3. SQL Editor → dán toàn bộ [`supabase/schema.sql`](supabase/schema.sql) → **Run** (tạo bảng `saves`, bật RLS: mỗi người chỉ
+   đọc / ghi được bản lưu của mình).
+4. Chép `.env.example` thành `.env.local`, điền **Project URL** và khoá **anon / publishable** (Project Settings → API Keys).
+   Không bao giờ dùng khoá secret / service_role trong game. `.env.local` không được đưa lên git.
+
+**Luồng chơi:** mở game → bảng **Đăng nhập / Đăng ký / Quên mật khẩu** (`src/ui/AuthPanel.js`, HTML đè lên game). Đăng nhập
+xong vào game luôn: tài khoản có bản lưu thì chơi tiếp, chưa có thì tạo nhân vật rồi chơi mới (không còn menu Tiếp tục / Chơi
+mới / Xoá dữ liệu). Đăng ký khi bật "Confirm email": bấm link trong email là game tự đăng nhập. Đăng nhập lần đầu mà máy này
+còn bản lưu từ trước khi có tài khoản thì game hỏi có dùng bản đó cho tài khoản không. **Đăng xuất**: Cài đặt → Chung.
+
+**Lưu game** vẫn như cũ (tự lưu vào máy sau mỗi sự kiện, mỗi lượt đánh...), rồi `src/online/cloudSave.js` gửi bản mới nhất
+lên Supabase vài giây sau lần lưu và ngay khi ẩn / đóng tab. Tắt ngang, văng game, mất mạng: bản trên máy vẫn còn, lần mở game
+sau thấy còn thay đổi chưa gửi thì dùng bản trên máy và gửi lên. Mở cùng tài khoản ở hai nơi: nơi lưu trước được giữ, nơi
+còn lại thôi lưu và báo đỏ ở góc màn hình (bảng `saves` có cột `version` tự tăng, ghi lên kèm điều kiện đúng version).
+
 ## Build ra web
 
 ```bash
@@ -31,7 +58,7 @@ và phòng thí nghiệm của Giáo sư Oak. Pallet **không có Pokémon Cente
 Sông Lục Bình). Bãi cỏ không có vật phẩm; hai góc dưới thị trấn có 2 thuốc giải độc (trái) và 2 thuốc giải tê liệt (phải).
 Không có cây quả mọng.
 
-0. Bấm **Chơi mới**: tạo nhân vật (giới tính, kiểu tóc, màu tóc, màu da, trang phục, màu mắt), rồi gõ tên (tối đa 12 ký tự, gõ được tiếng Việt;
+0. Đăng nhập tài khoản chưa có bản lưu: tạo nhân vật (giới tính, kiểu tóc, màu tóc, màu da, trang phục, màu mắt), rồi gõ tên (tối đa 12 ký tự, gõ được tiếng Việt;
    để trống thì tên là Khang / Linh). Tên xuất hiện trong lời chào, lời Gary và Nhà vô địch.
 1. Thức dậy ở **phòng ngủ tầng 2**, đi cầu thang (góc trên bên phải) xuống phòng khách tầng 1 nói chuyện với **mẹ**
    (mẹ ngồi trên bộ sofa đặt đối xứng hai bên bàn nước): mẹ cho **2 Potion**.
@@ -346,12 +373,13 @@ chỉ là nháp, bấm Áp dụng / OK mới có tác dụng; Huỷ, phím quay 
 bấm nút, kéo thanh trượt; bàn phím: ↑ / ↓ chọn dòng, ← / → đổi giá trị, xác nhận để bật / tắt, Tab đổi thẻ.
 
 - **Đồ hoạ**: **Chế độ hiển thị** Cửa sổ / Toàn màn hình (điện thoại: khoá màn hình ngang; iPhone Safari không hỗ trợ, dùng
-  "Thêm vào Màn hình chính"), **Giới hạn FPS** 30 / 60 / Theo màn hình (30 đỡ tốn pin, `src/game/display.js`),
+  "Thêm vào Màn hình chính"), **Kích thước khung hình** Vừa màn hình (giữ tỉ lệ 4:3) / Kéo giãn (lấp đầy, hình hơi méo) / Gốc 960×720,
+  **Giới hạn FPS** 30 / 60 / Theo màn hình (30 đỡ tốn pin, `src/game/display.js`),
   **Ánh sáng ngày đêm** và **Hiệu ứng thời tiết** (mưa, tuyết, mưa đá, bão cát) bật / tắt riêng.
 - **Chung**: **Xem nhanh Pokémon gửi vào PC** (mặc định bật): đội đã đủ 6 mà bắt thêm thì Pokémon tự vào hộp PC; khi bật, ngay
   sau khi bắt hiện bảng nhỏ cho biết cấp, giới tính, hệ, tính cách, đặc tính (đặc tính ẩn tô tím) và IV từng chỉ số; bấm phím
   xác nhận / quay lại hoặc bấm chuột để đóng. **Bản đồ vùng** (khi đã có bản đồ), **Đổi diện mạo** (mở lại bảng tạo nhân vật,
-  đổi xong nhân vật trên bản đồ đổi ngay).
+  đổi xong nhân vật trên bản đồ đổi ngay), email tài khoản đang đăng nhập và **Đăng xuất**.
 - **Điều khiển**: **Nút cảm ứng** Tự động (máy cảm ứng thì hiện) / Bật / Tắt, **cỡ nút**, **độ đậm nút**, **rung khi bấm**,
   **Phím tắt bàn phím** (xem mục Phím tắt bên dưới).
 
@@ -363,16 +391,15 @@ bên phải (`src/ui/TouchControls.js`). Nút cảm ứng giả lập đúng ph�
 phím hướng là đi liên tục, trượt ngón tay sang hướng khác là đổi hướng ngay, giữ lâu trong menu thì con trỏ tự chạy. Các nút
 khác trên màn hình (cột Pokémon, Túi đồ, ô phím tắt, menu trận đấu...) chạm trực tiếp. Trang không cuộn / phóng to khi chạm.
 
-Màn hình chính có **Tiếp tục** (chơi tiếp bản lưu), **Chơi mới** (chọn nhân vật, đặt tên; bản lưu cũ bị thay) và **Xoá dữ liệu** (xoá bản lưu, có hỏi lại).
-Bản lưu nằm trong trình duyệt đang dùng, đổi trình duyệt hoặc xoá dữ liệu trang web là mất.
+Bản lưu gắn với tài khoản (xem mục Tài khoản & bản lưu trên mạng), đổi máy / trình duyệt chỉ cần đăng nhập lại.
 
 ### Tải game nhanh
 
 Mở link là có ngay màn hình **Đang tải** (Poké Ball quay + thanh tiến độ, `#loading` trong `index.html`) thay vì màn đen.
 Màn hình chính hiện sau khi nạp đúng vài hình nó cần (3 Pokémon trên màn hình chính, loài làm icon thú cưỡi); 453 hình SVG
 Pokémon còn lại nạp ngầm trong lúc người chơi ở màn hình chính (`src/gfx/monImages.js`, mặt trước trước, rồi lưng, rồi
-nghiêng). Hình chỉ giữ dạng ảnh trong bộ nhớ, không đẩy lên GPU, tới lúc cần mới thu thành sprite GBA. Bấm Tiếp tục / Chơi
-mới khi chưa nạp xong thì hiện "Đang tải hình Pokémon… %" chờ nốt. Bản đồ chỉ được vẽ khi bước vào (`ensureMapTextures` trong
+nghiêng). Hình chỉ giữ dạng ảnh trong bộ nhớ, không đẩy lên GPU, tới lúc cần mới thu thành sprite GBA. Vào game khi chưa
+nạp xong thì hiện "Đang tải hình Pokémon… %" chờ nốt. Bản đồ chỉ được vẽ khi bước vào (`ensureMapTextures` trong
 `src/gfx/world.js`), giữ 6 bản đồ gần nhất, bản đồ cũ hơn được giải phóng (trước kia vẽ sẵn cả 101 bản đồ lúc khởi động,
 ~300MB bộ nhớ).
 
