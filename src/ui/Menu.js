@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { ITEMS } from '../data/items.js';
 import { fitScale, pixelMon } from '../gfx/textures.js';
-import { COLORS, GENDER, closeButton, cssColor, drawHpBar, drawPanel, fitText, fixToCamera, hpLabel, monTag, shade, textStyle } from './helpers.js';
+import { COLORS, GENDER, closeButton, cssColor, drawHpBar, drawPanel, fitText, fixToCamera, hpLabel, localX, monTag, shade, textStyle, uiX } from './helpers.js';
 import { directionOf, isCancel, isConfirm } from './input.js';
 import { withShinyMark } from './shinyMark.js';
 
@@ -114,7 +114,7 @@ export class Menu {
     this.lastRow = rows - 1;
     if (this.visibleRows < rows) {
       this.onWheel = (p, objs, dx, dy) => {
-        if (this.bounds.contains(p.x, p.y) && dy) this.scrollBy(Math.sign(dy));
+        if (this.bounds.contains(localX(this.scene, p), p.y) && dy) this.scrollBy(Math.sign(dy));
       };
       scene.input.on('wheel', this.onWheel);
     }
@@ -129,7 +129,8 @@ export class Menu {
     this.cells.forEach((_, i) => this.drawCell(i, false));
     this.index = -1;
     this.select(Phaser.Math.Clamp(opts.index ?? 0, 0, items.length - 1));
-    if (opts.fixed) fixToCamera(this.container);
+    // Trên bản đồ (cố định theo màn hình): dời vào giữa màn hình rộng
+    if (opts.fixed) fixToCamera(this.container).setX(uiX(scene));
   }
 
   renderContent(cell, item, w, h) {
@@ -215,7 +216,7 @@ export class Menu {
         (e) => e.timeStamp >= openedAt && this.handleKey(e),
         (p) => {
           if (p.downTime < openedAt) return;
-          const inside = this.bounds.contains(p.x, p.y) || this.inside?.(p);
+          const inside = this.bounds.contains(localX(this.scene, p), p.y) || this.inside?.(p);
           if (this.cancelable && (p.rightButtonDown() || !inside)) this.finish(null);
         },
       );
@@ -330,7 +331,7 @@ export class Menu {
     }
     this.ghost.setPosition(p.x, p.y);
     // Thả lên mục khác trong danh sách: mục đó sáng lên báo chỗ đổi
-    const target = this.drag.reorder ? this.cellAt(p.x, p.y) : -1;
+    const target = this.drag.reorder ? this.cellAt(localX(this.scene, p), p.y) : -1;
     if (target !== this.dropTarget) {
       if (this.dropTarget >= 0) this.drawCell(this.dropTarget, this.dropTarget === this.index);
       this.dropTarget = target;
@@ -345,7 +346,7 @@ export class Menu {
     if (!press || this.done) return;
     if (!this.dragging) {
       // Nhấn rồi thả trên đúng mục đó: chọn như bấm Enter
-      if (this.cellAt(p.x, p.y) === press.i) this.confirm();
+      if (this.cellAt(localX(this.scene, p), p.y) === press.i) this.confirm();
       return;
     }
     this.dragging = false;

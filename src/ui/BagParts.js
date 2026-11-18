@@ -1,5 +1,5 @@
 import { ITEMS } from '../data/items.js';
-import { fixToCamera, textStyle } from './helpers.js';
+import { fixToCamera, textStyle, uiX } from './helpers.js';
 
 const TIP_W = 230;
 const DARK = 0x141a2c;
@@ -24,6 +24,7 @@ export class ItemTip {
     this.desc.setText(item.desc ?? '');
     const h = 46 + this.desc.height;
     const top = Math.max(8, Math.min(this.scene.scale.height - h - 8, y - h / 2));
+    this.container.setX(uiX(this.scene)); // x theo khung thiết kế, khung nằm giữa màn hình rộng
     this.bg.clear();
     this.bg.fillStyle(0x000000, 0.25);
     this.bg.fillRoundedRect(3, 5, TIP_W, h, 12);

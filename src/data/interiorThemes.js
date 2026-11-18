@@ -1,4 +1,4 @@
-// Bảng màu nội thất theo từng loại nhà / gym: bản 2D (gfx/interior.js) và bản 3D (three/interior3d.js) dùng chung.
+// Bảng màu nội thất theo từng loại nhà / gym (gfx/interior.js).
 
 export const THEMES = {
   center: {

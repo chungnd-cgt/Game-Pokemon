@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { ITEMS, STORE_STOCK, formatMoney, martStock, sellPrice } from '../data/items.js';
 import { ITEM_MAX, buy, itemCount, sell, state } from '../game/state.js';
 import { fitScale } from '../gfx/textures.js';
-import { COLORS, backToWorld, closeButton, drawPanel, hideWorldHud, textStyle } from '../ui/helpers.js';
+import { BLEED, COLORS, backToWorld, centerStage, closeButton, drawPanel, hideWorldHud, textStyle } from '../ui/helpers.js';
 import { InputRouter, directionOf, isCancel, isConfirm } from '../ui/input.js';
 import { saveGame } from '../game/save.js';
 import { progressTier } from '../story/chapter1.js';
@@ -26,7 +26,8 @@ export default class MartScene extends Phaser.Scene {
 
   create() {
     hideWorldHud(this); // bản đồ phía sau chỉ còn làm nền
-    this.add.rectangle(480, 360, 960, 720, 0x000000, 0.45);
+    centerStage(this); // màn hình rộng: khung 960x720 nằm giữa
+    this.add.rectangle(480, 360, 960 + BLEED * 2, 720, 0x000000, 0.45);
     this.router = new InputRouter(this);
 
     drawPanel(this, 600, 24, 336, 78);

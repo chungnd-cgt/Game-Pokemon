@@ -1,5 +1,4 @@
-// Bảng màu từng kiểu nhân vật (người chơi, NPC): bản 2D vẽ pixel art theo bảng này (gfx/player.js),
-// bản 3D dựng mô hình theo bảng này (three/character.js).
+// Bảng màu từng kiểu nhân vật (người chơi, NPC): vẽ pixel art theo bảng này (gfx/player.js).
 
 const SKIN = '#f8c8a0';
 // Diện mạo mặc định của người chơi (khi chưa tuỳ chỉnh). LOOKS.player / LOOKS['player-f'] là bản sao, được thay bằng

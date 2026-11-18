@@ -4,7 +4,7 @@ import { itemCount, state } from '../game/state.js';
 import { fitScale } from '../gfx/textures.js';
 import { ItemTip } from './BagParts.js';
 import { bagItems, pocketCounts, searchKey } from './bagSearch.js';
-import { closeButton, fitText, fixToCamera, textStyle } from './helpers.js';
+import { closeButton, fitText, fixToCamera, localX, textStyle, uiX } from './helpers.js';
 import { directionOf, isCancel, isConfirm, isTyping } from './input.js';
 import { HOTBAR_ACTIONS, keysFor, shortKeyName } from '../game/keybinds.js';
 
@@ -116,7 +116,8 @@ export class BagPanel {
       this.inlineTip = true;
     } else this.tip = opts.tipSide === null ? null : new ItemTip(scene, this.depth + 2);
     this.rebuild(true);
-    if (opts.fixed) fixToCamera(this.container);
+    // Trên bản đồ (cố định theo màn hình): dời vào giữa màn hình rộng
+    if (opts.fixed) fixToCamera(this.container).setX(uiX(scene));
   }
 
   // ---------- Vẽ ----------
@@ -421,7 +422,7 @@ export class BagPanel {
     const openedAt = performance.now();
     const { scene } = this;
     this.onWheel = (p, objs, dx, dy) => {
-      if (dy && this.rect.contains(p.x, p.y)) this.scrollBy(Math.sign(dy));
+      if (dy && this.rect.contains(localX(scene, p), p.y)) this.scrollBy(Math.sign(dy));
     };
     this.onMove = (p) => this.dragMove(p);
     this.onUp = (p) => this.dragEnd(p);
@@ -436,7 +437,7 @@ export class BagPanel {
         (p) => {
           if (p.downTime < openedAt) return;
           if (p.rightButtonDown()) return this.finish(null);
-          const inside = this.rect.contains(p.x, p.y) || this.opts.hotbar?.contains(p.x, p.y);
+          const inside = this.rect.contains(localX(scene, p), p.y) || this.opts.hotbar?.contains(p.x, p.y);
           if (!inside) this.finish(null);
         },
       );
@@ -541,7 +542,7 @@ export class BagPanel {
     if (!this.drag) {
       // Nhấn rồi thả trên đúng vật phẩm đó: chọn
       const c = this.cells?.[press.i];
-      if (c && Math.abs(p.x - c.cell.x) <= this.cellW / 2 && Math.abs(p.y - c.cell.y) <= CELL_H / 2) this.confirm();
+      if (c && Math.abs(localX(this.scene, p) - c.cell.x) <= this.cellW / 2 && Math.abs(p.y - c.cell.y) <= CELL_H / 2) this.confirm();
       return;
     }
     const { id, ghost } = this.drag;

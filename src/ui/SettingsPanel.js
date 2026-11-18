@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
-import { FPS_STOPS, SCREEN_SIZES, applyFpsLimit, applyScreenSize, fullscreen } from '../game/display.js';
+import { FPS_STOPS, RESOLUTIONS, applyFpsLimit, applyResolution, fullscreen, resolutionLabel } from '../game/display.js';
 import { setSetting, settings } from '../game/settings.js';
-import { fixToCamera, textStyle } from './helpers.js';
+import { BLEED, fixToCamera, localX, textStyle, uiX } from './helpers.js';
 import { directionOf, isCancel, isConfirm } from './input.js';
 import { isTouchDevice, refreshTouchControls } from './TouchControls.js';
 
@@ -48,7 +48,9 @@ const C = {
   title: '#c3c6d0',
 };
 
-const ROW_H = { segment: 100, slider: 96, check: 60, button: 68, info: 34 };
+const ROW_H = { segment: 100, select: 100, slider: 96, check: 60, button: 68, info: 34 };
+// Danh sách xổ xuống: số cột, cỡ mỗi ô
+const DROP = { cols: 2, h: 42, gap: 6, pad: 10 };
 const bold = (size, color = C.text, extra = {}) => textStyle(size, color, { fontStyle: 'bold', stroke: '#0c0d10', strokeThickness: 3, ...extra });
 const pct = (v) => `${v}%`;
 
@@ -56,7 +58,7 @@ const pct = (v) => `${v}%`;
 function currentValues() {
   return {
     display: fullscreen.active ? 'full' : 'window',
-    screenSize: SCREEN_SIZES.includes(settings.screenSize) ? settings.screenSize : 'fit',
+    resolution: RESOLUTIONS.includes(settings.resolution) ? settings.resolution : 'screen',
     fpsLimit: FPS_STOPS.includes(settings.fpsLimit) ? settings.fpsLimit : 0,
     lighting: settings.lighting !== false,
     weather: settings.weather !== false,
@@ -68,7 +70,7 @@ function currentValues() {
   };
 }
 
-// Các thẻ và dòng trong thẻ. opts: { hasMap, has3d, game }
+// Các thẻ và dòng trong thẻ. opts: { hasMap, account (email đang đăng nhập), game }
 function buildTabs(opts) {
   const fsNote = fullscreen.available ? null
     : isTouchDevice() ? 'Máy này không hỗ trợ. Mẹo: "Thêm vào Màn hình chính" để chơi toàn màn hình.' : 'Trình duyệt không hỗ trợ.';
@@ -79,8 +81,8 @@ function buildTabs(opts) {
       rows: [
         { type: 'segment', key: 'display', label: 'Chế độ hiển thị', note: fsNote, disabled: !fullscreen.available,
           options: [{ value: 'window', label: 'Cửa sổ' }, { value: 'full', label: 'Toàn màn hình' }] },
-        { type: 'segment', key: 'screenSize', label: 'Kích thước khung hình',
-          options: [{ value: 'fit', label: 'Vừa màn hình' }, { value: 'fill', label: 'Kéo giãn' }, { value: 'original', label: 'Gốc 960×720' }] },
+        { type: 'select', key: 'resolution', label: 'Độ phân giải',
+          options: RESOLUTIONS.map((value) => ({ value, label: resolutionLabel(value) })) },
         { type: 'slider', key: 'fpsLimit', label: 'Giới hạn FPS', stops: FPS_STOPS, format: (v) => (v ? `${v} FPS` : 'Theo màn hình') },
         { type: 'info', text: () => `Đang chạy: ${Math.round(opts.game?.loop?.actualFps ?? 0)} FPS  ·  30 FPS giúp đỡ tốn pin trên điện thoại` },
         { type: 'check', key: 'lighting', label: 'Ánh sáng ngày đêm' },
@@ -94,7 +96,10 @@ function buildTabs(opts) {
         { type: 'check', key: 'catchPreview', label: 'Xem nhanh Pokémon gửi vào PC' },
         ...(opts.hasMap ? [{ type: 'button', label: 'Bản đồ vùng', action: 'map' }] : []),
         { type: 'button', label: 'Đổi diện mạo', action: 'look' },
-        ...(opts.has3d ? [{ type: 'button', label: 'Chơi bản thử 3D', action: '3d' }] : []),
+        ...(opts.account ? [
+          { type: 'info', text: () => `Tài khoản: ${opts.account}` },
+          { type: 'button', label: 'Đăng xuất', action: 'logout' },
+        ] : []),
       ],
     },
     {
@@ -115,7 +120,7 @@ function buildTabs(opts) {
 const focusable = (row) => row.type !== 'info' && !row.disabled;
 
 export class SettingsPanel {
-  // opts: { depth, hasMap, has3d, state (từ lần mở trước), onApplied(keys) }
+  // opts: { depth, hasMap, account, state (từ lần mở trước), onApplied(keys) }
   constructor(scene, router, opts = {}) {
     this.scene = scene;
     this.router = router;
@@ -133,12 +138,16 @@ export class SettingsPanel {
     this.pressed = null; // nút đang nhấn (kích hoạt lúc thả tay đúng trên nút đó)
     this.sliding = null; // thanh trượt đang kéo { row, x0, w }
 
-    this.container = scene.add.container(0, 0).setDepth(this.depth);
+    // Bảng vẽ theo khung 960x720, dời vào giữa màn hình rộng
+    this.container = scene.add.container(uiX(scene), 0).setDepth(this.depth);
     // Nền tối phủ cả màn hình (bấm vào = Huỷ, xử lý ở open)
-    this.container.add(scene.add.rectangle(0, 0, scene.scale.width, scene.scale.height, 0x000000, 0.45).setOrigin(0));
+    this.container.add(scene.add.rectangle(-BLEED, 0, 960 + BLEED * 2, scene.scale.height, 0x000000, 0.45).setOrigin(0));
     this.container.add(this.drawFrame());
     this.dyn = scene.add.container(0, 0);
     this.container.add(this.dyn);
+    // Đổi độ phân giải (Áp dụng) / xoay máy lúc bảng đang mở: dời bảng vào giữa màn hình mới
+    this.onResize = () => this.container.setX(uiX(scene));
+    scene.scale.on('resize', this.onResize);
     this.render();
   }
 
@@ -166,7 +175,7 @@ export class SettingsPanel {
     document.addEventListener('fullscreenchange', this.onFullscreen);
     document.addEventListener('webkitfullscreenchange', this.onFullscreen);
     // Kéo thanh trượt: theo dõi trên cả màn hình (ngón tay trượt ra khỏi rãnh vẫn kéo tiếp)
-    this.onMove = (p) => this.sliding && p.isDown && this.slideTo(p.x);
+    this.onMove = (p) => this.sliding && p.isDown && this.slideTo(localX(this.scene, p));
     this.onUp = () => {
       this.sliding = null;
       // Thả tay ra ngoài nút đang nhấn: thôi
@@ -185,7 +194,7 @@ export class SettingsPanel {
         (e) => e.timeStamp >= openedAt && this.handleKey(e),
         (p) => {
           if (p.downTime < openedAt) return;
-          if (p.rightButtonDown() || !this.bounds.contains(p.x, p.y)) this.finish(null);
+          if (p.rightButtonDown() || !this.bounds.contains(localX(this.scene, p), p.y)) this.finish(null);
         },
       );
     });
@@ -194,6 +203,7 @@ export class SettingsPanel {
   // ---------- Bàn phím ----------
 
   handleKey(e) {
+    if (this.dropdown) return this.dropKey(e);
     if (e.code === 'Tab') {
       e.preventDefault?.();
       if (!e.repeat) this.selectTab((this.tab + (e.shiftKey ? -1 : 1) + this.tabs.length) % this.tabs.length);
@@ -227,7 +237,7 @@ export class SettingsPanel {
     if (dir === 'left' || dir === 'right') {
       const step = dir === 'left' ? -1 : 1;
       if (row.type === 'slider') this.stepSlider(row, step);
-      else if (row.type === 'segment') this.stepSegment(row, step, false);
+      else if (row.type === 'segment' || row.type === 'select') this.stepSegment(row, step, false);
       else if (dir === 'left') this.focusSide();
     } else if (confirm) {
       this.activate(row);
@@ -285,7 +295,37 @@ export class SettingsPanel {
   activate(row) {
     if (row.type === 'check') this.set(row.key, !this.draft[row.key]);
     else if (row.type === 'segment') this.stepSegment(row, 1, true);
+    else if (row.type === 'select') this.openDropdown(row);
     else if (row.type === 'button') this.finish({ action: row.action });
+  }
+
+  // ---------- Danh sách xổ xuống (Độ phân giải) ----------
+
+  openDropdown(row) {
+    this.dropdown = row;
+    this.dropIndex = Math.max(0, row.options.findIndex((o) => o.value === this.draft[row.key]));
+    this.dirty();
+  }
+
+  closeDropdown() {
+    this.dropdown = null;
+    this.dirty();
+  }
+
+  // Đang mở danh sách: ← → ↑ ↓ chọn ô (2 cột), xác nhận để chọn, quay lại để đóng danh sách
+  dropKey(e) {
+    const row = this.dropdown;
+    if (isCancel(e)) return this.closeDropdown();
+    if (isConfirm(e)) {
+      this.set(row.key, row.options[this.dropIndex].value);
+      return this.closeDropdown();
+    }
+    const step = { left: -1, right: 1, up: -DROP.cols, down: DROP.cols }[directionOf(e)];
+    if (!step) return;
+    const next = this.dropIndex + step;
+    if (next < 0 || next >= row.options.length) return;
+    this.dropIndex = next;
+    this.dirty();
   }
 
   footAction(col) {
@@ -308,7 +348,7 @@ export class SettingsPanel {
       else setSetting(key, this.draft[key]);
     }
     if (keys.includes('fpsLimit')) applyFpsLimit(this.scene.game);
-    if (keys.includes('screenSize')) applyScreenSize(this.scene.game);
+    if (keys.includes('resolution')) applyResolution(this.scene.game, this.draft.resolution);
     if (keys.some((k) => k.startsWith('touch'))) refreshTouchControls();
     this.baseline = { ...this.draft };
     this.onApplied(keys);
@@ -360,11 +400,13 @@ export class SettingsPanel {
     if (this.done) return;
     this.dyn.removeAll(true);
     this.infoTexts = [];
+    this.dropAt = null;
     const g = this.scene.add.graphics();
     this.dyn.add(g);
     this.renderTabs(g);
     this.renderRows(g);
     this.renderFoot(g);
+    if (this.dropdown && this.dropAt) this.renderDropdown();
     fixToCamera(this.container);
   }
 
@@ -436,6 +478,64 @@ export class SettingsPanel {
     if (row.note) this.dyn.add(scene.add.text(x, by + bh + 8, row.note, textStyle(16, C.dim)));
   }
 
+  // Dòng danh sách xổ xuống: nút to hiện giá trị đang chọn và ▾, bấm vào thì mở danh sách bên dưới
+  row_select(g, row, y, focused, index) {
+    const { scene } = this;
+    const x = MAIN_X + PAD;
+    const w = MAIN_W - PAD * 2;
+    const by = y + 36;
+    const bh = 54;
+    const open = this.dropdown === row;
+    const id = `sel:${row.key}`;
+    this.dyn.add(scene.add.text(x, y, row.label, bold(22)));
+    drawButton(g, x, by, w, bh, open ? 'blue' : 'gray', this.pressed === id);
+    const current = row.options.find((o) => o.value === this.draft[row.key]) ?? row.options[0];
+    this.dyn.add(scene.add.text(x + 18, by + bh / 2, current.label, bold(21)).setOrigin(0, 0.5));
+    this.dyn.add(scene.add.text(x + w - 20, by + bh / 2, open ? '▴' : '▾', bold(24)).setOrigin(1, 0.5));
+    if (focused) focusRing(g, x, by, w, bh);
+    this.hit(x, by, w, bh, id, () => {
+      this.area = 'main';
+      this.row = index;
+      if (open) this.dropdown = null;
+      else this.openDropdown(row);
+    });
+    if (open) this.dropAt = { x, y: by + bh + 6, w };
+  }
+
+  // Danh sách các lựa chọn, vẽ đè lên các dòng bên dưới. Bấm ra ngoài danh sách (trong bảng) thì đóng danh sách
+  renderDropdown() {
+    const { scene } = this;
+    const row = this.dropdown;
+    const { x, y, w } = this.dropAt;
+    const rows = Math.ceil(row.options.length / DROP.cols);
+    const h = DROP.pad * 2 + rows * DROP.h + (rows - 1) * DROP.gap;
+    this.hit(PX, PY, PW, PH, 'dropClose', () => {
+      this.dropdown = null;
+    });
+    const g = scene.add.graphics();
+    this.dyn.add(g);
+    g.fillStyle(0x000000, 0.5);
+    g.fillRoundedRect(x + 3, y + 6, w, h, 12);
+    g.fillStyle(C.frame);
+    g.fillRoundedRect(x, y, w, h, 12);
+    g.lineStyle(2, C.blueLine, 0.8);
+    g.strokeRoundedRect(x, y, w, h, 12);
+    const cw = (w - DROP.pad * 2 - (DROP.cols - 1) * DROP.gap) / DROP.cols;
+    row.options.forEach((opt, i) => {
+      const cx = x + DROP.pad + (i % DROP.cols) * (cw + DROP.gap);
+      const cy = y + DROP.pad + Math.floor(i / DROP.cols) * (DROP.h + DROP.gap);
+      const on = this.draft[row.key] === opt.value;
+      const id = `opt:${opt.value}`;
+      drawButton(g, cx, cy, cw, DROP.h, on ? 'blue' : 'gray', this.pressed === id);
+      if (i === this.dropIndex) focusRing(g, cx + 3, cy + 3, cw - 6, DROP.h - 6);
+      this.dyn.add(scene.add.text(cx + cw / 2, cy + DROP.h / 2, opt.label, bold(18)).setOrigin(0.5));
+      this.hit(cx, cy, cw, DROP.h, id, () => {
+        this.draft[row.key] = opt.value;
+        this.dropdown = null;
+      });
+    });
+  }
+
   row_slider(g, row, y, focused, index) {
     const { scene } = this;
     const x = MAIN_X + PAD;
@@ -484,7 +584,7 @@ export class SettingsPanel {
       this.area = 'main';
       this.row = index;
       this.sliding = { row, x0, w: inner };
-      this.slideTo(p.x);
+      this.slideTo(localX(this.scene, p));
       this.dirty();
     });
     this.dyn.add(zone);
@@ -583,6 +683,7 @@ export class SettingsPanel {
     document.removeEventListener('fullscreenchange', this.onFullscreen);
     document.removeEventListener('webkitfullscreenchange', this.onFullscreen);
     this.ticker?.remove();
+    scene.scale.off('resize', this.onResize);
     // Huỷ vùng bấm ở khung hình sau: finish có thể chạy ngay trong sự kiện chuột của chính vùng bấm đó
     this.container.setVisible(false);
     scene.time.delayedCall(0, () => this.container.destroy());

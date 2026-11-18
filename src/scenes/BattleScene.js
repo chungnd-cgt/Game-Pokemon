@@ -39,7 +39,7 @@ import { GBA_MON, fitScale, monSourceExists, pixelMon } from '../gfx/textures.js
 import { AbilityBanner } from '../ui/AbilityBanner.js';
 import { BagPanel } from '../ui/BagPanel.js';
 import { ButtonGrid, commandIcons, paintCommand, paintMove, renderCommand, renderMove } from '../ui/BattleMenus.js';
-import { GENDER, drawPanel, fitText, gradientRect, shade, textStyle, tweenAsync, wait } from '../ui/helpers.js';
+import { BLEED, GENDER, centerStage, drawPanel, fitText, gradientRect, shade, textStyle, tweenAsync, wait } from '../ui/helpers.js';
 import { InputRouter, isCancel, isConfirm } from '../ui/input.js';
 import { Menu } from '../ui/Menu.js';
 import { MessageBox } from '../ui/MessageBox.js';
@@ -55,6 +55,11 @@ const CATEGORY_STYLE = { physical: { color: 0xe06030 }, special: { color: 0x4a78
 const ENEMY_SIZE = 192; // sprite GBA 64px x3 (pixel to bằng pixel bản đồ)
 const PLAYER_SIZE = 240; // sprite 80px x3
 const BALL_SCALE = 0.45;
+// Màn hình rộng: khung trận 960x720 nằm giữa, nền vẽ tràn ra hai bên (ui/helpers.js: centerStage)
+const LEFT = -BLEED;
+const SPAN = 960 + BLEED * 2;
+// Ngoài mép phải màn hình rộng nhất: đối thủ / nhà huấn luyện trượt vào từ đây
+const OFF_RIGHT = ENEMY_POS.x + BLEED + 600;
 
 const PALETTES = {
   meadow: {
@@ -155,23 +160,24 @@ export default class BattleScene extends Phaser.Scene {
 
   create() {
     this.input.mouse?.disableContextMenu();
+    centerStage(this);
     this.router = new InputRouter(this);
     this.drawBackground();
     // Ngoài trời: ánh sáng theo giờ và mưa giống bản đồ (phủ lên nền và Pokémon, không phủ giao diện)
-    this.ambience = new Ambience(this, { area: { x: 0, y: 0, w: 960, h: 548 }, depth: 1, rainDepth: 4.5 });
+    this.ambience = new Ambience(this, { area: { y: 0, h: 548 }, depth: 1, rainDepth: 4.5 });
     this.ambience.apply({ indoor: !this.outdoor, weather: this.fieldWeather });
     // Lớp nắng vàng khi trời nắng gắt
-    this.sunLight = this.add.rectangle(0, 0, 960, 548, 0xffd070, 0.22).setOrigin(0).setDepth(1.5)
+    this.sunLight = this.add.rectangle(LEFT, 0, SPAN, 548, 0xffd070, 0.22).setOrigin(0).setDepth(1.5)
       .setBlendMode(Phaser.BlendModes.ADD).setVisible(false);
     // Lớp màu khi có bão cát (vàng đất) hoặc mưa đá (trắng xanh), phủ lên cả Pokémon
-    this.weatherShade = this.add.rectangle(0, 0, 960, 548, 0xffffff, 0).setOrigin(0).setDepth(4.6).setVisible(false);
+    this.weatherShade = this.add.rectangle(LEFT, 0, SPAN, 548, 0xffffff, 0).setOrigin(0).setDepth(4.6).setVisible(false);
     this.showWeather();
 
     const enemyKey = pixelMon(this, this.enemy.speciesId, '', GBA_MON, this.enemy.shiny);
     this.enemyScale = fitScale(this, enemyKey, ENEMY_SIZE);
-    this.enemyShadow = this.add.image(ENEMY_POS.x + 600, ENEMY_POS.y - 4, 'fx-shadow').setScale(1.4, 1).setAlpha(0.28);
+    this.enemyShadow = this.add.image(OFF_RIGHT, ENEMY_POS.y - 4, 'fx-shadow').setScale(1.4, 1).setAlpha(0.28);
     this.enemySprite = this.add
-      .image(ENEMY_POS.x + 600, ENEMY_POS.y, enemyKey)
+      .image(OFF_RIGHT, ENEMY_POS.y, enemyKey)
       .setOrigin(0.5, 1)
       .setScale(this.enemyScale);
     this.playerShadow = this.add.image(PLAYER_POS.x, PLAYER_POS.y - 4, 'fx-shadow').setScale(1.8, 1.2).setAlpha(0.28).setVisible(false);
@@ -181,7 +187,7 @@ export default class BattleScene extends Phaser.Scene {
       this.enemySprite.setVisible(false);
       this.enemyShadow.setX(ENEMY_POS.x).setVisible(false);
       this.trainerSprite = this.add
-        .sprite(ENEMY_POS.x + 600, ENEMY_POS.y, this.trainer.sprite, 'down-stand')
+        .sprite(OFF_RIGHT, ENEMY_POS.y, this.trainer.sprite, 'down-stand')
         .setOrigin(0.5, 1)
         .setScale(BATTLE_CHAR_SCALE);
       this.teamBalls = this.enemyTeam.map((_, i) => this.add.image(70 + i * 34, 166, 'ball').setScale(0.3).setDepth(5).setVisible(false));
@@ -217,12 +223,12 @@ export default class BattleScene extends Phaser.Scene {
   drawBackground() {
     const p = PALETTES[this.zone] ?? PALETTES.meadow;
     const g = this.add.graphics();
-    gradientRect(g, 0, 0, 960, 330, p.skyTop, p.skyBottom);
+    gradientRect(g, LEFT, 0, SPAN, 330, p.skyTop, p.skyBottom);
 
     if (this.zone === 'cave' || this.zone === 'caveWater') this.drawCaveCeiling(g);
     else {
       g.fillStyle(0xffffff, 0.85);
-      for (const [cx, cy, s] of [[140, 70, 1], [480, 42, 0.75], [820, 96, 1.15]]) {
+      for (const [cx, cy, s] of [[-220, 58, 0.9], [140, 70, 1], [480, 42, 0.75], [820, 96, 1.15], [1170, 50, 0.85]]) {
         g.fillEllipse(cx, cy, 130 * s, 38 * s);
         g.fillEllipse(cx - 38 * s, cy + 6 * s, 76 * s, 30 * s);
         g.fillEllipse(cx + 40 * s, cy + 4 * s, 86 * s, 32 * s);
@@ -231,24 +237,26 @@ export default class BattleScene extends Phaser.Scene {
     }
 
     g.fillStyle(p.hill);
+    g.fillEllipse(-300, 340, 560, 160);
     g.fillEllipse(120, 330, 580, 180);
     g.fillEllipse(560, 345, 660, 150);
     g.fillEllipse(940, 330, 540, 190);
+    g.fillEllipse(1300, 340, 600, 170);
     for (const [color, dy, k] of [[p.treeDark, 0, 1], [p.tree, -6, 0.75]]) {
       g.fillStyle(color);
-      for (let x = -20; x < 1000; x += 28) {
+      for (let x = LEFT - 20; x < LEFT + SPAN + 40; x += 28) {
         const r = (20 + hash(x, 1) * 14) * k;
         g.fillCircle(x - (1 - k) * 8, 322 - r * 0.5 + dy, r);
       }
     }
 
-    gradientRect(g, 0, 318, 960, 230, p.groundTop, p.groundBottom);
+    gradientRect(g, LEFT, 318, SPAN, 230, p.groundTop, p.groundBottom);
     if (this.zone === 'water' || this.zone === 'caveWater') {
       // Mặt nước: vệt gợn sóng nằm ngang (gần thì dài và rõ hơn), không phải khóm cỏ
-      for (let i = 0; i < 70; i++) {
+      for (let i = 0; i < 125; i++) {
         const y = 330 + hash(i, 4) * 210;
         const near = (y - 330) / 210;
-        const x = hash(i, 3) * 960;
+        const x = LEFT + hash(i, 3) * SPAN;
         const w = 14 + near * 26 + hash(i, 5) * 12;
         g.lineStyle(2 + Math.round(near), p.blade, 0.35 + near * 0.25);
         g.lineBetween(x - w / 2, y, x + w / 2, y);
@@ -256,8 +264,8 @@ export default class BattleScene extends Phaser.Scene {
       }
     } else {
       g.lineStyle(3, p.blade, 0.5);
-      for (let i = 0; i < 80; i++) {
-        const x = hash(i, 3) * 960;
+      for (let i = 0; i < 140; i++) {
+        const x = LEFT + hash(i, 3) * SPAN;
         const y = 335 + hash(i, 4) * 200;
         g.lineBetween(x, y, x - 4, y - 10);
         g.lineBetween(x + 5, y, x + 8, y - 9);
@@ -272,8 +280,8 @@ export default class BattleScene extends Phaser.Scene {
     const ROCK = { dark: 0x241c24, base: 0x3c3038, mid: 0x4e4048, light: 0x6a5a5e, tip: 0x7c6c6a };
     // Vòm trần: dải đá dày, mép dưới lượn sóng bằng các khối tròn chồng nhau
     g.fillStyle(ROCK.dark);
-    g.fillRect(0, 0, 960, 22);
-    for (let x = -20; x < 1000; x += 26) {
+    g.fillRect(LEFT, 0, SPAN, 22);
+    for (let x = LEFT - 20; x < LEFT + SPAN + 40; x += 26) {
       const r = 16 + hash(x, 11) * 14;
       g.fillStyle(ROCK.dark);
       g.fillEllipse(x, 18, r * 2.4, r * 1.3);
@@ -281,8 +289,8 @@ export default class BattleScene extends Phaser.Scene {
       g.fillEllipse(x - r * 0.3, 12, r * 1.4, r * 0.6);
     }
     // Nhũ đá: thân là chồng các elip nhỏ dần (thắt khúc), mặt trái sáng, mặt phải tối, đầu tù có giọt nước
-    for (let i = 0; i < 17; i++) {
-      const x = 20 + i * 57 + (hash(i, 12) - 0.5) * 30;
+    for (let i = 0; i < 30; i++) {
+      const x = LEFT + 20 + i * 57 + (hash(i, 12) - 0.5) * 30;
       const len = 40 + hash(i, 13) * 90;
       const w = 18 + hash(i, 14) * 18;
       const top = 18;
@@ -344,7 +352,7 @@ export default class BattleScene extends Phaser.Scene {
       const name = this.trainer.name;
       await tweenAsync(this, { targets: this.trainerSprite, x: ENEMY_POS.x, duration: 750, ease: 'Cubic.out' });
       await this.msg.show(`${name} muốn thách đấu!`);
-      await tweenAsync(this, { targets: this.trainerSprite, x: ENEMY_POS.x + 600, duration: 450, ease: 'Cubic.in' });
+      await tweenAsync(this, { targets: this.trainerSprite, x: OFF_RIGHT, duration: 450, ease: 'Cubic.in' });
       await this.sendOutEnemy(this.enemy, false);
     } else {
       await tweenAsync(this, { targets: [this.enemySprite, this.enemyShadow], x: ENEMY_POS.x, duration: 750, ease: 'Cubic.out' });
@@ -1959,7 +1967,7 @@ export default class BattleScene extends Phaser.Scene {
 
     const open = { x: PLAYER_POS.x, y: PLAYER_POS.y - 100 };
     const ball = this.add.image(-40, 420, 'ball').setScale(BALL_SCALE).setDepth(6);
-    await this.throwArc(ball, { x: -40, y: 420 }, open, 150, 480);
+    await this.throwArc(ball, { x: LEFT - 40, y: 420 }, open, 150, 480);
     ball.destroy();
     this.ballBurst(open.x, open.y);
     this.playerSprite.setTintFill(0xffffff);

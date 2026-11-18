@@ -9,7 +9,7 @@ import { TYPES } from '../data/types.js';
 import { BOX_SLOTS, boxCount, monAt, moveMon, releaseMon, releaseProblem } from '../game/storage.js';
 import { PARTY_SIZE, state } from '../game/state.js';
 import { fitScale, pixelMon } from '../gfx/textures.js';
-import { GENDER, closeButton, cssColor, drawHpBar, drawPanel, fitText, fixToCamera, hpColor, hpLabel, monTag, textStyle } from './helpers.js';
+import { GENDER, closeButton, cssColor, drawHpBar, drawPanel, fitText, fixToCamera, hpColor, hpLabel, localX, monTag, textStyle, uiX } from './helpers.js';
 import { directionOf, isCancel, isConfirm } from './input.js';
 import { typeBadges } from './TypeBadge.js';
 import { shinyGap, shinyMark } from './shinyMark.js';
@@ -58,7 +58,8 @@ export class PcBox {
     this.cursorG = scene.add.graphics().setDepth(this.depth + 0.2);
     this.info = scene.add.container(0, 0).setDepth(this.depth + 0.1);
     this.buildBase();
-    for (const o of [this.container, this.content, this.cursorG, this.info]) fixToCamera(o);
+    // Cố định theo màn hình, dời vào giữa màn hình rộng
+    for (const o of [this.container, this.content, this.cursorG, this.info]) fixToCamera(o).setX(uiX(scene));
     this.render();
   }
 
@@ -69,7 +70,8 @@ export class PcBox {
       this.onPointerMove = (p) => this.dragMove(p);
       this.onPointerUp = (p) => this.dragEnd(p);
       this.onWheel = (p, objs, dx, dy) => {
-        if (!this.locked && dy && p.x >= GRID.x && p.x <= GRID.x + GRID.cols * GRID.cell && p.y >= GRID.y - 60 && p.y <= GRID.y + GRID.rows * GRID.cell) this.turnPage(Math.sign(dy));
+        const x = localX(this.scene, p);
+        if (!this.locked && dy && x >= GRID.x && x <= GRID.x + GRID.cols * GRID.cell && p.y >= GRID.y - 60 && p.y <= GRID.y + GRID.rows * GRID.cell) this.turnPage(Math.sign(dy));
       };
       this.scene.input.on('pointermove', this.onPointerMove);
       this.scene.input.on('pointerup', this.onPointerUp);
@@ -387,7 +389,8 @@ export class PcBox {
     }
     press.ghost.setPosition(p.x, p.y - 6);
     // Giữ trên mũi tên ◀ ▶ một lúc thì lật hộp (mang Pokémon sang hộp khác)
-    const arrow = Math.abs(p.y - (GRID.y - 32)) < 24 && (Math.abs(p.x - (GRID.x + 26)) < 26 ? -1 : Math.abs(p.x - (GRID.x + GRID.cols * GRID.cell - 26)) < 26 ? 1 : 0);
+    const lx = localX(this.scene, p);
+    const arrow = Math.abs(p.y - (GRID.y - 32)) < 24 && (Math.abs(lx - (GRID.x + 26)) < 26 ? -1 : Math.abs(lx - (GRID.x + GRID.cols * GRID.cell - 26)) < 26 ? 1 : 0);
     if (arrow && !this.flipTimer) {
       this.flipTimer = this.scene.time.delayedCall(450, () => {
         this.flipTimer = null;
@@ -397,7 +400,7 @@ export class PcBox {
       this.flipTimer.remove();
       this.flipTimer = null;
     }
-    const target = this.slotAt(p.x, p.y);
+    const target = this.slotAt(localX(this.scene, p), p.y);
     const same = target && press.target && target.area === press.target.area && target.k === press.target.k;
     if (!same) {
       press.target = target;
@@ -413,7 +416,7 @@ export class PcBox {
     this.flipTimer = null;
     if (!press.ghost) return; // chỉ bấm: con trỏ đã chuyển tới ô đó
     press.ghost.destroy();
-    const target = this.slotAt(p.x, p.y);
+    const target = this.slotAt(localX(this.scene, p), p.y);
     const from = { area: press.slot.area, i: press.slot.area === 'box' ? press.slot.page * BOX_SLOTS + press.slot.k : press.slot.k };
     if (target) this.cursor = target.area === 'trash' ? this.cursor : target;
     this.render();

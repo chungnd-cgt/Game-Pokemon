@@ -17,7 +17,9 @@ import { giveHeldItem } from '../game/heldItems.js';
 import { assignHotbar, setHotbarSlot, swapHotbarSlots } from '../game/hotbar.js';
 import { repelBlocks, startRepel, stepRepel } from '../game/repel.js';
 import { applyItem, escapeProblem, itemProblem, needsMove } from '../game/itemUse.js';
-import { saveBlocked, saveGame } from '../game/save.js';
+import { saveBlockMessage, saveBlocked, saveGame } from '../game/save.js';
+import { signOut } from '../online/account.js';
+import { stopCloudSave } from '../online/cloudSave.js';
 import { forfeitable, rematchDef, trainerBeaten, trainerForfeit, trainerReady } from '../game/trainers.js';
 import { addItem, blackoutLoss, hasFlag, healParty, itemCount, setFlag, state, swapParty, useItem } from '../game/state.js';
 import { Ambience } from '../gfx/ambience.js';
@@ -36,7 +38,7 @@ import {
 } from '../story/chapter1.js';
 import { resetLeague } from '../story/league.js';
 import { houseKnock } from '../story/villages.js';
-import { COLORS, cssColor, drawHpBar, drawPanel, fixToCamera, textStyle, tweenAsync, wait } from '../ui/helpers.js';
+import { COLORS, cssColor, drawHpBar, drawPanel, fixToCamera, textStyle, tweenAsync, uiX, wait } from '../ui/helpers.js';
 import { HeldKeys, InputRouter, directionOf, isCancel, isConfirm } from '../ui/input.js';
 import { KeyBindings } from '../ui/KeyBindings.js';
 import { actionsForCode, hotbarSlotOf } from '../game/keybinds.js';
@@ -210,9 +212,10 @@ export default class WorldScene extends Phaser.Scene {
 
     this.router = new InputRouter(this);
     this.msg = new MessageBox(this, this.router, 24, 578, 912, 130);
-    fixToCamera(this.msg.container).setDepth(HUD_DEPTH + 5).setVisible(false);
+    // Khung lời thoại vẽ theo khung 960x720: dời vào giữa màn hình rộng (đổi cỡ màn hình: onScreenResize)
+    fixToCamera(this.msg.container).setDepth(HUD_DEPTH + 5).setVisible(false).setX(uiX(this));
     this.speakerTag = this.add
-      .text(44, 548, '', textStyle(19, '#ffffff', { fontStyle: 'bold', backgroundColor: cssColor(COLORS.ink), padding: { x: 14, y: 6 } }))
+      .text(44 + uiX(this), 548, '', textStyle(19, '#ffffff', { fontStyle: 'bold', backgroundColor: cssColor(COLORS.ink), padding: { x: 14, y: 6 } }))
       .setScrollFactor(0)
       .setDepth(HUD_DEPTH + 6)
       .setVisible(false);
@@ -239,6 +242,9 @@ export default class WorldScene extends Phaser.Scene {
       swapHotbarSlots(a, b);
       if (!this.busy && !this.moving) this.save();
     });
+    // Màn hình đổi cỡ (đổi độ phân giải, bật toàn màn hình, xoay máy, kéo cửa sổ): bố trí lại camera và giao diện
+    this.scale.on('resize', this.onScreenResize, this);
+    this.events.once('shutdown', () => this.scale.off('resize', this.onScreenResize, this));
     this.time.addEvent({
       delay: 20000,
       loop: true,
@@ -329,6 +335,10 @@ export default class WorldScene extends Phaser.Scene {
   }
 
   update(time, delta) {
+    if (this.pendingFit && !this.busy) {
+      this.pendingFit = false;
+      this.fitCamera();
+    }
     const talking = this.msg.container.visible;
     const free = !talking && !this.partyMenu && !this.settingsMenu && !this.overlay && !this.busy;
     this.hud.setVisible(free);
@@ -429,7 +439,7 @@ ${this.map.name}`, this.ambience.state.tod);
     });
     if (!ok && saveBlocked() && !this.warnedStale) {
       this.warnedStale = true;
-      this.hud.showSaveNote('Game đang chơi ở tab khác, tab này không lưu nữa', true);
+      this.hud.showSaveNote(saveBlockMessage() ?? 'Game đang chơi ở tab khác, tab này không lưu nữa', true);
     }
     return ok;
   }
@@ -472,6 +482,14 @@ ${this.map.name}`, this.ambience.state.tod);
     this.setFrame('stand');
     this.placeFollower();
 
+    this.fitCamera();
+    this.hud.showMapName(map.name);
+    this.ambience.apply(map);
+  }
+
+  // Camera theo bản đồ đang đứng và cỡ màn hình
+  fitCamera() {
+    const { map } = this;
     // Bản đồ nhỏ hơn màn hình (trong nhà) thì đặt giữa màn hình, nền đen xung quanh
     const cam = this.cameras.main;
     const w = map.width * CELL;
@@ -489,8 +507,22 @@ ${this.map.name}`, this.ambience.state.tod);
       cam.setBounds(bx, by, Math.max(w, sw), Math.max(h, sh)).setRoundPixels(true);
       cam.startFollow(this.player, true);
     }
-    this.hud.showMapName(map.name);
-    this.ambience.apply(map);
+  }
+
+  // Màn hình đổi cỡ: camera tính lại theo bản đồ, nút bám mép phải dời theo, khung lời thoại về giữa màn hình.
+  // Bảng đang mở (túi đồ, PC...) giữ chỗ cũ tới khi đóng; Cài đặt tự dời theo
+  onScreenResize() {
+    if (!this.map) return;
+    // Đang bận (cốt truyện có thể đang lia camera): chờ xong rồi mới đặt lại camera (update)
+    if (this.busy) this.pendingFit = true;
+    else this.fitCamera();
+    this.hud.relayout();
+    if (!this.areaNav.sliding) this.areaNav.render();
+    this.msg.container.setX(uiX(this));
+    this.speakerTag.setX(44 + uiX(this));
+    // Lớp tối trong hang vẽ đúng cỡ màn hình: huỷ để khung hình sau tạo lại theo cỡ mới
+    this.darkRT?.destroy();
+    this.darkRT = null;
   }
 
   // Câu đố gym dựng lại mỗi lần vào bản đồ: tảng đá đẩy được về chỗ cũ, hố chưa lấp; lửa ở miệng lò (Gym Lò Gốm)
@@ -718,7 +750,7 @@ ${this.map.name}`, this.ambience.state.tod);
   }
 
   // Hiệu ứng vòng tròn: close = thu nhỏ quanh người chơi tới khi tối hẳn, ngược lại mở rộng ra
-  // Giữa người chơi trên màn hình (toạ độ game 960x720). Bản 3D thay hàm này bằng vị trí trên cảnh 3D (view3d.js)
+  // Giữa người chơi trên màn hình (toạ độ game 960x720)
   playerScreenPoint() {
     const cam = this.cameras.main;
     return { x: this.player.x - cam.scrollX, y: this.player.y - CHAR_HEIGHT / 2 - cam.scrollY };
@@ -2533,7 +2565,7 @@ ${this.map.name}`, this.ambience.state.tod);
   // Xem Pokémon khởi đầu trên bàn rồi hỏi có chọn không
   async previewStarter(speciesId) {
     const sp = SPECIES[speciesId];
-    const { add, destroy } = this.overlayLayer(HUD_DEPTH + 8);
+    const { objs, add, destroy } = this.overlayLayer(HUD_DEPTH + 8);
     add(drawPanel(this, 290, 40, 380, 440, 18, true));
     const glow = add(this.add.graphics());
     glow.fillStyle(TYPES[sp.types[0]].color, 0.2);
@@ -2543,6 +2575,7 @@ ${this.map.name}`, this.ambience.state.tod);
     add(this.add.text(480, 314, sp.name, textStyle(34, COLORS.text, { fontStyle: 'bold' })).setOrigin(0.5, 0));
     typeBadges(this, 480, 384, sp.types, { align: 'center' }).forEach(add);
     add(this.add.text(480, 412, sp.desc ?? '', textStyle(18, '#4a5266', { align: 'center', wordWrap: { width: 330 } })).setOrigin(0.5, 0));
+    for (const o of objs) o.x += uiX(this); // vẽ theo khung 960x720, dời vào giữa màn hình rộng
     const types = sp.types.map((t) => TYPES[t].name).join('/');
     const ok = await this.ask(`Bạn chọn ${sp.name}, Pokémon hệ ${types}?`);
     destroy();
@@ -2781,8 +2814,7 @@ ${this.map.name}`, this.ambience.state.tod);
         depth: HUD_DEPTH + 10,
         state: panelState,
         hasMap: itemCount('townMap') > 0,
-        // Bản 2D (index.html có nút sang bản 3D): chuyển sang bản 3D, chơi tiếp từ bản lưu
-        has3d: Boolean(document.getElementById('link3d')),
+        account: this.registry.get('user')?.email ?? null,
         onApplied: (keys) => {
           if (keys.includes('lighting') || keys.includes('weather')) this.ambience.refresh(true);
         },
@@ -2817,10 +2849,13 @@ ${this.map.name}`, this.ambience.state.tod);
           this.setFrame('stand');
           this.save();
         }
-      } else if (action === '3d') {
-        if (await this.ask('Lưu game và chuyển sang bản thử 3D?', null, { safe: true })) {
+      } else if (action === 'logout') {
+        if (await this.ask('Đăng xuất khỏi tài khoản? Tiến độ đã được lưu.', null, { safe: true })) {
+          // Lưu và gửi nốt bản lưu lên mạng rồi mới đăng xuất; tải lại trang để về màn đăng nhập với trạng thái sạch
           this.save();
-          window.location.href = document.getElementById('link3d').href;
+          await stopCloudSave();
+          await signOut();
+          window.location.reload();
           return;
         }
       }

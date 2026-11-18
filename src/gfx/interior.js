@@ -746,7 +746,7 @@ function drawMat(ctx, ox, oy) {
   for (const dy of [6, 9, 12]) px(ctx, '#f08850', ox + 2, oy + dy, 12, 1);
 }
 
-// Đồ treo trên tường sau (map.wallDecor: { cột x: 'photo' | 'poster' | 'calendar' | 'clock' }, dùng chung với bản 3D):
+// Đồ treo trên tường sau (map.wallDecor: { cột x: 'photo' | 'poster' | 'calendar' | 'clock' }, ):
 // vẽ trên hàng tường sát sàn, nằm dưới đồ đạc cao (tủ sách, tủ lạnh) nếu chồng lên nhau
 function drawWallDecor(ctx, map) {
   let row = 0;

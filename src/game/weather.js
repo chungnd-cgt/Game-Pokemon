@@ -1,5 +1,5 @@
 // Thời tiết ngoài trời theo vùng khí hậu (không phụ thuộc Phaser: dùng cho bản đồ, trận đấu và test).
-// Hình ảnh (hạt mưa / tuyết / cát, màu trời) ở gfx/ambience.js và three/view3d.js.
+// Hình ảnh (hạt mưa / tuyết / cát, màu trời) ở gfx/ambience.js.
 
 export const WEATHER_NAMES = { rain: 'Mưa', snow: 'Tuyết rơi', hail: 'Mưa đá', sand: 'Bão cát' };
 

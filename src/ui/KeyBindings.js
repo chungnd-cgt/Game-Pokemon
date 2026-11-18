@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { KEY_ACTIONS, canBind, clearBinding, getBindings, keyName, resetBindings, setBinding } from '../game/keybinds.js';
-import { COLORS, closeButton, drawPanel, fixToCamera, textStyle } from './helpers.js';
+import { COLORS, closeButton, drawPanel, fixToCamera, localX, textStyle, uiX } from './helpers.js';
 import { directionOf, isCancel, isConfirm } from './input.js';
 
 // Màn Cài đặt → Phím tắt: mỗi hành động một dòng, hai ô phím (chính / phụ).
@@ -51,13 +51,13 @@ export class KeyBindings {
     this.foot = scene.add.container(0, 0);
     this.container.add(this.foot);
     this.render();
-    if (this.fixed) fixToCamera(this.container);
+    if (this.fixed) fixToCamera(this.container).setX(uiX(this.scene));
   }
 
   open() {
     const openedAt = performance.now();
     this.onWheel = (p, objs, dx, dy) => {
-      if (dy && this.bounds.contains(p.x, p.y)) this.scrollBy(Math.sign(dy));
+      if (dy && this.bounds.contains(localX(this.scene, p), p.y)) this.scrollBy(Math.sign(dy));
     };
     this.scene.input.on('wheel', this.onWheel);
     // Ô đang chờ phím nhấp nháy
@@ -74,7 +74,7 @@ export class KeyBindings {
           if (p.downTime < openedAt) return;
           // Bấm ra chỗ khác (không phải ô phím) khi đang chờ phím: thôi
           if (this.capturing) return this.stopCapture();
-          if (p.rightButtonDown() || !this.bounds.contains(p.x, p.y)) this.finish();
+          if (p.rightButtonDown() || !this.bounds.contains(localX(this.scene, p), p.y)) this.finish();
         },
       );
     });
@@ -219,7 +219,7 @@ export class KeyBindings {
       g.fillRoundedRect(x + W - 30, thumbY, 6, thumbH, 3);
     }
     this.renderReset();
-    if (this.fixed) fixToCamera(this.container);
+    if (this.fixed) fixToCamera(this.container).setX(uiX(this.scene));
   }
 
   renderSlot(g, row, col, code, cy, selected) {

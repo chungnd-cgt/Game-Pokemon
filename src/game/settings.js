@@ -8,7 +8,7 @@ const DEFAULTS = {
   lighting: true, // ánh sáng theo buổi (ngày / chiều / đêm, đèn cửa sổ, hang tối)
   weather: true, // hình ảnh thời tiết (mưa, tuyết, mưa đá, bão cát); tắt thì thời tiết vẫn có tác dụng trong trận
   fpsLimit: 0, // giới hạn khung hình / giây: 30 / 60, 0 = theo màn hình (game/display.js)
-  screenSize: 'fit', // kích thước khung game (game/display.js): 'fit' vừa màn hình | 'fill' kéo giãn lấp đầy | 'original' cỡ gốc 960x720
+  resolution: 'screen', // độ phân giải (game/display.js: RESOLUTIONS): 'screen' theo màn hình | 'WxH' vd '1920x1080'
   touchControls: 'auto', // nút cảm ứng (ui/TouchControls.js): 'auto' (máy cảm ứng thì hiện) | 'on' | 'off'
   touchSize: 100, // cỡ nút cảm ứng (%)
   touchOpacity: 70, // độ đậm nút cảm ứng (%)
@@ -32,6 +32,8 @@ function read() {
       saved.weather ??= saved.ambience;
     }
     delete saved.ambience;
+    // Bản cũ: kích thước khung "Vừa màn hình / Kéo giãn / Gốc", nay là độ phân giải
+    delete saved.screenSize;
     return { ...DEFAULTS, ...saved, version: VERSION };
   } catch {
     return { ...DEFAULTS };

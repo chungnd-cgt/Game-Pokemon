@@ -14,31 +14,34 @@ npm run dev      # mở http://localhost:5173 trên trình duyệt
 
 Sửa code xong, trình duyệt tự tải lại.
 
-## Bản 3D (thử nghiệm, đang tạm ẩn)
+## Tài khoản & bản lưu trên mạng (Supabase)
 
-**Đang tạm ẩn:** game 2D không còn nút "Xem bản thử 3D" ở màn hình chính, Cài đặt không còn mục "Chơi bản thử 3D", bản build
-(`npm run build`) không có `3d.html`. Code vẫn giữ nguyên trong `src/three/` và `3d.html`; khi chạy dev vẫn mở tay được
-http://localhost:5173/3d.html. **Bật lại:** bỏ chú thích thẻ `<a id="link3d">` trong `index.html` và thêm lại
-`proto3d: '3d.html'` vào `rollupOptions.input` trong `vite.config.js`. Mô tả dưới đây là bản 3D khi đang bật.
+Phải đăng nhập mới chơi được. Mỗi tài khoản đúng **1 bản lưu**, nằm trên [Supabase](https://supabase.com) nên đổi máy /
+trình duyệt vẫn chơi tiếp được.
 
-Đây vẫn là **nguyên game 2D** (màn hình chính, cốt truyện, trận đấu, túi đồ, Pokédex, lưu game dùng chung),
-chỉ có phần thế giới được vẽ lại bằng 3D ([Three.js](https://threejs.org)) phía sau, giao diện 2D vẽ đè lên trên:
+**Cài đặt lần đầu** (người làm game, một lần cho mỗi project Supabase):
 
-- `src/three/view3d.js`: mỗi khung hình đọc trạng thái WorldScene (bản đồ, người chơi, NPC, Pokémon đi theo, vật phẩm,
-  buổi trong ngày, mưa) rồi dựng lại bằng 3D; ẩn phần thế giới 2D trong lúc vẽ; dấu "!" và icon nhận đồ được đặt
-  đúng chỗ trên cảnh 3D.
-- Mọi khu vực đều có 3D: thị trấn, thành phố, làng, tuyến đường (vách đá, cửa hang, ruộng lúa, đèn lồng, cầu, lò gốm, ao sen, tuyết),
-  8 gym (luồng gió, dòng nước, tường điện, than hồng, ô dịch chuyển, sàn băng, gym tối), Liên minh và 3 hang.
-  Code dựng cảnh: `world3d.js` + `buildings3d.js` + `outdoorProps.js` (ngoài trời), `interior3d.js` + `gymProps.js` (trong nhà),
-  `cave3d.js` (hang). Hiệu ứng (`effects.js`): cửa trượt, xe đạp, lướt nước, cưỡi thú, câu cá, bom khói và khí cầu của Team Rocket.
-- Nhân vật 3D dựng theo bảng màu nhân vật của bản 2D (`src/data/characterLooks.js`).
-- Pokémon (đi theo, NPC là Pokémon, thú cưỡi) là sprite kiểu GBA (`monSprite.js`): hình pixel art luôn quay thẳng vào
-  màn hình như game GBA, giữ đúng tỉ lệ với nhân vật 3D, hơi tối đi khi trời tối.
-- Màn hình chính (`title3d.js`): đồi cỏ 3D phía sau logo với 3 Pokémon sprite GBA nhún nhảy; màn chọn nhân vật hiện mô hình 3D
-  nam / nữ trên bệ xoay, nhân vật đang chọn quay ra vẫy tay.
-- Nhà người chơi 2 tầng (`homeProps.js`): cầu thang lên / xuống, bộ sofa, bàn nước, bếp, tủ lạnh, bàn học, thảm, tranh treo tường.
-- Chạy dev có thể mở thẳng một bản đồ: `3d.html?map=town4&x=10&y=12&time=night`.
-- Phím riêng: V đổi góc nhìn, lăn chuột phóng to / thu nhỏ. Mọi phím khác như bản 2D.
+1. Tạo project Supabase. Authentication → Sign In / Providers → **Email**: bật. "Confirm email" bật thì người chơi phải bấm
+   link trong email mới đăng nhập được. Dịch vụ gửi mail có sẵn của Supabase chỉ gửi được rất ít mail; cho người khác chơi thì
+   cấu hình SMTP riêng (Authentication → Emails → SMTP Settings).
+2. Authentication → URL Configuration: **Site URL** = địa chỉ game (chạy dev: `http://localhost:5173`); thêm địa chỉ thật vào
+   **Redirect URLs** khi deploy. Link trong email (xác nhận, đặt lại mật khẩu) mở lại đúng địa chỉ này.
+3. SQL Editor → dán toàn bộ [`supabase/schema.sql`](supabase/schema.sql) → **Run** (tạo bảng `saves`, bật RLS: mỗi người chỉ
+   đọc / ghi được bản lưu của mình).
+4. Chép `.env.example` thành `.env.local`, điền **Project URL** và khoá **anon / publishable** (Project Settings → API Keys).
+   Không bao giờ dùng khoá secret / service_role trong game. `.env.local` không được đưa lên git.
+
+**Luồng chơi:** mở game → bảng **Đăng nhập / Đăng ký / Quên mật khẩu** (`src/ui/AuthPanel.js`, HTML đè lên game). Đăng nhập
+xong vào game luôn: tài khoản có bản lưu thì chơi tiếp, chưa có thì tạo nhân vật rồi chơi mới (không còn menu Tiếp tục / Chơi
+mới / Xoá dữ liệu). Đăng ký khi bật "Confirm email": bấm link trong email là game tự đăng nhập. Đăng nhập lần đầu mà máy này
+còn bản lưu từ trước khi có tài khoản thì game hỏi có dùng bản đó cho tài khoản không. **Đăng xuất**: Cài đặt → Chung.
+Ô **Ghi nhớ đăng nhập** (mặc định bật): mở lại game là vào thẳng, email điền sẵn; bỏ tích thì đóng tab / trình duyệt là phải
+đăng nhập lại (phiên đăng nhập cất trong sessionStorage thay vì localStorage, `src/online/supabase.js`).
+
+**Lưu game** vẫn như cũ (tự lưu vào máy sau mỗi sự kiện, mỗi lượt đánh...), rồi `src/online/cloudSave.js` gửi bản mới nhất
+lên Supabase vài giây sau lần lưu và ngay khi ẩn / đóng tab. Tắt ngang, văng game, mất mạng: bản trên máy vẫn còn, lần mở game
+sau thấy còn thay đổi chưa gửi thì dùng bản trên máy và gửi lên. Mở cùng tài khoản ở hai nơi: nơi lưu trước được giữ, nơi
+còn lại thôi lưu và báo đỏ ở góc màn hình (bảng `saves` có cột `version` tự tăng, ghi lên kèm điều kiện đúng version).
 
 ## Build ra web
 
@@ -57,7 +60,7 @@ và phòng thí nghiệm của Giáo sư Oak. Pallet **không có Pokémon Cente
 Sông Lục Bình). Bãi cỏ không có vật phẩm; hai góc dưới thị trấn có 2 thuốc giải độc (trái) và 2 thuốc giải tê liệt (phải).
 Không có cây quả mọng.
 
-0. Bấm **Chơi mới**: tạo nhân vật (giới tính, kiểu tóc, màu tóc, màu da, trang phục, màu mắt), rồi gõ tên (tối đa 12 ký tự, gõ được tiếng Việt;
+0. Đăng nhập tài khoản chưa có bản lưu: tạo nhân vật (giới tính, kiểu tóc, màu tóc, màu da, trang phục, màu mắt), rồi gõ tên (tối đa 12 ký tự, gõ được tiếng Việt;
    để trống thì tên là Khang / Linh). Tên xuất hiện trong lời chào, lời Gary và Nhà vô địch.
 1. Thức dậy ở **phòng ngủ tầng 2**, đi cầu thang (góc trên bên phải) xuống phòng khách tầng 1 nói chuyện với **mẹ**
    (mẹ ngồi trên bộ sofa đặt đối xứng hai bên bàn nước): mẹ cho **2 Potion**.
@@ -372,12 +375,17 @@ chỉ là nháp, bấm Áp dụng / OK mới có tác dụng; Huỷ, phím quay 
 bấm nút, kéo thanh trượt; bàn phím: ↑ / ↓ chọn dòng, ← / → đổi giá trị, xác nhận để bật / tắt, Tab đổi thẻ.
 
 - **Đồ hoạ**: **Chế độ hiển thị** Cửa sổ / Toàn màn hình (điện thoại: khoá màn hình ngang; iPhone Safari không hỗ trợ, dùng
-  "Thêm vào Màn hình chính"), **Giới hạn FPS** 30 / 60 / Theo màn hình (30 đỡ tốn pin, `src/game/display.js`),
+  "Thêm vào Màn hình chính"), **Độ phân giải** (danh sách xổ xuống): **Theo màn hình** (mặc định, game lấp kín màn hình, không viền đen) hoặc
+  một cỡ cố định 16:9 / 16:10 / 21:9 / 4:3 (1280×720 … 3840×2160, cửa sổ nhỏ hơn thì thu nhỏ cho vừa). Game luôn cao 720 (chữ,
+  nút giữ nguyên cỡ), rộng theo tỉ lệ màn hình từ 960 (4:3) tới 1680 (21:9): bản đồ thấy rộng hơn, nút trên bản đồ bám mép màn
+  hình, còn trận đấu / menu / Pokédex vẽ theo khung 960×720 đặt giữa với nền tràn ra hai bên (`uiX`, `centerStage` trong
+  `src/ui/helpers.js`). Đổi cỡ cửa sổ, xoay máy, bật / tắt toàn màn hình thì game tự bố trí lại,
+  **Giới hạn FPS** 30 / 60 / Theo màn hình (30 đỡ tốn pin, `src/game/display.js`),
   **Ánh sáng ngày đêm** và **Hiệu ứng thời tiết** (mưa, tuyết, mưa đá, bão cát) bật / tắt riêng.
 - **Chung**: **Xem nhanh Pokémon gửi vào PC** (mặc định bật): đội đã đủ 6 mà bắt thêm thì Pokémon tự vào hộp PC; khi bật, ngay
   sau khi bắt hiện bảng nhỏ cho biết cấp, giới tính, hệ, tính cách, đặc tính (đặc tính ẩn tô tím) và IV từng chỉ số; bấm phím
   xác nhận / quay lại hoặc bấm chuột để đóng. **Bản đồ vùng** (khi đã có bản đồ), **Đổi diện mạo** (mở lại bảng tạo nhân vật,
-  đổi xong nhân vật trên bản đồ đổi ngay), **Chơi bản thử 3D** (chỉ khi bật bản 3D).
+  đổi xong nhân vật trên bản đồ đổi ngay), email tài khoản đang đăng nhập và **Đăng xuất**.
 - **Điều khiển**: **Nút cảm ứng** Tự động (máy cảm ứng thì hiện) / Bật / Tắt, **cỡ nút**, **độ đậm nút**, **rung khi bấm**,
   **Phím tắt bàn phím** (xem mục Phím tắt bên dưới).
 
@@ -389,16 +397,15 @@ bên phải (`src/ui/TouchControls.js`). Nút cảm ứng giả lập đúng ph�
 phím hướng là đi liên tục, trượt ngón tay sang hướng khác là đổi hướng ngay, giữ lâu trong menu thì con trỏ tự chạy. Các nút
 khác trên màn hình (cột Pokémon, Túi đồ, ô phím tắt, menu trận đấu...) chạm trực tiếp. Trang không cuộn / phóng to khi chạm.
 
-Màn hình chính có **Tiếp tục** (chơi tiếp bản lưu), **Chơi mới** (chọn nhân vật, đặt tên; bản lưu cũ bị thay) và **Xoá dữ liệu** (xoá bản lưu, có hỏi lại).
-Bản lưu nằm trong trình duyệt đang dùng, đổi trình duyệt hoặc xoá dữ liệu trang web là mất.
+Bản lưu gắn với tài khoản (xem mục Tài khoản & bản lưu trên mạng), đổi máy / trình duyệt chỉ cần đăng nhập lại.
 
 ### Tải game nhanh
 
 Mở link là có ngay màn hình **Đang tải** (Poké Ball quay + thanh tiến độ, `#loading` trong `index.html`) thay vì màn đen.
 Màn hình chính hiện sau khi nạp đúng vài hình nó cần (3 Pokémon trên màn hình chính, loài làm icon thú cưỡi); 453 hình SVG
 Pokémon còn lại nạp ngầm trong lúc người chơi ở màn hình chính (`src/gfx/monImages.js`, mặt trước trước, rồi lưng, rồi
-nghiêng). Hình chỉ giữ dạng ảnh trong bộ nhớ, không đẩy lên GPU, tới lúc cần mới thu thành sprite GBA. Bấm Tiếp tục / Chơi
-mới khi chưa nạp xong thì hiện "Đang tải hình Pokémon… %" chờ nốt. Bản đồ chỉ được vẽ khi bước vào (`ensureMapTextures` trong
+nghiêng). Hình chỉ giữ dạng ảnh trong bộ nhớ, không đẩy lên GPU, tới lúc cần mới thu thành sprite GBA. Vào game khi chưa
+nạp xong thì hiện "Đang tải hình Pokémon… %" chờ nốt. Bản đồ chỉ được vẽ khi bước vào (`ensureMapTextures` trong
 `src/gfx/world.js`), giữ 6 bản đồ gần nhất, bản đồ cũ hơn được giải phóng (trước kia vẽ sẵn cả 101 bản đồ lúc khởi động,
 ~300MB bộ nhớ).
 
@@ -542,7 +549,7 @@ vượt đội:
   Pokémon dưới nước trong hang: Psyduck / Golduck, Slowpoke / Slowbro, Krabby / Kingler, Golbat; câu: Magikarp (cần cũ), Goldeen /
   Poliwag / Krabby / Shellder (cần tốt), Kingler / Seaking / Seadra / Gyarados / Cloyster / Dewgong (cần siêu); hang băng có Seel,
   Dewgong, Lapras. Cấp cao hơn Pokémon trên cạn của hang một chút vì phải có Surf mới tới. Mặt nước xanh lục thẫm gợn sóng, bờ đá lởm
-  chởm (hang băng: nước xanh lạnh, viền băng trắng, mảnh băng trôi); bản 3D khoét nền hang thành hồ. Test: `tests/cave-water.test.js`.
+  chởm (hang băng: nước xanh lạnh, viền băng trắng, mảnh băng trôi). Test: `tests/cave-water.test.js`.
 - **Hàng rào gỗ** (ô `H`, cản đường, tự nối với ô hàng rào bên cạnh): rào ngăn Pallet với bụi cỏ phía bắc, rào quanh vườn
   quả mọng Lò Gốm, ruộng lúa Xóm Cối Xay và Thành phố Lúa Vàng (luôn chừa lối đi).
 - **Nói chuyện với NPC**: đứng phía nào bắt chuyện thì NPC quay về phía đó (kể cả người đứng yên, nói qua quầy, nhà huấn luyện),

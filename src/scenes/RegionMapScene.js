@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { PLACES, REGION_NAME, placeOf, placePoint } from '../data/region.js';
 import { state } from '../game/state.js';
-import { backToWorld, closeButton, gradientRect, textStyle } from '../ui/helpers.js';
+import { BLEED, backToWorld, centerStage, closeButton, gradientRect, textStyle } from '../ui/helpers.js';
 import { InputRouter, isCancel, isConfirm } from '../ui/input.js';
 import { matches } from '../game/keybinds.js';
 
@@ -23,9 +23,12 @@ export default class RegionMapScene extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.scale;
+    // Màn hình rộng: khung 960x720 nằm giữa, biển tràn ra hai bên
+    centerStage(this);
+    const width = 960;
+    const height = 720;
     const g = this.add.graphics();
-    gradientRect(g, 0, 0, width, height, 0x3a88c8, 0x1e5a98);
+    gradientRect(g, -BLEED, 0, width + BLEED * 2, height, 0x3a88c8, 0x1e5a98);
     this.drawLand(g);
     this.drawRoutes(g);
     // Chú thích khi rê chuột: đặt dưới tiêu đề để không che các thị trấn phía nam

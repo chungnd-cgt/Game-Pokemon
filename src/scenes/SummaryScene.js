@@ -11,7 +11,7 @@ import { evTotal, expProgress, expToReach } from '../game/monster.js';
 import { giveHeldItem, takeHeldItem } from '../game/heldItems.js';
 import { itemCount, state } from '../game/state.js';
 import { GBA_MON, fitScale, pixelMon } from '../gfx/textures.js';
-import { COLORS, GENDER, backToWorld, closeButton, cssColor, drawHpBar, drawPanel, fitText, gradientRect, hpLabel, monTag, textStyle } from '../ui/helpers.js';
+import { BLEED, COLORS, GENDER, backToWorld, centerStage, closeButton, cssColor, drawHpBar, drawPanel, fitText, gradientRect, hpLabel, monTag, textStyle } from '../ui/helpers.js';
 import { ItemTip } from '../ui/BagParts.js';
 import { InputRouter, directionOf, isCancel, isConfirm } from '../ui/input.js';
 import { matches } from '../game/keybinds.js';
@@ -41,8 +41,9 @@ export default class SummaryScene extends Phaser.Scene {
   }
 
   create() {
+    centerStage(this); // màn hình rộng: khung 960x720 nằm giữa (toạ độ chuột: p.worldX)
     const g = this.add.graphics();
-    gradientRect(g, 0, 0, 960, 720, 0x2c3a64, 0x18203a);
+    gradientRect(g, -BLEED, 0, 960 + BLEED * 2, 720, 0x2c3a64, 0x18203a);
     this.page = this.add.container(0, 0);
     this.router = new InputRouter(this);
     this.router.set((e) => this.handleKey(e), (p) => p.rightButtonDown() && this.close());
@@ -180,24 +181,24 @@ export default class SummaryScene extends Phaser.Scene {
     this.input.dragDistanceThreshold = 6;
     this.input.on('wheel', (p, objs, dx, dy) => {
       const { x, y, w, h } = BAG;
-      if (!this.bagOpen || !dy || p.x < x || p.x > x + w || p.y < y || p.y > y + h) return;
+      if (!this.bagOpen || !dy || p.worldX < x || p.worldX > x + w || p.y < y || p.y > y + h) return;
       this.bagScroll = Math.max(0, this.bagScroll + Math.sign(dy));
       this.renderBag();
     });
-    const overSlot = (p) => p.x >= SLOT.x - 10 && p.x <= SLOT.x + SLOT.size + 10 && p.y >= SLOT.y - 10 && p.y <= SLOT.y + SLOT.size + 10;
-    const overBag = (p) => this.bagOpen && p.x >= BAG.x && p.x <= BAG.x + BAG.w && p.y >= BAG.y && p.y <= BAG.y + BAG.h;
+    const overSlot = (p) => p.worldX >= SLOT.x - 10 && p.worldX <= SLOT.x + SLOT.size + 10 && p.y >= SLOT.y - 10 && p.y <= SLOT.y + SLOT.size + 10;
+    const overBag = (p) => this.bagOpen && p.worldX >= BAG.x && p.worldX <= BAG.x + BAG.w && p.y >= BAG.y && p.y <= BAG.y + BAG.h;
     this.input.on('dragstart', (p, obj) => {
       const data = obj.getData('drag');
       if (!data) return;
       this.dragging = data;
       this.tip.hide();
       obj.setAlpha(0.3);
-      this.ghost = this.add.image(p.x, p.y, ITEMS[data.id].icon).setScale(fitScale(this, ITEMS[data.id].icon, 46));
+      this.ghost = this.add.image(p.worldX, p.y, ITEMS[data.id].icon).setScale(fitScale(this, ITEMS[data.id].icon, 46));
       this.dragLayer.add(this.ghost);
     });
     this.input.on('drag', (p) => {
       if (!this.dragging) return;
-      this.ghost.setPosition(p.x, p.y);
+      this.ghost.setPosition(p.worldX, p.y);
       this.drawSlot(this.dragging.from === 'bag' && overSlot(p));
     });
     this.input.on('dragend', (p, obj) => {
