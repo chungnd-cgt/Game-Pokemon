@@ -8,7 +8,7 @@ export const BLACKOUT_RATE = 0.05;
 export const BLACKOUT_MAX = 25000;
 export const ITEM_MAX = 999; // mỗi loại vật phẩm giữ tối đa 999 cái
 
-// Tên mặc định khi người chơi để trống ô đặt tên
+// Tên mặc định khi tài khoản không có tên đăng nhập (tên nhân vật = tên đăng nhập, scenes/TitleScene.js)
 export const DEFAULT_NAMES = { male: 'Khang', female: 'Linh' };
 
 function freshState() {

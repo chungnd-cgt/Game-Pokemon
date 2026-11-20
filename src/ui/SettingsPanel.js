@@ -65,7 +65,7 @@ function currentValues() {
   };
 }
 
-// Các thẻ và dòng trong thẻ. opts: { hasMap, account (email đang đăng nhập), game }
+// Các thẻ và dòng trong thẻ. opts: { hasMap, account (tên đăng nhập, tài khoản chưa có tên thì email), game }
 function buildTabs(opts) {
   const fsNote = fullscreen.available ? null
     : isTouchDevice() ? 'Máy này không hỗ trợ. Mẹo: "Thêm vào Màn hình chính" để chơi toàn màn hình.' : 'Trình duyệt không hỗ trợ.';

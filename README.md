@@ -34,15 +34,33 @@ trình duyệt vẫn chơi tiếp được.
       Settings: **tắt "Allow public access"**. Game mở kênh ở chế độ riêng tư nên thiếu bước này thì không thấy nhau / giao dịch.
    5. [`supabase/errors.sql`](supabase/errors.sql): nhật ký lỗi JavaScript của người chơi (xem *Nhật ký lỗi* bên dưới).
    6. [`supabase/sessions.sql`](supabase/sessions.sql): mỗi tài khoản chỉ chơi ở một nơi cùng lúc (xem *Một nơi chơi* bên dưới).
+   7. [`supabase/usernames.sql`](supabase/usernames.sql): tên đăng nhập (xem *Tên đăng nhập* bên dưới). Thiếu file này thì
+      không đăng ký / đăng nhập được.
 4. Chép `.env.example` thành `.env.local`, điền **Project URL** và khoá **anon / publishable** (Project Settings → API Keys).
    Không bao giờ dùng khoá secret / service_role trong game. `.env.local` không được đưa lên git.
 
-**Luồng chơi:** mở game → bảng **Đăng nhập / Đăng ký / Quên mật khẩu** (`src/ui/AuthPanel.js`, HTML đè lên game). Đăng nhập
-xong vào game luôn: tài khoản có bản lưu thì chơi tiếp, chưa có thì tạo nhân vật rồi chơi mới (không còn menu Tiếp tục / Chơi
-mới / Xoá dữ liệu). Đăng ký khi bật "Confirm email": bấm link trong email là game tự đăng nhập. Đăng nhập lần đầu mà máy này
+**Luồng chơi:** mở game → bảng **Đăng nhập / Đăng ký / Quên mật khẩu** (`src/ui/AuthPanel.js`, HTML đè lên game). Đăng ký
+nhập **tên đăng nhập + email + mật khẩu** (2 lần); đăng nhập bằng **tên đăng nhập + mật khẩu**; quên mật khẩu thì nhập email.
+Đăng nhập xong vào game luôn: tài khoản có bản lưu thì chơi tiếp, chưa có thì chọn diện mạo nhân vật rồi chơi mới (không còn menu Tiếp tục / Chơi
+mới / Xoá dữ liệu). **Đăng ký** khi bật "Confirm email": bấm link trong email thì game mở ở **tab mới** và tự đăng nhập; tab
+cũ chỉ báo "đã xác nhận ở tab mới", đóng đi là được (phiên đăng nhập nằm trong tab mới, mỗi tài khoản chỉ chơi ở một nơi).
+**Quên mật khẩu**: bấm link trong email → tab mới hỏi mật khẩu mới → vào game. Nút "Gửi lại email" chờ 60 giây giữa hai lần
+gửi (giới hạn của Supabase). Đăng nhập mà email chưa xác nhận thì có nút gửi lại email xác nhận. Đăng nhập lần đầu mà máy này
 còn bản lưu từ trước khi có tài khoản thì game hỏi có dùng bản đó cho tài khoản không. **Đăng xuất**: Cài đặt → Chung.
-Mỗi lần mở game (đóng tab / trình duyệt rồi mở lại) đều phải **đăng nhập lại**; email lần trước được điền sẵn. Phiên đăng nhập
-chỉ cất trong sessionStorage (`src/online/supabase.js`) nên tải lại trang trong cùng tab (vd văng game bấm F5) thì vẫn còn.
+Mỗi lần mở game (đóng tab / trình duyệt rồi mở lại) đều phải **đăng nhập lại**; tên đăng nhập lần trước được điền sẵn. Phiên
+đăng nhập chỉ cất trong sessionStorage (`src/online/supabase.js`) nên tải lại trang trong cùng tab (vd văng game bấm F5) thì
+vẫn còn.
+
+**Tên đăng nhập** (`src/online/username.js`, [`supabase/usernames.sql`](supabase/usernames.sql)): bỏ khoảng trắng 2 đầu; 1-18
+ký tự; chỉ chữ cái không dấu và số (không khoảng trắng, ký tự đặc biệt, biểu tượng); chữ cái đầu tự viết hoa (gõ `chung` thành
+`Chung`). Không trùng tên, không phân biệt hoa thường (`Chung` và `chung` là một; đăng nhập gõ hoa thường thế nào cũng được);
+email cũng không trùng (Supabase chặn). Tên lưu ở bảng `profiles` khi tạo tài khoản (trigger trên `auth.users`, trùng / sai
+quy tắc thì huỷ đăng ký); tài khoản không xác nhận email sau 1 ngày thì tên được nhả ra. Supabase chỉ đăng nhập được bằng
+email, nên game gọi `login_email(tên, mật khẩu)`: hàm kiểm tra mật khẩu ngay trong database, đúng thì trả về email để đăng nhập
+Supabase như thường, sai tên hay sai mật khẩu đều chỉ báo chung "sai tên đăng nhập hoặc mật khẩu" (người lạ không lấy được email
+từ tên). Sai quá 10 lần / 15 phút thì khoá tên đó 15 phút. Tên đăng nhập cũng là **tên nhân vật** trong game (không có màn đặt tên;
+đọc từ bảng `profiles` nên người chơi không tự đổi được; bản lưu có tên khác thì đổi theo tên đăng nhập).
+Tài khoản tạo trước khi có tên đăng nhập (hoặc tạo trong Dashboard) không có tên nên không đăng nhập được: xoá đi rồi đăng ký lại.
 
 **Lưu game** vẫn như cũ (tự lưu vào máy mỗi 30 giây, sau mỗi sự kiện, mỗi lượt đánh, khi rời tab...), rồi
 `src/online/cloudSave.js` gửi bản mới nhất lên Supabase 30 giây sau lần lưu (các lần lưu trong lúc chờ gộp làm một; lỗi mạng
@@ -71,7 +89,8 @@ Authentication → Emails → **SMTP Settings** → Enable custom SMTP:
 
 Sau đó: Authentication → **Rate Limits** → tăng "Rate limit for sending emails" (mặc định 30 mail/giờ khi dùng SMTP riêng).
 Mẫu email tiếng Việt: Authentication → Emails → Templates, dán [`confirm-signup.html`](supabase/email-templates/confirm-signup.html)
-(Confirm signup) và [`reset-password.html`](supabase/email-templates/reset-password.html) (Reset Password).
+(Confirm signup) và [`reset-password.html`](supabase/email-templates/reset-password.html) (Reset Password). Chỉ sửa được mẫu
+khi đã bật SMTP riêng; chưa có thì dùng mẫu mặc định (tiếng Anh, cũng là link) vẫn chạy được.
 
 ### Bảo mật, chống gian lận, giữ project hoạt động
 
@@ -86,7 +105,8 @@ Mẫu email tiếng Việt: Authentication → Emails → Templates, dán [`conf
   Không chặn được 100%: muốn chặn hẳn thì trận đấu / bắt Pokémon phải chạy trên máy chủ.
 - **Realtime riêng tư** (`supabase/realtime.sql`): chỉ người đã đăng nhập vào được kênh bản đồ, chỉ hai người trong giao dịch
   vào được kênh giao dịch. Tin nhắn Realtime được gom: đứng một mình trên bản đồ thì không gửi tin bước đi, có người khác thì
-  tối đa ~6 tin / giây (gói miễn phí giới hạn số tin mỗi tháng).
+  mỗi người đang đi gửi tối đa ~2 tin / giây, mỗi tin kèm các ô vừa đi qua để bên nhận đi lại đúng đường (người khác thấy mình
+  đi chậm hơn thực tế khoảng nửa giây). Gói miễn phí giới hạn số tin mỗi tháng / mỗi giây, và mỗi người nhận tính một tin.
 - **Giữ project không bị tạm dừng** (gói miễn phí tạm dừng sau 7 ngày không hoạt động): GitHub Action
   [`.github/workflows/supabase-keepalive.yml`](.github/workflows/supabase-keepalive.yml) cứ 3 ngày gọi Supabase một lần. Cần thêm
   2 secret trong GitHub (Settings → Secrets and variables → Actions): `SUPABASE_URL`, `SUPABASE_ANON_KEY`.

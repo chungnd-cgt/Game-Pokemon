@@ -1,5 +1,6 @@
 import { CELL, WORLD_SCALE } from '../config.js';
 import { currentLook, resolveLook } from '../data/playerCustom.js';
+import { planSteps, stepFacing, trimQueue } from '../game/movePath.js';
 import { playerName, state } from '../game/state.js';
 import { RIDE_SEAT, rideTexture } from '../gfx/mounts.js';
 import { CHAR_HEIGHT, CHAR_SCALE, makeBikeTexture, makeCharacterTexture } from '../gfx/player.js';
@@ -11,7 +12,8 @@ import { showTrainerCard } from '../ui/TrainerCard.js';
 import { onTradeRequest, requestTrade } from './worldTrade.js';
 
 // Người chơi khác trên bản đồ (online/presence.js): hình nhân vật theo diện mạo của họ, tên trên đầu, đi lại mượt theo từng
-// bước. Chọn một người: chuột phải (máy tính) hoặc chạm đúp (điện thoại, chuột trái nhấn đúp cũng được) -> menu nhỏ
+// bước (tin bước đi đến ~2 lần/giây kèm các ô đã đi qua: xếp hàng rồi đi lại đúng đường đó từng ô, sắp hết hàng thì đi
+// chậm lại một chút cho khỏi đứng chờ tin sau, dồn nhiều thì đi nhanh lên). Chọn một người: chuột phải (máy tính) hoặc chạm đúp (điện thoại, chuột trái nhấn đúp cũng được) -> menu nhỏ
 // "Xem chi tiết" (thẻ HLV rút gọn: không có huy hiệu, tiền, Pokédex) / "Giao dịch" (scenes/worldTrade.js).
 // Người chơi khác không chặn đường (đi xuyên qua nhau được). Đi xe đạp / cưỡi Arcanine / cưỡi Lapras / lướt Surf thì
 // vẽ đúng như vậy (xe đạp; người ngồi trên thú cưỡi hoặc khối nước, nhấp nhô theo sóng).
@@ -164,7 +166,7 @@ function syncPlayers(world, list) {
       o.label.setText(meta.name || 'Người chơi');
       if (changedLook || (meta.vehicle ?? null) !== o.vehicle || (meta.rideArt ?? null) !== (o.meta.rideArt ?? null)) applyVehicle(world, o);
       // Chỗ đứng trong presence (cập nhật khi đứng yên): sửa lại nếu lỡ mất tin bước đi
-      if (!o.moving && Number.isFinite(meta.x) && (meta.x !== o.pos.x || meta.y !== o.pos.y)) moveOther(world, meta.id, meta);
+      if (!o.walking && Number.isFinite(meta.x) && (meta.x !== o.pos.x || meta.y !== o.pos.y)) moveOther(world, meta.id, meta);
     }
   }
   for (const id of [...world.others.keys()]) if (!seen.has(id)) removeOther(world, id);
@@ -181,7 +183,11 @@ function addOther(world, meta) {
   const label = world.add.text(x, y - CHAR_HEIGHT - 4, meta.name || 'Người chơi', textStyle(13, '#ffffff', {
     fontStyle: 'bold', backgroundColor: 'rgba(20,26,44,0.75)', padding: { x: 6, y: 2 },
   })).setOrigin(0.5, 1).setDepth(DEPTH + 2);
-  const o = { meta, pos, facing, sprite, shadow, label, lastTap: 0, moving: false };
+  // pos: ô cuối cùng đã biết (đích của hàng đợi); mover: chỗ đang vẽ (px); queue: các bước chưa đi (game/movePath.js)
+  const o = {
+    meta, pos, facing, endFacing: facing, sprite, shadow, label, lastTap: 0, moving: false, walking: false,
+    mover: { x, y }, queue: [], at: pos,
+  };
   applyVehicle(world, o);
   sprite.setInteractive({ useHandCursor: true });
   sprite.on('pointerdown', (p, lx, ly, e) => {
@@ -200,47 +206,70 @@ function addOther(world, meta) {
 function removeOther(world, id) {
   const o = world.others.get(id);
   if (!o) return;
-  world.tweens.killTweensOf([o.sprite, o.shadow, o.label]);
+  world.tweens.killTweensOf(o.mover);
+  o.queue = [];
   for (const part of [o.sprite, o.shadow, o.label, o.mount, o.mountOver]) part?.destroy();
   world.others.delete(id);
 }
 
-// Người kia bước sang ô kề bên thì đi mượt (chân trái / phải), xa hơn (vào cửa, dịch chuyển) thì hiện luôn ở chỗ mới
+// Đặt hình, bóng, tên theo chỗ đang vẽ (o.mover); đang cưỡi thì placeMount đặt cả người ngồi và tên
+function placeOther(world, o) {
+  const { x, y } = o.mover;
+  o.sprite.setPosition(x, y);
+  o.shadow.setPosition(x, y - 2);
+  if (o.art) placeMount(o, world.time.now);
+  else o.label.setPosition(x, y - CHAR_HEIGHT - 4);
+}
+
+// Tin bước đi của người kia: xếp các bước vào hàng đợi rồi đi lần lượt (bước sang ô kề bên thì đi mượt, chân trái / phải;
+// vào cửa / dịch chuyển thì hiện luôn ở chỗ mới). Chỉ quay mặt: quay ngay nếu đang đứng, đang đi thì quay khi đi xong
 function moveOther(world, id, pos) {
   const o = world.others?.get(id);
   if (!o) return;
-  const facing = pos.facing ?? o.facing;
-  const dist = Math.abs(pos.x - o.pos.x) + Math.abs(pos.y - o.pos.y);
-  o.facing = facing;
-  o.pos = { x: pos.x, y: pos.y };
   if ((pos.vehicle ?? null) !== o.vehicle || (pos.rideArt ?? null) !== (o.meta.rideArt ?? null)) {
     o.meta = { ...o.meta, vehicle: pos.vehicle ?? null, rideArt: pos.rideArt ?? null };
     applyVehicle(world, o);
   }
-  const stepMs = VEHICLE_STEP_MS[o.vehicle] ?? STEP_MS;
-  const [x, y] = cellCenter(o.pos);
-  world.tweens.killTweensOf([o.sprite, o.shadow, o.label]);
-  // Gần (tin bước đi được gom, đạp xe nhanh): đi mượt cả quãng; xa (vào cửa, dịch chuyển): hiện luôn ở chỗ mới
-  if (dist < 1 || dist > 4) {
+  if (pos.facing) o.endFacing = pos.facing;
+  const steps = planSteps(o.pos, pos);
+  if (steps.length) o.pos = { x: steps.at(-1).x, y: steps.at(-1).y };
+  o.queue = trimQueue([...o.queue, ...steps]);
+  if (!o.walking) walkNext(world, o);
+}
+
+function walkNext(world, o) {
+  if (world.others?.get(o.meta.id) !== o) return; // người đó đã rời bản đồ
+  const step = o.queue.shift();
+  if (!step) {
+    o.walking = false;
     o.moving = false;
-    o.sprite.setPosition(x, y);
-    o.shadow.setPosition(x, y - 2);
-    o.label.setPosition(x, y - CHAR_HEIGHT - 4);
-    setFrame(o.sprite, facing);
+    o.facing = o.endFacing ?? o.facing;
+    setFrame(o.sprite, o.facing);
+    placeOther(world, o);
     return;
   }
+  const [x, y] = cellCenter(step);
+  if (step.jump) {
+    o.at = step;
+    o.mover.x = x;
+    o.mover.y = y;
+    placeOther(world, o);
+    walkNext(world, o);
+    return;
+  }
+  o.facing = stepFacing(o.at ?? step, step, o.facing);
+  o.at = step;
+  o.walking = true;
   o.moving = true;
   o.foot = o.foot === 'left' ? 'right' : 'left';
-  setFrame(o.sprite, facing, o.art ? 'stand' : o.foot);
-  const ms = stepMs * dist;
-  world.tweens.add({ targets: o.sprite, x, y, duration: ms });
-  world.tweens.add({ targets: o.shadow, x, y: y - 2, duration: ms });
+  setFrame(o.sprite, o.facing, o.art ? 'stand' : o.foot);
+  // Sắp hết hàng (tin sau chưa tới): đi chậm lại chút; dồn nhiều bước: đi nhanh lên cho kịp
+  const left = o.queue.length;
+  const ms = (VEHICLE_STEP_MS[o.vehicle] ?? STEP_MS) * (left === 0 ? 1.15 : left > 4 ? 0.7 : 1);
   world.tweens.add({
-    targets: o.label, x, y: y - CHAR_HEIGHT - 4, duration: ms,
-    onComplete: () => {
-      o.moving = false;
-      setFrame(o.sprite, o.facing);
-    },
+    targets: o.mover, x, y, duration: ms,
+    onUpdate: () => placeOther(world, o),
+    onComplete: () => walkNext(world, o),
   });
 }
 

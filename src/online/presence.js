@@ -9,10 +9,13 @@ import { supabase } from './supabase.js';
 
 // Tiết kiệm tin nhắn Realtime (gói miễn phí giới hạn số tin mỗi tháng / mỗi giây):
 //  - đứng một mình trên bản đồ: không gửi tin bước đi; chỗ đứng chỉ cập nhật vào presence khi đứng yên lâu hơn
-//  - có người khác: gom bước đi, mỗi MOVE_GAP ms gửi tối đa một tin (chỗ đứng mới nhất); bên nhận tự đi mượt qua các ô
+//  - có người khác: gom bước đi, mỗi MOVE_GAP ms gửi tối đa một tin gồm chỗ đứng mới nhất + path (các ô đã đi qua từ tin
+//    trước); bên nhận đi lại đúng đường đó từng ô một (scenes/worldPlayers.js). Tin đầu tiên sau khi đứng yên cũng đợi
+//    MOVE_GAP: các tin đến đều nhịp nên bên nhận đi liền mạch, không đi một bước rồi đứng chờ
 const TRACK_DELAY = 800; // ms đứng yên rồi mới cập nhật chỗ đứng vào presence (có người khác)
 const TRACK_DELAY_ALONE = 2500; // ... (một mình trên bản đồ)
-const MOVE_GAP = 160;
+const MOVE_GAP = 500; // ~2 tin/giây mỗi người đang đi (đi bộ ~2 ô, xe đạp / thú cưỡi ~5 ô mỗi tin)
+const MAX_TRAIL = 16; // tối đa số ô trong path của một tin
 
 export class MapPresence {
   // handlers: onPlayers([meta]) danh sách người khác trong bản đồ đổi; onMove(id, { x, y, facing }); onRequest({ id, from })
@@ -22,8 +25,10 @@ export class MapPresence {
     this.channel = null;
     this.mapId = null;
     this.pos = null;
-    this.lastMove = 0;
+    this.lastMove = -Infinity;
     this.moveTimer = null;
+    this.trail = []; // các ô đã đi qua chưa gửi
+    this.sentCell = null; // ô đã báo cho người khác lần cuối
   }
 
   meta() {
@@ -35,6 +40,8 @@ export class MapPresence {
   // supabase-js trả lại kênh cũ nếu trùng tên (A -> B -> A thật nhanh): chờ kênh cũ đóng hẳn rồi mới mở kênh mới
   async enter(mapId, pos) {
     this.pos = { ...pos };
+    this.trail = [];
+    this.sentCell = { x: pos.x, y: pos.y };
     if (mapId === this.mapId && this.channel) {
       this.track();
       return;
@@ -76,23 +83,34 @@ export class MapPresence {
     const alone = this.players().length === 0;
     clearTimeout(this.trackTimer);
     this.trackTimer = setTimeout(() => this.track(), alone ? TRACK_DELAY_ALONE : TRACK_DELAY);
-    if (alone) return;
-    // Gom bước đi: đã gửi trong MOVE_GAP ms vừa rồi thì hẹn gửi chỗ đứng mới nhất ở cuối khoảng đó
-    const wait = this.lastMove + MOVE_GAP - performance.now();
-    if (wait > 0) {
-      this.moveTimer ??= setTimeout(() => {
-        this.moveTimer = null;
-        this.sendMove();
-      }, wait);
+    if (alone) {
+      this.trail = [];
+      this.sentCell = { x: pos.x, y: pos.y };
       return;
     }
-    this.sendMove();
+    const last = this.trail.at(-1) ?? this.sentCell;
+    if (!last || last.x !== pos.x || last.y !== pos.y) {
+      this.trail.push({ x: pos.x, y: pos.y });
+      if (this.trail.length > MAX_TRAIL) this.trail.shift();
+    }
+    // Gom bước đi: gửi ở cuối khoảng MOVE_GAP kể từ tin trước (đứng yên lâu rồi thì đợi trọn MOVE_GAP)
+    const wait = this.lastMove + MOVE_GAP - performance.now();
+    this.moveTimer ??= setTimeout(() => {
+      this.moveTimer = null;
+      this.sendMove();
+    }, wait > 0 ? wait : MOVE_GAP);
   }
 
   sendMove() {
     if (!this.channel) return;
     this.lastMove = performance.now();
-    this.channel.send({ type: 'broadcast', event: 'move', payload: { id: this.me.id, ...this.pos } }).catch(() => {});
+    // path: các ô đã đi qua trước chỗ đứng hiện tại ([[x, y], ...], không gồm chỗ đứng hiện tại)
+    const path = this.trail.map((c) => [c.x, c.y]);
+    const end = path.at(-1);
+    if (end && end[0] === this.pos.x && end[1] === this.pos.y) path.pop();
+    this.trail = [];
+    this.sentCell = { x: this.pos.x, y: this.pos.y };
+    this.channel.send({ type: 'broadcast', event: 'move', payload: { id: this.me.id, ...this.pos, path } }).catch(() => {});
   }
 
   // Đổi thông tin của mình (tên, diện mạo, số huy hiệu...)
@@ -114,6 +132,7 @@ export class MapPresence {
     clearTimeout(this.trackTimer);
     clearTimeout(this.moveTimer);
     this.moveTimer = null;
+    this.trail = [];
     const ch = this.channel;
     this.channel = null;
     this.mapId = null;

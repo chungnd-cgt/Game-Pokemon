@@ -23,8 +23,8 @@ export function clearLinkError() {
 }
 
 // Phiên đăng nhập chỉ cất trong sessionStorage: đóng tab / trình duyệt rồi mở lại game là phải đăng nhập lại (tải lại trang
-// trong cùng tab thì vẫn còn, văng game bấm F5 không phải đăng nhập). Chỉ nhớ email lần trước để điền sẵn
-const EMAIL_KEY = 'pokemon-demo-last-email';
+// trong cùng tab thì vẫn còn, văng game bấm F5 không phải đăng nhập). Chỉ nhớ tên đăng nhập lần trước để điền sẵn
+const LOGIN_KEY = 'pokemon-demo-last-login';
 const safe = (fn, fallback = null) => {
   try {
     return fn();
@@ -32,14 +32,15 @@ const safe = (fn, fallback = null) => {
     return fallback; // trình duyệt chặn localStorage / sessionStorage
   }
 };
-export const lastEmail = () => safe(() => localStorage.getItem(EMAIL_KEY) ?? '', '');
-export function setLastEmail(email) {
-  safe(() => (email ? localStorage.setItem(EMAIL_KEY, email) : localStorage.removeItem(EMAIL_KEY)));
+export const lastLogin = () => safe(() => localStorage.getItem(LOGIN_KEY) ?? '', '');
+export function setLastLogin(name) {
+  safe(() => (name ? localStorage.setItem(LOGIN_KEY, name) : localStorage.removeItem(LOGIN_KEY)));
 }
 
 // Bản cũ có "Ghi nhớ đăng nhập" cất phiên trong localStorage: xoá đi để lần mở này cũng phải đăng nhập lại
 safe(() => {
   localStorage.removeItem('pokemon-demo-remember');
+  localStorage.removeItem('pokemon-demo-last-email'); // bản cũ nhớ email (giờ nhớ tên đăng nhập)
   for (const k of Object.keys(localStorage)) if (/^sb-.*-auth-token/.test(k)) localStorage.removeItem(k);
 });
 

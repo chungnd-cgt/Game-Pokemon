@@ -3,7 +3,7 @@ import { formatMoney } from '../data/items.js';
 import { MAPS, SPAWN, resumePosition } from '../data/map.js';
 import { clearLegacySave, deleteSave, legacySave, loadGame, setSaveOwner, summarize, writeSave } from '../game/save.js';
 import { createMonster } from '../game/monster.js';
-import { currentUser } from '../online/account.js';
+import { currentUser, fetchUsername } from '../online/account.js';
 import { markDirty, startCloudSave } from '../online/cloudSave.js';
 import { claimSession } from '../online/session.js';
 import { clearLinkError, emailLink, supabase } from '../online/supabase.js';
@@ -13,12 +13,12 @@ import { monImagesReady } from '../gfx/monImages.js';
 import { applyPlayerLook } from '../gfx/player.js';
 import { fitScale, pixelMon } from '../gfx/textures.js';
 import { CharacterCreator } from '../ui/CharacterCreator.js';
-import { BLEED, COLORS, centerStage, closeButton, drawPanel, gradientRect, textStyle, uiX } from '../ui/helpers.js';
+import { BLEED, COLORS, centerStage, drawPanel, gradientRect, textStyle } from '../ui/helpers.js';
 import { InputRouter } from '../ui/input.js';
 import { Menu } from '../ui/Menu.js';
 
-// Màn hình chính: đăng nhập / đăng ký rồi vào game luôn (có bản lưu thì chơi tiếp, chưa có thì tạo nhân vật)
-const NAME_MAX = 12;
+// Màn hình chính: đăng nhập / đăng ký rồi vào game luôn (có bản lưu thì chơi tiếp, chưa có thì tạo nhân vật).
+// Tên nhân vật = tên đăng nhập (không có màn đặt tên; bản lưu có tên khác thì đổi theo tên đăng nhập)
 // Bản đồ trong nhà trước kia thuộc Pallet, giờ thuộc Thị trấn Lục Bình (xem bước tải bản lưu)
 const OLD_PALLET_SHOPS = ['center', 'mart'];
 // 3 Pokémon trên màn hình chính [loài, x, lật ngang]. BootScene nạp hình các loài này trước khi hiện màn hình chính
@@ -96,7 +96,8 @@ export default class TitleScene extends Phaser.Scene {
       await claimSession(user, true, { onLost });
     }
 
-    this.registry.set('user', { id: user.id, email: user.email });
+    this.username = await fetchUsername(user);
+    this.registry.set('user', { id: user.id, email: user.email, username: this.username });
     for (;;) {
       this.status('Đang tải bản lưu…');
       const { hasSave, offline } = await startCloudSave(user);
@@ -166,6 +167,11 @@ export default class TitleScene extends Phaser.Scene {
       if (OLD_PALLET_SHOPS.includes(position?.map)) position = { map: 'route1', x: 13, y: 11, facing: 'down' };
     }
     if (!position) return false;
+    // Tên nhân vật luôn là tên đăng nhập
+    if (this.username && state.player && state.player.name !== this.username) {
+      state.player.name = this.username;
+      markDirty();
+    }
     applyPlayerLook(this, state.player);
     this.go({ position: resumePosition(position) });
     return true;
@@ -212,83 +218,13 @@ export default class TitleScene extends Phaser.Scene {
     return c;
   }
 
-  // Chơi mới: bảng tuỳ chỉnh nhân vật (giới tính + diện mạo, ui/CharacterCreator.js) rồi đặt tên.
-  // Trả về { name, gender, look }, hoặc null nếu huỷ. Quay lại từ ô đặt tên thì về bảng tuỳ chỉnh (lựa chọn vẫn giữ)
+  // Chơi mới: bảng tuỳ chỉnh nhân vật (giới tính + diện mạo, ui/CharacterCreator.js). Tên = tên đăng nhập (không có thì
+  // tên mặc định theo giới tính). Trả về { name, gender, look }, hoặc null nếu huỷ
   async createCharacter() {
-    let current = { gender: 'male' };
-    for (;;) {
-      const { gender, ...look } = current;
-      const creator = new CharacterCreator(this, this.router, { gender, look: current.hairStyle ? look : undefined });
-      const picked = await creator.open();
-      if (!picked) return null;
-      current = picked;
-      const { gender: chosen, ...chosenLook } = picked;
-      const name = await this.enterName(chosen);
-      if (name !== null) return { name, gender: chosen, look: chosenLook };
-    }
-  }
-
-  // Ô nhập tên (ô chữ HTML đặt đè lên canvas để gõ được tiếng Việt). Để trống thì dùng tên mặc định.
-  // Trả về tên, hoặc null nếu quay lại bảng tuỳ chỉnh nhân vật
-  enterName(gender) {
-    const c = this.add.container(0, 0).setDepth(30);
-    c.add(this.add.rectangle(480, 360, 960 + BLEED * 2, 720, 0x0a1430, 0.75));
-    c.add(drawPanel(this, 230, 210, 500, 280, 18, true));
-    c.add(this.add.text(480, 240, 'Tên của bạn là gì?', textStyle(28, COLORS.text, { fontStyle: 'bold' })).setOrigin(0.5, 0));
-
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.maxLength = NAME_MAX;
-    input.placeholder = DEFAULT_NAMES[gender];
-    input.autocomplete = 'off';
-    const place = () => {
-      const r = this.game.canvas.getBoundingClientRect();
-      const k = r.width / this.scale.width;
-      Object.assign(input.style, {
-        position: 'fixed', left: `${r.left + (uiX(this) + 300) * k}px`, top: `${r.top + 300 * k}px`, width: `${360 * k}px`, height: `${54 * k}px`,
-        fontSize: `${26 * k}px`, fontFamily: 'Nunito, sans-serif', fontWeight: '700', textAlign: 'center', boxSizing: 'border-box',
-        border: `${3 * k}px solid #4a88e0`, borderRadius: `${12 * k}px`, outline: 'none', color: '#2a3248', background: '#ffffff', zIndex: 10,
-      });
-    };
-    place();
-    // Phaser căn lại canvas sau sự kiện resize của cửa sổ: đặt lại ô nhập tên theo vị trí mới của canvas
-    const replace = () => requestAnimationFrame(place);
-    window.addEventListener('resize', replace);
-    this.scale.on('resize', replace);
-    document.body.appendChild(input);
-    input.focus();
-    this.router.clear();
-
-    let done;
-    const result = new Promise((resolve) => {
-      done = (value) => {
-        window.removeEventListener('resize', replace);
-        this.scale.off('resize', replace);
-        input.remove();
-        c.destroy();
-        resolve(value);
-      };
-    });
-    const ok = () => done(input.value.trim().slice(0, NAME_MAX) || DEFAULT_NAMES[gender]);
-    input.addEventListener('keydown', (e) => {
-      e.stopPropagation();
-      if (e.isComposing) return;
-      if (e.key === 'Enter') ok();
-      else if (e.key === 'Escape' || (e.key === 'Backspace' && !input.value && !e.repeat)) done(null);
-    });
-    // Nút OK và nút quay lại (✕) bấm bằng chuột
-    const button = (x, label, color, onClick) => {
-      const g = this.add.graphics();
-      g.fillStyle(color);
-      g.fillRoundedRect(x - 80, 420, 160, 50, 14);
-      const t = this.add.text(x, 445, label, textStyle(22, '#ffffff', { fontStyle: 'bold' })).setOrigin(0.5);
-      const z = this.add.zone(x, 445, 160, 50).setInteractive({ useHandCursor: true }).on('pointerdown', onClick);
-      c.add([g, t, z]);
-    };
-    button(390, 'Quay lại', 0x8a92a6, () => done(null));
-    button(570, 'Xong', 0x40b060, ok);
-    c.add(closeButton(this, 700, 240, () => done(null)));
-    return result;
+    const picked = await new CharacterCreator(this, this.router, { gender: 'male' }).open();
+    if (!picked) return null;
+    const { gender, ...look } = picked;
+    return { name: this.username || DEFAULT_NAMES[gender], gender, look };
   }
 
   // Hỏi Có / Không (mặc định chọn Không). items: thay hai lựa chọn mặc định

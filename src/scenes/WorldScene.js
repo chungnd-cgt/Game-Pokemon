@@ -3096,7 +3096,7 @@ ${this.map.name}`, this.ambience.state.tod);
         depth: HUD_DEPTH + 10,
         state: panelState,
         hasMap: itemCount('townMap') > 0,
-        account: this.registry.get('user')?.email ?? null,
+        account: this.registry.get('user')?.username ?? this.registry.get('user')?.email ?? null,
         onApplied: (keys) => {
           if (keys.includes('lighting') || keys.includes('weather')) this.ambience.refresh(true);
           if (keys.includes('uiScale')) this.refreshHudScale();
