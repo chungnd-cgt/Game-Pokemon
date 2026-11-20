@@ -2,7 +2,7 @@ import { ITEMS } from '../data/items.js';
 import { itemCount, state } from '../game/state.js';
 import { fitScale } from '../gfx/textures.js';
 import { HOTBAR_ACTIONS, bindingsVersion, keysFor, shortKeyName } from '../game/keybinds.js';
-import { textStyle } from './helpers.js';
+import { hudScale, hudSize, textStyle } from './helpers.js';
 
 const DEPTH = 100;
 const SLOT = 46;
@@ -23,6 +23,8 @@ const DRAG_START = 8; // nhấn giữ rồi kéo quá chừng này px mới tín
 // dùng thuốc...); ô còn trống thì không làm gì. Kéo icon từ ô này thả sang ô khác là đổi chỗ hai ô.
 // Rê chuột vào ô có đồ: viền sáng và hiện tên vật phẩm phía trên ô.
 // Chỉ hiện trên bản đồ, khi không có hội thoại / menu (và khi mở túi đồ).
+// Cỡ giao diện (helpers.js hudScale): xếp theo toạ độ ảo, container phóng to theo hệ số; ô bấm, tên vật phẩm nằm ngoài
+// container nên tự nhân hệ số
 export class Hotbar {
   // onSwap(a, b): kéo ô a thả vào ô b
   constructor(scene, onUse, onSwap) {
@@ -49,7 +51,7 @@ export class Hotbar {
   // Vẽ lại khi vật phẩm gán / số lượng / món đang dùng (xe, thú cưỡi) thay đổi
   update(active = null) {
     const ids = state.hotbar ?? [];
-    const key = `${ids.map((id) => `${id}:${id ? itemCount(id) : ''}`).join('|')}|${active}|${this.hover}|${this.pointed}|${bindingsVersion()}`;
+    const key = `${ids.map((id) => `${id}:${id ? itemCount(id) : ''}`).join('|')}|${active}|${this.hover}|${this.pointed}|${bindingsVersion()}|${hudScale(this.scene)}|${this.scene.scale.height}`;
     if (key === this.key) return;
     this.key = key;
     this.active = active;
@@ -77,7 +79,9 @@ export class Hotbar {
     this.zones = [];
     this.tip?.destroy();
     this.tip = null;
-    const top = scene.scale.height - 16 - SLOT;
+    const { height, s } = hudSize(scene);
+    this.container.setScale(s);
+    const top = height - 16 - SLOT;
     for (let i = 0; i < HOTBAR_SIZE; i++) {
       const x = LEFT + i * (SLOT + GAP);
       const id = ids[i] ?? null;
@@ -105,7 +109,7 @@ export class Hotbar {
       // Phím của ô (phím chính, chưa có thì phím phụ; không gán phím nào thì để trống)
       const keyText = shortKeyName(keysFor(HOTBAR_ACTIONS[i])[0]);
       if (keyText) this.container.add(scene.add.text(x + 5, top + 3, keyText, textStyle(12, '#ffd860', { fontStyle: 'bold', stroke: '#141a2c', strokeThickness: 3 })));
-      const zone = scene.add.zone(x + SLOT / 2, top + SLOT / 2, SLOT, SLOT).setScrollFactor(0).setDepth(DEPTH + 1)
+      const zone = scene.add.zone((x + SLOT / 2) * s, (top + SLOT / 2) * s, SLOT * s, SLOT * s).setScrollFactor(0).setDepth(DEPTH + 1)
         .setInteractive({ useHandCursor: true });
       zone.on('pointerdown', (p, lx, ly, e) => {
         e?.stopPropagation();
@@ -116,10 +120,10 @@ export class Hotbar {
       this.zones.push(zone);
       // Tên vật phẩm phía trên ô đang rê chuột
       if (pointed) {
-        this.tip = scene.add.text(x + SLOT / 2, top - 3, ITEMS[id].name, textStyle(12, '#ffffff', {
+        this.tip = scene.add.text((x + SLOT / 2) * s, (top - 3) * s, ITEMS[id].name, textStyle(12, '#ffffff', {
           fontStyle: 'bold', backgroundColor: 'rgba(10,14,26,0.92)', padding: { x: 7, y: 3 },
-        })).setOrigin(0.5, 1).setScrollFactor(0).setDepth(DEPTH + 11); // trên khung túi đồ (đang mở túi vẫn đọc được)
-        this.tip.setX(Math.max(8 + this.tip.width / 2, this.tip.x)).setVisible(this.visible);
+        })).setOrigin(0.5, 1).setScale(s).setScrollFactor(0).setDepth(DEPTH + 11); // trên khung túi đồ (đang mở túi vẫn đọc được)
+        this.tip.setX(Math.max(8 + this.tip.displayWidth / 2, this.tip.x)).setVisible(this.visible);
       }
     }
   }
@@ -145,7 +149,7 @@ export class Hotbar {
       this.pointed = -1;
       const icon = ITEMS[press.id].icon;
       press.ghost = this.scene.add.image(p.x, p.y, icon).setScrollFactor(0).setDepth(DEPTH + 20)
-        .setScale(fitScale(this.scene, icon, 34));
+        .setScale(fitScale(this.scene, icon, 34) * hudScale(this.scene));
       this.key = null; // vẽ lại để làm mờ ô gốc
     }
     press.ghost.setPosition(p.x, p.y);
@@ -183,7 +187,10 @@ export class Hotbar {
 
   // Ô nằm dưới điểm (px, py) trên màn hình, hoặc -1 (thả vật phẩm kéo từ túi đồ)
   slotAt(px, py) {
-    const top = this.scene.scale.height - 16 - SLOT;
+    const { height, s } = hudSize(this.scene);
+    px /= s;
+    py /= s;
+    const top = height - 16 - SLOT;
     for (let i = 0; i < HOTBAR_SIZE; i++) {
       const x = LEFT + i * (SLOT + GAP);
       if (px >= x - GAP / 2 && px <= x + SLOT + GAP / 2 && py >= top - 10 && py <= top + SLOT + 10) return i;
@@ -193,7 +200,10 @@ export class Hotbar {
 
   // Vùng thanh phím tắt (bấm chuột ở đây không đóng túi đồ)
   contains(px, py) {
-    const top = this.scene.scale.height - 16 - SLOT;
+    const { height, s } = hudSize(this.scene);
+    px /= s;
+    py /= s;
+    const top = height - 16 - SLOT;
     return px >= LEFT - GAP && px <= LEFT + HOTBAR_SIZE * (SLOT + GAP) && py >= top - 10 && py <= top + SLOT + 10;
   }
 

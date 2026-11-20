@@ -10,6 +10,32 @@ export const uiX = (scene) => Math.round((scene.scale.width - GAME_WIDTH) / 2);
 // Toạ độ x của con trỏ trong khung thiết kế (dùng để so với vị trí nút / ô trong bảng)
 export const localX = (scene, p) => p.x - uiX(scene);
 
+// Cỡ giao diện trên bản đồ (game/display.js: hudScaleFor; WorldScene đặt scene.hudScale). Các phần giao diện (cột đội hình,
+// thanh phím tắt...) xếp chỗ theo cỡ "ảo" hudSize = cỡ màn hình / hệ số, rồi phóng to cả cụm theo hệ số (container.setScale).
+// Toạ độ chuột trên màn hình đổi sang toạ độ ảo: chia cho hệ số
+export const hudScale = (scene) => scene.hudScale ?? 1;
+export function hudSize(scene) {
+  const s = hudScale(scene);
+  return { width: scene.scale.width / s, height: scene.scale.height / s, s };
+}
+
+// Bảng đang mở trên bản đồ (cố định theo màn hình) mà màn hình đổi cỡ (xoay máy, bật toàn màn hình, kéo cửa sổ):
+// dời các phần của bảng theo khung giữa màn hình. objs: mảng (có thể thêm phần tử sau). Trả về hàm thôi theo dõi;
+// phần tử đầu bị huỷ thì tự thôi
+export function followCenter(scene, objs) {
+  let ox = uiX(scene);
+  const onResize = () => {
+    const nx = uiX(scene);
+    const d = nx - ox;
+    ox = nx;
+    if (d) for (const o of objs) if (o?.active) o.x += d;
+  };
+  scene.scale.on('resize', onResize);
+  const off = () => scene.scale.off('resize', onResize);
+  objs[0]?.once?.('destroy', off);
+  return off;
+}
+
 // Lề thừa tối đa mỗi bên (màn hình rộng nhất, MAX_WIDTH): nền của màn hình toàn khung vẽ tràn ra chừng này để luôn kín
 export const BLEED = (MAX_WIDTH - GAME_WIDTH) / 2;
 

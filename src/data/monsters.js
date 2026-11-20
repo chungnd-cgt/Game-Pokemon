@@ -8,7 +8,8 @@ import { parseEvYield, parseFemaleRatio } from './stats.js';
 // chiêu học được lấy từ bộ chiêu gốc (learnsets.json, xem learnsetOf bên dưới); ở đây chỉ khai báo phần riêng của game:
 //  desc: mô tả ở màn chọn khởi đầu
 //  color/belly/features: để vẽ hình tạm khi thiếu ảnh (xem src/gfx/textures.js)
-//  evolution: [{ to, level }] tiến hoá khi lên cấp, hoặc [{ to, item }] khi dùng đá tiến hoá
+//  evolution: [{ to, level }] tiến hoá khi lên cấp, [{ to, item }] khi dùng đá tiến hoá, hoặc [{ to, trade: true }] khi được
+//  trao đổi với người chơi khác (game/trade.js); npcLevel: cấp mà đội hình nhà huấn luyện (đấu lại) đã tiến hoá sẵn
 const PLAYABLE = {
   charmander: {
     color: 0xf08a3c, belly: 0xf8d68a, features: ['flameTail'],
@@ -224,7 +225,7 @@ Object.assign(PLAYABLE, {
   ninetales: evolved('vulpix', { color: 0xf0e0a0 }),
   rapidash: evolved('ponyta'),
   rhydon: evolved('rhyhorn', { color: 0x8a8aa0 }),
-  kadabra: evolved('abra', { evolution: [{ to: 'alakazam', level: 40 }] }),
+  kadabra: evolved('abra', { evolution: [{ to: 'alakazam', trade: true, npcLevel: 40 }] }),
   hypno: evolved('drowzee'),
   slowbro: evolved('slowpoke', { color: 0xe87898 }),
   dewgong: evolved('seel'),
@@ -235,7 +236,7 @@ Object.assign(PLAYABLE, {
   tentacruel: evolved('tentacool', { color: 0x4a90d0 }),
   starmie: evolved('staryu', { color: 0x9a68c8 }),
   golbat: evolved('zubat', { color: 0x4a5ac0 }),
-  graveler: evolved('geodude', { color: 0x8a867a, evolution: [{ to: 'golem', level: 45 }] }),
+  graveler: evolved('geodude', { color: 0x8a867a, evolution: [{ to: 'golem', trade: true, npcLevel: 45 }] }),
   seaking: evolved('goldeen', { color: 0xf0e8e0 }),
   golduck: evolved('psyduck', { color: 0x4a88d0 }),
   charizard: evolved('charmeleon', { color: 0xf07838, features: ['wings'] }),
@@ -252,10 +253,10 @@ PLAYABLE.victreebel = evolved('weepinbell', { color: 0xc8c040 });
 PLAYABLE.vaporeon = evolved('eevee', { color: 0x58a8e8, belly: 0xe8f0f8 });
 PLAYABLE.jolteon = evolved('eevee', { color: 0xf0d040, belly: 0xf8f0d0 });
 PLAYABLE.flareon = evolved('eevee', { color: 0xe8703a, belly: 0xf8e0a0 });
-// Liên minh. Haunter / Machoke / Graveler tiến hoá theo cấp (game không có trao đổi)
-PLAYABLE.haunter = evolved('gastly', { color: 0x5a3a88, features: ['bigEars'], evolution: [{ to: 'gengar', level: 38 }] });
+// Liên minh. Kadabra / Haunter / Machoke / Graveler tiến hoá khi được trao đổi với người chơi khác (như bản gốc)
+PLAYABLE.haunter = evolved('gastly', { color: 0x5a3a88, features: ['bigEars'], evolution: [{ to: 'gengar', trade: true, npcLevel: 38 }] });
 PLAYABLE.gengar = evolved('haunter', { color: 0x4a3478, features: ['teeth', 'redEyes'] });
-PLAYABLE.machoke = evolved('machop', { color: 0x7a8ab0, evolution: [{ to: 'machamp', level: 40 }] });
+PLAYABLE.machoke = evolved('machop', { color: 0x7a8ab0, evolution: [{ to: 'machamp', trade: true, npcLevel: 40 }] });
 PLAYABLE.machamp = evolved('machoke', { color: 0x6a7aa0 });
 PLAYABLE.primeape = evolved('mankey');
 PLAYABLE.muk = evolved('grimer', { color: 0x8a58a8 });

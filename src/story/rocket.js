@@ -12,7 +12,7 @@ import { hasFlag, setFlag, state } from '../game/state.js';
 const EVENTS = [
   {
     // Thị trấn Lục Bình: chặn cửa Poké Mart (id 'pallet' giữ như cũ để bản lưu cũ vẫn dùng được)
-    id: 'pallet', map: 'town1', x: 18, y: 16, pet: 'meowth', escape: 'balloon',
+    id: 'pallet', map: 'town1', x: 40, y: 16, pet: 'meowth', escape: 'balloon',
     show: () => hasFlag('questDone'), done: 'gruntsDefeated',
     hung: [['koffing', 7]], mai: [['ekans', 7]],
     intro: [

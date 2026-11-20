@@ -24,6 +24,7 @@ export const F = {
   BOSS: 'rocketDefeated', // đã nhặt lại gói hàng của Poké Mart (tên cờ giữ như cũ để bản lưu cũ vẫn dùng được)
   MART_REWARD: 'martReward',
   RIVAL2: 'rival2', // thắng Gary ở Thị trấn Lục Bình lúc lên đường tới Hang Thạch Nhũ
+  CLERK_BACK: 'martClerkBack', // nhân viên Poké Mart đứng chặn cửa hang đã cảm ơn và về lại cửa hàng
   DONE: 'chapter1Done',
   BIKE: 'gotBicycle',
   MOM_GIFT: 'momGift', // mẹ tặng Bản đồ vùng và Hộp huy hiệu
@@ -68,7 +69,7 @@ export function objective(mapId = 'home2f') {
     if (!hasFlag(F.GRUNTS)) return 'Đến Poké Mart Lục Bình xem có chuyện gì';
     if (!hasFlag(F.BOSS)) return 'Nhặt gói hàng Team Rocket đánh rơi trước Poké Mart';
     if (!hasFlag(F.MART_REWARD)) return 'Mang gói hàng vào trả cho Poké Mart Lục Bình';
-    if (!hasFlag(F.RIVAL2)) return 'Lên đường tới Hang Thạch Nhũ phía đông bắc Lục Bình';
+    if (!hasFlag(F.RIVAL2)) return 'Lên đường tới Hang Thạch Nhũ phía bắc Lục Bình';
   }
   // Vô địch rồi: mẹ → Giáo sư Oak (Master Ball) → Pokémon huyền thoại (story/postgame.js)
   return postgameObjective() ?? rocketObjective() ?? objective2();
@@ -108,6 +109,29 @@ async function giveRod(world, name, rod, lines) {
 
 // Các NPC chỉ xuất hiện ở một giai đoạn cốt truyện (show), có lời thoại riêng (onTalk)
 export const STORY_NPCS = [
+  {
+    // Nhân viên Poké Mart Lục Bình đứng chặn trước cửa Hang Thạch Nhũ (không cho Team Rocket trốn vào hang) tới khi bạn đuổi
+    // được Team Rocket và trả gói hàng; đi lên chỗ anh ấy thì anh cảm ơn rồi về lại cửa hàng (xem clerkThanks)
+    id: 't1-clerk', sprite: 'npc-boy', name: 'Nhân viên Poké Mart', map: 'town1', x: 27, y: 6, facing: 'down', fixed: true,
+    show: () => !hasFlag(F.CLERK_BACK) && !hasFlag(F.DONE),
+    async onTalk(world) {
+      if (hasFlag(F.MART_REWARD)) {
+        await clerkThanks(world);
+        return;
+      }
+      if (!hasFlag(F.GRUNTS)) {
+        await world.say(this.name, [
+          'Khoan đã! Không vào hang được đâu!',
+          'Bọn Team Rocket vừa cướp gói hàng của Poké Mart chỗ tôi làm. Tôi đứng chặn ở đây để chúng không trốn vào hang!',
+          'Cháu xuống Poké Mart ở khu phía đông thị trấn xem giúp tôi với!',
+        ]);
+      } else if (!hasFlag(F.BOSS)) {
+        await world.say(this.name, ['Cháu đuổi được bọn chúng rồi à? Giỏi quá!', 'Gói hàng chúng đánh rơi trước cửa Poké Mart đó, nhặt giúp tôi nhé.']);
+      } else {
+        await world.say(this.name, ['Cháu nhặt được gói hàng rồi! Mang vào trả cho Poké Mart giúp tôi nhé.']);
+      }
+    },
+  },
   {
     // Mẹ ngồi trên sofa bên phải bàn nước ở tầng 1 (seated: ngồi yên, quay mặt vào bàn, không đứng dậy quay theo người chơi)
     id: 'mom', sprite: 'npc-mom', name: 'Mẹ', map: 'home', x: 7, y: 4, facing: 'left', fixed: true, seated: true,
@@ -537,9 +561,12 @@ export function stepTrigger(world) {
   if (rocket) return rocket;
   const rival = rivalTrigger(world);
   if (rival) return rival;
-  // Lên đường rời Lục Bình (đã trả gói hàng): Gary ra đấu lại như đã hẹn ở phòng thí nghiệm
+  // Lên đường rời Lục Bình (đã trả gói hàng): nhân viên Poké Mart chặn cửa hang cảm ơn rồi về cửa hàng; đi tiếp tới cửa hang
+  // thì Gary ra đấu lại như đã hẹn ở phòng thí nghiệm
   const [x1, y1, x2, y2] = CAVE_APPROACH;
-  if (world.map.id === 'town1' && x >= x1 && x <= x2 && y >= y1 && y <= y2 && hasFlag(F.MART_REWARD) && !hasFlag(F.RIVAL2)) {
+  const nearCave = world.map.id === 'town1' && x >= x1 && x <= x2 && y >= y1 && y <= y2;
+  if (nearCave && hasFlag(F.MART_REWARD) && !hasFlag(F.CLERK_BACK) && !hasFlag(F.DONE)) return () => clerkThanks(world);
+  if (nearCave && hasFlag(F.MART_REWARD) && !hasFlag(F.RIVAL2)) {
     return () => rivalRematch(world);
   }
   return null;
@@ -600,6 +627,25 @@ async function oakStopsPlayer(world) {
     'Cháu hãy chọn một con đi!',
     'Ta cũng hẹn thằng cháu Gary hôm nay, chắc nó sắp sang rồi. Ai đến trước được chọn trước!',
   ]);
+}
+
+// Nhân viên Poké Mart chặn cửa hang: cảm ơn vì đã lấy lại gói hàng rồi về lại cửa hàng (vào cửa Poké Mart)
+export async function clerkThanks(world) {
+  const clerk = world.findNpc('t1-clerk');
+  if (clerk) {
+    world.faceNpcToPlayer(clerk);
+    world.facePlayerTo(clerk);
+  }
+  await world.say('Nhân viên Poké Mart', [
+    'Cháu trả gói hàng cho cửa hàng rồi à? Cảm ơn cháu nhiều lắm!',
+    'Bọn Team Rocket bay mất rồi, tôi không phải canh ở đây nữa. Tôi về cửa hàng làm việc tiếp đây!',
+    'Lúc nào cần mua gì thì ghé Poké Mart nhé!',
+  ]);
+  setFlag(F.CLERK_BACK);
+  if (!clerk) return;
+  const mart = world.map.buildings.find((b) => b.to === 'mart');
+  await world.walkNpcTo(clerk, { x: mart.door.x, y: mart.door.y + 1 });
+  await world.npcEntersDoor(clerk, mart);
 }
 
 // Lên đường rời Thị trấn Lục Bình: Gary bước ra từ Pokémon Center, đấu lại như đã hẹn ở phòng thí nghiệm (Lv 8).

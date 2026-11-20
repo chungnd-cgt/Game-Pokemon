@@ -27,9 +27,10 @@ export function trainerBeaten(def, now = Date.now()) {
   if (rematchable(def) && !((state.trainerRest[def.id] ?? 0) > now)) state.trainerRest[def.id] = restUntil(now);
 }
 
-// Dạng tiến hoá theo cấp của loài ở cấp level (Rattata Lv 40 -> Raticate)
+// Dạng tiến hoá theo cấp của loài ở cấp level (Rattata Lv 40 -> Raticate). Loài tiến hoá khi trao đổi (Kadabra) thì nhà
+// huấn luyện có sẵn dạng tiến hoá từ npcLevel
 function evolvedAt(speciesId, level) {
-  const next = SPECIES[speciesId].evolution?.find((e) => e.level && e.level <= level);
+  const next = SPECIES[speciesId].evolution?.find((e) => (e.level ?? e.npcLevel) && (e.level ?? e.npcLevel) <= level);
   return next ? evolvedAt(next.to, level) : speciesId;
 }
 

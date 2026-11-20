@@ -39,6 +39,20 @@ export function recalcStats(mon) {
 
 let nextUid = 1;
 
+// Độ thân thiết (happiness): 0..255, Pokémon mới có 70 như game gốc. Hạ gục Pokémon hoang dã / của nhà huấn luyện +1,
+// bị gục -5 (BattleScene). Hiện chỉ lưu lại cho tính năng sau này (tiến hoá theo độ thân thiết...), chưa ảnh hưởng gì
+export const HAPPINESS_MAX = 255;
+export const HAPPINESS_START = 70;
+export const HAPPINESS_KO = 1;
+export const HAPPINESS_FAINT = -5;
+export function changeHappiness(mon, delta) {
+  if (!mon) return;
+  const now = Number.isFinite(mon.happiness) ? mon.happiness : HAPPINESS_START;
+  mon.happiness = Math.max(0, Math.min(HAPPINESS_MAX, now + delta));
+}
+// uid mới chưa trùng Pokémon nào đang có (Pokémon nhận qua giao dịch mang uid của máy người kia)
+export const takeUid = () => nextUid++;
+
 // Sau khi tải save: uid mới không được trùng uid của Pokémon đã có
 export function syncUid(mons) {
   nextUid = Math.max(nextUid, ...mons.map((m) => (Number.isFinite(m.uid) ? m.uid + 1 : 0)));
@@ -104,6 +118,7 @@ export function createMonster(speciesId, level, opts = {}) {
     ...stats,
     moves,
     pp: fullPp(moves),
+    happiness: HAPPINESS_START,
     ...traits,
   };
 }
@@ -111,6 +126,8 @@ export function createMonster(speciesId, level, opts = {}) {
 // Bản lưu cũ (trước khi có IV / EV / tính cách...): bổ sung các trường còn thiếu
 export function upgradeMonster(mon, rng = Math.random) {
   syncExpCurve(mon);
+  // Bản lưu trước khi có độ thân thiết
+  if (!Number.isFinite(mon.happiness)) mon.happiness = HAPPINESS_START;
   if (mon.ivs) return syncAbility(mon);
   const hp = mon.hp;
   Object.assign(mon, rollTraits(SPECIES[mon.speciesId], { rng, shiny: false }), { pp: fullPp(mon.moves) });

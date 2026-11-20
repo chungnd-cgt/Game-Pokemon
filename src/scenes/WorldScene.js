@@ -8,6 +8,8 @@ import { HEAL_RESPAWN, HOME_RESPAWN, MAPS, SPAWN } from '../data/map.js';
 import { followStyle, followerCry } from '../data/followStyle.js';
 import { SPECIES } from '../data/monsters.js';
 import { NPCS, TRAINERS } from '../data/npcs.js';
+import { HOUSE_RESIDENTS } from '../data/npcHouses.js';
+import { residentTalk } from '../story/residents.js';
 import { placeOf } from '../data/region.js';
 import { TYPES } from '../data/types.js';
 import { createMonster, replaceMove } from '../game/monster.js';
@@ -38,7 +40,8 @@ import {
 } from '../story/chapter1.js';
 import { resetLeague } from '../story/league.js';
 import { houseKnock } from '../story/villages.js';
-import { COLORS, cssColor, drawHpBar, drawPanel, fixToCamera, textStyle, tweenAsync, uiX, wait } from '../ui/helpers.js';
+import { hudScaleFor } from '../game/display.js';
+import { COLORS, closeButton, cssColor, drawHpBar, drawPanel, fixToCamera, followCenter, textStyle, tweenAsync, uiX, wait } from '../ui/helpers.js';
 import { HeldKeys, InputRouter, directionOf, isCancel, isConfirm } from '../ui/input.js';
 import { KeyBindings } from '../ui/KeyBindings.js';
 import { actionsForCode, hotbarSlotOf } from '../game/keybinds.js';
@@ -53,6 +56,9 @@ import { PcBox } from '../ui/PcBox.js';
 import { BagPanel } from '../ui/BagPanel.js';
 import { attachShinySparkle } from '../gfx/shinyFx.js';
 import { WorldHud, drawRoundIcon } from '../ui/WorldHud.js';
+import { resumePendingTrades, setupTrade, tradeCounter } from './worldTrade.js';
+import { enterMapPlayers, setupPlayers, updatePlayers } from './worldPlayers.js';
+import { Joystick } from '../ui/Joystick.js';
 
 const STEP_MS = 225; // đi bộ ~4.5 ô/giây
 // Thời gian mỗi bước: xe đạp ~10 ô/giây, cưỡi Arcanine ~11 ô/giây, cưỡi Lapras ~10 ô/giây; dùng chiêu Surf bơi chậm như đi bộ
@@ -219,12 +225,9 @@ export default class WorldScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(HUD_DEPTH + 6)
       .setVisible(false);
-    this.hud = new WorldHud(this, {
-      bag: () => this.openBag(),
-      dex: () => this.openPokedex(),
-      trainer: () => this.openTrainerCard(),
-      settings: () => this.toggleSettings(),
-    });
+    // Cỡ giao diện (Cài đặt → Chung; helpers.js hudScale): đặt trước khi tạo các phần giao diện
+    this.hudScale = this.currentHudScale();
+    this.hud = this.makeHud();
     this.ambience = new Ambience(this);
     // Cột đội hình góc trái trên; bảng Pokémon hoang dã ở góc phải dưới đồng hồ
     // Bấm vào ô: mở thẳng màn chi tiết Pokémon; kéo thả ô này lên ô khác: đổi chỗ trong đội
@@ -258,6 +261,14 @@ export default class WorldScene extends Phaser.Scene {
 
     // Phím đang giữ (đi liên tục), theo bảng phím trong Cài đặt → Phím tắt (game/keybinds.js). Chặn phím mũi tên cuộn trang
     this.held = new HeldKeys(this);
+    // Cần gạt tròn (chạm / nhấn chuột vào chỗ trống trên bản đồ rồi kéo) và chạm để thao tác (ui/Joystick.js)
+    this.joystick = new Joystick(this, {
+      canStart: () => this.freeForInput(),
+      onDir: (dir) => {
+        this.held.virtual = dir;
+      },
+      onTap: (p) => this.tapMap(p),
+    });
     this.input.keyboard.addCapture('UP,DOWN,LEFT,RIGHT');
     this.input.keyboard.on('keydown', (e) => {
       const slot = hotbarSlotOf(e);
@@ -296,6 +307,9 @@ export default class WorldScene extends Phaser.Scene {
       document.removeEventListener('visibilitychange', onHide);
     });
 
+    // Người chơi khác trên bản đồ (scenes/worldPlayers.js) và giao dịch với họ (scenes/worldTrade.js)
+    setupTrade(this);
+    setupPlayers(this);
     const start = data?.position ?? SPAWN;
     this.loadMap(start.map, start, start.facing);
     // Thoát game rồi vào lại: đang đi xe đạp / cưỡi Arcanine thì vào lại là đi bộ (xuống xe / xuống thú).
@@ -315,6 +329,8 @@ export default class WorldScene extends Phaser.Scene {
         await intro(this);
       });
     }
+    // Giao dịch đã chốt mà chưa nhận (văng game giữa chừng): nhận nốt
+    resumePendingTrades(this);
   }
 
   // Toạ độ y trên hình người chơi (part: 1 = đỉnh đầu, 0.6 = ngang ngực), tính cả lúc ngồi cao khi cưỡi / lướt nước
@@ -335,20 +351,24 @@ export default class WorldScene extends Phaser.Scene {
   }
 
   update(time, delta) {
+    updatePlayers(this); // vừa bước / quay mặt thì báo cho người chơi khác cùng bản đồ
     if (this.pendingFit && !this.busy) {
       this.pendingFit = false;
       this.fitCamera();
     }
     const talking = this.msg.container.visible;
     const free = !talking && !this.partyMenu && !this.settingsMenu && !this.overlay && !this.busy;
-    this.hud.setVisible(free);
-    this.hotbar.setVisible(free || Boolean(this.bagOpen)); // mở túi đồ thì vẫn hiện để kéo vật phẩm vào
+    // Túi đồ nổi lên trên giao diện, không ẩn cột nút / đội hình / đồng hồ (kéo đồ thả vào Pokémon / ô phím tắt)
+    // (cả lúc giao dịch với người chơi khác: bảng giao dịch nổi lên trên)
+    const shown = free || ((Boolean(this.bagOpen) || Boolean(this.trade?.active)) && !talking && !this.partyMenu && !this.settingsMenu && !this.overlay);
+    this.hud.setVisible(shown);
+    this.hotbar.setVisible(shown);
     this.hotbar.update(VEHICLE_ITEMS[this.vehicle] ?? null);
     this.hud.update(objective(this.map.id), `${this.ambience.label()}
 ${this.map.name}`, this.ambience.state.tod);
-    this.partyPanel.setVisible(free);
+    this.partyPanel.setVisible(shown);
     this.partyPanel.update();
-    this.areaNav.setVisible(free);
+    this.areaNav.setVisible(shown);
     this.areaNav.update(this.areaInfo());
     this.advanceWalk(this.playerMover, delta);
     for (const npc of [...this.npcs]) this.advanceWalk(npc, delta);
@@ -469,7 +489,7 @@ ${this.map.name}`, this.ambience.state.tod);
     this.objectsLayer = layer(`objects${cleared}`, 1);
     // Lớp over (ngọn cây) nằm trên nhân vật để nhân vật đứng sau cây bị che
     this.mapLayers = [this.groundLayer, this.animLayer, this.objectsLayer, layer('over', 30)];
-    this.npcs = [...NPCS, ...TRAINERS, ...STORY_NPCS]
+    this.npcs = [...NPCS, ...TRAINERS, ...STORY_NPCS, ...HOUSE_RESIDENTS] // + người ở trong nhà dân (data/npcHouses.js)
       .filter((d) => d.map === id && (!d.show || d.show()))
       .map((d) => this.createNpc(d));
     this.litLanterns = new Set(); // đèn lồng đã thắp (gym tối), tắt lại khi ra khỏi gym
@@ -485,6 +505,7 @@ ${this.map.name}`, this.ambience.state.tod);
     this.fitCamera();
     this.hud.showMapName(map.name);
     this.ambience.apply(map);
+    enterMapPlayers(this);
   }
 
   // Camera theo bản đồ đang đứng và cỡ màn hình
@@ -509,6 +530,37 @@ ${this.map.name}`, this.ambience.state.tod);
     }
   }
 
+  makeHud() {
+    return new WorldHud(this, {
+      bag: () => this.openBag(),
+      dex: () => this.openPokedex(),
+      trainer: () => this.openTrainerCard(),
+      settings: () => this.toggleSettings(),
+    });
+  }
+
+  // Hệ số cỡ giao diện theo cài đặt và cỡ game đang hiện trên màn hình (game/display.js)
+  currentHudScale() {
+    return hudScaleFor(this.scale.width, this.scale.displaySize?.height ?? this.scale.height);
+  }
+
+  // Cỡ giao diện đổi (Cài đặt, hoặc Tự động mà màn hình đổi cỡ): tạo lại khung giao diện, các phần còn lại vẽ lại ở khung
+  // hình sau (update). Không đổi thì chỉ dời các phần bám mép phải
+  refreshHudScale() {
+    const s = this.currentHudScale();
+    if (s !== this.hudScale) {
+      this.hudScale = s;
+      this.hud.destroy();
+      this.hud = this.makeHud();
+      this.hotbar.key = null;
+      this.partyPanel.key = null;
+      this.areaNav.key = null;
+    } else {
+      this.hud.relayout();
+    }
+    if (!this.areaNav.sliding) this.areaNav.render();
+  }
+
   // Màn hình đổi cỡ: camera tính lại theo bản đồ, nút bám mép phải dời theo, khung lời thoại về giữa màn hình.
   // Bảng đang mở (túi đồ, PC...) giữ chỗ cũ tới khi đóng; Cài đặt tự dời theo
   onScreenResize() {
@@ -516,8 +568,7 @@ ${this.map.name}`, this.ambience.state.tod);
     // Đang bận (cốt truyện có thể đang lia camera): chờ xong rồi mới đặt lại camera (update)
     if (this.busy) this.pendingFit = true;
     else this.fitCamera();
-    this.hud.relayout();
-    if (!this.areaNav.sliding) this.areaNav.render();
+    this.refreshHudScale();
     this.msg.container.setX(uiX(this));
     this.speakerTag.setX(44 + uiX(this));
     // Lớp tối trong hang vẽ đúng cỡ màn hình: huỷ để khung hình sau tạo lại theo cỡ mới
@@ -833,7 +884,16 @@ ${this.map.name}`, this.ambience.state.tod);
       objs.push(fixToCamera(o).setDepth(depth));
       return o;
     };
-    return { objs, add, destroy: () => objs.forEach((o) => o.destroy()) };
+    // Màn hình đổi cỡ lúc đang mở: dời cả lớp theo giữa màn hình
+    const off = followCenter(this, objs);
+    return {
+      objs,
+      add,
+      destroy: () => {
+        off();
+        objs.forEach((o) => o.destroy());
+      },
+    };
   }
 
   // Điện vinh danh: đội hình nhà vô địch lần lượt hiện lên rồi được ghi lại. first: lần đầu vô địch
@@ -1085,6 +1145,41 @@ ${this.map.name}`, this.ambience.state.tod);
   resetHeldKeys() {
     this.input.keyboard.resetKeys();
     this.held.reset();
+    this.joystick?.release();
+  }
+
+  // Đang đứng tự do trên bản đồ (không hội thoại, menu, cảnh cắt): cần gạt / chạm bản đồ mới có tác dụng
+  freeForInput() {
+    return !this.busy && !this.partyMenu && !this.settingsMenu && !this.overlay && !this.bagOpen
+      && !this.msg.container.visible && !this.trade?.active;
+  }
+
+  // Chạm vào bản đồ (không kéo): chạm vào nhân vật thì thao tác với ô phía trước; chạm vào NPC / đồ vật / bảng hiệu ngay
+  // cạnh (hoặc cách 2 ô thẳng hàng, vd y tá sau quầy) thì quay về phía đó rồi thao tác như bấm phím xác nhận
+  tapMap(p) {
+    if (!this.freeForInput() || this.moving) return;
+    const wx = p.worldX;
+    const wy = p.worldY;
+    if (this.player.getBounds().contains(wx, wy)) {
+      this.interact();
+      return;
+    }
+    // Hình NPC cao hơn một ô: chạm vào đầu cũng tính là chạm vào NPC đó
+    const npc = this.npcs.find((n) => n.sprite.visible && n.sprite.getBounds().contains(wx, wy));
+    const target = npc ? npc.pos : { x: Math.floor(wx / CELL), y: Math.floor(wy / CELL) };
+    const dx = target.x - this.pos.x;
+    const dy = target.y - this.pos.y;
+    if (!dx && !dy) {
+      this.interact();
+      return;
+    }
+    if ((dx && dy) || Math.abs(dx) + Math.abs(dy) > 2) return;
+    const dir = dx > 0 ? 'right' : dx < 0 ? 'left' : dy > 0 ? 'down' : 'up';
+    if (dir !== this.facing) {
+      this.facing = dir;
+      this.setFrame('stand');
+    }
+    this.interact();
   }
 
   npcAt(x, y, except = null) {
@@ -2422,8 +2517,12 @@ ${this.map.name}`, this.ambience.state.tod);
         await def.onTalk(this, npc);
         // Người đang ngồi nói xong thì quay lại tư thế ngồi cũ (nhìn vào bàn)
         if (def.seated && npc.sprite.active) this.seatFace(npc, npc.seatFacing);
+      } else if (def.resident) {
+        await residentTalk(this, def);
       } else if (def.role === 'nurse') {
         await this.nurseHeal(npc);
+      } else if (def.role === 'trade') {
+        await tradeCounter(this, def);
       } else if (npc.isTrainer && !state.party.length) {
         await this.say(def.name, ['Không có Pokémon thì đấu sao được!']);
       } else if (npc.isTrainer && !state.defeatedTrainers.has(def.id)) {
@@ -2452,6 +2551,87 @@ ${this.map.name}`, this.ambience.state.tod);
     }).open();
     this.refreshFollower();
     this.save();
+  }
+
+  // Thanh chọn Pokémon nằm ngang giữa màn hình (dùng / cho cầm vật phẩm, dạy HM): mỗi thẻ là một Pokémon trong đội (hình,
+  // tên, cấp, máu). Bấm / chạm thẻ là chọn; ← → và phím xác nhận; phím quay lại, ✕ hoặc bấm ra ngoài là thôi.
+  // icon: hình vật phẩm cạnh tiêu đề. Trả về vị trí trong đội hoặc null
+  pickMonBar(title, icon = null) {
+    const party = state.party;
+    if (!party.length) return Promise.resolve(null);
+    const { width, height } = this.scale;
+    const CW = 132;
+    const CH = 158;
+    const GAP = 10;
+    const w = party.length * CW + (party.length - 1) * GAP + 40;
+    const h = CH + 92;
+    const x0 = Math.round(width / 2 - w / 2);
+    const y0 = Math.round(height / 2 - h / 2) - 30;
+    const { add, destroy } = this.overlayLayer(HUD_DEPTH + 12);
+    add(this.add.rectangle(0, 0, width, height, 0x000000, 0.35).setOrigin(0).setInteractive());
+    const g = add(this.add.graphics());
+    g.fillStyle(0x000000, 0.35);
+    g.fillRoundedRect(x0 + 4, y0 + 6, w, h, 16);
+    g.fillStyle(0x1e2a44, 0.97);
+    g.fillRoundedRect(x0, y0, w, h, 16);
+    g.lineStyle(3, 0x4a88e0);
+    g.strokeRoundedRect(x0, y0, w, h, 16);
+    if (icon) add(this.add.image(x0 + 34, y0 + 30, icon).setScale(fitScale(this, icon, 30)));
+    add(this.add.text(x0 + (icon ? 56 : 20), y0 + 30, title, textStyle(20, '#ffe066', { fontStyle: 'bold' })).setOrigin(0, 0.5));
+    const cards = party.map((mon, i) => {
+      const cx = x0 + 20 + i * (CW + GAP);
+      const cy = y0 + 58;
+      const cg = add(this.add.graphics());
+      const key = pixelMon(this, mon.speciesId, '', GBA_MON, mon.shiny);
+      add(this.add.image(cx + CW / 2, cy + 74, key).setOrigin(0.5, 1).setScale(fitScale(this, key, 72)));
+      add(this.add.text(cx + CW / 2, cy + 82, mon.name, textStyle(15, '#ffffff', { fontStyle: 'bold' })).setOrigin(0.5, 0));
+      add(this.add.text(cx + CW / 2, cy + 104, `Lv ${mon.level}${mon.hp <= 0 ? ' • Kiệt sức' : ''}`, textStyle(13, '#a8b4d0', { fontStyle: 'bold' })).setOrigin(0.5, 0));
+      const zone = add(this.add.zone(cx, cy, CW, CH).setOrigin(0).setInteractive({ useHandCursor: true }));
+      return { mon, cx, cy, cg, zone };
+    });
+    let index = 0;
+    const draw = () => cards.forEach((c, i) => {
+      const { cg, cx, cy, mon } = c;
+      const on = i === index;
+      cg.clear();
+      cg.fillStyle(on ? 0x2f4a7a : 0x22304e);
+      cg.fillRoundedRect(cx, cy, CW, CH, 12);
+      cg.lineStyle(3, on ? 0xffd860 : 0x3a4a6c);
+      cg.strokeRoundedRect(cx, cy, CW, CH, 12);
+      drawHpBar(cg, cx + 14, cy + CH - 26, CW - 28, Math.max(0, mon.hp / mon.maxHp));
+    });
+    draw();
+    return new Promise((resolve) => {
+      const done = (value) => {
+        this.router.clear();
+        destroy();
+        resolve(value);
+      };
+      closeButton(this, x0 + w - 26, y0 + 28, () => done(null)).forEach(add);
+      cards.forEach((c, i) => {
+        c.zone.on('pointerover', () => {
+          index = i;
+          draw();
+        });
+        c.zone.on('pointerdown', (p, lx, ly, e) => {
+          e?.stopPropagation();
+          done(i);
+        });
+      });
+      const openedAt = performance.now();
+      this.router.set((e) => {
+        if (e.timeStamp < openedAt) return;
+        const dir = directionOf(e);
+        if (dir === 'left' || dir === 'right') {
+          index = (index + (dir === 'left' ? -1 : 1) + cards.length) % cards.length;
+          draw();
+        } else if (isConfirm(e)) done(index);
+        else if (isCancel(e)) done(null);
+      }, (p) => {
+        if (p.downTime < openedAt) return;
+        if (p.rightButtonDown() || p.x < x0 || p.x > x0 + w || p.y < y0 || p.y > y0 + h) done(null);
+      });
+    });
   }
 
   // Danh sách Pokémon dạng thẻ (cuộn được khi dài), trả về vị trí đã chọn hoặc null
@@ -2731,44 +2911,96 @@ ${this.map.name}`, this.ambience.state.tod);
     }
   }
 
-  // Màn tiến hoá: hình cũ và mới nhấp nháy xen kẽ, nhanh dần. cancelable: bấm Esc để ngừng (tiến hoá theo cấp)
-  async evolutionScene(mon, to, cancelable) {
+  // Màn tiến hoá dạng bảng nổi giữa màn hình: Pokémon đứng trên bệ sáng, nhấp nháy phát sáng.
+  // ask: hỏi "Có muốn cho tiến hoá?" (lên cấp, Rare Candy, được trao đổi) — Không thì giữ nguyên, lần lên cấp sau hỏi lại;
+  // dùng đá tiến hoá thì không hỏi (người chơi đã chọn dùng đá). Có: hình trắng đổi qua lại giữa dạng cũ / mới, nhanh dần,
+  // rồi hiện dạng mới. Trả về true nếu đã tiến hoá
+  async evolutionScene(mon, to, ask = true) {
     this.overlay = true;
+    const ox = uiX(this);
     const { width, height } = this.scale;
     const depth = HUD_DEPTH + 3;
     const { objs, add, destroy } = this.overlayLayer(depth);
     const dim = add(this.add.rectangle(width / 2, height / 2, width, height, 0x0a0e1a, 1)).setAlpha(0);
-    await tweenAsync(this, { targets: dim, alpha: 0.94, duration: 400 });
-    const glow = add(this.add.image(width / 2, 300, 'fx-glow').setScale(5).setAlpha(0.35));
+    await tweenAsync(this, { targets: dim, alpha: 0.8, duration: 300 });
+
+    // Bảng: tiêu đề, khung trong có bệ sáng, dòng hỏi, hai nút
+    const P = { x: ox + 240, y: 40, w: 480, h: 560 };
+    const cx = P.x + P.w / 2;
+    const g = add(this.add.graphics());
+    g.fillStyle(0x000000, 0.4);
+    g.fillRoundedRect(P.x + 4, P.y + 6, P.w, P.h, 14);
+    g.fillStyle(0x262c3e, 0.98);
+    g.fillRoundedRect(P.x, P.y, P.w, P.h, 14);
+    g.fillStyle(0x1a1f2e);
+    g.fillRoundedRect(P.x, P.y, P.w, 50, { tl: 14, tr: 14, bl: 0, br: 0 });
+    g.fillStyle(0x161a26);
+    g.fillRoundedRect(P.x + 16, P.y + 62, P.w - 32, 300, 10);
+    g.lineStyle(2, 0x3e4660);
+    g.strokeRoundedRect(P.x + 1, P.y + 1, P.w - 2, P.h - 2, 13);
+    add(this.add.text(cx, P.y + 25, 'Pokémon của bạn đang tiến hoá', textStyle(21, '#c8d0e8', { fontStyle: 'bold' })).setOrigin(0.5));
+    const floorY = P.y + 300;
+    g.fillStyle(0x3a6ab0, 0.45);
+    g.fillEllipse(cx, floorY + 6, 300, 64);
+    g.fillStyle(0xd8eeff, 0.9);
+    g.fillEllipse(cx, floorY, 270, 46);
+    const glow = add(this.add.image(cx, floorY - 90, 'fx-glow').setScale(4).setAlpha(0.45));
     const oldKey = pixelMon(this, mon.speciesId, '', GBA_MON, mon.shiny);
     const newKey = pixelMon(this, to, '', GBA_MON, mon.shiny);
-    const sprite = add(this.add.image(width / 2, 300, oldKey).setScale(fitScale(this, oldKey, GBA_MON * 3)));
-    await this.say(null, [`Ồ? ${mon.name} đang tiến hoá!`]);
+    const size = 190;
+    const sprite = add(this.add.image(cx, floorY + 8, oldKey).setOrigin(0.5, 1).setScale(fitScale(this, oldKey, size)));
+    // Lớp trắng đè lên hình: nhấp nháy phát sáng trong lúc chờ trả lời
+    const shine = add(this.add.image(cx, floorY + 8, oldKey).setOrigin(0.5, 1).setScale(fitScale(this, oldKey, size)).setTintFill(0xffffff).setAlpha(0));
+    this.tweens.add({ targets: glow, scale: 5.2, alpha: 0.7, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+    const toName = SPECIES[to].name;
+    // Dòng chữ nằm giữa khung hình và hai nút (không bị nút che)
+    const line = add(this.add.text(cx, P.y + 384, '', textStyle(19, '#ffffff', {
+      fontStyle: 'bold', align: 'center', wordWrap: { width: P.w - 48 }, lineSpacing: 6,
+    })).setOrigin(0.5, 0));
 
-    // Hình trắng đổi qua lại giữa dạng cũ và dạng mới, mỗi lần nhanh hơn
-    let cancelled = false;
-    if (cancelable) this.router.set((e) => { if (isCancel(e)) cancelled = true; });
-    sprite.setTintFill(0xffffff);
-    this.tweens.add({ targets: glow, scale: 7, alpha: 0.6, duration: 600, yoyo: true, repeat: -1 });
-    for (let i = 0; i < 14 && !cancelled; i++) {
-      const key = i % 2 ? oldKey : newKey;
-      sprite.setTexture(key);
-      const s = fitScale(this, key, 200);
-      await tweenAsync(this, { targets: sprite, scale: { from: s * 0.75, to: s }, duration: Math.max(90, 420 - i * 26) });
+    let yes = true;
+    if (ask) {
+      line.setText(`${mon.name} đang muốn tiến hoá thành ${toName}!\nCho ${mon.name} tiến hoá không?`);
+      // Trong lúc hỏi: nhấp nháy phát sáng, đổi qua lại giữa dạng hiện tại và dạng tiến hoá (lóe trắng mỗi lần đổi)
+      let showNew = false;
+      const swap = this.time.addEvent({
+        delay: 900, loop: true,
+        callback: () => {
+          showNew = !showNew;
+          const key = showNew ? newKey : oldKey;
+          for (const s of [sprite, shine]) s.setTexture(key).setScale(fitScale(this, key, size));
+          this.tweens.add({ targets: shine, alpha: { from: 0.9, to: 0 }, duration: 420, ease: 'Quad.out' });
+        },
+      });
+      yes = await this.evolutionChoice(add, { x: cx, y: P.y + P.h - 46 });
+      swap.remove();
+      for (const s of [sprite, shine]) s.setTexture(oldKey).setScale(fitScale(this, oldKey, size));
     }
-    this.router.clear();
-    this.tweens.killTweensOf(glow);
+    this.tweens.killTweensOf([shine, glow]);
+    shine.setAlpha(0);
 
-    if (cancelled) {
-      sprite.setTexture(oldKey).setScale(fitScale(this, oldKey, 200)).clearTint();
-      await this.say(null, [`${mon.name} đã ngừng tiến hoá.`]);
+    if (!yes) {
+      line.setText(`${mon.name} không tiến hoá.`);
+      await this.say(null, [`${mon.name} không tiến hoá.`]);
     } else {
+      line.setText(`Ồ? ${mon.name} đang tiến hoá!`);
+      // Hình trắng đổi qua lại giữa dạng cũ và dạng mới, mỗi lần nhanh hơn
+      sprite.setTintFill(0xffffff);
+      this.tweens.add({ targets: glow, scale: 6, alpha: 0.8, duration: 500, yoyo: true, repeat: -1 });
+      for (let i = 0; i < 14; i++) {
+        const key = i % 2 ? oldKey : newKey;
+        const s = fitScale(this, key, size);
+        sprite.setTexture(key);
+        await tweenAsync(this, { targets: sprite, scale: { from: s * 0.75, to: s }, duration: Math.max(90, 420 - i * 26) });
+      }
+      this.tweens.killTweensOf(glow);
       this.cameras.main.flash(400, 255, 255, 255);
-      sprite.setTexture(newKey).setScale(fitScale(this, newKey, 200)).clearTint();
+      sprite.setTexture(newKey).setScale(fitScale(this, newKey, size)).clearTint();
       const oldName = mon.name;
       const events = evolve(mon, to);
+      line.setText(`${oldName} đã tiến hoá thành ${toName}!`);
       await wait(this, 500);
-      await this.say(null, [`Chúc mừng! ${oldName} đã tiến hoá thành ${SPECIES[to].name}!`]);
+      await this.say(null, [`Chúc mừng! ${oldName} đã tiến hoá thành ${toName}!`]);
       for (const ev of events) {
         if (ev.type === 'learn') await this.say(null, [`${mon.name} đã học được chiêu ${MOVES[ev.move].name}!`]);
         else if (ev.type === 'cantLearn') await this.forgetToLearn(mon, ev.move);
@@ -2778,7 +3010,57 @@ ${this.map.name}`, this.ambience.state.tod);
     destroy();
     this.overlay = false;
     this.refreshFollower();
-    return !cancelled;
+    return yes;
+  }
+
+  // Hai nút Không (đỏ) / Có (xanh) dưới bảng tiến hoá: bấm chuột / chạm, hoặc ← → chọn và phím xác nhận; phím quay lại = Không
+  evolutionChoice(add, { x, y }) {
+    const W = 150;
+    const H = 50;
+    const buttons = [
+      { label: 'Không', value: false, color: 0xc84848, dark: 0x8a2a2a, x: x - W / 2 - 14 },
+      { label: 'Có', value: true, color: 0x40b060, dark: 0x2a7a40, x: x + W / 2 + 14 },
+    ];
+    let index = 1;
+    return new Promise((resolve) => {
+      const parts = [];
+      const finish = (value) => {
+        this.router.clear();
+        // Ẩn (cả bảng mờ dần rồi huỷ một lượt ở evolutionScene)
+        for (const o of parts) o.setVisible(false).disableInteractive?.();
+        resolve(value);
+      };
+      const draw = () => buttons.forEach((b, i) => {
+        b.g.clear();
+        b.g.fillStyle(b.dark);
+        b.g.fillRoundedRect(b.x - W / 2, y - H / 2 + 4, W, H, 12);
+        b.g.fillStyle(b.color);
+        b.g.fillRoundedRect(b.x - W / 2, y - H / 2, W, H, 12);
+        if (i === index) {
+          b.g.lineStyle(3, 0xffd860);
+          b.g.strokeRoundedRect(b.x - W / 2 - 4, y - H / 2 - 4, W + 8, H + 12, 14);
+        }
+      });
+      for (const b of buttons) {
+        b.g = add(this.add.graphics());
+        const t = add(this.add.text(b.x, y + 2, b.label, textStyle(22, '#ffffff', { fontStyle: 'bold' })).setOrigin(0.5));
+        const zone = add(this.add.zone(b.x, y + 2, W, H + 4).setInteractive({ useHandCursor: true }));
+        zone.on('pointerdown', (p, lx, ly, e) => {
+          e?.stopPropagation();
+          finish(b.value);
+        });
+        parts.push(b.g, t, zone);
+      }
+      draw();
+      this.router.set((e) => {
+        const dir = directionOf(e);
+        if (dir === 'left' || dir === 'right') {
+          index = dir === 'left' ? 0 : 1;
+          draw();
+        } else if (isConfirm(e)) finish(buttons[index].value);
+        else if (isCancel(e)) finish(false);
+      });
+    });
   }
 
   // ---------- Menu ----------
@@ -2797,7 +3079,7 @@ ${this.map.name}`, this.ambience.state.tod);
   }
 
   // Bảng Cài đặt (ui/SettingsPanel.js): Đồ hoạ (toàn màn hình, giới hạn FPS, ánh sáng, thời tiết), Chung (xem nhanh khi
-  // gửi vào PC, bản đồ vùng, đổi diện mạo), Điều khiển (nút cảm ứng, phím tắt). Game luôn tự động lưu.
+  // gửi vào PC, bản đồ vùng, đổi diện mạo), Điều khiển (cách điều khiển, phím tắt). Game luôn tự động lưu.
   // Đóng bằng Huỷ / OK, phím quay lại / cài đặt hoặc bấm ra ngoài khung. Nút mở màn hình khác (phím tắt, đổi diện mạo)
   // thì đóng bảng, mở màn đó, xong mở lại bảng đúng thẻ cũ (giữ cả phần chưa áp dụng)
   async toggleSettings() {
@@ -2817,6 +3099,7 @@ ${this.map.name}`, this.ambience.state.tod);
         account: this.registry.get('user')?.email ?? null,
         onApplied: (keys) => {
           if (keys.includes('lighting') || keys.includes('weather')) this.ambience.refresh(true);
+          if (keys.includes('uiScale')) this.refreshHudScale();
         },
       });
       const result = await this.settingsMenu.open();
@@ -2932,9 +3215,9 @@ ${this.map.name}`, this.ambience.state.tod);
   }
 
   // Túi đồ chia ngăn (tab: Hồi phục / Bóng / Quả mọng / Vật phẩm / Quan trọng), cuộn bằng con lăn chuột; đổi ngăn bằng
-  // bấm tab hoặc ← →. Mô tả vật phẩm chỉ hiện khi rê chuột / di phím tới vật phẩm đó. Chọn vật phẩm -> bảng thao tác
-  // (Dùng / Cho cầm / Gán phím tắt) -> dùng (chọn Pokémon, chọn chiêu...). Lặp tới khi đóng túi.
-  // Thanh phím tắt dưới đáy vẫn hiện: kéo icon vật phẩm thả vào ô để gán (hoặc bấm phím 1-6).
+  // bấm tab hoặc ← →. Mô tả vật phẩm chỉ hiện khi rê chuột / di phím tới vật phẩm đó. Bấm vật phẩm là dùng luôn (chọn Pokémon
+  // trên thanh ngang giữa màn hình, chọn chiêu...). Lặp tới khi đóng túi. Túi nổi lên trên, giao diện bản đồ vẫn hiện:
+  // kéo icon vật phẩm thả vào ô phím tắt để gán (hoặc bấm phím 1-6), thả vào Pokémon ở cột đội hình để cho cầm.
   // assignSlot: mở từ ô phím tắt còn trống, chọn vật phẩm là gán luôn vào ô đó rồi đóng túi
   async bagLoop({ assignSlot = null } = {}) {
     this.bagOpen = true;
@@ -2946,8 +3229,8 @@ ${this.map.name}`, this.ambience.state.tod);
     }
   }
 
-  // Túi đồ dạng khung bên phải (ui/BagPanel.js): dải tab ngăn bên trái, ô tìm kiếm (gõ phím là tìm), lưới 2 cột, mô tả bên trái khung.
-  // Chọn vật phẩm -> bảng thao tác (Dùng / Cho cầm / Gán phím tắt). Kéo icon thả vào thanh phím tắt hoặc bấm 1-6 để gán.
+  // Túi đồ dạng khung bên phải (ui/BagPanel.js): dải tab ngăn bên trái, ô tìm kiếm (bấm vào ô mới gõ), lưới 2 cột, mô tả bên
+  // trái khung. Bấm vật phẩm là dùng; kéo thả vào ô phím tắt (gán) hoặc vào Pokémon ở cột đội hình (cho cầm).
   // assignSlot: mở từ ô phím tắt còn trống, chọn vật phẩm là gán luôn vào ô đó rồi đóng túi
   async bagScreens(assignSlot) {
     // Nhớ ngăn / chữ tìm / vị trí con trỏ giữa các lần mở túi
@@ -2962,6 +3245,8 @@ ${this.map.name}`, this.ambience.state.tod);
         memory: this.bagMemory,
         title: assignSlot === null ? null : `Chọn đồ cho ô ${assignSlot + 1}`,
         hotbar: this.hotbar,
+        // Kéo vật phẩm thả vào Pokémon ở cột đội hình (góc trái trên): cho cầm
+        party: { slotAt: (px, py) => this.partyPanel.slotAt(px, py), highlight: (i) => this.partyPanel.setHover(i) },
         hotkey: hotbarSlotOf,
         onAssign: (slot, item) => {
           this.hud.showSaveNote(setHotbarSlot(slot, item));
@@ -2969,6 +3254,12 @@ ${this.map.name}`, this.ambience.state.tod);
         },
       }).open();
       if (!id) return;
+      if (typeof id === 'object') {
+        // Kéo thả vào Pokémon trong cột đội hình: cho cầm
+        if (state.party[id.give]) await this.giveHeld(state.party[id.give], id.id);
+        this.save();
+        continue;
+      }
       if (assignSlot !== null) {
         await this.say(null, [setHotbarSlot(assignSlot, id)]);
         return;
@@ -2980,60 +3271,21 @@ ${this.map.name}`, this.ambience.state.tod);
         if (close) return;
         continue;
       }
-      const action = await this.itemAction(id);
-      if (action === 'hotbar') await this.pickHotbarSlot(id);
-      else if (action === 'give') await this.giveFromBag(id);
-      else if (action === 'use') {
+      // Bấm vào vật phẩm là dùng luôn (không còn bảng Dùng / Cho cầm / Gán phím tắt): đồ chỉ để cầm thì chọn Pokémon cho cầm.
+      // Gán phím tắt: kéo vào thanh phím tắt hoặc bấm 1-6; cho cầm: kéo vào Pokémon ở cột đội hình
+      if (ITEMS[id].kind === 'held') await this.giveFromBag(id);
+      else {
         const close = await this.useBagItem(id);
         this.save();
         if (close) return;
       }
+      this.save();
     }
-  }
-
-  // Bảng thao tác với một vật phẩm trong túi (như game gốc: Dùng / Cho cầm / Đăng ký phím tắt)
-  itemAction(id) {
-    const item = ITEMS[id];
-    // Đồ chỉ để cầm (Leftovers, đồ tăng sức mạnh theo hệ...) không có "Dùng"
-    const items = [
-      ...(item.kind === 'held' ? [] : [{ label: 'Dùng', value: 'use' }]),
-      ...(canHold(id) && state.party.length ? [{ label: 'Cho cầm', value: 'give' }] : []),
-      { label: state.hotbar.includes(id) ? `Phím tắt (ô ${state.hotbar.indexOf(id) + 1})` : 'Gán phím tắt', value: 'hotbar' },
-      { label: 'Thôi', value: null },
-    ];
-    this.msg.container.setVisible(true);
-    this.speakerTag.setVisible(false);
-    this.msg.setText(`${item.name}: làm gì?`);
-    return new Menu(this, this.router, {
-      x: 640, y: 150, width: 300, height: 60 + items.length * 56, title: item.name, rowHeight: 50, items,
-      fixed: true, depth: HUD_DEPTH + 12,
-    }).open().then((v) => {
-      this.msg.container.setVisible(false);
-      return v;
-    });
-  }
-
-  // Chọn ô phím tắt (1-6) cho vật phẩm: mỗi dòng là một ô, kèm món đang gán ở ô đó
-  async pickHotbarSlot(id) {
-    const items = state.hotbar.map((cur, i) => ({
-      label: `Ô ${i + 1}`,
-      sub: cur ? (cur === id ? 'đang gán' : ITEMS[cur].name) : '(trống)',
-      icon: cur ? ITEMS[cur].icon : null,
-      value: i,
-      fontSize: 23,
-    }));
-    const empty = state.hotbar.indexOf(null);
-    const slot = await new Menu(this, this.router, {
-      x: 250, y: 24, width: 460, height: 82 + items.length * 56, title: `Gán ${ITEMS[id].name} vào ô nào?`, rowHeight: 50, items,
-      index: Math.max(0, state.hotbar.indexOf(id) >= 0 ? state.hotbar.indexOf(id) : empty), fixed: true, depth: HUD_DEPTH + 12,
-    }).open();
-    if (slot === null) return;
-    await this.say(null, [setHotbarSlot(slot, id)]);
   }
 
   // Cho Pokémon trong đội cầm vật phẩm đang chọn trong túi
   async giveFromBag(id) {
-    const index = await this.pickMon(`Cho Pokémon nào cầm ${ITEMS[id].name}?`, state.party);
+    const index = await this.pickMonBar(`Cho Pokémon nào cầm ${ITEMS[id].name}?`, ITEMS[id].icon);
     if (index === null) return;
     await this.giveHeld(state.party[index], id);
   }
@@ -3042,7 +3294,7 @@ ${this.map.name}`, this.ambience.state.tod);
   async teachMove(item) {
     const move = MOVES[item.teaches];
     const canLearn = (mon) => SPECIES[mon.speciesId].types.includes(MOVES[item.teaches].type) || item.learners?.includes(mon.speciesId);
-    const index = await this.pickMon(`Dạy ${move.name} cho Pokémon nào?`, state.party);
+    const index = await this.pickMonBar(`Dạy ${move.name} cho Pokémon nào?`, item.icon);
     if (index === null) return;
     const mon = state.party[index];
     if (mon.moves.includes(item.teaches)) {
@@ -3189,7 +3441,7 @@ ${this.map.name}`, this.ambience.state.tod);
       await this.say(null, [problem]);
       return;
     }
-    const index = await this.pickMon(`Dùng ${item.name} cho Pokémon nào?`, state.party);
+    const index = await this.pickMonBar(`Dùng ${item.name} cho Pokémon nào?`, item.icon);
     if (index === null) return;
     const mon = state.party[index];
     let moveId = null;

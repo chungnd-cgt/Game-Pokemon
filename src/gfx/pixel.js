@@ -123,6 +123,43 @@ export function addCanvasTexture(scene, key, canvas) {
   return tex;
 }
 
+// Khung chứa mọi điểm không trong suốt (alpha > threshold) của ảnh RGBA w x h: { x, y, w, h }, hoặc null (ảnh trống)
+export function alphaBounds(data, w, h, threshold = 8) {
+  let x0 = w;
+  let y0 = h;
+  let x1 = -1;
+  let y1 = -1;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      if (data[(y * w + x) * 4 + 3] <= threshold) continue;
+      if (x < x0) x0 = x;
+      if (x > x1) x1 = x;
+      if (y < y0) y0 = y;
+      if (y > y1) y1 = y;
+    }
+  }
+  return x1 < 0 ? null : { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+}
+
+// Ảnh PNG Pokémon người dùng thêm (src/assets/pokemon) thường có viền trong suốt rất rộng (vd 120x112 mà con Pokémon chỉ
+// ~44x48 ở đáy ảnh): game co cả khung cho vừa ô nên trông bé tí. Cắt sát phần có hình (chừa pad px), trả về canvas mới;
+// ảnh trống hoặc không có viền thừa thì trả về null
+export function trimTransparent(image, pad = 1) {
+  const { width: w, height: h } = image;
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(image, 0, 0);
+  const box = alphaBounds(ctx.getImageData(0, 0, w, h).data, w, h);
+  if (!box || (box.w >= w - 2 * pad && box.h >= h - 2 * pad)) return null;
+  const out = document.createElement('canvas');
+  out.width = box.w + pad * 2;
+  out.height = box.h + pad * 2;
+  out.getContext('2d').drawImage(c, box.x, box.y, box.w, box.h, pad, pad, box.w, box.h);
+  return out;
+}
+
 // Thu nhỏ một ảnh (vd: hình SVG Pokémon) thành pixel art size x size, viền trong suốt sắc nét
 export function pixelate(image, size) {
   const c = document.createElement('canvas');

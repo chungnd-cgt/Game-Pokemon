@@ -125,6 +125,7 @@ export function saveGame(position = lastPosition) {
     badges: [...state.badges],
     visited: [...state.visited],
     hallOfFame: state.hallOfFame,
+    tradesDone: [...state.tradesDone],
     playTime: state.playTime,
     startedAt: state.startedAt,
   };
@@ -162,6 +163,7 @@ export function loadGame() {
     badges: new Set(data.badges),
     visited: new Set(data.visited),
     hallOfFame: data.hallOfFame ?? [],
+    tradesDone: new Set(data.tradesDone),
     playTime: data.playTime ?? 0,
     startedAt: data.startedAt ?? null,
   });
@@ -200,6 +202,16 @@ export function loadGame() {
   lastWrite = data.savedAt ?? 0;
   blocked = false;
   return data.position;
+}
+
+// Bỏ bản lưu trên máy (đã gửi lên mạng xong lúc thoát game, online/cloudSave.js). Game đang chạy vẫn giữ tiến độ trong
+// bộ nhớ, lần lưu sau tạo lại bản trên máy
+export function removeLocalSave() {
+  try {
+    localStorage.removeItem(KEY);
+  } catch {
+    // trình duyệt chặn localStorage
+  }
 }
 
 export function deleteSave() {

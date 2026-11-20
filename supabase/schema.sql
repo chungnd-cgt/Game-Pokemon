@@ -1,5 +1,5 @@
 -- Bảng lưu game trên Supabase. Chạy một lần trong Supabase Dashboard → SQL Editor → New query → dán toàn bộ file → Run.
--- Chạy lại nhiều lần cũng không sao (không xoá dữ liệu đã có).
+-- Chạy lại nhiều lần cũng không sao (không xoá dữ liệu đã có). Giao dịch giữa người chơi: chạy thêm supabase/trades.sql.
 --
 -- Mỗi tài khoản đúng 1 bản lưu (user_id là khoá chính). Bản lưu là JSON y như bản lưu trong localStorage (src/game/save.js).
 -- RLS: mỗi người chỉ đọc / ghi được bản lưu của chính mình; khoá công khai (anon / publishable) nằm trong code game là an toàn.

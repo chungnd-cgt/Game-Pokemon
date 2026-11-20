@@ -26,7 +26,8 @@ export function resolutionLabel(res) {
   const size = parse(res);
   if (!size) return 'Theo màn hình';
   const ratio = size.w / size.h;
-  const name = Object.keys(ASPECT_NAMES).find((k) => Math.abs(ASPECT_NAMES[k][0] / ASPECT_NAMES[k][1] - ratio) < 0.04);
+  // Tỉ lệ gần đúng (3440x1440 là 2,39 vẫn gọi là 21:9 như cách người ta hay gọi)
+  const name = Object.keys(ASPECT_NAMES).find((k) => Math.abs(ASPECT_NAMES[k][0] / ASPECT_NAMES[k][1] - ratio) < 0.08);
   return `${size.w} × ${size.h}${name ? `  ${name}` : ''}`;
 }
 
@@ -83,7 +84,7 @@ export function applyFpsLimit(game, fps = settings.fpsLimit) {
   }
 }
 
-// Toàn màn hình cho cả trang (không chỉ canvas) để nút cảm ứng (nằm ngoài khung game) vẫn hiện.
+// Toàn màn hình cho cả trang (không chỉ canvas): ô nhập HTML (đăng nhập, giao dịch) vẫn hiện trên game.
 // iPhone (Safari) không cho trang web toàn màn hình: available = false
 const root = () => document.documentElement;
 export const fullscreen = {
@@ -110,3 +111,22 @@ export const fullscreen = {
     }
   },
 };
+
+// Cỡ giao diện trên bản đồ (Cài đặt → Chung): cột đội hình, cột nút, thanh phím tắt, đồng hồ, khung nhiệm vụ, bảng Pokémon
+// trong khu. Game luôn cao 720 rồi thu cho vừa màn hình, nên trên điện thoại nằm ngang (cao ~390 px) mọi thứ nhỏ đi một nửa:
+// phóng to riêng phần giao diện này. 0 = Tự động: màn hình càng thấp càng to (tối đa 150%)
+export const UI_SCALES = [0, 1, 1.15, 1.3, 1.5];
+export const uiScaleLabel = (v) => (v ? `${Math.round(v * 100)}%` : 'Tự động');
+// Giao diện cần chừng này px (sau khi chia hệ số) theo chiều ngang để thanh phím tắt và khung nhiệm vụ không chồng nhau
+export const HUD_MIN_WIDTH = 820;
+
+// Hệ số cỡ giao diện. gameWidth: bề ngang game • shownHeight: chiều cao game đang hiện trên màn hình (px CSS)
+export function hudScaleFor(gameWidth, shownHeight, choice = settings.uiScale) {
+  let s = UI_SCALES.includes(choice) && choice ? choice : 1;
+  if (!choice) {
+    // Tự động: chữ 15px của giao diện hiện ra ít nhất ~10px trên màn hình
+    const shown = shownHeight > 0 ? shownHeight / GAME_HEIGHT : 1;
+    s = Math.min(1.5, Math.max(1, Math.round((0.7 / shown) * 20) / 20));
+  }
+  return Math.max(1, Math.min(s, gameWidth / HUD_MIN_WIDTH));
+}

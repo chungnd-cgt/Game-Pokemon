@@ -1,12 +1,14 @@
 import Phaser from 'phaser';
 import { formatMoney } from '../data/items.js';
 import { MAPS, SPAWN, resumePosition } from '../data/map.js';
-import { clearLegacySave, deleteSave, legacySave, loadGame, summarize, writeSave } from '../game/save.js';
+import { clearLegacySave, deleteSave, legacySave, loadGame, setSaveOwner, summarize, writeSave } from '../game/save.js';
+import { createMonster } from '../game/monster.js';
 import { currentUser } from '../online/account.js';
 import { markDirty, startCloudSave } from '../online/cloudSave.js';
+import { claimSession } from '../online/session.js';
 import { clearLinkError, emailLink, supabase } from '../online/supabase.js';
 import { AuthPanel } from '../ui/AuthPanel.js';
-import { DEFAULT_NAMES, resetState, state } from '../game/state.js';
+import { DEFAULT_NAMES, resetState, setFlag, state } from '../game/state.js';
 import { monImagesReady } from '../gfx/monImages.js';
 import { applyPlayerLook } from '../gfx/player.js';
 import { fitScale, pixelMon } from '../gfx/textures.js';
@@ -60,18 +62,38 @@ export default class TitleScene extends Phaser.Scene {
   // Đăng nhập (ui/AuthPanel.js) rồi vào game luôn: có bản lưu thì chơi tiếp, chưa có thì tạo nhân vật và chơi mới.
   // Không còn menu Tiếp tục / Chơi mới / Xoá dữ liệu: mỗi tài khoản đúng 1 bản lưu (online/cloudSave.js)
   async run() {
+    // Chỉ khi chạy dev: ?e2e=<bản đồ> vào thẳng bản đồ với đội hình mẫu, không đăng nhập / không mạng (test Playwright: e2e/)
+    const e2e = import.meta.env.DEV ? new URLSearchParams(location.search).get('e2e') : null;
+    if (e2e !== null) {
+      this.e2eStart(e2e || 'town1');
+      return;
+    }
     if (!supabase) {
       this.status('Chưa cấu hình Supabase: tạo file .env.local theo .env.example rồi chạy lại.', true);
       return;
     }
     let user = await currentUser();
+    // fresh: vừa đăng nhập bằng mật khẩu (không phải phiên còn lại trong tab khi tải lại trang / nhân bản tab)
+    let fresh = false;
     // Link "đặt lại mật khẩu" trong email: đã có phiên tạm, đặt mật khẩu mới rồi vào game
-    if (user && emailLink.recovery) user = await new AuthPanel().openNewPassword();
+    if (user && emailLink.recovery) {
+      user = await new AuthPanel().openNewPassword();
+      fresh = true;
+    }
     if (!user) {
       const linkError = emailLink.errorCode
         ? 'Link trong email đã hết hạn hoặc đã dùng rồi. Hãy đăng nhập, hoặc gửi lại email.' : null;
       clearLinkError();
       user = await new AuthPanel({ error: linkError }).open();
+      fresh = true;
+    }
+
+    // Mỗi tài khoản chỉ chơi ở một nơi (online/session.js): nơi khác đã vào sau thì phải đăng nhập lại để giành quyền.
+    // Bị nơi khác giành quyền giữa chừng: dừng hẳn game (bảng "Đăng nhập lại" che lên trên)
+    const onLost = () => this.game.pause();
+    if (await claimSession(user, fresh, { onLost }) === 'taken') {
+      user = await new AuthPanel({ error: 'Tài khoản đã được mở ở tab hoặc thiết bị khác. Đăng nhập lại để chơi ở đây.' }).open();
+      await claimSession(user, true, { onLost });
     }
 
     this.registry.set('user', { id: user.id, email: user.email });
@@ -98,6 +120,25 @@ export default class TitleScene extends Phaser.Scene {
       await this.newGame();
       return;
     }
+  }
+
+  // Test Playwright (chỉ dev): bản lưu riêng trên máy, đã qua chương 1, 4 huy hiệu, đội 3 con, túi có đồ; không mạng
+  e2eStart(mapId) {
+    this.registry.set('user', null);
+    setSaveOwner('e2e');
+    deleteSave();
+    resetState();
+    state.player = { name: 'Test', gender: 'male', look: null };
+    for (const f of ['talkedMom', 'metOak', 'gotStarter', 'rival1', 'gotPokedex', 'questDone', 'gruntsDefeated', 'rocketDefeated',
+      'martReward', 'martClerkBack', 'rival2', 'chapter1Done', 'momGift']) setFlag(f);
+    state.party = [createMonster('charmander', 16), createMonster('pikachu', 20), createMonster('kadabra', 30)];
+    state.badges = new Set(['wind', 'grass', 'electric', 'water']);
+    state.bag = { potion: 5, superPotion: 2, pokeBall: 10, oranBerry: 3, leftovers: 1, bicycle: 1, rareCandy: 3 };
+    state.money = 50000;
+    state.visited.add('town1');
+    applyPlayerLook(this, state.player);
+    window.__dev = { state, createMonster };
+    this.go({ position: { map: mapId, ...(MAPS[mapId].entry ?? { x: 14, y: 9 }), facing: 'down' } });
   }
 
   // Dòng trạng thái dưới màn hình chính (đang tải, lỗi kết nối...)

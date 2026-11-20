@@ -34,6 +34,7 @@ function freshState() {
     badges: new Set(), // huy hiệu gym đã nhận (data/badges.js)
     visited: new Set(), // khu vực đã đặt chân tới (data/region.js)
     hallOfFame: [], // các lần vô địch Liên minh: { at, team: [{ speciesId, name, level, shiny }] }
+    tradesDone: new Set(), // id các giao dịch với người chơi khác đã nhận vào bản lưu (online/trade.js): không nhận hai lần
     playTime: 0, // giây
     startedAt: Date.now(), // lúc bắt đầu chơi mới (ms, hiện trên Thẻ Huấn luyện viên); bản lưu cũ không có thì null
   };

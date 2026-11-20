@@ -1,16 +1,21 @@
-import { blockSaves, onSaved, readSave, setSaveOwner, writeSave } from '../game/save.js';
+import { blockSaves, onSaved, readSave, removeLocalSave, setSaveOwner, writeSave } from '../game/save.js';
+import { sessionClaim, sessionLost } from './session.js';
 import { supabase } from './supabase.js';
 
 // Đồng bộ bản lưu với Supabase (bảng saves, supabase/schema.sql). Mỗi tài khoản 1 bản lưu.
 //  - Game vẫn lưu vào máy y như cũ (game/save.js) sau mỗi lần lưu, nên tắt ngang / văng game / mất mạng vẫn còn tiến độ.
-//  - Sau mỗi lần lưu: chờ vài giây rồi gửi bản mới nhất lên (lưu liên tục thì gộp lại); rời tab / tắt trang thì gửi ngay.
+//  - Sau mỗi lần lưu: chờ UPLOAD_DELAY rồi gửi bản mới nhất lên (lưu liên tục thì gộp lại); rời tab / tắt trang / lưu lúc
+//    tab đang ẩn thì gửi ngay.
+//  - Thoát game (ẩn / đóng tab, đăng xuất) mà gửi lên xong thì xoá bản trên máy (trên mạng đã có đủ); gửi chưa được (mất
+//    mạng) thì giữ lại, lần sau gửi tiếp.
+//  - Bản lưu gửi lên mang mã phiên chơi (session.js): máy chủ chỉ nhận từ nơi đang giữ quyền chơi tài khoản.
 //  - Ghi nhớ trên máy: bản lưu trên máy dựa trên version nào của bản trên mạng, và có thay đổi chưa gửi không (dirty).
 //    Mở game lần sau: còn thay đổi chưa gửi thì dùng bản trên máy rồi gửi lên; không thì dùng bản trên mạng.
 //  - Ghi lên mạng kèm điều kiện version = version đã biết. Không khớp nghĩa là máy / tab khác vừa lưu tài khoản này:
 //    thôi lưu ở đây (không ghi đè tiến độ của nơi kia), báo cho người chơi.
 
-const UPLOAD_DELAY = 8000; // ms sau lần lưu đầu tiên thì gửi (các lần lưu trong lúc chờ gộp làm một)
-const RETRY_DELAY = 30000; // lỗi mạng: thử lại sau chừng này
+const UPLOAD_DELAY = 30000; // ms sau lần lưu đầu tiên thì gửi (các lần lưu trong lúc chờ gộp làm một)
+const RETRY_DELAY = 60000; // lỗi mạng: thử lại sau chừng này
 const CONFLICT_MESSAGE = 'Tài khoản đang được chơi ở nơi khác, ở đây không lưu nữa. Tải lại trang để chơi tiếp.';
 
 let uid = null;
@@ -104,8 +109,11 @@ export function upload() {
   return uploading;
 }
 
+const hidden = () => document.visibilityState === 'hidden';
+
 async function send(meta, data) {
-  const row = { data, play_time: Math.floor(data.playTime ?? 0) };
+  const claim = sessionClaim();
+  const row = { data: claim ? { ...data, claim } : data, play_time: Math.floor(data.playTime ?? 0) };
   let result;
   try {
     result = meta.version === null
@@ -115,6 +123,11 @@ async function send(meta, data) {
     result = { error: err };
   }
   const { data: rows, error } = result;
+  // Nơi khác đã giành quyền chơi tài khoản (supabase/sessions.sql): dừng game ở đây
+  if (/SESSION/.test(error?.message ?? '')) {
+    sessionLost('device');
+    return;
+  }
   // 23505: trùng khoá chính, nơi khác vừa tạo bản lưu trước
   const conflict = error?.code === '23505' || (!error && rows.length === 0);
   if (conflict) {
@@ -129,7 +142,9 @@ async function send(meta, data) {
   // Trong lúc gửi mà game lưu thêm thì bản trên máy đã khác bản vừa gửi: vẫn còn thay đổi chưa gửi
   const changed = readSave()?.savedAt !== data.savedAt;
   writeMeta({ version: rows[0].version, dirty: changed });
-  if (changed) scheduleUpload();
+  if (changed) scheduleUpload(hidden() ? 0 : UPLOAD_DELAY);
+  // Đang thoát game (tab ẩn / đóng) và trên mạng đã có bản mới nhất: xoá bản trên máy
+  else if (hidden()) removeLocalSave();
 }
 
 function conflicted() {
@@ -139,19 +154,37 @@ function conflicted() {
   blockSaves(CONFLICT_MESSAGE);
 }
 
-// Đăng xuất: gửi nốt bản lưu rồi thôi đồng bộ
+// Đăng xuất: gửi nốt bản lưu rồi thôi đồng bộ; gửi xong thì xoá bản trên máy
 export async function stopCloudSave() {
   await upload();
+  if (uid && !readMeta().dirty) removeLocalSave();
   stopped = true;
   uid = null;
 }
 
-// Game lưu xong vào máy -> đánh dấu chưa gửi, hẹn gửi
+// Nơi khác đã giành quyền chơi (session.js): thôi đồng bộ, bỏ bản trên máy (cũ hơn bản ở nơi kia, không gửi lên nữa)
+export function abandonCloudSave() {
+  if (!uid) return;
+  stopped = true;
+  clearTimeout(timer);
+  timer = null;
+  removeLocalSave();
+  try {
+    localStorage.removeItem(META_KEY());
+  } catch {
+    // trình duyệt chặn localStorage
+  }
+  uid = null;
+}
+
+// Game lưu xong vào máy -> đánh dấu chưa gửi, hẹn gửi. Lưu lúc tab đang ẩn (game lưu khi rời tab, sau phần gửi ở dưới):
+// gửi ngay, vì tab ẩn thì trình duyệt (nhất là điện thoại) thường dừng hẳn bộ hẹn giờ
 onSaved(() => {
   if (!uid || stopped) return;
   const meta = readMeta();
   if (!meta.dirty) writeMeta({ ...meta, dirty: true });
-  scheduleUpload();
+  if (hidden()) upload();
+  else scheduleUpload();
 });
 
 // Rời tab / thu nhỏ / tắt trang: gửi ngay (trình duyệt có thể không chờ xong; bản trên máy vẫn còn, lần sau gửi tiếp)

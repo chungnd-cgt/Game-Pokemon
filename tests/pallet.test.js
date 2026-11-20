@@ -35,6 +35,7 @@ function fakeWorld(mapId, pos, result = 'win') {
     walkNpc: async () => {},
     walkNpcTo: async () => {},
     walkNpcAway: async () => {},
+    npcEntersDoor: async () => {},
     npcLeave: async (npc, where) => log.leaves?.push(where),
     npcFlyAway: async () => {},
     removeNpc: () => {},
@@ -175,6 +176,13 @@ test('Thị trấn Lục Bình: trả gói hàng xong, lên đường tới Hang
   assert.equal(await clerkTalk(world), true);
   assert.ok(hasFlag(F.MART_REWARD) && !hasFlag(F.DONE), 'trả gói hàng xong vẫn còn trận với Gary');
   assert.equal(world.log.chapterEnd, 0);
+  // Tới gần cửa hang: nhân viên Poké Mart đang chặn cửa hang cảm ơn rồi về cửa hàng (chưa có trận nào)
+  const thanks = stepTrigger(world);
+  assert.equal(typeof thanks, 'function');
+  await thanks();
+  assert.ok(hasFlag(F.CLERK_BACK) && !hasFlag(F.RIVAL2), 'nhân viên về cửa hàng');
+  assert.equal(world.log.battles.length, 0);
+  assert.ok(!STORY_NPCS.find((n) => n.id === 't1-clerk').show(), 'không còn chặn cửa hang');
   // Mọi lối tới cửa hang đều đi qua chỗ Gary chặn
   const event = stepTrigger(world);
   assert.equal(typeof event, 'function');
@@ -189,7 +197,7 @@ test('Thị trấn Lục Bình: trả gói hàng xong, lên đường tới Hang
 
   // Thua thì lần sau tới cửa hang lại gặp
   resetState();
-  for (const f of [F.STARTER, F.QUEST_DONE, F.GRUNTS, F.BOSS, F.MART_REWARD]) setFlag(f);
+  for (const f of [F.STARTER, F.QUEST_DONE, F.GRUNTS, F.BOSS, F.MART_REWARD, F.CLERK_BACK]) setFlag(f);
   const lose = fakeWorld('town1', front, 'lose');
   await stepTrigger(lose)();
   assert.ok(!hasFlag(F.RIVAL2) && !hasFlag(F.DONE));
@@ -423,4 +431,25 @@ test('Lục Bình: nhà dân góc tây bắc, Pokémon Center / Poké Mart phía
   assert.ok(seen.has(`${item.x},${item.y}`), 'đi bộ lên tầng trên được (vòng phía đông rồi qua khe phía tây)');
   assert.ok(berries.every((b) => seen.has(`${b.x},${b.y + 1}`) || seen.has(`${b.x},${b.y - 1}`)), 'đứng hái được');
   assert.ok(seen.has('27,6'), 'tới được cửa hang');
+});
+
+test('Lục Bình: nhân viên Poké Mart chặn cửa hang tới khi trả gói hàng, cảm ơn rồi về cửa hàng; hang ở trước Center / Mart', async () => {
+  resetState();
+  const clerk = STORY_NPCS.find((n) => n.id === 't1-clerk');
+  const cave = town1.warps.find((w) => w.to === 'cave1');
+  assert.deepEqual([clerk.map, clerk.x, clerk.y], ['town1', cave.x, cave.y + 1], 'đứng ngay trước cửa hang');
+  // Từ lối vào (Tuyến đường 2, mép tây) đi tới cửa hang trước, Pokémon Center / Poké Mart ở khu phía đông
+  const entry = town1.warps.find((w) => w.to === 'route2');
+  for (const b of town1.buildings.filter((x) => x.to === 'center' || x.to === 'mart')) {
+    assert.ok(b.door.x - entry.x > cave.x - entry.x, `${b.to} xa lối vào hơn cửa hang`);
+  }
+  for (const [flags, show] of [[[], true], [[F.GRUNTS], true], [[F.GRUNTS, F.BOSS], true], [[F.GRUNTS, F.BOSS, F.MART_REWARD], true]]) {
+    resetState();
+    for (const f of flags) setFlag(f);
+    assert.equal(clerk.show(), show);
+    const world = fakeWorld('town1', { x: cave.x - 1, y: cave.y + 1 });
+    await clerk.onTalk.call(clerk, world);
+    assert.equal(hasFlag(F.CLERK_BACK), flags.includes(F.MART_REWARD), `cờ: ${flags.join(',')}`);
+  }
+  assert.equal(clerk.show(), false, 'cảm ơn xong thì về cửa hàng');
 });

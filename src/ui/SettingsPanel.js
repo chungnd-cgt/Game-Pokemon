@@ -1,9 +1,8 @@
 import Phaser from 'phaser';
-import { FPS_STOPS, RESOLUTIONS, applyFpsLimit, applyResolution, fullscreen, resolutionLabel } from '../game/display.js';
+import { FPS_STOPS, RESOLUTIONS, UI_SCALES, applyFpsLimit, applyResolution, fullscreen, resolutionLabel, uiScaleLabel } from '../game/display.js';
 import { setSetting, settings } from '../game/settings.js';
 import { BLEED, fixToCamera, localX, textStyle, uiX } from './helpers.js';
-import { directionOf, isCancel, isConfirm } from './input.js';
-import { isTouchDevice, refreshTouchControls } from './TouchControls.js';
+import { directionOf, isCancel, isConfirm, isTouchDevice } from './input.js';
 
 // Bảng Cài đặt kiểu game PC: cột thẻ bên trái (Đồ hoạ / Chung / Điều khiển), nội dung bên phải (nút chọn, ô tích, thanh
 // trượt), đáy là Huỷ / Áp dụng / OK. Đổi gì cũng chỉ là nháp, bấm Áp dụng / OK mới có tác dụng; Huỷ, phím quay lại hoặc
@@ -50,9 +49,8 @@ const C = {
 
 const ROW_H = { segment: 100, select: 100, slider: 96, check: 60, button: 68, info: 34 };
 // Danh sách xổ xuống: số cột, cỡ mỗi ô
-const DROP = { cols: 2, h: 42, gap: 6, pad: 10 };
+const DROP = { cols: 2, h: 34, gap: 4, pad: 8 }; // gọn để không đè hàng nút đáy bảng
 const bold = (size, color = C.text, extra = {}) => textStyle(size, color, { fontStyle: 'bold', stroke: '#0c0d10', strokeThickness: 3, ...extra });
-const pct = (v) => `${v}%`;
 
 // Giá trị hiện tại của mọi mục (để so với nháp)
 function currentValues() {
@@ -63,10 +61,7 @@ function currentValues() {
     lighting: settings.lighting !== false,
     weather: settings.weather !== false,
     catchPreview: settings.catchPreview !== false,
-    touchControls: settings.touchControls ?? 'auto',
-    touchSize: settings.touchSize ?? 100,
-    touchOpacity: settings.touchOpacity ?? 70,
-    vibrate: settings.vibrate !== false,
+    uiScale: UI_SCALES.includes(settings.uiScale) ? settings.uiScale : 0,
   };
 }
 
@@ -93,6 +88,8 @@ function buildTabs(opts) {
       id: 'general',
       label: 'Chung',
       rows: [
+        // Phóng to cột đội hình, cột nút, thanh phím tắt... trên bản đồ (game/display.js: hudScaleFor)
+        { type: 'slider', key: 'uiScale', label: 'Cỡ giao diện', stops: UI_SCALES, format: uiScaleLabel },
         { type: 'check', key: 'catchPreview', label: 'Xem nhanh Pokémon gửi vào PC' },
         ...(opts.hasMap ? [{ type: 'button', label: 'Bản đồ vùng', action: 'map' }] : []),
         { type: 'button', label: 'Đổi diện mạo', action: 'look' },
@@ -106,11 +103,9 @@ function buildTabs(opts) {
       id: 'controls',
       label: 'Điều khiển',
       rows: [
-        { type: 'segment', key: 'touchControls', label: 'Nút cảm ứng (phím hướng + A / B)',
-          options: [{ value: 'auto', label: 'Tự động' }, { value: 'on', label: 'Bật' }, { value: 'off', label: 'Tắt' }] },
-        { type: 'slider', key: 'touchSize', label: 'Cỡ nút cảm ứng', stops: [70, 80, 90, 100, 115, 130, 150], format: pct },
-        { type: 'slider', key: 'touchOpacity', label: 'Độ đậm nút cảm ứng', stops: [30, 40, 50, 60, 70, 80, 90, 100], format: pct },
-        { type: 'check', key: 'vibrate', label: 'Rung khi bấm nút cảm ứng' },
+        { type: 'info', text: () => 'Di chuyển: phím hướng, hoặc chạm / nhấn chuột vào bản đồ rồi kéo (cần gạt).' },
+        { type: 'info', text: () => 'Thao tác: phím xác nhận, hoặc chạm vào người / đồ vật ngay cạnh nhân vật.' },
+        { type: 'info', text: () => 'Người chơi khác: chuột phải / chạm đúp để Xem chi tiết hoặc Giao dịch.' },
         { type: 'button', label: 'Phím tắt bàn phím', action: 'keys' },
       ],
     },
@@ -349,7 +344,6 @@ export class SettingsPanel {
     }
     if (keys.includes('fpsLimit')) applyFpsLimit(this.scene.game);
     if (keys.includes('resolution')) applyResolution(this.scene.game, this.draft.resolution);
-    if (keys.some((k) => k.startsWith('touch'))) refreshTouchControls();
     this.baseline = { ...this.draft };
     this.onApplied(keys);
   }
@@ -528,7 +522,7 @@ export class SettingsPanel {
       const id = `opt:${opt.value}`;
       drawButton(g, cx, cy, cw, DROP.h, on ? 'blue' : 'gray', this.pressed === id);
       if (i === this.dropIndex) focusRing(g, cx + 3, cy + 3, cw - 6, DROP.h - 6);
-      this.dyn.add(scene.add.text(cx + cw / 2, cy + DROP.h / 2, opt.label, bold(18)).setOrigin(0.5));
+      this.dyn.add(scene.add.text(cx + cw / 2, cy + DROP.h / 2, opt.label, bold(17)).setOrigin(0.5));
       this.hit(cx, cy, cw, DROP.h, id, () => {
         this.draft[row.key] = opt.value;
         this.dropdown = null;

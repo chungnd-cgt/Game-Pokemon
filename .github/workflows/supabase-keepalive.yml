@@ -1,0 +1,28 @@
+# Giữ project Supabase (gói miễn phí) không bị tạm dừng: Supabase tự tạm dừng project 7 ngày không có hoạt động.
+# Cứ 3 ngày GitHub gọi Supabase một lần (đọc bảng saves: RLS trả về danh sách rỗng, chỉ để có hoạt động).
+# Cần thêm 2 secret trong GitHub: Settings → Secrets and variables → Actions → New repository secret
+#   SUPABASE_URL       = https://xxxx.supabase.co   (giống VITE_SUPABASE_URL trong .env.local)
+#   SUPABASE_ANON_KEY  = khoá anon / publishable    (giống VITE_SUPABASE_ANON_KEY; KHÔNG dùng khoá secret / service_role)
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: '17 3 */3 * *' # 03:17 UTC, 3 ngày một lần
+  workflow_dispatch: # bấm chạy tay trong tab Actions
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Gọi Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "Chưa có secret SUPABASE_URL / SUPABASE_ANON_KEY"; exit 1
+          fi
+          code=$(curl -s -o /dev/null -w '%{http_code}' "$SUPABASE_URL/rest/v1/saves?select=user_id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+          echo "HTTP $code"
+          [ "$code" = "200" ]

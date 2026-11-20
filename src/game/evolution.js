@@ -4,8 +4,10 @@ import { markCaught } from './state.js';
 
 // Loài mà Pokémon sẽ tiến hoá thành, hoặc null.
 // item: đá tiến hoá đang dùng. Không có item thì xét tiến hoá theo cấp (Everstone đang cầm thì không tiến hoá).
+// Tiến hoá khi trao đổi (Kadabra...) không xét ở đây: xem tradeEvolutionTarget
 export function evolutionTarget(mon, item = null) {
   for (const evo of SPECIES[mon.speciesId].evolution ?? []) {
+    if (evo.trade) continue;
     if (evo.item) {
       if (evo.item === item) return evo.to;
     } else if (!item && mon.heldItem !== 'everstone' && mon.level >= evo.level) {
@@ -13,6 +15,13 @@ export function evolutionTarget(mon, item = null) {
     }
   }
   return null;
+}
+
+// Vừa được trao đổi sang người chơi mới: loài tiến hoá khi trao đổi (Kadabra -> Alakazam...), hoặc null.
+// Đang cầm Everstone thì không tiến hoá
+export function tradeEvolutionTarget(mon) {
+  if (mon.heldItem === 'everstone') return null;
+  return (SPECIES[mon.speciesId].evolution ?? []).find((evo) => evo.trade)?.to ?? null;
 }
 
 // Tiến hoá: đổi loài, tên, chỉ số; đặc tính giữ đúng ô (thường thứ mấy / ẩn).

@@ -27,7 +27,9 @@ import { applyItem, itemProblem, needsMove } from '../game/itemUse.js';
 import { saveGame } from '../game/save.js';
 import { settings } from '../game/settings.js';
 import { trainerBeaten } from '../game/trainers.js';
-import { MAX_LEVEL, calcStats, createMonster, expProgress, gainEvs, gainExp, replaceMove } from '../game/monster.js';
+import {
+  HAPPINESS_FAINT, HAPPINESS_KO, MAX_LEVEL, calcStats, changeHappiness, createMonster, expProgress, gainEvs, gainExp, replaceMove,
+} from '../game/monster.js';
 import { addCaught, blackoutLoss, healParty, itemCount, markSeen, state, useItem } from '../game/state.js';
 import { Ambience } from '../gfx/ambience.js';
 import { effectivenessHint, moveNotes } from '../battle/moveInfo.js';
@@ -1815,6 +1817,8 @@ export default class BattleScene extends Phaser.Scene {
       const wiped = !state.party.some((m) => m.hp > 0);
       const bothDown = this.active.hp <= 0;
       if (!wiped) await this.moxie(this.active, this.enemy);
+      // Độ thân thiết: Pokémon đang trên sân hạ gục được đối thủ (hoang dã hoặc của nhà huấn luyện)
+      changeHappiness(this.active, HAPPINESS_KO);
       await this.faint(this.enemySprite, this.enemyShadow);
       revertBattleForm(this.enemy); // gục là hết biến hình (EXP, EV tính theo loài gốc)
       this.enemyInfo.setVisible(false);
@@ -1860,6 +1864,7 @@ export default class BattleScene extends Phaser.Scene {
     this.updateGas();
     // Gục là hết trạng thái (độc, bỏng, ngủ...): hồi sinh bằng Revive không còn bị độc / ngủ tiếp
     cureStatus(this.active);
+    changeHappiness(this.active, HAPPINESS_FAINT); // độ thân thiết: bị gục
     await this.moxie(this.enemy, this.active);
     await this.faint(this.playerSprite, this.playerShadow);
     revertBattleForm(this.active);

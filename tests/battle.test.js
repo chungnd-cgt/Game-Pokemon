@@ -307,7 +307,7 @@ test('cốt truyện: mục tiêu đổi theo từng mốc', () => {
   state.visited.add('town1');
   assert.equal(objective(), 'Đến Poké Mart Lục Bình xem có chuyện gì');
   for (const f of [F.GRUNTS, F.BOSS, F.MART_REWARD]) setFlag(f);
-  assert.equal(objective(), 'Lên đường tới Hang Thạch Nhũ phía đông bắc Lục Bình', 'Gary đợi đấu lại trước khi lên đường');
+  assert.equal(objective(), 'Lên đường tới Hang Thạch Nhũ phía bắc Lục Bình', 'Gary đợi đấu lại trước khi lên đường');
   setFlag(F.RIVAL2);
   setFlag(F.DONE);
   assert.equal(objective(), 'Từ Thị trấn Lục Bình băng qua Hang Thạch Nhũ tới Làng Chân Đồi', 'xong chương 1 thì sang nhiệm vụ chương 2');

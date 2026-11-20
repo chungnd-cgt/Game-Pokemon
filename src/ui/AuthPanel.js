@@ -1,7 +1,7 @@
 import {
   PASSWORD_MIN, onSignedIn, resendConfirmation, sendPasswordReset, setNewPassword, signIn, signUp,
 } from '../online/account.js';
-import { lastEmail, rememberLogin, setLastEmail, setRememberLogin } from '../online/supabase.js';
+import { lastEmail, setLastEmail } from '../online/supabase.js';
 
 // Bảng đăng nhập / đăng ký / quên mật khẩu / đặt mật khẩu mới. Là HTML đặt đè lên game (không vẽ trong Phaser) để gõ
 // được tiếng Việt, trình duyệt gợi ý lưu mật khẩu và bàn phím điện thoại hiện đúng kiểu (email / mật khẩu).
@@ -34,9 +34,28 @@ const CSS = `
 #auth .msg.err { background: #4a1e26; color: #ffb4b4; }
 #auth .msg.ok { background: #1e4a32; color: #b4f0c8; }
 #auth .msg:empty { display: none; }
-#auth .remember { display: flex; align-items: center; gap: 8px; margin: 12px 0 0; font-size: 15px; cursor: pointer; }
-#auth .remember input { width: 18px; height: 18px; margin: 0; accent-color: #40b060; cursor: pointer; }
+#auth .pw { position: relative; }
+#auth .pw input { padding-right: 46px; }
+#auth .pw input::-ms-reveal, #auth .pw input::-ms-clear { display: none; }
+#auth .eye { position: absolute; top: 50%; right: 6px; transform: translateY(-50%); width: 36px; height: 36px; padding: 0;
+  display: flex; align-items: center; justify-content: center; border: 0; border-radius: 8px; background: transparent;
+  color: #6a7896; cursor: pointer; }
+#auth .eye:hover, #auth .eye:focus-visible { color: #1e2a44; background: #e2e8f4; outline: none; }
+#auth .eye svg { width: 22px; height: 22px; }
 `;
+
+// Biểu tượng con mắt (hiện mật khẩu) / con mắt gạch chéo (ẩn mật khẩu) ở cuối ô mật khẩu
+const EYE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+  aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>`;
+const EYE_OFF = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+  aria-hidden="true"><path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-2.6 3.5"/>
+  <path d="M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>
+  <path d="M2 2l20 20"/></svg>`;
+// Ô mật khẩu kèm nút con mắt bật / tắt xem mật khẩu
+const passwordField = (id, attrs) => `<div class="pw">
+  <input id="${id}" type="password" maxlength="72" ${attrs}>
+  <button type="button" class="eye" data-eye="${id}" aria-label="Hiện mật khẩu" aria-pressed="false" title="Hiện mật khẩu">${EYE}</button>
+</div>`;
 
 const VIEWS = {
   login: { title: 'Đăng nhập', button: 'Đăng nhập' },
@@ -111,12 +130,9 @@ export class AuthPanel {
         ${view !== 'newPassword' ? `<label for="auth-email">Email</label>
           <input id="auth-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254">` : ''}
         ${view !== 'forgot' ? `<label for="auth-pass">${view === 'newPassword' ? 'Mật khẩu mới' : 'Mật khẩu'}</label>
-          <input id="auth-pass" name="password" type="password" maxlength="72"
-            autocomplete="${view === 'login' ? 'current-password' : 'new-password'}">` : ''}
+          ${passwordField('auth-pass', `name="password" autocomplete="${view === 'login' ? 'current-password' : 'new-password'}"`)}` : ''}
         ${view === 'register' || view === 'newPassword' ? `<label for="auth-pass2">Nhập lại mật khẩu</label>
-          <input id="auth-pass2" type="password" autocomplete="new-password" maxlength="72">` : ''}
-        ${view === 'login' ? `<label class="remember"><input id="auth-remember" type="checkbox" ${rememberLogin() ? 'checked' : ''}>
-          Ghi nhớ đăng nhập</label>` : ''}
+          ${passwordField('auth-pass2', 'autocomplete="new-password"')}` : ''}
         <button class="main" type="submit">${v.button}</button>
         <div class="msg"></div>
         ${view === 'login' ? '<div class="row"><button type="button" class="link" data-go="forgot">Quên mật khẩu?</button></div>' : ''}
@@ -130,6 +146,21 @@ export class AuthPanel {
       b.addEventListener('click', () => {
         this.email = this.emailInput?.value.trim() ?? this.email;
         this.render(b.dataset.go);
+      });
+    }
+    // Nút con mắt: bật / tắt xem mật khẩu của ô đó, con trỏ vẫn ở trong ô (không mất chỗ đang gõ)
+    for (const eye of this.root.querySelectorAll('[data-eye]')) {
+      const input = $(`#${eye.dataset.eye}`);
+      eye.addEventListener('mousedown', (e) => e.preventDefault());
+      eye.addEventListener('click', () => {
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        eye.innerHTML = show ? EYE_OFF : EYE;
+        const label = show ? 'Ẩn mật khẩu' : 'Hiện mật khẩu';
+        eye.setAttribute('aria-label', label);
+        eye.setAttribute('aria-pressed', String(show));
+        eye.title = label;
+        if (document.activeElement !== input) input.focus();
       });
     }
     this.form.addEventListener('submit', (e) => {
@@ -176,8 +207,6 @@ export class AuthPanel {
     this.busy(true);
     this.say('');
     if (view === 'login') {
-      // Đặt trước khi đăng nhập: supabase-js cất phiên vào đúng chỗ (localStorage / sessionStorage)
-      setRememberLogin(this.root.querySelector('#auth-remember')?.checked ?? true);
       const res = await signIn(email, password);
       if (!this.root) return; // tab khác vừa đăng nhập xong
       this.busy(false);

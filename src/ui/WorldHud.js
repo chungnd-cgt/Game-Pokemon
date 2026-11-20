@@ -2,7 +2,7 @@ import { formatMoney } from '../data/items.js';
 import { setSetting, settings } from '../game/settings.js';
 import { state } from '../game/state.js';
 import { HUD_PHASE_ICON } from '../gfx/textures.js';
-import { textStyle } from './helpers.js';
+import { hudSize, textStyle } from './helpers.js';
 import { HOTBAR_RIGHT, MONEY_W } from './Hotbar.js';
 import { drawCardIcon } from './TrainerCard.js';
 
@@ -104,13 +104,28 @@ export function drawRoundIcon(g, type, cx, cy) {
 // (trên trái, ui/PartyPanel.js), cột nút tròn có nhãn bên trái ngay trên thanh phím tắt (Túi đồ / Pokédex / Thẻ HLV /
 // Cài đặt; Bản đồ vùng và Phím tắt nằm trong Cài đặt), nút ≡ cạnh thanh phím tắt ẩn / hiện cột nút, khung nhiệm vụ ở góc
 // phải dưới (bấm tiêu đề để thu gọn / mở ra). Trạng thái thu gọn nhớ trong cài đặt.
+// Cỡ giao diện (helpers.js hudScale): mọi phần nằm trong một container root, xếp theo cỡ ảo (hudSize) rồi phóng to theo
+// hệ số. Hệ số đổi thì WorldScene huỷ (destroy) và tạo lại. Riêng cột nút tròn (menuRoot) giữ cỡ 100% (phóng to thì đè lên
+// cột đội hình), chỉ dời theo hàng nút ≡ / thanh phím tắt đã phóng to
 // actions: { bag, dex, trainer, settings } – hàm gọi khi bấm nút
 export class WorldHud {
   constructor(scene, actions) {
     this.scene = scene;
     this.actions = actions;
-    const { width, height } = scene.scale;
-    const fixed = (o) => o.setScrollFactor(0).setDepth(DEPTH);
+    const { width, height, s } = hudSize(scene);
+    this.root = scene.add.container(0, 0).setScrollFactor(0).setDepth(DEPTH).setScale(s);
+    const fixed = (o) => {
+      o.setScrollFactor(0);
+      this.root.add(o);
+      return o;
+    };
+    this.fixed = fixed;
+    this.menuRoot = scene.add.container(0, 0).setScrollFactor(0).setDepth(DEPTH);
+    this.menuFixed = (o) => {
+      o.setScrollFactor(0);
+      this.menuRoot.add(o);
+      return o;
+    };
 
     // Khung nhiệm vụ góc phải dưới: mép phải / dưới cố định, nhiệm vụ dài thì xuống dòng (khung nới lên trên).
     // Bấm vào khung (hoặc mũi tên ▼ / ▲) để thu gọn chỉ còn tiêu đề
@@ -136,13 +151,12 @@ export class WorldHud {
       backgroundColor: 'rgba(20,26,44,0.72)', padding: { left: 12 + CLOCK_ICON + 6, right: 12, top: 6, bottom: 6 }, align: 'right', lineSpacing: 2,
     })).setOrigin(1, 0));
     this.clockIcon = fixed(scene.add.image(0, 0, HUD_PHASE_ICON.day).setDisplaySize(CLOCK_ICON, CLOCK_ICON));
-    this.clockIcon.setDepth(DEPTH + 0.01);
 
     // Báo đã lưu / đã gán phím tắt: chỗ trống giữa thanh phím tắt và khung nhiệm vụ (xem showSaveNote).
-    // Nằm trên các menu, túi đồ (đang kéo đồ vào ô phím tắt vẫn thấy)
-    this.saveNote = fixed(scene.add.text(width / 2 + 60, height - 16, 'Đã lưu game', textStyle(16, '#ffffff', {
+    // Nằm trên các menu, túi đồ (đang kéo đồ vào ô phím tắt vẫn thấy): ngoài root, toạ độ màn hình
+    this.saveNote = scene.add.text((width / 2 + 60) * s, (height - 16) * s, 'Đã lưu game', textStyle(16, '#ffffff', {
       backgroundColor: 'rgba(30,110,70,0.85)', padding: { x: 12, y: 5 }, align: 'center',
-    })).setOrigin(0.5, 1)).setAlpha(0).setDepth(DEPTH + 15);
+    })).setOrigin(0.5, 1).setScale(s).setScrollFactor(0).setAlpha(0).setDepth(DEPTH + 15);
 
     // Nút ≡ cạnh thanh phím tắt: ẩn / hiện cột nút tròn
     this.expanded = settings.hudMenuOpen !== false;
@@ -169,7 +183,7 @@ export class WorldHud {
 
   makeSquareButton(x, y, onClick) {
     const { scene } = this;
-    const g = scene.add.graphics().setScrollFactor(0).setDepth(DEPTH);
+    const g = this.fixed(scene.add.graphics());
     const draw = (hover) => {
       g.clear();
       g.fillStyle(DARK, hover ? 0.95 : 0.8);
@@ -178,7 +192,7 @@ export class WorldHud {
       g.strokeRoundedRect(x + 1, y + 1, BTN - 2, BTN - 2, 9);
       drawIcon(g, 'menu', x + BTN / 2, y + BTN / 2);
     };
-    const zone = scene.add.zone(x + BTN / 2, y + BTN / 2, BTN, BTN).setScrollFactor(0).setInteractive({ useHandCursor: true });
+    const zone = this.fixed(scene.add.zone(x + BTN / 2, y + BTN / 2, BTN, BTN)).setInteractive({ useHandCursor: true });
     zone.on('pointerover', () => draw(true));
     zone.on('pointerout', () => draw(false));
     zone.on('pointerdown', (p, lx, ly, e) => {
@@ -192,8 +206,8 @@ export class WorldHud {
   // Nút tròn có biểu tượng, nhãn tên dạng viên thuốc chìa sang phải
   makeRoundButton(item, onClick) {
     const { scene } = this;
-    const g = scene.add.graphics().setScrollFactor(0).setDepth(DEPTH);
-    const label = scene.add.text(0, 0, item.label, textStyle(15, '#ffffff', { fontStyle: 'bold' })).setOrigin(0, 0.5).setScrollFactor(0).setDepth(DEPTH + 1);
+    const g = this.menuFixed(scene.add.graphics());
+    const label = this.menuFixed(scene.add.text(0, 0, item.label, textStyle(15, '#ffffff', { fontStyle: 'bold' })).setOrigin(0, 0.5));
     const btn = { item, g, label, zone: null, cx: 0, cy: 0, hover: false };
     btn.draw = (hover = btn.hover) => {
       btn.hover = hover;
@@ -216,7 +230,7 @@ export class WorldHud {
       label.setPosition(cx + ROUND + 10, cy);
       const w = pillW + ROUND;
       if (!btn.zone) {
-        btn.zone = scene.add.zone(cx - ROUND + w / 2, cy, w, ROUND * 2).setScrollFactor(0).setInteractive({ useHandCursor: true });
+        btn.zone = this.menuFixed(scene.add.zone(cx - ROUND + w / 2, cy, w, ROUND * 2)).setInteractive({ useHandCursor: true });
         btn.zone.on('pointerover', () => btn.draw(true));
         btn.zone.on('pointerout', () => btn.draw(false));
         btn.zone.on('pointerdown', (p, lx, ly, e) => {
@@ -232,21 +246,30 @@ export class WorldHud {
 
   // Màn hình đổi cỡ (chỉ đổi chiều ngang, game luôn cao 720): dời các phần bám mép phải
   relayout() {
-    const { width, height } = this.scene.scale;
+    const { width, height, s } = hudSize(this.scene);
     this.clock.setX(width - 16);
     this.clockIcon.setPosition(this.clock.x - this.clock.width + 12 + CLOCK_ICON / 2, this.clock.y + 6 + 11);
-    this.saveNote.setPosition(width / 2 + 60, height - 16);
+    this.saveNote.setPosition((width / 2 + 60) * s, (height - 16) * s);
     this.drawQuest();
   }
 
-  // Xếp cột nút tròn ngay trên nút ≡ / thanh phím tắt
+  // Xếp cột nút tròn ngay trên nút ≡ / thanh phím tắt (toạ độ màn hình: cột không phóng to, hàng nút ≡ thì có)
   layoutMenu() {
-    const bottom = this.scene.scale.height - 16 - BTN - 12 - ROUND;
+    const { s } = hudSize(this.scene);
+    const bottom = this.scene.scale.height - (16 + BTN + 12) * s - ROUND;
     this.buttons.forEach((b, i) => {
       b.cx = 16 + ROUND;
       b.cy = bottom - (this.buttons.length - 1 - i) * STEP;
       b.draw();
     });
+  }
+
+  // Huỷ hết (đổi cỡ giao diện: WorldScene tạo lại)
+  destroy() {
+    this.root.destroy();
+    this.menuRoot.destroy();
+    this.saveNote.destroy();
+    this.mapBanner?.destroy();
   }
 
   toggleMenu(open = !this.expanded, remember = true) {
@@ -308,7 +331,7 @@ export class WorldHud {
 
   // Vẽ khung nhiệm vụ góc phải dưới (thu gọn: chỉ dòng tiêu đề "NHIỆM VỤ ▲")
   drawQuest() {
-    const { width, height } = this.scene.scale;
+    const { width, height } = hudSize(this.scene);
     const open = this.questOpen;
     const w = (open ? Math.max(this.questText.width, this.questLabel.width + 30) : this.questLabel.width + 30) + 28;
     const h = open ? 21 + this.questText.height + 9 : 26;
@@ -331,13 +354,15 @@ export class WorldHud {
   showMapName(name) {
     const { scene } = this;
     this.mapBanner?.destroy();
+    const { s } = hudSize(scene);
     const t = scene.add
-      .text(scene.scale.width / 2, -50, name, textStyle(22, '#ffffff', { fontStyle: 'bold', backgroundColor: 'rgba(20,26,44,0.85)', padding: { x: 20, y: 9 } }))
+      .text(scene.scale.width / 2, -50 * s, name, textStyle(22, '#ffffff', { fontStyle: 'bold', backgroundColor: 'rgba(20,26,44,0.85)', padding: { x: 20, y: 9 } }))
       .setOrigin(0.5, 0)
+      .setScale(s)
       .setScrollFactor(0)
       .setDepth(DEPTH + 1);
     this.mapBanner = t;
-    scene.tweens.add({ targets: t, y: 24, duration: 300, ease: 'Back.out' });
+    scene.tweens.add({ targets: t, y: 24 * s, duration: 300, ease: 'Back.out' });
     scene.tweens.add({ targets: t, alpha: 0, delay: 2200, duration: 400, onComplete: () => t.destroy() });
   }
 
@@ -346,7 +371,7 @@ export class WorldHud {
   // nằm giữa màn hình, ngay trên hàng phím tắt / khung nhiệm vụ
   showSaveNote(text = 'Đã lưu game', warn = false) {
     const { scene } = this;
-    const { width, height } = scene.scale;
+    const { width, height, s } = hudSize(scene); // tính theo toạ độ ảo, đặt chỗ thì nhân hệ số
     const note = this.saveNote;
     scene.tweens.killTweensOf(note);
     note.setText(text).setBackgroundColor(warn ? 'rgba(170,50,50,0.9)' : 'rgba(30,110,70,0.85)').setAlpha(1);
@@ -356,11 +381,11 @@ export class WorldHud {
     note.setWordWrapWidth(Math.max(120, right - left - 24), true);
     const lines = note.getWrappedText(text).length;
     if (lines <= 2) {
-      note.setPosition((left + right) / 2, height - 16);
+      note.setPosition(((left + right) / 2) * s, (height - 16) * s);
     } else {
       note.setWordWrapWidth(NOTE_WRAP, true);
       const top = Math.min(height - 16 - 46, quest ? quest.y : height);
-      note.setPosition(width / 2, top - 10);
+      note.setPosition((width / 2) * s, (top - 10) * s);
     }
     scene.tweens.add({ targets: note, alpha: 0, delay: warn ? 6000 : Math.max(1200, text.length * 45), duration: 400 });
   }

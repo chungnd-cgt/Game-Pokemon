@@ -63,7 +63,7 @@ test('tắt game giữa trận: trainer thường tính là thua, thủ lĩnh / 
 test('Team Rocket: đứng hàng ngang trước cửa Poké Mart, thua cả hai trận thì bỏ lại gói hàng', () => {
   resetState();
   const rockets = STORY_NPCS.filter((n) => n.id.startsWith('rocket-pallet-'));
-  assert.deepEqual(rockets.map((r) => [r.map, r.x, r.y]), [['town1', 18, 16], ['town1', 19, 16], ['town1', 20, 16]], 'ở Thị trấn Lục Bình');
+  assert.deepEqual(rockets.map((r) => [r.map, r.x, r.y]), [['town1', 40, 16], ['town1', 41, 16], ['town1', 42, 16]], 'ở Thị trấn Lục Bình');
   assert.ok(rockets.some((r) => r.mon === 'meowth'));
   assert.ok(!STORY_NPCS.some((n) => n.id === 'rocket-boss'), 'không còn chỉ huy Rocket');
   const door = MAPS.town1.buildings.find((b) => b.to === 'mart').door;

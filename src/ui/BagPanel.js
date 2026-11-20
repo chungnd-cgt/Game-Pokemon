@@ -4,8 +4,8 @@ import { itemCount, state } from '../game/state.js';
 import { fitScale } from '../gfx/textures.js';
 import { ItemTip } from './BagParts.js';
 import { bagItems, pocketCounts, searchKey } from './bagSearch.js';
-import { closeButton, fitText, fixToCamera, localX, textStyle, uiX } from './helpers.js';
-import { directionOf, isCancel, isConfirm, isTyping } from './input.js';
+import { closeButton, fitText, fixToCamera, followCenter, localX, textStyle, uiX } from './helpers.js';
+import { directionOf, isCancel, isConfirm } from './input.js';
 import { HOTBAR_ACTIONS, keysFor, shortKeyName } from '../game/keybinds.js';
 
 // Màu khung túi đồ (tối, cùng tông thanh phím tắt / khung mô tả vật phẩm)
@@ -117,7 +117,10 @@ export class BagPanel {
     } else this.tip = opts.tipSide === null ? null : new ItemTip(scene, this.depth + 2);
     this.rebuild(true);
     // Trên bản đồ (cố định theo màn hình): dời vào giữa màn hình rộng
-    if (opts.fixed) fixToCamera(this.container).setX(uiX(scene));
+    if (opts.fixed) {
+      fixToCamera(this.container).setX(uiX(scene));
+      followCenter(scene, [this.container]);
+    }
   }
 
   // ---------- Vẽ ----------
@@ -210,9 +213,18 @@ export class BagPanel {
     const shown = this.query || 'Tìm vật phẩm';
     const text = scene.add.text(fx + 40, fy + 17, shown, textStyle(16, this.query ? '#ffffff' : '#6a7698')).setOrigin(0, 0.5);
     this.headLayer.add(text);
-    const caret = scene.add.rectangle(this.query ? text.x + text.width + 2 : text.x - 3, fy + 17, 2, 18, C.gold);
-    this.headLayer.add(caret);
-    this.caretTween = scene.tweens.add({ targets: caret, alpha: 0, duration: 450, yoyo: true, repeat: -1, ease: 'Stepped' });
+    // Mở túi không tự vào ô tìm kiếm: bấm / chạm vào ô mới gõ được (ô nhập HTML để điện thoại hiện bàn phím)
+    const field = scene.add.zone(fx, fy, fw - 36, 34).setOrigin(0).setInteractive({ useHandCursor: true });
+    field.on('pointerdown', (p, lx, ly, e) => {
+      e?.stopPropagation();
+      scene.time.delayedCall(0, () => !this.done && this.focusSearch({ x: fx, y: fy, w: fw }));
+    });
+    this.headLayer.add(field);
+    if (this.searchInput) {
+      const caret = scene.add.rectangle(this.query ? text.x + text.width + 2 : text.x - 3, fy + 17, 2, 18, C.gold);
+      this.headLayer.add(caret);
+      this.caretTween = scene.tweens.add({ targets: caret, alpha: 0, duration: 450, yoyo: true, repeat: -1, ease: 'Stepped' });
+    }
     if (this.query) {
       // nút xoá chữ tìm
       const clear = scene.add.text(fx + fw - 18, fy + 17, '✕', textStyle(15, '#8a96b8', { fontStyle: 'bold' })).setOrigin(0.5)
@@ -410,6 +422,49 @@ export class BagPanel {
     this.rebuild(fromMouse);
   }
 
+  // Bấm vào ô tìm kiếm: đặt ô nhập HTML trong suốt đè đúng chỗ ô (gõ được tiếng Việt, điện thoại hiện bàn phím).
+  // Enter / Esc / bấm ra chỗ khác thì thôi gõ (chữ đã gõ vẫn giữ)
+  focusSearch(field) {
+    if (this.searchInput) return this.searchInput.focus();
+    const { scene } = this;
+    const input = document.createElement('input');
+    input.type = 'search';
+    input.value = this.query;
+    input.maxLength = MAX_QUERY;
+    input.placeholder = 'Tìm vật phẩm';
+    input.autocomplete = 'off';
+    const place = () => {
+      const r = scene.game.canvas.getBoundingClientRect();
+      const k = r.width / scene.scale.width;
+      Object.assign(input.style, {
+        position: 'fixed', left: `${r.left + (uiX(scene) + field.x + 36) * k}px`, top: `${r.top + field.y * k}px`,
+        width: `${(field.w - 72) * k}px`, height: `${34 * k}px`, fontSize: `${16 * k}px`, zIndex: 30, boxSizing: 'border-box',
+        border: '0', outline: 'none', background: 'transparent', color: 'transparent', caretColor: 'transparent', padding: '0',
+      });
+    };
+    place();
+    input.addEventListener('input', () => this.setQuery(input.value));
+    input.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.isComposing) return;
+      if (e.key === 'Enter' || e.key === 'Escape') input.blur();
+    });
+    input.addEventListener('keyup', (e) => e.stopPropagation());
+    input.addEventListener('blur', () => this.blurSearch());
+    this.searchInput = input;
+    document.body.appendChild(input);
+    input.focus();
+    this.drawHead();
+  }
+
+  blurSearch() {
+    const input = this.searchInput;
+    if (!input) return;
+    this.searchInput = null;
+    input.remove();
+    if (!this.done) this.drawHead();
+  }
+
   setQuery(q) {
     const next = q.slice(0, MAX_QUERY);
     if (next === this.query) return;
@@ -457,13 +512,10 @@ export class BagPanel {
       this.setPocket(this.pocket + (e.code === 'PageUp' ? -1 : 1));
       return;
     }
-    if (e.code === 'Backspace' && this.query) {
-      this.setQuery(this.query.slice(0, -1));
-      return;
-    }
+
     // Phím gõ ra chữ dành cho ô tìm kiếm (Space khi chưa gõ gì vẫn là phím xác nhận nếu đã gán) — trừ phím của ô phím tắt
     const slot = this.opts.hotkey?.(e) ?? null;
-    const typing = isTyping(e) && !(e.code === 'Space' && !this.query) && slot === null;
+    const typing = false; // gõ chữ: chỉ khi đã bấm vào ô tìm kiếm (ô nhập HTML nhận phím, xem focusSearch)
     const dir = typing ? null : directionOf(e);
     const confirm = !typing && isConfirm(e);
     // Ô đang chọn bị bỏ sáng (chuột vừa rời đi): phím hướng / xác nhận đầu tiên chỉ hiện lại con trỏ ở đó
@@ -522,7 +574,7 @@ export class BagPanel {
     const press = this.press;
     if (!press || !p.isDown || this.done) return;
     if (!this.drag) {
-      if (!this.opts.hotbar || Math.hypot(p.x - press.x, p.y - press.y) < DRAG_START) return;
+      if (!(this.opts.hotbar || this.opts.party) || Math.hypot(p.x - press.x, p.y - press.y) < DRAG_START) return;
       const id = this.list[press.i];
       const icon = ITEMS[id].icon;
       const ghost = this.scene.add.container(p.x, p.y).setDepth(this.depth + 6);
@@ -532,7 +584,8 @@ export class BagPanel {
       this.tip?.hide();
     }
     this.drag.ghost.setPosition(p.x, p.y);
-    this.opts.hotbar.highlight(this.opts.hotbar.slotAt(p.x, p.y));
+    this.opts.hotbar?.highlight(this.opts.hotbar.slotAt(p.x, p.y));
+    this.opts.party?.highlight(this.opts.party.slotAt(p.x, p.y));
   }
 
   dragEnd(p) {
@@ -550,12 +603,17 @@ export class BagPanel {
     ghost.destroy();
     this.cells[press.i]?.cell.setAlpha(1);
     const hotbar = this.opts.hotbar;
-    const slot = hotbar.slotAt(p.x, p.y);
-    hotbar.highlight(-1);
+    const slot = hotbar ? hotbar.slotAt(p.x, p.y) : -1;
+    hotbar?.highlight(-1);
+    const mon = this.opts.party ? this.opts.party.slotAt(p.x, p.y) : -1;
+    this.opts.party?.highlight(-1);
     if (slot >= 0) {
       this.opts.onAssign?.(slot, id);
       this.drawGrid();
       this.layout();
+    } else if (mon >= 0) {
+      // Thả vào Pokémon ở cột đội hình: cho cầm (đóng túi, màn hình gọi lo hỏi đổi đồ đang cầm...)
+      this.finish({ give: mon, id });
     }
   }
 
@@ -568,6 +626,8 @@ export class BagPanel {
     scene.input.off('pointermove', this.onMove);
     scene.input.off('pointerup', this.onUp);
     scene.input.keyboard?.removeCapture('TAB');
+    this.searchInput?.remove();
+    this.searchInput = null;
     this.drag?.ghost.destroy();
     this.opts.hotbar?.highlight(-1);
     this.caretTween?.remove();

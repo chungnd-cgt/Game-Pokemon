@@ -2,12 +2,12 @@ import { BADGES, BADGE_COUNT } from '../data/badges.js';
 import { formatMoney } from '../data/items.js';
 import { DEX } from '../data/pokedex.js';
 import { playerName, state } from '../game/state.js';
-import { closeButton, textStyle } from './helpers.js';
+import { closeButton, followCenter, textStyle } from './helpers.js';
 import { isCancel } from './input.js';
 import { matches } from '../game/keybinds.js';
 
 const W = 640;
-const H = 380;
+const FULL_H = 380;
 const PANEL = 0x262c3e;
 const INNER = 0x1c2131;
 const LINE = 0x3e4660;
@@ -42,9 +42,12 @@ export function drawCardIcon(g, cx, cy, s = 1) {
 
 // Thẻ Huấn luyện viên (phím T / nút Thẻ HLV): tên, thời gian chơi, ngày bắt đầu, tổng số Pokémon, Pokédex, số lần vô địch,
 // hình nhân vật trên bục, 8 ô huy hiệu (chưa có thì bóng đen, rê chuột xem tên), tiền. Đóng: Esc / X / T / bấm ✕ hoặc ra ngoài.
-// playerKey: texture nhân vật đang dùng (WorldScene.playerTexture)
-export function showTrainerCard(scene, router, playerKey) {
+// playerKey: texture nhân vật đang dùng (WorldScene.playerTexture).
+// other: thẻ của người chơi khác (meta trong online/presence.js): chỉ tên, thời gian chơi, ngày bắt đầu và hình nhân vật;
+// không có huy hiệu, tiền, Pokédex, số Pokémon (người khác xem thẻ của mình cũng vậy)
+export function showTrainerCard(scene, router, playerKey, { other = null } = {}) {
   const { width, height } = scene.scale;
+  const H = other ? 230 : FULL_H;
   const x0 = Math.round(width / 2 - W / 2);
   const y0 = Math.round(height / 2 - H / 2) - 20;
   const c = scene.add.container(0, 0).setDepth(130);
@@ -73,7 +76,11 @@ export function showTrainerCard(scene, router, playerKey) {
   g.fillRoundedRect(x0 + 16, y0 + 64, infoW, 150, 10);
   const party = state.party.length;
   const boxed = state.storage.filter(Boolean).length;
-  const rows = [
+  const rows = other ? [
+    ['Tên', other.name || 'Người chơi'],
+    ['Thời gian chơi', playTime(other.playTime ?? 0)],
+    ['Ngày bắt đầu', dateText(other.startedAt)],
+  ] : [
     ['Tên', playerName()],
     ['Thời gian chơi', playTime(state.playTime ?? 0)],
     ['Ngày bắt đầu', dateText(state.startedAt)],
@@ -95,38 +102,42 @@ export function showTrainerCard(scene, router, playerKey) {
   g.fillEllipse(px, y0 + 192, 104, 20);
   if (playerKey && scene.textures.exists(playerKey)) add(scene.add.image(px, y0 + 194, playerKey, 'down-stand').setOrigin(0.5, 1).setScale(1.7));
 
-  // cột tiền bên phải
-  const rx = x0 + W - 124;
-  g.fillStyle(INNER);
-  g.fillRoundedRect(rx, y0 + 64, 108, 150, 10);
-  add(scene.add.text(rx + 12, y0 + 76, 'Tiền', textStyle(15, LABEL, { fontStyle: 'bold' })));
-  add(scene.add.text(rx + 12, y0 + 98, formatMoney(state.money), textStyle(17, '#ffd860', { fontStyle: 'bold' })));
-  add(scene.add.text(rx + 12, y0 + 132, 'Huy hiệu', textStyle(15, LABEL, { fontStyle: 'bold' })));
-  add(scene.add.text(rx + 12, y0 + 154, `${state.badges.size} / ${BADGE_COUNT}`, textStyle(17, VALUE, { fontStyle: 'bold' })));
+  // Thẻ của mình: thêm tiền, số huy hiệu và khung huy hiệu
+  if (!other) {
+    // cột tiền bên phải
+    const rx = x0 + W - 124;
+    g.fillStyle(INNER);
+    g.fillRoundedRect(rx, y0 + 64, 108, 150, 10);
+    add(scene.add.text(rx + 12, y0 + 76, 'Tiền', textStyle(15, LABEL, { fontStyle: 'bold' })));
+    add(scene.add.text(rx + 12, y0 + 98, formatMoney(state.money), textStyle(17, '#ffd860', { fontStyle: 'bold' })));
+    add(scene.add.text(rx + 12, y0 + 132, 'Huy hiệu', textStyle(15, LABEL, { fontStyle: 'bold' })));
+    add(scene.add.text(rx + 12, y0 + 154, `${state.badges.size} / ${BADGE_COUNT}`, textStyle(17, VALUE, { fontStyle: 'bold' })));
 
-  // khung huy hiệu
-  const by = y0 + 226;
-  g.fillStyle(INNER);
-  g.fillRoundedRect(x0 + 16, by, W - 32, 138, 10);
-  add(scene.add.text(x0 + 30, by + 10, 'HUY HIỆU', textStyle(15, '#8a94b0', { fontStyle: 'bold' })));
-  const tip = scene.add.text(0, 0, '', textStyle(14, '#ffffff', { fontStyle: 'bold', backgroundColor: 'rgba(10,14,26,0.95)', padding: { x: 8, y: 4 } }))
-    .setOrigin(0.5, 1).setVisible(false);
-  const step = (W - 32 - 40) / BADGE_COUNT;
-  BADGES.forEach((badge, i) => {
-    const cx = x0 + 16 + 20 + step * i + step / 2;
-    const cy = by + 82;
-    const owned = state.badges.has(badge.id);
-    g.fillStyle(0xffffff, owned ? 0.12 : 0.05);
-    g.fillCircle(cx, cy, 26);
-    const icon = add(scene.add.image(cx, cy, `badge-${badge.id}`).setScale(1.5));
-    if (!owned) icon.setTintFill(0x080a12).setAlpha(0.75);
-    const zone = add(scene.add.zone(cx, cy, 54, 54).setInteractive());
-    zone.on('pointerover', () => tip.setText(owned ? `${badge.name} • ${badge.town}` : '???').setPosition(cx, cy - 30).setVisible(true));
-    zone.on('pointerout', () => tip.setVisible(false));
-  });
-  add(tip);
+    // khung huy hiệu
+    const by = y0 + 226;
+    g.fillStyle(INNER);
+    g.fillRoundedRect(x0 + 16, by, W - 32, 138, 10);
+    add(scene.add.text(x0 + 30, by + 10, 'HUY HIỆU', textStyle(15, '#8a94b0', { fontStyle: 'bold' })));
+    const tip = scene.add.text(0, 0, '', textStyle(14, '#ffffff', { fontStyle: 'bold', backgroundColor: 'rgba(10,14,26,0.95)', padding: { x: 8, y: 4 } }))
+      .setOrigin(0.5, 1).setVisible(false);
+    const step = (W - 32 - 40) / BADGE_COUNT;
+    BADGES.forEach((badge, i) => {
+      const cx = x0 + 16 + 20 + step * i + step / 2;
+      const cy = by + 82;
+      const owned = state.badges.has(badge.id);
+      g.fillStyle(0xffffff, owned ? 0.12 : 0.05);
+      g.fillCircle(cx, cy, 26);
+      const icon = add(scene.add.image(cx, cy, `badge-${badge.id}`).setScale(1.5));
+      if (!owned) icon.setTintFill(0x080a12).setAlpha(0.75);
+      const zone = add(scene.add.zone(cx, cy, 54, 54).setInteractive());
+      zone.on('pointerover', () => tip.setText(owned ? `${badge.name} • ${badge.town}` : '???').setPosition(cx, cy - 30).setVisible(true));
+      zone.on('pointerout', () => tip.setVisible(false));
+    });
+    add(tip);
+  }
   c.setScrollFactor(0);
   c.list.forEach((o) => o.setScrollFactor?.(0));
+  followCenter(scene, [c]); // màn hình đổi cỡ lúc đang xem: dời theo giữa màn hình
 
   return new Promise((resolve) => {
     const openedAt = performance.now();

@@ -85,9 +85,22 @@ export const NPCS = [
       'Có Pokémon biết lướt nước thì đi ngược dòng sông được. Nghe nói giữa sông có bãi bồi lắm đồ hay!',
     ],
   },
+  // (Nhân viên Poké Mart chặn cửa Hang Thạch Nhũ: NPC cốt truyện, xem story/chapter1.js 't1-clerk')
+  {
+    id: 't1-miner', sprite: 'npc-hiker', name: 'Bác thợ mỏ', map: 'town1', x: 29, y: 7, facing: 'left', fixed: true,
+    lines: ['Hang Thạch Nhũ ngay sau lưng bác đây. Trong hang tối lắm, Zubat bay khắp nơi.', 'Nhớ mang theo Repel nha cháu!'],
+  },
   {
     id: 't1-boy', sprite: 'npc-boy', name: 'Cậu bé', map: 'town1', x: 25, y: 11, facing: 'left', wander: 1,
-    lines: ['Hang Thạch Nhũ ở dưới vách đá phía đông bắc đó.', 'Trong hang tối lắm, Zubat bay khắp nơi. Nhớ mang theo Repel nha!'],
+    lines: ['Pokémon Center với Poké Mart ở khu phía đông thị trấn đó, cứ đi thẳng đường lớn là tới!'],
+  },
+  {
+    id: 't1-oldman', sprite: 'npc-oldman', name: 'Ông lão', map: 'town1', x: 36, y: 10, facing: 'down', wander: 1,
+    lines: ['Hồi trẻ ta cũng đi khắp vùng Sơn Thủy thu phục Pokémon đấy.', 'Pokémon mệt thì cứ vào Pokémon Center, y tá Joy chữa miễn phí!'],
+  },
+  {
+    id: 't1-girl', sprite: 'npc-girl', name: 'Bé Thu', map: 'town1', x: 44, y: 11, facing: 'left', wander: 1,
+    lines: ['Mẹ em làm ở Poké Mart đó!', 'Nghe nói mấy hôm trước có bọn mặc đồ đen chữ R lảng vảng quanh đây... Em sợ lắm!'],
   },
   // Sông Lục Bình: ông câu cá trên bãi bồi phía bắc
   {
@@ -207,6 +220,14 @@ for (const joy of NPCS.filter((n) => n.role === 'nurse')) {
   NPCS.push({
     id: `chansey-${joy.map}`, mon: 'chansey', name: 'Chansey', map: joy.map, x: joy.x + 1, y: joy.y, facing: 'down', fixed: true,
     lines: CHANSEY_LINES[NPCS.length % CHANSEY_LINES.length],
+  });
+}
+
+// Quầy giao dịch ở mọi Pokémon Center (bên phải quầy): giao dịch với người chơi khác, cần 4 huy hiệu (scenes/worldTrade.js)
+for (const joy of NPCS.filter((n) => n.role === 'nurse' && n.map !== 'leagueLobby')) {
+  NPCS.push({
+    id: `trade-${joy.map}`, sprite: 'npc-guide', name: 'Quầy giao dịch', map: joy.map, x: 10, y: 2, facing: 'down', fixed: true,
+    role: 'trade',
   });
 }
 

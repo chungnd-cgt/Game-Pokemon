@@ -9,9 +9,14 @@ export const isTyping = (e) => typeof e.key === 'string' && e.key.length === 1 &
 
 // Các phím đang giữ (theo e.code), để đi liên tục khi giữ phím hướng. Không dùng đối tượng phím của Phaser (gắn theo
 // keyCode) vì bộ gõ tiếng Việt đổi keyCode của vài chữ cái (S, W...) và vì phím hướng đổi được trong Cài đặt
+// Máy có màn hình cảm ứng làm cách nhập chính (điện thoại, máy tính bảng)
+export const isTouchDevice = () => window.matchMedia?.('(pointer: coarse)').matches ?? false;
+
+// Phím hướng / hành động đang giữ. virtual: hướng đang giữ trên cần gạt (ui/Joystick.js), tính như đang giữ phím hướng đó
 export class HeldKeys {
   constructor(scene) {
     this.down = new Set();
+    this.virtual = null;
     const kb = scene.input.keyboard;
     const press = (e) => e.code && this.down.add(e.code);
     const release = (e) => this.down.delete(e.code);
@@ -28,12 +33,14 @@ export class HeldKeys {
 
   // Đang giữ phím nào của hành động id
   isDown(id) {
+    if (this.virtual === id) return true;
     for (const code of this.down) if (matches({ code }, id)) return true;
     return false;
   }
 
   reset() {
     this.down.clear();
+    this.virtual = null;
   }
 }
 

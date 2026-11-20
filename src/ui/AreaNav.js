@@ -4,7 +4,7 @@ import { setSetting, settings } from '../game/settings.js';
 import { dexStatus, state } from '../game/state.js';
 import { fitScale, pixelMon } from '../gfx/textures.js';
 import { areaLabel, areaSpecies } from './areaSpecies.js';
-import { fixToCamera, textStyle } from './helpers.js';
+import { fixToCamera, hudScale, hudSize, textStyle } from './helpers.js';
 
 const DEPTH = 100;
 const WIDTH = 256; // 5 ô Pokémon + cột nút thu gọn ▶ bên phải
@@ -23,6 +23,7 @@ const SLIDE_MS = 220;
 // Chưa gặp: bóng đen "?"; đã gặp: hiện hình; đã bắt: hiện hình + Poké Ball nhỏ góc dưới phải. Bấm vào Pokémon để mở đúng trang Pokédex.
 // Loài chỉ xuất hiện vào một buổi có biểu tượng buổi đó ở góc (☀ ngày, ◐ chạng vạng, ☾ đêm), ngoài buổi đó thì mờ đi.
 // Thu gọn thì trượt vào mép phải, chỉ chừa một tab nhỏ; bấm tab để mở lại.
+// Cỡ giao diện (helpers.js hudScale): vẽ theo toạ độ ảo, container phóng to theo hệ số
 // info: { title, sections: [{ label, tables: [id bảng gặp], dim }] } hoặc null (không có Pokémon hoang dã)
 
 export class AreaNav {
@@ -44,7 +45,7 @@ export class AreaNav {
     this.info = info;
     // Vẽ lại khi Pokédex có thêm loài đã gặp / đã bắt
     const caught = `${state.dex.seen.size}/${state.dex.caught.size}`;
-    const key = info ? `${this.open}|${caught}|${timeOfDay()}|${info.title}|${info.sections.map((s) => `${s.tables.join('+')}${s.dim}`).join()}` : 'none';
+    const key = info ? `${this.open}|${caught}|${timeOfDay()}|${info.title}|${info.sections.map((s) => `${s.tables.join('+')}${s.dim}`).join()}|${hudScale(this.scene)}` : 'none';
     if (key === this.key || this.sliding) return;
     this.key = key;
     this.render();
@@ -98,12 +99,12 @@ export class AreaNav {
     this.unhover = null;
     if (!this.info) return;
     const { scene } = this;
-    const { width } = scene.scale;
-    const c = scene.add.container(0, TOP).setDepth(DEPTH).setVisible(this.visible);
+    const { width, s } = hudSize(scene);
+    const c = scene.add.container(0, TOP * s).setDepth(DEPTH).setVisible(this.visible).setScale(s);
     this.container = c;
     if (this.open) this.renderPanel(c);
     else this.renderTab(c);
-    c.x = this.open ? width - 16 - WIDTH : width - TAB_W;
+    c.x = (this.open ? width - 16 - WIDTH : width - TAB_W) * s;
     fixToCamera(c);
   }
 
@@ -237,8 +238,10 @@ export class AreaNav {
     const t = scene.add.text(0, y, label, textStyle(13, '#ffffff', {
       fontStyle: 'bold', backgroundColor: 'rgba(10,14,26,0.94)', padding: { x: 8, y: 4 },
     })).setOrigin(0.5, 0).setScrollFactor(0);
-    const left = 8 - c.x + t.width / 2;
-    const right = scene.scale.width - 8 - c.x - t.width / 2;
+    // Toạ độ trong container (đã phóng theo cỡ giao diện)
+    const s = hudScale(scene);
+    const left = (8 - c.x) / s + t.width / 2;
+    const right = (scene.scale.width - 8 - c.x) / s - t.width / 2;
     t.setX(Math.max(left, Math.min(right, cx)));
     c.add(t);
     this.tip = t;

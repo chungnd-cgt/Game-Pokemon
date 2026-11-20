@@ -9,7 +9,7 @@ import { TYPES } from '../data/types.js';
 import { BOX_SLOTS, boxCount, monAt, moveMon, releaseMon, releaseProblem } from '../game/storage.js';
 import { PARTY_SIZE, state } from '../game/state.js';
 import { fitScale, pixelMon } from '../gfx/textures.js';
-import { GENDER, closeButton, cssColor, drawHpBar, drawPanel, fitText, fixToCamera, hpColor, hpLabel, localX, monTag, textStyle, uiX } from './helpers.js';
+import { GENDER, closeButton, cssColor, drawHpBar, drawPanel, fitText, fixToCamera, followCenter, hpColor, hpLabel, localX, monTag, textStyle, uiX } from './helpers.js';
 import { directionOf, isCancel, isConfirm } from './input.js';
 import { typeBadges } from './TypeBadge.js';
 import { shinyGap, shinyMark } from './shinyMark.js';
@@ -60,6 +60,7 @@ export class PcBox {
     this.buildBase();
     // Cố định theo màn hình, dời vào giữa màn hình rộng
     for (const o of [this.container, this.content, this.cursorG, this.info]) fixToCamera(o).setX(uiX(scene));
+    followCenter(scene, [this.container, this.content, this.cursorG, this.info]);
     this.render();
   }
 

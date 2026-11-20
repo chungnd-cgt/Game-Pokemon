@@ -22,9 +22,8 @@ export function clearLinkError() {
   history.replaceState(null, '', location.pathname);
 }
 
-// "Ghi nhớ đăng nhập" (bảng đăng nhập, mặc định bật): phiên đăng nhập lưu trong localStorage, mở lại game là vào luôn.
-// Tắt thì lưu trong sessionStorage: đóng tab / trình duyệt là phải đăng nhập lại
-const REMEMBER_KEY = 'pokemon-demo-remember';
+// Phiên đăng nhập chỉ cất trong sessionStorage: đóng tab / trình duyệt rồi mở lại game là phải đăng nhập lại (tải lại trang
+// trong cùng tab thì vẫn còn, văng game bấm F5 không phải đăng nhập). Chỉ nhớ email lần trước để điền sẵn
 const EMAIL_KEY = 'pokemon-demo-last-email';
 const safe = (fn, fallback = null) => {
   try {
@@ -33,28 +32,21 @@ const safe = (fn, fallback = null) => {
     return fallback; // trình duyệt chặn localStorage / sessionStorage
   }
 };
-export const rememberLogin = () => safe(() => localStorage.getItem(REMEMBER_KEY) !== '0', true);
-export function setRememberLogin(on) {
-  safe(() => localStorage.setItem(REMEMBER_KEY, on ? '1' : '0'));
-}
-// Email đăng nhập lần trước (điền sẵn khi Ghi nhớ đăng nhập đang bật)
-export const lastEmail = () => (rememberLogin() ? safe(() => localStorage.getItem(EMAIL_KEY) ?? '', '') : '');
+export const lastEmail = () => safe(() => localStorage.getItem(EMAIL_KEY) ?? '', '');
 export function setLastEmail(email) {
-  safe(() => (rememberLogin() && email ? localStorage.setItem(EMAIL_KEY, email) : localStorage.removeItem(EMAIL_KEY)));
+  safe(() => (email ? localStorage.setItem(EMAIL_KEY, email) : localStorage.removeItem(EMAIL_KEY)));
 }
 
-// Chỗ supabase-js cất phiên đăng nhập: theo Ghi nhớ đăng nhập, xoá bản ở chỗ còn lại để không sót phiên cũ
+// Bản cũ có "Ghi nhớ đăng nhập" cất phiên trong localStorage: xoá đi để lần mở này cũng phải đăng nhập lại
+safe(() => {
+  localStorage.removeItem('pokemon-demo-remember');
+  for (const k of Object.keys(localStorage)) if (/^sb-.*-auth-token/.test(k)) localStorage.removeItem(k);
+});
+
 const sessionStore = {
-  getItem: (k) => safe(() => localStorage.getItem(k) ?? sessionStorage.getItem(k)),
-  setItem: (k, v) => safe(() => {
-    const [keep, drop] = rememberLogin() ? [localStorage, sessionStorage] : [sessionStorage, localStorage];
-    keep.setItem(k, v);
-    drop.removeItem(k);
-  }),
-  removeItem: (k) => safe(() => {
-    localStorage.removeItem(k);
-    sessionStorage.removeItem(k);
-  }),
+  getItem: (k) => safe(() => sessionStorage.getItem(k)),
+  setItem: (k, v) => safe(() => sessionStorage.setItem(k, v)),
+  removeItem: (k) => safe(() => sessionStorage.removeItem(k)),
 };
 
 export const supabase = URL && KEY

@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { ITEMS } from '../data/items.js';
 import { fitScale, pixelMon } from '../gfx/textures.js';
-import { COLORS, GENDER, closeButton, cssColor, drawHpBar, drawPanel, fitText, fixToCamera, hpLabel, localX, monTag, shade, textStyle, uiX } from './helpers.js';
+import { COLORS, GENDER, closeButton, cssColor, drawHpBar, drawPanel, fitText, fixToCamera, followCenter, hpLabel, localX, monTag, shade, textStyle, uiX } from './helpers.js';
 import { directionOf, isCancel, isConfirm } from './input.js';
 import { withShinyMark } from './shinyMark.js';
 
@@ -130,7 +130,10 @@ export class Menu {
     this.index = -1;
     this.select(Phaser.Math.Clamp(opts.index ?? 0, 0, items.length - 1));
     // Trên bản đồ (cố định theo màn hình): dời vào giữa màn hình rộng
-    if (opts.fixed) fixToCamera(this.container).setX(uiX(scene));
+    if (opts.fixed) {
+      fixToCamera(this.container).setX(uiX(scene));
+      followCenter(scene, [this.container]);
+    }
   }
 
   renderContent(cell, item, w, h) {

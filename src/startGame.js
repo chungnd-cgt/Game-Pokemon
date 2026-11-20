@@ -3,6 +3,7 @@ import '@fontsource/nunito/800.css';
 import Phaser from 'phaser';
 import { applyFpsLimit, applyResolution, gameSizeFor, watchResolution } from './game/display.js';
 import { state } from './game/state.js';
+import { installErrorLog } from './online/errorLog.js';
 import BattleScene from './scenes/BattleScene.js';
 import BootScene from './scenes/BootScene.js';
 import MartScene from './scenes/MartScene.js';
@@ -11,7 +12,6 @@ import RegionMapScene from './scenes/RegionMapScene.js';
 import SummaryScene from './scenes/SummaryScene.js';
 import TitleScene from './scenes/TitleScene.js';
 import WorldScene from './scenes/WorldScene.js';
-import { initTouchControls } from './ui/TouchControls.js';
 import './cheats/chung.js'; // cheat tên "Chung" (gỡ: xoá dòng này + file src/cheats/chung.js)
 
 // Khởi động game Phaser (gọi từ main.js)
@@ -39,13 +39,19 @@ export async function startGame() {
     scene: [BootScene, TitleScene, WorldScene, BattleScene, PokedexScene, MartScene, SummaryScene, RegionMapScene],
   });
 
-  // Giới hạn FPS và độ phân giải đã chọn trong Cài đặt → Đồ hoạ; nút cảm ứng cho điện thoại (Cài đặt → Điều khiển)
+  // Lỗi JavaScript của người chơi gửi lên Supabase (supabase/errors.sql), kèm cảnh / bản đồ đang chơi
+  installErrorLog(() => ({
+    scenes: game.scene.getScenes(true).map((s) => s.scene.key).join(','),
+    map: game.scene.getScene('World')?.map?.id ?? null,
+    game: game.scale.width + 'x' + game.scale.height,
+  }));
+
+  // Giới hạn FPS và độ phân giải đã chọn trong Cài đặt → Đồ hoạ
   game.events.once(Phaser.Core.Events.READY, () => {
     applyFpsLimit(game);
     applyResolution(game);
     watchResolution(game);
   });
-  initTouchControls();
 
   // Đếm thời gian chơi theo đồng hồ thật (cả lúc đánh trận, mua sắm), trừ lúc ở màn hình chính
   let lastTick = performance.now();

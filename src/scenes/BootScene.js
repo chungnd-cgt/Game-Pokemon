@@ -4,6 +4,7 @@ import ballUrl from '../assets/ui/pokeball.svg?url';
 import ultraBallUrl from '../assets/ui/ultraball.svg?url';
 import { ITEMS } from '../data/items.js';
 import { loadAllMonImages, loadMonImages } from '../gfx/monImages.js';
+import { addCanvasTexture, trimTransparent } from '../gfx/pixel.js';
 import { generateTextures } from '../gfx/textures.js';
 import { hideLoading, setLoading } from '../ui/loading.js';
 import { TITLE_MONS } from './TitleScene.js';
@@ -39,7 +40,14 @@ export default class BootScene extends Phaser.Scene {
 
   async create() {
     for (const key of this.pngKeys) {
-      if (this.textures.exists(key)) this.textures.get(key).setFilter(Phaser.Textures.FilterMode.NEAREST);
+      if (!this.textures.exists(key)) continue;
+      // Cắt bỏ viền trong suốt thừa (không thì con Pokémon bé tí trong ô, gfx/pixel.js: trimTransparent)
+      const cut = trimTransparent(this.textures.get(key).getSourceImage());
+      if (cut) addCanvasTexture(this, key, cut);
+      // Sprite pixel nhỏ: giữ nét pixel khi phóng to; ảnh lớn (vd 600px) thu nhỏ nhiều thì làm mịn cho khỏi răng cưa
+      const img = this.textures.get(key).getSourceImage();
+      const big = Math.max(img.width, img.height) > 160;
+      this.textures.get(key).setFilter(big ? Phaser.Textures.FilterMode.LINEAR : Phaser.Textures.FilterMode.NEAREST);
     }
     // Sprite PNG thật thì không chuyển sang pixel nữa (xem pixelMon)
     this.registry.set('pngSprites', this.pngKeys);

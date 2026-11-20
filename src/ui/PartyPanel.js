@@ -3,7 +3,7 @@ import { ITEMS } from '../data/items.js';
 import { expProgress } from '../game/monster.js';
 import { state } from '../game/state.js';
 import { fitScale, pixelMon } from '../gfx/textures.js';
-import { GENDER, cssColor, fitText, fixToCamera, hpColor, textStyle } from './helpers.js';
+import { GENDER, cssColor, fitText, fixToCamera, hpColor, hudScale, textStyle } from './helpers.js';
 import { withShinyMark } from './shinyMark.js';
 
 const DEPTH = 100;
@@ -20,6 +20,7 @@ const DRAG_START = 8; // kéo quá chừng này px mới tính là kéo thả (�
 // bọc quanh** (xanh / vàng / đỏ, tụt dần theo máu), ký hiệu giới tính + cấp dưới chân dung; bên phải là tên (chữ S vàng nếu
 // shiny), thanh HP và thanh EXP mảnh; đồ đang cầm hiện icon nhỏ góc phải, trạng thái xấu là viên màu cạnh tên; kiệt sức thì
 // cả hàng xám đi. Rê chuột: sáng viền, hiện % HP. Bấm: mở thẳng màn chi tiết Pokémon. Kéo thả hàng này lên hàng khác: đổi chỗ.
+// Cỡ giao diện (helpers.js hudScale): vẽ theo toạ độ ảo, container phóng to theo hệ số
 export class PartyPanel {
   // top: mép trên • onPick(index): bấm vào Pokémon thứ index • onSwap(a, b): kéo ô a thả lên ô b
   constructor(scene, top, onPick, onSwap) {
@@ -44,7 +45,7 @@ export class PartyPanel {
   }
 
   update() {
-    const key = state.party.map((m) => `${m.uid}:${m.speciesId}:${m.hp}/${m.maxHp}:${m.level}:${m.exp}:${m.status}:${m.shiny}:${m.name}:${m.heldItem}`).join("|");
+    const key = state.party.map((m) => `${m.uid}:${m.speciesId}:${m.hp}/${m.maxHp}:${m.level}:${m.exp}:${m.status}:${m.shiny}:${m.name}:${m.heldItem}`).join("|") + `|${hudScale(this.scene)}`;
     if (key === this.key) return;
     this.key = key;
     this.render();
@@ -60,12 +61,16 @@ export class PartyPanel {
     }
   }
 
-  // Tâm chân dung của hàng thứ i (toạ độ màn hình); hàng bắt đầu từ x = 16
+  // Tâm chân dung của hàng thứ i (toạ độ ảo, xem helpers.js hudSize); hàng bắt đầu từ x = 16
   center(i) {
     return { x: 16 + ROW_H / 2, y: this.top + ROW_H / 2 + i * STEP };
   }
 
+  // Hàng dưới điểm (px, py) trên màn hình, hoặc -1
   slotAt(px, py) {
+    const s = hudScale(this.scene);
+    px /= s;
+    py /= s;
     for (let i = 0; i < state.party.length; i++) {
       const { y } = this.center(i);
       if (px >= 12 && px <= 16 + ROW_W + 4 && Math.abs(py - y) <= ROW_H / 2 + 3) return i;
@@ -88,7 +93,7 @@ export class PartyPanel {
       fontStyle: 'bold', backgroundColor: 'rgba(20,26,44,0.92)', padding: { x: 10, y: 5 }, lineSpacing: 2,
     })).setOrigin(0, 0.5).setVisible(false);
     c.add(this.tip);
-    fixToCamera(c);
+    fixToCamera(c).setScale(hudScale(scene));
   }
 
   slot(c, mon, i) {
@@ -204,7 +209,7 @@ export class PartyPanel {
       if (state.party.length < 2 || Math.hypot(p.x - press.x, p.y - press.y) < DRAG_START) return;
       const mon = state.party[press.i];
       const key = pixelMon(this.scene, mon.speciesId, '', 28, mon.shiny);
-      press.ghost = this.scene.add.image(p.x, p.y, key).setScrollFactor(0).setDepth(DEPTH + 20).setScale(fitScale(this.scene, key, ICON + 6)).setAlpha(0.9);
+      press.ghost = this.scene.add.image(p.x, p.y, key).setScrollFactor(0).setDepth(DEPTH + 20).setScale(fitScale(this.scene, key, ICON + 6) * hudScale(this.scene)).setAlpha(0.9);
       this.slots[press.i]?.icon.setAlpha(0.25);
       this.tip?.setVisible(false);
     }

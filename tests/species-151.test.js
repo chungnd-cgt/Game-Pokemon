@@ -28,7 +28,9 @@ test('đủ 151 loài: mọi Pokémon trong Pokédex đều chơi được', () 
     assert.ok(sp.abilities.normal.length, `${sp.id}: không có đặc tính`);
     for (const e of sp.evolution ?? []) {
       assert.ok(SPECIES[e.to], `${sp.id} -> ${e.to}`);
-      assert.ok(e.item ? ITEMS[e.item]?.kind === 'evolution' : Number.isInteger(e.level), `${sp.id} -> ${e.to}: thiếu cấp / đá tiến hoá`);
+      // Theo cấp, theo đá, hoặc khi trao đổi (kèm npcLevel: cấp nhà huấn luyện đấu lại có sẵn dạng tiến hoá)
+      const valid = e.item ? ITEMS[e.item]?.kind === 'evolution' : e.trade ? Number.isInteger(e.npcLevel) : Number.isInteger(e.level);
+      assert.ok(valid, `${sp.id} -> ${e.to}: thiếu cấp / đá tiến hoá / cách trao đổi`);
     }
   }
 });

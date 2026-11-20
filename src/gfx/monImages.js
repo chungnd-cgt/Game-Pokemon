@@ -1,3 +1,5 @@
+import MON_KEYS from 'virtual:mon-svg-keys';
+
 // Hình Pokémon dạng SVG (src/assets/pokemon-svg/<loài>[-back|-side].svg), nạp ngầm sau khi game đã hiện màn hình chính.
 // Ảnh chỉ giữ ở dạng <img> trong bộ nhớ, KHÔNG đưa lên GPU: game không bao giờ vẽ thẳng ảnh gốc 256px mà luôn thu nhỏ
 // thành sprite kiểu GBA (gfx/textures.js: pixelMon), lúc đó mới vẽ ảnh ra pixel. Trước kia nạp cả 453 ảnh bằng loader của
@@ -8,10 +10,11 @@
 export const SVG_SIZE = 256;
 const CONCURRENT = 24; // số ảnh nạp cùng lúc (nạp ồ ạt cả trăm ảnh một lúc làm điện thoại giật / tốn bộ nhớ)
 
-const URLS = Object.fromEntries(
-  Object.entries(import.meta.glob('../assets/pokemon-svg/*.svg', { eager: true, query: '?url', import: 'default' }))
-    .map(([path, url]) => [`mon-${path.split('/').pop().replace('.svg', '')}`, url]),
-);
+// Tên mọi hình có SVG (MON_KEYS, nạp ngay); chữ SVG của cả 453 hình gộp trong MỘT file tải ngầm một lần (vite.config.js: monSvgPack)
+
+const URLS = Object.fromEntries(MON_KEYS.map((k) => [k, true]));
+let packPromise = null;
+const svgPack = () => (packPromise ??= import('virtual:mon-svgs').then((m) => m.default));
 
 const images = new Map(); // 'mon-pikachu-back' -> <img> đã nạp xong
 const loading = new Map(); // key -> Promise đang nạp
@@ -37,8 +40,8 @@ function sized(text) {
 function loadOne(key) {
   if (images.has(key) || !URLS[key]) return Promise.resolve();
   if (loading.has(key)) return loading.get(key);
-  const job = fetch(URLS[key])
-    .then((r) => r.text())
+  const job = svgPack()
+    .then((pack) => pack[key])
     .then((text) => new Promise((resolve) => {
       const svg = sized(text);
       const img = new Image();

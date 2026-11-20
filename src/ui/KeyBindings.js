@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { KEY_ACTIONS, canBind, clearBinding, getBindings, keyName, resetBindings, setBinding } from '../game/keybinds.js';
-import { COLORS, closeButton, drawPanel, fixToCamera, localX, textStyle, uiX } from './helpers.js';
+import { COLORS, closeButton, drawPanel, fixToCamera, followCenter, localX, textStyle, uiX } from './helpers.js';
 import { directionOf, isCancel, isConfirm } from './input.js';
 
 // Màn Cài đặt → Phím tắt: mỗi hành động một dòng, hai ô phím (chính / phụ).
@@ -52,6 +52,7 @@ export class KeyBindings {
     this.container.add(this.foot);
     this.render();
     if (this.fixed) fixToCamera(this.container).setX(uiX(this.scene));
+    if (this.fixed) followCenter(scene, [this.container]);
   }
 
   open() {

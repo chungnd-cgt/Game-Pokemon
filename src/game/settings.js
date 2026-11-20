@@ -8,11 +8,8 @@ const DEFAULTS = {
   lighting: true, // ánh sáng theo buổi (ngày / chiều / đêm, đèn cửa sổ, hang tối)
   weather: true, // hình ảnh thời tiết (mưa, tuyết, mưa đá, bão cát); tắt thì thời tiết vẫn có tác dụng trong trận
   fpsLimit: 0, // giới hạn khung hình / giây: 30 / 60, 0 = theo màn hình (game/display.js)
+  uiScale: 0, // cỡ giao diện trên bản đồ (game/display.js: UI_SCALES): 0 = tự động theo cỡ màn hình, 1.15 = 115%...
   resolution: 'screen', // độ phân giải (game/display.js: RESOLUTIONS): 'screen' theo màn hình | 'WxH' vd '1920x1080'
-  touchControls: 'auto', // nút cảm ứng (ui/TouchControls.js): 'auto' (máy cảm ứng thì hiện) | 'on' | 'off'
-  touchSize: 100, // cỡ nút cảm ứng (%)
-  touchOpacity: 70, // độ đậm nút cảm ứng (%)
-  vibrate: true, // rung nhẹ khi bấm nút cảm ứng (máy hỗ trợ)
   areaNavOpen: true, // bảng Pokémon trong khu đang mở hay thu vào cạnh phải
   questOpen: true, // khung nhiệm vụ góc phải dưới đang mở hay thu gọn chỉ còn tiêu đề
   hudMenuOpen: true, // cột nút menu bên trái (Đội hình, Túi đồ...) đang hiện hay thu lại vào nút ≡
@@ -34,6 +31,8 @@ function read() {
     delete saved.ambience;
     // Bản cũ: kích thước khung "Vừa màn hình / Kéo giãn / Gốc", nay là độ phân giải
     delete saved.screenSize;
+    // Bản cũ: phím chữ thập + nút A / B cảm ứng, nay là cần gạt chạm-kéo trên bản đồ (không cần cài đặt)
+    for (const k of ['touchControls', 'touchSize', 'touchOpacity', 'vibrate']) delete saved[k];
     return { ...DEFAULTS, ...saved, version: VERSION };
   } catch {
     return { ...DEFAULTS };

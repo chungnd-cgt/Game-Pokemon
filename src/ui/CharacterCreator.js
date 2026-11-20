@@ -2,7 +2,7 @@ import {
   CUSTOM_ROWS, GENDERS, normalizeCustom, optionIds, optionInfo, randomCustom, resolveLook, stepOption, switchGender,
 } from '../data/playerCustom.js';
 import { makeCharacterTexture } from '../gfx/player.js';
-import { BLEED, COLORS, closeButton, drawPanel, fixToCamera, shade, textStyle, uiX } from './helpers.js';
+import { BLEED, COLORS, closeButton, drawPanel, fixToCamera, followCenter, shade, textStyle, uiX } from './helpers.js';
 import { directionOf, isCancel, isConfirm } from './input.js';
 
 // Bảng "Bạn trông thế nào?": chọn giới tính, tuỳ chỉnh kiểu tóc, màu tóc, màu da, trang phục, màu mắt của người chơi.
@@ -87,7 +87,10 @@ export class CharacterCreator {
 
     this.refresh();
     this.selectRow(0);
-    if (this.opts.fixed) fixToCamera(c).setX(uiX(scene)); // trên bản đồ: dời vào giữa màn hình rộng
+    if (this.opts.fixed) {
+      fixToCamera(c).setX(uiX(scene)); // trên bản đồ: dời vào giữa màn hình rộng
+      followCenter(scene, [c]);
+    }
 
     this.router.set((e) => {
       const dir = directionOf(e);

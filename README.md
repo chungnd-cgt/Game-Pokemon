@@ -22,12 +22,18 @@ trình duyệt vẫn chơi tiếp được.
 **Cài đặt lần đầu** (người làm game, một lần cho mỗi project Supabase):
 
 1. Tạo project Supabase. Authentication → Sign In / Providers → **Email**: bật. "Confirm email" bật thì người chơi phải bấm
-   link trong email mới đăng nhập được. Dịch vụ gửi mail có sẵn của Supabase chỉ gửi được rất ít mail; cho người khác chơi thì
-   cấu hình SMTP riêng (Authentication → Emails → SMTP Settings).
+   link trong email mới đăng nhập được. Dịch vụ gửi mail có sẵn của Supabase chỉ gửi được rất ít mail (và chỉ tới email thành
+   viên project); cho người khác chơi thì cấu hình **SMTP riêng** (xem mục *Gửi email (SMTP)* bên dưới).
 2. Authentication → URL Configuration: **Site URL** = địa chỉ game (chạy dev: `http://localhost:5173`); thêm địa chỉ thật vào
    **Redirect URLs** khi deploy. Link trong email (xác nhận, đặt lại mật khẩu) mở lại đúng địa chỉ này.
-3. SQL Editor → dán toàn bộ [`supabase/schema.sql`](supabase/schema.sql) → **Run** (tạo bảng `saves`, bật RLS: mỗi người chỉ
-   đọc / ghi được bản lưu của mình).
+3. SQL Editor: lần lượt dán toàn bộ từng file rồi **Run** (theo đúng thứ tự; chạy lại nhiều lần không sao, sửa file thì chạy lại):
+   1. [`supabase/schema.sql`](supabase/schema.sql): bảng `saves` (bản lưu), RLS: mỗi người chỉ đọc / ghi được bản lưu của mình.
+   2. [`supabase/trades.sql`](supabase/trades.sql): giao dịch giữa người chơi.
+   3. [`supabase/anticheat.sql`](supabase/anticheat.sql): chống gian lận bản lưu (tự sinh: `npm run gen:anticheat`).
+   4. [`supabase/realtime.sql`](supabase/realtime.sql): kênh Realtime riêng tư, rồi Project Settings → Realtime → Realtime
+      Settings: **tắt "Allow public access"**. Game mở kênh ở chế độ riêng tư nên thiếu bước này thì không thấy nhau / giao dịch.
+   5. [`supabase/errors.sql`](supabase/errors.sql): nhật ký lỗi JavaScript của người chơi (xem *Nhật ký lỗi* bên dưới).
+   6. [`supabase/sessions.sql`](supabase/sessions.sql): mỗi tài khoản chỉ chơi ở một nơi cùng lúc (xem *Một nơi chơi* bên dưới).
 4. Chép `.env.example` thành `.env.local`, điền **Project URL** và khoá **anon / publishable** (Project Settings → API Keys).
    Không bao giờ dùng khoá secret / service_role trong game. `.env.local` không được đưa lên git.
 
@@ -35,13 +41,149 @@ trình duyệt vẫn chơi tiếp được.
 xong vào game luôn: tài khoản có bản lưu thì chơi tiếp, chưa có thì tạo nhân vật rồi chơi mới (không còn menu Tiếp tục / Chơi
 mới / Xoá dữ liệu). Đăng ký khi bật "Confirm email": bấm link trong email là game tự đăng nhập. Đăng nhập lần đầu mà máy này
 còn bản lưu từ trước khi có tài khoản thì game hỏi có dùng bản đó cho tài khoản không. **Đăng xuất**: Cài đặt → Chung.
-Ô **Ghi nhớ đăng nhập** (mặc định bật): mở lại game là vào thẳng, email điền sẵn; bỏ tích thì đóng tab / trình duyệt là phải
-đăng nhập lại (phiên đăng nhập cất trong sessionStorage thay vì localStorage, `src/online/supabase.js`).
+Mỗi lần mở game (đóng tab / trình duyệt rồi mở lại) đều phải **đăng nhập lại**; email lần trước được điền sẵn. Phiên đăng nhập
+chỉ cất trong sessionStorage (`src/online/supabase.js`) nên tải lại trang trong cùng tab (vd văng game bấm F5) thì vẫn còn.
 
-**Lưu game** vẫn như cũ (tự lưu vào máy sau mỗi sự kiện, mỗi lượt đánh...), rồi `src/online/cloudSave.js` gửi bản mới nhất
-lên Supabase vài giây sau lần lưu và ngay khi ẩn / đóng tab. Tắt ngang, văng game, mất mạng: bản trên máy vẫn còn, lần mở game
-sau thấy còn thay đổi chưa gửi thì dùng bản trên máy và gửi lên. Mở cùng tài khoản ở hai nơi: nơi lưu trước được giữ, nơi
-còn lại thôi lưu và báo đỏ ở góc màn hình (bảng `saves` có cột `version` tự tăng, ghi lên kèm điều kiện đúng version).
+**Lưu game** vẫn như cũ (tự lưu vào máy mỗi 30 giây, sau mỗi sự kiện, mỗi lượt đánh, khi rời tab...), rồi
+`src/online/cloudSave.js` gửi bản mới nhất lên Supabase 30 giây sau lần lưu (các lần lưu trong lúc chờ gộp làm một; lỗi mạng
+thì 60 giây sau thử lại), và gửi ngay khi ẩn / đóng tab hoặc khi game lưu lúc tab đang ẩn. **Thoát game** (ẩn / đóng tab, đăng
+xuất) mà gửi lên xong thì **bản trên máy bị xoá** (trên mạng đã đủ); gửi chưa được (mất mạng, trình duyệt tắt trước khi gửi
+xong) thì giữ lại, lần mở game sau thấy còn thay đổi chưa gửi thì dùng bản trên máy và gửi lên. Bảng `saves` có cột `version`
+tự tăng, ghi lên kèm điều kiện đúng version: không bao giờ ghi đè bản mới hơn.
+
+**Một nơi chơi** (`src/online/session.js`, [`supabase/sessions.sql`](supabase/sessions.sql)): mỗi tài khoản chỉ chơi ở một
+thiết bị, một tab cùng lúc; nơi **vào sau** được chơi. Đăng nhập ở thiết bị khác thì thiết bị cũ (trong vòng 20 giây, hoặc ngay
+khi quay lại tab) dừng game, hiện bảng "Đã dừng game" với nút Đăng nhập lại; phiên đăng nhập ở thiết bị cũ bị thu hồi. Nhân bản
+tab (tab mới mang theo phiên đăng nhập) thì tab cũ dừng ngay. Tải lại trang chỉ vào lại được khi tab đó vẫn đang giữ quyền, không
+thì phải đăng nhập lại. Máy chủ chỉ nhận bản lưu mang mã phiên đang giữ quyền, nên nơi bị dừng không ghi đè được tiến độ;
+phần chơi ở nơi bị dừng mà chưa kịp gửi lên (tối đa ~30 giây) bị bỏ.
+
+### Gửi email (SMTP)
+
+Authentication → Emails → **SMTP Settings** → Enable custom SMTP:
+
+- **Thử nhanh, chưa có tên miền: Gmail** (khoảng 500 mail/ngày). Bật xác minh 2 bước cho tài khoản Google → tạo
+  **Mật khẩu ứng dụng** (myaccount.google.com → Bảo mật → Mật khẩu ứng dụng). Host `smtp.gmail.com`, Port `465`,
+  Username = địa chỉ Gmail, Password = mật khẩu ứng dụng 16 ký tự, Sender email = địa chỉ Gmail đó, Sender name tuỳ ý.
+- **Chạy thật: Resend** (gói miễn phí 3.000 mail/tháng), cần tên miền riêng (không dùng được `*.vercel.app`): xác minh tên
+  miền trong Resend → tạo API key. Host `smtp.resend.com`, Port `465`, Username `resend`, Password = API key, Sender email
+  `noreply@<tên miền>`.
+
+Sau đó: Authentication → **Rate Limits** → tăng "Rate limit for sending emails" (mặc định 30 mail/giờ khi dùng SMTP riêng).
+Mẫu email tiếng Việt: Authentication → Emails → Templates, dán [`confirm-signup.html`](supabase/email-templates/confirm-signup.html)
+(Confirm signup) và [`reset-password.html`](supabase/email-templates/reset-password.html) (Reset Password).
+
+### Bảo mật, chống gian lận, giữ project hoạt động
+
+- **Khoá:** khoá anon / publishable nằm trong code game là bình thường (ai mở trang cũng thấy), an toàn nhờ RLS: mỗi người chỉ
+  đọc / ghi được dữ liệu của mình, mọi thay đổi giao dịch đi qua hàm SQL tự kiểm tra. Mật khẩu do Supabase băm (bcrypt), game
+  không giữ. Khoá secret / service_role không bao giờ có trong game; `.env.local` không lên git.
+- **Chống gian lận** (`supabase/anticheat.sql`): mỗi lần bản lưu được gửi lên, máy chủ kiểm tra. Dữ liệu không thể có (loài lạ,
+  cấp ngoài 1–100, IV / EV quá giới hạn, đồ quá 999, đội quá 6...) thì **không ghi** (giữ bản cũ trên mạng). Đáng ngờ (chỉ số
+  không khớp công thức của game, tiền / số Pokémon / cấp / shiny tăng vọt so với thời gian chơi thêm; tiền và Pokémon nhận qua
+  giao dịch được trừ ra) thì vẫn ghi nhưng **khoá giao dịch** tài khoản. Nhật ký: bảng `save_flags`; mở khoá:
+  `update public.player_status set trade_blocked = false where user_id = '<uuid>';`. Tài khoản dùng cheat "Chung" sẽ bị khoá giao dịch.
+  Không chặn được 100%: muốn chặn hẳn thì trận đấu / bắt Pokémon phải chạy trên máy chủ.
+- **Realtime riêng tư** (`supabase/realtime.sql`): chỉ người đã đăng nhập vào được kênh bản đồ, chỉ hai người trong giao dịch
+  vào được kênh giao dịch. Tin nhắn Realtime được gom: đứng một mình trên bản đồ thì không gửi tin bước đi, có người khác thì
+  tối đa ~6 tin / giây (gói miễn phí giới hạn số tin mỗi tháng).
+- **Giữ project không bị tạm dừng** (gói miễn phí tạm dừng sau 7 ngày không hoạt động): GitHub Action
+  [`.github/workflows/supabase-keepalive.yml`](.github/workflows/supabase-keepalive.yml) cứ 3 ngày gọi Supabase một lần. Cần thêm
+  2 secret trong GitHub (Settings → Secrets and variables → Actions): `SUPABASE_URL`, `SUPABASE_ANON_KEY`.
+
+### Nhật ký lỗi
+
+Bản build (không phải lúc chạy dev) gửi lỗi JavaScript của người chơi lên bảng `client_errors` (`src/online/errorLog.js`,
+[`supabase/errors.sql`](supabase/errors.sql)): lỗi không ai bắt, promise bị từ chối và các lỗi game tự bắt rồi ghi
+`console.error` (lỗi sự kiện, lỗi trận đấu...), kèm cảnh / bản đồ đang chơi, trình duyệt, cỡ màn hình. Email, token và tham số
+trên đường dẫn bị xoá khỏi nội dung trước khi gửi.
+
+- **Xem lỗi:** Dashboard → Table Editor → `client_errors`, hoặc SQL Editor: `select * from public.client_errors_summary;`
+  (gộp theo nội dung: số lần, số người gặp, lần cuối, stack). Người chơi chỉ gửi được, không ai đọc được qua API.
+- **Chống spam:** mỗi phiên chơi gửi tối đa 10 lỗi khác nhau; máy chủ gộp lỗi lặp lại (cùng người, cùng nội dung trong 1 giờ chỉ
+  tăng số lần), mỗi người tối đa 30 dòng / giờ, người chưa đăng nhập chung nhau 200 dòng / giờ, cả bảng 2.000 dòng / giờ; lỗi
+  cũ hơn 30 ngày tự xoá.
+
+### Kiểm thử
+
+- `npm test`: luật game, bản lưu, giao dịch... và cả các file SQL chạy trên Postgres thật (PGlite chạy trong Node,
+  `tests/sql.test.js`: giao dịch, giới hạn lời mời, chống gian lận, Realtime riêng tư, nhật ký lỗi, một nơi chơi).
+- `npm run e2e`: mở game trong trình duyệt thật (Playwright, Chromium; lần đầu: `npx playwright install chromium`) ở 3 cỡ màn hình
+  (máy tính, điện thoại ngang / dọc), vào bản đồ bằng chế độ test (`?e2e=<bản đồ>`, chỉ có khi chạy dev: không đăng nhập, không
+  mạng, đội hình mẫu), mở các bảng (túi đồ, chọn Pokémon, Cài đặt, Thẻ HLV, tiến hoá, nhà dân, trận đấu, cần gạt, cỡ giao diện
+  100% / 150%) và chụp ảnh vào `test-results/screens/`; trang có lỗi JavaScript thì test hỏng.
+
+## Người chơi khác trên bản đồ
+
+Người chơi cùng đứng ở một bản đồ thấy nhau (`src/scenes/worldPlayers.js`, kênh Supabase Realtime `map-<id>` trong
+`src/online/presence.js`): đúng diện mạo, tên hiện trên đầu, thấy nhau đi lại (mỗi bước gửi một tin, đứng yên thì cập nhật
+chỗ đứng cho người vào sau). Người chơi khác không chặn đường. Chọn một người: **chuột phải** (máy tính) hoặc **chạm đúp**
+(điện thoại; nhấn đúp chuột trái cũng được) → menu nhỏ:
+
+- **Xem chi tiết:** thẻ Huấn luyện viên rút gọn của người đó: tên, thời gian chơi, ngày bắt đầu và hình nhân vật. Không hiện
+  huy hiệu, tiền, Pokédex, số Pokémon (người khác xem thẻ của mình cũng vậy).
+- **Giao dịch:** gửi lời mời (xem mục dưới).
+
+## Giao dịch giữa người chơi
+
+Trao đổi **Pokémon, vật phẩm (kể cả quả mọng) và tiền** với người chơi khác. Cài đặt: chạy
+[`supabase/trades.sql`](supabase/trades.sql) trong SQL Editor (sau `schema.sql`; đã chạy bản cũ thì chạy lại, file tự nâng cấp).
+
+- **Điều kiện:** cả hai có **từ 4 huy hiệu**, và chỉ giao dịch được **trong Pokémon Center** (chọn người chơi trong cùng
+  Pokémon Center → Giao dịch). NPC **Quầy giao dịch** cạnh y tá Joy hướng dẫn cách làm.
+- **Lời mời:** người được mời thấy popup **Đồng ý / Từ chối** trên cùng màn hình (30 giây không trả lời thì hết hạn). Nhiều
+  lời mời thì xếp chồng; đồng ý lời nào trước thì giao dịch với người đó (máy chủ huỷ các lời mời còn lại). Đang giao dịch /
+  đang chờ người khác mà bấm Đồng ý lời mời khác: báo "Không thể thực hiện khi đang giao dịch với người chơi khác". Người mời
+  thấy "Đang chờ … đồng ý" kèm nút Huỷ lời mời. **Mỗi người chỉ gửi được 1 lời mời / 30 giây** (máy chủ chặn trong
+  `trade_open`, game báo còn chờ bao nhiêu giây).
+- **Bảng giao dịch** (`src/ui/TradePanel.js`, HTML nổi lên trên game, không phủ tối màn hình: cột đội hình, cột nút, đồng hồ,
+  bảng Pokémon trong khu, thanh phím tắt vẫn hiện): cột trái là đồ mình đưa, cột phải là đồ bên kia đưa.
+  Bấm Pokémon trong đội để đưa / bỏ: **tối đa 5 con mỗi lần, luôn chừa lại ít nhất 1 con trong đội**; Pokémon huyền thoại /
+  huyền ảo (Articuno, Zapdos, Moltres, Mewtwo, Mew) và vật phẩm quan trọng không đưa được. Vật phẩm chọn trong danh sách
+  kèm số lượng, tiền gõ số. Thấy được tên, cấp, loài, tính cách, đồ cầm của Pokémon bên kia đưa, và báo nếu nó sẽ tiến hoá.
+- **Chốt hai bước:** mỗi bên bấm **Đồng ý** → cột của bên đó chuyển **xanh lá**; cả hai đã Đồng ý thì nút đổi thành
+  **Giao dịch**; cả hai bấm Giao dịch thì giao dịch thành công. Ai đổi đề nghị thì cả hai phải Đồng ý lại; Đồng ý luôn kèm
+  đúng đề nghị của bên kia đang thấy (không bị lừa đổi đồ phút cuối). **Huỷ giữa chừng không ai mất gì.** Máy chủ kiểm tra
+  lại cả hai bên theo bản lưu trên mạng (huy hiệu, Pokémon còn trong đội, đủ đồ, đủ tiền) rồi mới chốt; Pokémon nhận được
+  lấy đúng từ bản lưu bên kia.
+- **Nhận đồ:** Pokémon nhận được vào đội (đầy thì vào hộp PC), ghi vào Pokédex. Văng game / mất mạng sau khi đã chốt: lần sau
+  vào game nhận nốt; mỗi giao dịch chỉ nhận một lần (`tradesDone` trong bản lưu).
+- **Tiến hoá khi trao đổi:** Kadabra → Alakazam, Machoke → Machamp, Graveler → Golem, Haunter → Gengar: nhận được qua giao
+  dịch thì hỏi có cho tiến hoá không (cầm Everstone thì không tiến hoá); không tiến hoá theo cấp. Nhà huấn luyện đấu lại vẫn
+  có sẵn dạng tiến hoá ở cấp cao (`npcLevel` trong `src/data/monsters.js`).
+- Code: luật `src/game/trade.js` (test: `tests/trade.test.js`), mạng `src/online/trade.js`, trên bản đồ `src/scenes/worldTrade.js`.
+
+## Nhà dân
+
+Nhà trên bản đồ phần lớn **vào được** (`src/data/npcHouses.js` dựng sẵn phòng một tầng cho mọi nhà chưa có nội thất, 3 kiểu phòng,
+màu thảm / chăn / TV chọn cố định theo vị trí nhà); lác đác vài nhà vẫn khoá cửa, nhà gắn với nhiệm vụ làng giữ nguyên. Mỗi nhà
+có một chủ nhà; có nhà thêm 1–2 người nhà (nói chuyện), hoặc có một Pokémon nuôi đi lại trong nhà (Meowth, Eevee, Clefairy...;
+không đi tới cửa ra). Chủ nhà (`src/story/residents.js`):
+
+- **Nói chuyện** (nhiều nhất): mẹo chơi, chuyện vặt.
+- **Tặng quà** (vừa): thuốc, bóng, quả mọng, Repel, Revive... mỗi nhà một lần.
+- **Thách đấu** (ít): hỏi có đấu không; đội 1–2 Pokémon theo cấp Pokémon mạnh nhất của bạn (kém 3 cấp), thắng được tiền.
+- **Đổi Pokémon** (ít, mỗi nhà một lần), kiểu đổi Pokémon trong game gốc: họ muốn một loài **hay gặp ngay quanh khu đó** (bụi
+  cỏ / hang / mặt nước của bản đồ ngoài cửa và các bản đồ cạnh bên), đưa lại một loài **hiếm mà khu đó không có** (Farfetch'd,
+  Mr. Mime, Scyther, Eevee, Electabuzz...) cùng cấp, có **biệt danh** và **cầm sẵn đồ tốt** (Leftovers, Lucky Egg, Sitrus / Lum
+  Berry...). Ví dụ ở Thành phố Đồi Gió: "Đổi Growlithe lấy Electabuzz "Bánh Bao" (cầm Lum Berry)?" → Có → chọn trong danh sách
+  đội hình (dọc) → đúng loài họ muốn thì xác nhận → Pokémon của họ vào ngay chỗ đó trong đội (khác giao dịch giữa người chơi).
+  Pokémon tiến hoá khi trao đổi thì hỏi có cho tiến hoá không.
+- **Lão Ma Mãnh** (nhà dân ở Bản Vách Đá, nơi có Machoke): khoe Haunter "Bóng Ma" đổi đi là tiến hoá thành Gengar, xin đổi lấy
+  Machoke của bạn. Đổi xong Machoke về tay lão tiến hoá thành Machamp ngay, còn Haunter của bạn... đang cầm **Everstone** nên
+  không tiến hoá. Một màn "lừa" kinh điển.
+
+## Tiến hoá và độ thân thiết
+
+- **Hỏi trước khi tiến hoá:** Pokémon đủ điều kiện (lên cấp trong trận, Rare Candy, được trao đổi) thì hiện bảng "Pokémon của
+  bạn đang tiến hoá": Pokémon đứng trên bệ sáng, nhấp nháy phát sáng, đổi qua lại giữa dạng hiện tại và dạng tiến hoá, hỏi **Có / Không** (bấm / chạm, hoặc ← → và phím xác
+  nhận; phím quay lại = Không). Có: hình trắng đổi qua lại giữa dạng cũ / mới rồi hiện dạng mới, học chiêu mới. Không: giữ
+  nguyên, lần lên cấp sau hỏi lại. Mỗi lần chỉ lên một bậc (đang dạng 1 ở Lv 99 lên Lv 100 thì cao nhất là dạng 2, hoặc
+  không tiến hoá; Lv 100 không còn lên cấp nên không tiến hoá theo cấp nữa). Đá tiến hoá và trao đổi không cần lên cấp nên
+  Lv 100 vẫn tiến hoá được; dùng đá thì không hỏi lại.
+- **Độ thân thiết** (`happiness`, 0–255, Pokémon mới có 70 như game gốc): hạ gục một Pokémon (hoang dã hoặc của nhà huấn
+  luyện) +1 cho Pokémon đang trên sân, bị gục −5. Hiện chỉ lưu lại cho tính năng sau này, chưa ảnh hưởng gì tới Pokémon và
+  game (`changeHappiness` trong `src/game/monster.js`).
 
 ## Build ra web
 
@@ -76,17 +218,20 @@ Không có cây quả mọng.
    Còn một ô nữa là bước sang Tuyến đường 2 thì **tiếng mẹ gọi với theo**: mẹ chạy ra tặng **Bản đồ vùng** (có nó mới bấm N xem bản đồ được)
    và **Hộp huy hiệu** rồi mới đi tiếp.
 6. Băng qua bụi cỏ phía bắc, theo **Tuyến đường 2** (tuyến làm quen: 1 dãy cây quả mọng, chỉ 2 nhà huấn luyện, mọi Pokémon tối đa Lv 7, chủ yếu là sâu bọ: dòng Caterpie, dòng Weedle, Oddish, Pikachu hiếm) tới **Thị trấn Lục Bình**:
-   thị trấn đầu tiên có Pokémon Center, Poké Mart (phía nam đường chính, cạnh ao; góc tây bắc ngay lối vào là hai nhà dân).
+   thị trấn đầu tiên có Pokémon Center, Poké Mart. Từ lối vào phía tây đi theo đường lớn thì **gặp cửa Hang Thạch Nhũ trước**
+   (phía bắc, cạnh bác thợ mỏ), Pokémon Center và Poké Mart ở **khu phía đông** thị trấn; góc tây bắc và chỗ cạnh ao là nhà dân.
+   **Nhân viên Poké Mart** đứng chặn ngay trước cửa hang (không cho Team Rocket trốn vào hang) cho tới khi bạn đuổi được
+   Team Rocket **và** trả gói hàng; nói chuyện với anh ấy thì được chỉ đường xuống Poké Mart.
    Trước cửa hang là **gò đất 2 tầng viền gờ đá** (màu đá như vách núi) như game gốc: tầng dưới viền gờ chữ L,
    tầng trên viền gờ chữ L ngược. Lên tầng dưới từ phía đông (cạnh lối vào hang), men theo gờ sang tây rồi qua khe lên tầng trên
-   (dãy 3 cây quả mọng Oran / Pecha / Cheri dời từ Tuyến đường 2 sang, 2 Repel). Nhảy gờ xuống phía tây / nam / đông là về thẳng
-   Pokémon Center; gờ chỉ nhảy xuống được, không leo ngược lên. Gò nằm sát vách núi, chừa đúng một ô làm lối đi bên cạnh.
+   (dãy 3 cây quả mọng Oran / Pecha / Cheri dời từ Tuyến đường 2 sang, 2 Repel). Nhảy gờ xuống phía tây / nam / đông là về đường lớn; gờ chỉ nhảy xuống được, không leo ngược lên. Gò nằm sát vách núi, chừa đúng một ô làm lối đi bên cạnh.
    Nhảy gờ thì người nhảy trước, Pokémon đi theo bước tới mép gờ rồi mới nhảy theo sau.
    Bộ đôi **Team Rocket** (Hùng, Mai và Meowth) đứng hàng ngang chặn cửa Poké Mart. Bước tới trước mặt hoặc nói chuyện là bị gây sự.
    Hùng và Mai mỗi người một trận: thắng người này thì người kia ra đấu tiếp. Thua thì về chỗ hồi phục, quay lại đấu tiếp người còn lại.
    Thắng cả hai thì cả bọn bỏ lại gói hàng, chuồn bằng khinh khí cầu Meowth.
-7. Nhặt **gói hàng**, mang vào trả nhân viên Poké Mart.
-8. Chuẩn bị lên đường tới **Hang Thạch Nhũ** (dưới vách đá phía đông bắc Lục Bình) thì **Gary** bước ra từ Pokémon Center,
+7. Nhặt **gói hàng**, mang vào trả nhân viên Poké Mart. Đi lên cửa hang: nhân viên Poké Mart đứng chặn cảm ơn bạn rồi về lại
+   cửa hàng (đuổi được Team Rocket mà chưa trả gói hàng thì anh vẫn chặn).
+8. Đi tiếp tới **Hang Thạch Nhũ** (dưới vách đá phía bắc Lục Bình) thì **Gary** gọi giật lại, bước ra từ Pokémon Center,
    đấu lại như đã hẹn (Pidgey và Pokémon khởi đầu, **Lv 8**). Thua thì về Pokémon Center, lần sau tới cửa hang lại gặp;
    thắng thì Gary vào hang trước, hết chương 1, cửa hang mở.
 
@@ -382,27 +527,40 @@ bấm nút, kéo thanh trượt; bàn phím: ↑ / ↓ chọn dòng, ← / → �
   `src/ui/helpers.js`). Đổi cỡ cửa sổ, xoay máy, bật / tắt toàn màn hình thì game tự bố trí lại,
   **Giới hạn FPS** 30 / 60 / Theo màn hình (30 đỡ tốn pin, `src/game/display.js`),
   **Ánh sáng ngày đêm** và **Hiệu ứng thời tiết** (mưa, tuyết, mưa đá, bão cát) bật / tắt riêng.
-- **Chung**: **Xem nhanh Pokémon gửi vào PC** (mặc định bật): đội đã đủ 6 mà bắt thêm thì Pokémon tự vào hộp PC; khi bật, ngay
+- **Chung**: **Cỡ giao diện** (Tự động / 100% / 115% / 130% / 150%): phóng to cột đội hình, cột nút, thanh phím tắt, ô tiền,
+  đồng hồ, bảng Pokémon trong khu và khung nhiệm vụ trên bản đồ (cột nút Túi đồ / Pokédex / Thẻ HLV / Cài đặt giữ cỡ 100% để
+  không đè lên cột đội hình). Game luôn cao 720 rồi thu cho vừa màn hình, nên trên điện thoại
+  nằm ngang (cao ~390 px) mọi thứ nhỏ đi một nửa; **Tự động** (mặc định) phóng to theo chiều cao màn hình (máy tính 100%, điện
+  thoại ngang ~130%, tối đa 150%). Màn hình hẹp (khung 4:3, điện thoại dọc) thì tự giảm cho thanh phím tắt và khung nhiệm vụ không
+  chồng nhau (`hudScaleFor` trong
+  `src/game/display.js`, `hudScale` / `hudSize` trong `src/ui/helpers.js`).
+  **Xem nhanh Pokémon gửi vào PC** (mặc định bật): đội đã đủ 6 mà bắt thêm thì Pokémon tự vào hộp PC; khi bật, ngay
   sau khi bắt hiện bảng nhỏ cho biết cấp, giới tính, hệ, tính cách, đặc tính (đặc tính ẩn tô tím) và IV từng chỉ số; bấm phím
   xác nhận / quay lại hoặc bấm chuột để đóng. **Bản đồ vùng** (khi đã có bản đồ), **Đổi diện mạo** (mở lại bảng tạo nhân vật,
   đổi xong nhân vật trên bản đồ đổi ngay), email tài khoản đang đăng nhập và **Đăng xuất**.
-- **Điều khiển**: **Nút cảm ứng** Tự động (máy cảm ứng thì hiện) / Bật / Tắt, **cỡ nút**, **độ đậm nút**, **rung khi bấm**,
-  **Phím tắt bàn phím** (xem mục Phím tắt bên dưới).
+- **Điều khiển**: cách điều khiển bằng cần gạt / chạm (xem Chơi trên điện thoại) và **Phím tắt bàn phím** (xem mục Phím tắt
+  bên dưới). Không còn cài đặt riêng cho điện thoại hay máy tính: chuột và cảm ứng dùng chung một cách.
 
 ### Chơi trên điện thoại
 
-Mở game bằng trình duyệt điện thoại (chạy dev cho máy khác trong mạng LAN: `npm run dev -- --host`). Nên xoay ngang: khung
-game nằm giữa, **phím hướng** ở dải đen bên trái, **A** (xác nhận / nói chuyện) và **B** (quay lại; trên bản đồ là mở Cài đặt)
-bên phải (`src/ui/TouchControls.js`). Nút cảm ứng giả lập đúng phím đang gán trong Phím tắt nên dùng được ở mọi màn hình: giữ
-phím hướng là đi liên tục, trượt ngón tay sang hướng khác là đổi hướng ngay, giữ lâu trong menu thì con trỏ tự chạy. Các nút
-khác trên màn hình (cột Pokémon, Túi đồ, ô phím tắt, menu trận đấu...) chạm trực tiếp. Trang không cuộn / phóng to khi chạm.
+Mở game bằng trình duyệt điện thoại (chạy dev cho máy khác trong mạng LAN: `npm run dev -- --host`), nên xoay ngang.
+Không có phím chữ thập hay nút A / B: mọi thứ chạm trực tiếp trên màn hình (chuột trên máy tính cũng vậy).
+
+- **Di chuyển — cần gạt tròn** (`src/ui/Joystick.js`): chạm vào chỗ trống trên bản đồ rồi kéo, cần gạt hiện ngay dưới ngón
+  tay; kéo về hướng nào thì đi hướng đó (4 hướng, theo trục kéo nhiều hơn), giữ là đi liên tục, thả tay là dừng. Chạm bắt đầu
+  trên nút / ô giao diện (cột nút, ô phím tắt, khung nhiệm vụ...) thì không thành cần gạt.
+- **Thao tác — chạm thẳng:** chạm vào người / đồ vật / bảng hiệu / Pokémon đi theo ngay cạnh nhân vật (hoặc cách 2 ô thẳng
+  hàng, vd y tá sau quầy) là quay về phía đó rồi nói chuyện / nhặt / xem; chạm vào chính nhân vật là thao tác với ô phía
+  trước. Lời thoại chạm để đọc tiếp, menu / trận đấu / túi đồ chạm vào nút và ô; mở Cài đặt bằng nút bánh răng trên màn hình.
+- Trang không cuộn / phóng to khi chạm.
 
 Bản lưu gắn với tài khoản (xem mục Tài khoản & bản lưu trên mạng), đổi máy / trình duyệt chỉ cần đăng nhập lại.
 
 ### Tải game nhanh
 
 Mở link là có ngay màn hình **Đang tải** (Poké Ball quay + thanh tiến độ, `#loading` trong `index.html`) thay vì màn đen.
-Màn hình chính hiện sau khi nạp đúng vài hình nó cần (3 Pokémon trên màn hình chính, loài làm icon thú cưỡi); 453 hình SVG
+453 hình SVG Pokémon được **gộp thành một file** lúc build (`vite.config.js`: monSvgPack, ~237 KB khi nén): tải một lần thay vì
+453 lượt (đã thử atlas ảnh điểm nhưng nặng gấp ~20 lần vì hình là vector). Màn hình chính hiện sau khi nạp đúng vài hình nó cần (3 Pokémon trên màn hình chính, loài làm icon thú cưỡi); 453 hình SVG
 Pokémon còn lại nạp ngầm trong lúc người chơi ở màn hình chính (`src/gfx/monImages.js`, mặt trước trước, rồi lưng, rồi
 nghiêng). Hình chỉ giữ dạng ảnh trong bộ nhớ, không đẩy lên GPU, tới lúc cần mới thu thành sprite GBA. Vào game khi chưa
 nạp xong thì hiện "Đang tải hình Pokémon… %" chờ nốt. Bản đồ chỉ được vẽ khi bước vào (`ensureMapTextures` trong
@@ -475,12 +633,15 @@ Bố cục màn hình trên bản đồ:
   cấp / thanh HP. Pokémon kiệt sức không có nhãn, chỉ mờ đi và thanh HP trống. Màn thông tin Pokémon có nút ◀ 1/6 ▶ để đổi con bằng chuột.
   Lên cấp trong trận thì hiện chỉ số mới kèm mức tăng (+2 Atk...).
 
-Túi đồ (B) là khung bên phải, một khung lớn bọc cả dải tab các ngăn (ở **bên trái**) lẫn danh sách vật phẩm, ô tìm kiếm (gõ là lọc, không cần dấu: "xe dap" ra "Xe đạp",
-tìm cả mọi ngăn), vật phẩm xếp lưới 2 cột, mô tả hiện cạnh khung. Trong trận đấu túi đồ cũng dùng khung này. Mở túi đồ (B) thì thanh phím tắt vẫn hiện ở đáy màn hình; gán vật phẩm
-(xe đạp, thú cưỡi, cần câu, thuốc, quả mọng, bóng...) bằng một trong các cách:
-- **Kéo thả**: nhấn giữ vật phẩm trong túi, kéo icon thả vào ô dưới đáy (ô dưới con trỏ sáng viền vàng).
-- **Chọn rồi gán**: bấm vào vật phẩm → **Gán phím tắt** → chọn ô (bảng thao tác vật phẩm có Dùng / Cho cầm / Gán phím tắt như game gốc).
-- **Phím của ô**: chọn vật phẩm rồi bấm phím của ô (mặc định 1-6).
+Túi đồ (B) là khung bên phải, một khung lớn bọc cả dải tab các ngăn (ở **bên trái**) lẫn danh sách vật phẩm, ô tìm kiếm (**bấm vào
+ô mới gõ**, mở túi không tự vào ô; lọc không cần dấu: "xe dap" ra "Xe đạp", tìm cả mọi ngăn), vật phẩm xếp lưới 2 cột, mô tả hiện
+cạnh khung. Trong trận đấu túi đồ cũng dùng khung này. Túi **nổi lên trên**, giao diện bản đồ (cột đội hình, cột nút, đồng hồ,
+bảng Pokémon trong khu, thanh phím tắt) vẫn hiện.
+- **Bấm vào vật phẩm là dùng luôn** (không còn bảng Dùng / Cho cầm / Gán phím tắt): cần chọn Pokémon thì hiện **thanh ngang giữa
+  màn hình** liệt kê đội hình (hình, tên, cấp, máu), bấm / chạm Pokémon là dùng. Đồ chỉ để cầm (Leftovers...) thì chọn Pokémon cho cầm.
+- **Cho cầm**: kéo vật phẩm thả thẳng vào Pokémon ở cột đội hình (góc trái trên; ô dưới con trỏ sáng lên).
+- **Gán phím tắt** (xe đạp, thú cưỡi, cần câu, thuốc, quả mọng, bóng...): kéo icon thả vào ô dưới đáy (ô dưới con trỏ sáng viền
+  vàng), hoặc chọn vật phẩm rồi bấm phím của ô (mặc định 1-6).
 
 **Kéo icon từ ô này thả sang ô khác** trên thanh phím tắt là đổi chỗ hai ô (thả vào ô trống thì chuyển sang). Bấm vào ô còn trống
 thì không có gì xảy ra.
@@ -512,7 +673,7 @@ vượt đội:
 - **Cho Pokémon cầm đồ**: màn chi tiết có ô **Đồ cầm** ở góc trên trái. Bấm vào ô (hoặc phím B) mở túi đồ ngay bên cạnh
   (đè lên cột chỉ số, chỉ có đồ cầm được, cuộn chuột, rê chuột xem mô tả). Kéo icon vật phẩm thả vào ô là cho cầm (món đang cầm
   tự cất vào túi); kéo món đang cầm thả vào túi là cất đi. Túi vẫn mở khi bấm ← → sang Pokémon khác, tiện cho cả đội cầm đồ.
-  Trong túi đồ ngoài bản đồ vẫn chọn vật phẩm → **Cho cầm** → chọn Pokémon được.
+  Trong túi đồ ngoài bản đồ: kéo vật phẩm thả vào Pokémon ở cột đội hình là cho cầm.
   Loài đi bộ thì bước mượt, hơi lắc lư; loài không có chân (cá, Poliwag, Geodude, Voltorb...) thì nhảy;
   loài có cánh (Pidgey, Zubat, Charizard...) bay lơ lửng và vỗ cánh; Gastly, Koffing, Magnemite... thì bồng bềnh (`src/data/followStyle.js`).
   Quay mặt vào nó và bấm Enter thì nó nhảy lên và kêu tiếng của loài mình (vd: "Pika pika!"). Đã gục vẫn đi theo như bình thường.
