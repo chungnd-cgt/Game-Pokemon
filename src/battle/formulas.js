@@ -84,6 +84,7 @@ export function effectiveSpeed(mon, ctx = {}) {
   if ((weather === 'rain' && ability === 'swiftSwim') || (weather === 'sun' && ability === 'chlorophyll')
     || (weather === 'sand' && ability === 'sandRush')) speed *= 2;
   if (ability === 'unburden' && mon.unburdened && !mon.heldItem) speed *= 2;
+  if (ITEMS[mon.heldItem]?.held === 'machoBrace') speed *= 0.5; // Macho Brace: nặng nề, chậm đi một nửa
   return Math.floor(speed);
 }
 
@@ -338,12 +339,25 @@ export function expGain(defeated, level = defeated.level, { trainer = false, spl
 
 // Chia EXP như Gen 5: các Pokémon đã ra sân đấu với nó và còn đứng (participants) chia nhau, mỗi con tính theo cấp của mình;
 // cầm Lucky Egg x1.5. Trả về [{ mon, amount }]
-export function expShares(defeated, participants, { trainer = false } = {}) {
+// sharers: Pokémon cầm Exp. Share không ra trận (còn chiến đấu được): mỗi con nhận 50% EXP như khi tự hạ một mình
+// (con ra trận vẫn nhận đủ phần của mình, không bị chia bớt)
+export function expShares(defeated, participants, { trainer = false, sharers = [] } = {}) {
   if (!participants.length) return [];
-  return participants.map((mon) => {
-    const egg = ITEMS[mon.heldItem]?.held === 'luckyEgg' ? 1.5 : 1;
-    return { mon, amount: Math.floor(expGain(defeated, mon.level, { trainer, split: participants.length }) * egg) };
-  });
+  const egg = (mon) => (ITEMS[mon.heldItem]?.held === 'luckyEgg' ? 1.5 : 1);
+  return [
+    ...participants.map((mon) => ({
+      mon, amount: Math.floor(expGain(defeated, mon.level, { trainer, split: participants.length }) * egg(mon)),
+    })),
+    ...sharers.filter((mon) => !participants.includes(mon)).map((mon) => ({
+      mon, amount: Math.floor(expGain(defeated, mon.level, { trainer, split: 1 }) * 0.5 * egg(mon)), shared: true,
+    })),
+  ];
+}
+
+// EV nhận được từ Pokémon bị hạ: cầm Macho Brace thì gấp đôi
+export function evYieldFor(mon, evYield) {
+  if (ITEMS[mon.heldItem]?.held !== 'machoBrace') return evYield;
+  return Object.fromEntries(Object.entries(evYield).map(([k, n]) => [k, n * 2]));
 }
 
 export function escapeChance(runner, enemy, attempts, ctx = {}) {

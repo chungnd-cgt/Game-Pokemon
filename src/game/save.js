@@ -3,6 +3,7 @@ import { ITEMS } from '../data/items.js';
 import { normalizeCustom } from '../data/playerCustom.js';
 import { MOVES } from '../data/moves.js';
 import { restUntil } from './trainers.js';
+import { normalizeSafari } from './safari.js';
 import { addItem, resetState, state } from './state.js';
 
 // Lưu game vào localStorage của trình duyệt. Đã đăng nhập thì mỗi tài khoản một bản lưu riêng trên máy (setSaveOwner),
@@ -64,8 +65,7 @@ export function writeSave(data) {
   }
 }
 
-// Bản lưu cũ trên máy từ trước khi có tài khoản (khoá chung), để chuyển vào tài khoản lần đăng nhập đầu
-export const legacySave = () => (KEY === BASE_KEY ? null : readKey(BASE_KEY));
+// Xoá bản lưu cũ trên máy từ trước khi có tài khoản (khoá chung): không còn dùng (đăng nhập xong là xoá)
 export function clearLegacySave() {
   try {
     localStorage.removeItem(BASE_KEY);
@@ -121,6 +121,7 @@ export function saveGame(position = lastPosition) {
     flags: [...state.flags],
     berryTrees: state.berryTrees,
     repel: state.repel,
+    safari: state.safari,
     lastCenter: state.lastCenter,
     badges: [...state.badges],
     visited: [...state.visited],
@@ -159,6 +160,7 @@ export function loadGame() {
     flags: new Set(data.flags),
     berryTrees: data.berryTrees ?? {},
     repel: data.repel ?? null,
+    safari: normalizeSafari(data.safari),
     lastCenter: data.lastCenter ?? null,
     badges: new Set(data.badges),
     visited: new Set(data.visited),

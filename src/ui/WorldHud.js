@@ -1,9 +1,11 @@
 import { formatMoney } from '../data/items.js';
+import { gameClock } from '../game/clock.js';
 import { setSetting, settings } from '../game/settings.js';
 import { state } from '../game/state.js';
 import { HUD_PHASE_ICON } from '../gfx/textures.js';
 import { hudSize, textStyle } from './helpers.js';
 import { HOTBAR_RIGHT, MONEY_W } from './Hotbar.js';
+import { InfoPanel } from './InfoPanel.js';
 import { drawCardIcon } from './TrainerCard.js';
 
 const DEPTH = 100;
@@ -11,8 +13,17 @@ const BTN = 46; // nút ≡ vuông cạnh thanh phím tắt (cùng cỡ ô phím
 const ROUND = 22; // bán kính nút tròn trong cột menu
 const STEP = 52; // khoảng cách giữa hai nút tròn
 const DARK = 0x141a2c;
-const CLOCK_ICON = 22; // cỡ icon buổi trong ngày cạnh đồng hồ
-const QUEST_WIDTH = 250; // chữ nhiệm vụ dài hơn thì xuống dòng
+// Khung giờ góc phải trên: giờ máy (trên), giờ trong game (dưới), icon buổi trong ngày trong vòng tròn bên phải;
+// tên bản đồ in ngay dưới khung
+const CLOCK_W = 172;
+const CLOCK_H = 50;
+const CLOCK_TOP = 14;
+const PHASE_R = 18; // bán kính vòng tròn đựng icon buổi
+const CLOCK_ICON = 24;
+const PHASE_RING = { day: 0xffd860, dusk: 0xff9a50, night: 0x9ab8ff };
+// Khung nền góc trái dưới (bao cột nút tròn và hàng nút ≡ / tiền / phím tắt), chỗ nối uốn cong
+const FRAME_FILL = 0x10151f;
+const FRAME_EDGE = 0x3d4c72;
 const NOTE_WRAP = 540; // dòng báo dài (vd gán phím tắt) xuống dòng ở chừng này px
 
 // Biểu tượng vẽ bằng code cho các nút
@@ -102,8 +113,8 @@ export function drawRoundIcon(g, type, cx, cy) {
 
 // Giao diện trên bản đồ: giờ & tên bản đồ (trên phải; bảng Pokémon trong khu ngay dưới, ui/AreaNav.js), cột đội hình
 // (trên trái, ui/PartyPanel.js), cột nút tròn có nhãn bên trái ngay trên thanh phím tắt (Túi đồ / Pokédex / Thẻ HLV /
-// Cài đặt; Bản đồ vùng và Phím tắt nằm trong Cài đặt), nút ≡ cạnh thanh phím tắt ẩn / hiện cột nút, khung nhiệm vụ ở góc
-// phải dưới (bấm tiêu đề để thu gọn / mở ra). Trạng thái thu gọn nhớ trong cài đặt.
+// Cài đặt; Bản đồ vùng và Phím tắt nằm trong Cài đặt), nút ≡ cạnh thanh phím tắt ẩn / hiện cột nút, khung góc phải dưới
+// có 2 tab Hệ thống / Nhiệm vụ (ui/InfoPanel.js; bấm tab đang chọn để thu gọn / mở ra).
 // Cỡ giao diện (helpers.js hudScale): mọi phần nằm trong một container root, xếp theo cỡ ảo (hudSize) rồi phóng to theo
 // hệ số. Hệ số đổi thì WorldScene huỷ (destroy) và tạo lại. Riêng cột nút tròn (menuRoot) giữ cỡ 100% (phóng to thì đè lên
 // cột đội hình), chỉ dời theo hàng nút ≡ / thanh phím tắt đã phóng to
@@ -127,30 +138,28 @@ export class WorldHud {
       return o;
     };
 
-    // Khung nhiệm vụ góc phải dưới: mép phải / dưới cố định, nhiệm vụ dài thì xuống dòng (khung nới lên trên).
-    // Bấm vào khung (hoặc mũi tên ▼ / ▲) để thu gọn chỉ còn tiêu đề
-    this.questOpen = settings.questOpen !== false;
-    this.questBg = fixed(scene.add.graphics());
-    this.questLabel = fixed(scene.add.text(0, 0, 'NHIỆM VỤ', textStyle(12, '#ffd860', { fontStyle: 'bold' })));
-    this.questArrow = fixed(scene.add.text(0, 0, '▼', textStyle(12, '#c8d0e8', { fontStyle: 'bold' })).setOrigin(1, 0));
-    this.questText = fixed(scene.add.text(0, 0, '', textStyle(15, '#ffffff', { wordWrap: { width: QUEST_WIDTH, useAdvancedWrap: true }, lineSpacing: 1 })));
-    this.questZone = fixed(scene.add.zone(0, 0, 10, 10).setOrigin(0)).setInteractive({ useHandCursor: true });
-    this.questZone.on('pointerdown', (p, lx, ly, e) => {
-      e?.stopPropagation();
-      this.questOpen = !this.questOpen;
-      setSetting('questOpen', this.questOpen);
-      this.drawQuest();
-    });
-    this.questZone.on('pointerover', () => this.questArrow.setColor('#ffd860'));
-    this.questZone.on('pointerout', () => this.questArrow.setColor('#c8d0e8'));
-    this.drawQuest();
+    // Khung góc phải dưới: tab Hệ thống (nhật ký thông báo) / Nhiệm vụ (ui/InfoPanel.js)
+    this.info = new InfoPanel(scene, fixed);
 
-    // Đồng hồ: chừa chỗ bên trái cho icon buổi trong ngày (mặt trời vàng / mặt trời lặn cam / trăng khuyết)
-    // Hai dòng: buổi + giờ, rồi tên bản đồ đang đứng (căn phải)
-    this.clock = fixed(scene.add.text(width - 16, 14, '', textStyle(17, '#ffffff', {
-      backgroundColor: 'rgba(20,26,44,0.72)', padding: { left: 12 + CLOCK_ICON + 6, right: 12, top: 6, bottom: 6 }, align: 'right', lineSpacing: 2,
-    })).setOrigin(1, 0));
+    // Khung giờ góc phải trên: "Giờ máy" / "Giờ game" (nhãn mờ bên trái, giờ bên phải), icon buổi (mặt trời vàng / mặt trời
+    // lặn cam / trăng khuyết) trong vòng tròn viền theo màu buổi; tên bản đồ ngay dưới khung
+    this.clockBg = fixed(scene.add.graphics());
+    const label = (text) => fixed(scene.add.text(0, 0, text, textStyle(12, '#9aa6c4', { fontStyle: 'bold' })).setOrigin(0, 0.5));
+    const value = () => fixed(scene.add.text(0, 0, '', textStyle(16, '#ffffff', { fontStyle: 'bold' })).setOrigin(1, 0.5));
+    this.localLabel = label('Giờ máy');
+    this.gameLabel = label('Giờ game');
+    this.localTime = value();
+    this.gameTime = value();
     this.clockIcon = fixed(scene.add.image(0, 0, HUD_PHASE_ICON.day).setDisplaySize(CLOCK_ICON, CLOCK_ICON));
+    this.mapName = fixed(scene.add.text(0, 0, '', textStyle(15, '#ffffff', {
+      fontStyle: 'bold', stroke: '#0c1020', strokeThickness: 4,
+    })).setOrigin(1, 0));
+    this.clockParts = [this.clockBg, this.localLabel, this.gameLabel, this.localTime, this.gameTime, this.clockIcon, this.mapName];
+    this.phase = 'day';
+    this.layoutClock();
+
+    // Khung nền góc trái dưới (dưới cột nút và hàng nút ≡ / tiền / phím tắt): toạ độ màn hình, vẽ lại khi bố trí lại
+    this.frame = scene.add.graphics().setScrollFactor(0).setDepth(DEPTH - 1);
 
     // Báo đã lưu / đã gán phím tắt: chỗ trống giữa thanh phím tắt và khung nhiệm vụ (xem showSaveNote).
     // Nằm trên các menu, túi đồ (đang kéo đồ vào ô phím tắt vẫn thấy): ngoài root, toạ độ màn hình
@@ -247,10 +256,84 @@ export class WorldHud {
   // Màn hình đổi cỡ (chỉ đổi chiều ngang, game luôn cao 720): dời các phần bám mép phải
   relayout() {
     const { width, height, s } = hudSize(this.scene);
-    this.clock.setX(width - 16);
-    this.clockIcon.setPosition(this.clock.x - this.clock.width + 12 + CLOCK_ICON / 2, this.clock.y + 6 + 11);
+    this.layoutClock();
     this.saveNote.setPosition((width / 2 + 60) * s, (height - 16) * s);
     this.drawQuest();
+    this.drawFrame();
+  }
+
+  // Khung giờ góc phải trên (toạ độ ảo)
+  layoutClock() {
+    const { width } = hudSize(this.scene);
+    const x = width - 16 - CLOCK_W;
+    const y = CLOCK_TOP;
+    const cx = x + CLOCK_W - 8 - PHASE_R; // tâm vòng tròn buổi
+    const cy = y + CLOCK_H / 2;
+    const g = this.clockBg.clear();
+    g.fillStyle(DARK, 0.8);
+    g.fillRoundedRect(x, y, CLOCK_W, CLOCK_H, 10);
+    g.lineStyle(2, FRAME_EDGE, 0.9);
+    g.strokeRoundedRect(x + 1, y + 1, CLOCK_W - 2, CLOCK_H - 2, 9);
+    g.fillStyle(0x0c1020, 0.9);
+    g.fillCircle(cx, cy, PHASE_R);
+    g.lineStyle(3, PHASE_RING[this.phase] ?? PHASE_RING.day);
+    g.strokeCircle(cx, cy, PHASE_R);
+    const right = cx - PHASE_R - 8;
+    this.localLabel.setPosition(x + 12, y + 15);
+    this.gameLabel.setPosition(x + 12, y + 35);
+    this.localTime.setPosition(right, y + 15);
+    this.gameTime.setPosition(right, y + 35);
+    this.clockIcon.setPosition(cx, cy);
+    this.mapName.setPosition(width - 18, y + CLOCK_H + 4);
+  }
+
+  // Khung nền góc trái dưới (toạ độ màn hình): hàng dưới bao nút ≡, ô tiền, thanh phím tắt; cột nút đang hiện thì nối thêm
+  // phần đứng bao cột nút, chỗ nối với hàng dưới uốn cong mềm (bo lõm)
+  drawFrame() {
+    const g = this.frame.clear();
+    if (this.visible === false) return;
+    const { scene } = this;
+    const { s } = hudSize(scene);
+    const H = scene.scale.height;
+    const L = 6 * s;
+    const B = H - 5 * s;
+    const barTop = H - (16 + BTN + 9) * s;
+    const barRight = (HOTBAR_RIGHT + 9) * s;
+    const r = 12 * s;
+    g.fillStyle(FRAME_FILL, 0.62);
+    g.lineStyle(2, FRAME_EDGE, 0.85);
+    g.beginPath();
+    if (this.expanded && this.buttons?.length) {
+      const f = 16 * s; // bán kính chỗ uốn cong giữa cột và hàng dưới
+      const colRight = Math.max(...this.buttons.map((b) => b.label.getBounds().right)) + 10;
+      const top = Math.min(...this.buttons.map((b) => b.cy)) - ROUND - 10;
+      g.moveTo(L + r, top);
+      g.lineTo(colRight - r, top);
+      g.arc(colRight - r, top + r, r, -Math.PI / 2, 0);
+      g.lineTo(colRight, barTop - f);
+      g.arc(colRight + f, barTop - f, f, Math.PI, Math.PI / 2, true);
+      g.lineTo(barRight - r, barTop);
+      g.arc(barRight - r, barTop + r, r, -Math.PI / 2, 0);
+      g.lineTo(barRight, B - r);
+      g.arc(barRight - r, B - r, r, 0, Math.PI / 2);
+      g.lineTo(L + r, B);
+      g.arc(L + r, B - r, r, Math.PI / 2, Math.PI);
+      g.lineTo(L, top + r);
+      g.arc(L + r, top + r, r, Math.PI, Math.PI * 1.5);
+    } else {
+      g.moveTo(L + r, barTop);
+      g.lineTo(barRight - r, barTop);
+      g.arc(barRight - r, barTop + r, r, -Math.PI / 2, 0);
+      g.lineTo(barRight, B - r);
+      g.arc(barRight - r, B - r, r, 0, Math.PI / 2);
+      g.lineTo(L + r, B);
+      g.arc(L + r, B - r, r, Math.PI / 2, Math.PI);
+      g.lineTo(L, barTop + r);
+      g.arc(L + r, barTop + r, r, Math.PI, Math.PI * 1.5);
+    }
+    g.closePath();
+    g.fillPath();
+    g.strokePath();
   }
 
   // Xếp cột nút tròn ngay trên nút ≡ / thanh phím tắt (toạ độ màn hình: cột không phóng to, hàng nút ≡ thì có)
@@ -266,6 +349,8 @@ export class WorldHud {
 
   // Huỷ hết (đổi cỡ giao diện: WorldScene tạo lại)
   destroy() {
+    this.info.destroy();
+    this.frame.destroy();
     this.root.destroy();
     this.menuRoot.destroy();
     this.saveNote.destroy();
@@ -277,6 +362,7 @@ export class WorldHud {
     if (remember) setSetting('hudMenuOpen', open);
     this.toggleBtn.draw(false);
     this.applyMenuVisibility();
+    this.drawFrame();
   }
 
   applyMenuVisibility() {
@@ -295,26 +381,28 @@ export class WorldHud {
   setVisible(visible) {
     if (visible === this.visible) return;
     this.visible = visible;
-    if (!visible) {
-      this.toggleBtn.draw(false);
-      this.questArrow.setColor('#c8d0e8');
-    }
-    for (const o of [this.questBg, this.questLabel, this.questArrow, this.clock, this.clockIcon, this.toggleBtn.g, this.moneyBg, this.moneyCoin, this.moneyText]) o.setVisible(visible);
-    this.questText.setVisible(visible && this.questOpen);
-    for (const z of [this.toggleBtn.zone, this.questZone]) {
-      if (visible) z.setInteractive();
-      else z.disableInteractive();
-    }
+    if (!visible) this.toggleBtn.draw(false);
+    for (const o of [...this.clockParts, this.toggleBtn.g, this.moneyBg, this.moneyCoin, this.moneyText]) o.setVisible(visible);
+    if (visible) this.toggleBtn.zone.setInteractive();
+    else this.toggleBtn.zone.disableInteractive();
+    this.info.setVisible(visible);
     this.applyMenuVisibility();
+    this.drawFrame();
   }
 
-  // clock: chữ giờ (ambience.label) • phase: 'day' | 'dusk' | 'night' để chọn icon
-  update(objective, clock, phase = 'day') {
-    if (objective !== this.questText.text) {
-      this.questText.setText(objective);
-      this.drawQuest();
+  // mapName: tên bản đồ • phase: 'day' | 'dusk' | 'night' (icon và màu vòng tròn buổi)
+  update(objective, mapName, phase = 'day') {
+    this.info.setQuest(objective);
+    const now = new Date();
+    const local = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    if (local !== this.localTime.text) this.localTime.setText(local);
+    const game = gameClock(now).time;
+    if (game !== this.gameTime.text) this.gameTime.setText(game);
+    if (mapName !== this.mapName.text) this.mapName.setText(mapName);
+    if (phase !== this.phase) {
+      this.phase = phase;
+      this.layoutClock();
     }
-    if (clock !== this.clock.text) this.clock.setText(clock);
     if (state.money !== this.moneyShown) {
       this.moneyShown = state.money;
       this.moneyText.setText(formatMoney(state.money).replace('₽', ''));
@@ -325,29 +413,16 @@ export class WorldHud {
     }
     const icon = HUD_PHASE_ICON[phase] ?? HUD_PHASE_ICON.day;
     if (this.clockIcon.texture.key !== icon) this.clockIcon.setTexture(icon).setDisplaySize(CLOCK_ICON, CLOCK_ICON);
-    // Icon buổi ngang dòng đầu (buổi + giờ); dòng thứ hai là tên bản đồ
-    this.clockIcon.setPosition(this.clock.x - this.clock.width + 12 + CLOCK_ICON / 2, this.clock.y + 6 + 11);
   }
 
-  // Vẽ khung nhiệm vụ góc phải dưới (thu gọn: chỉ dòng tiêu đề "NHIỆM VỤ ▲")
+  // Vẽ lại khung góc phải dưới (đổi cỡ màn hình)
   drawQuest() {
-    const { width, height } = hudSize(this.scene);
-    const open = this.questOpen;
-    const w = (open ? Math.max(this.questText.width, this.questLabel.width + 30) : this.questLabel.width + 30) + 28;
-    const h = open ? 21 + this.questText.height + 9 : 26;
-    const x = width - 16 - w;
-    const y = height - 16 - h;
-    this.questLabel.setPosition(x + 14, y + 6);
-    this.questArrow.setText(open ? '▼' : '▲').setPosition(x + w - 10, y + 5);
-    this.questText.setPosition(x + 14, y + 21).setVisible(open && this.visible !== false);
-    this.questBg.clear();
-    this.questBg.fillStyle(DARK, 0.78);
-    this.questBg.fillRoundedRect(x, y, w, h, 9);
-    this.questBg.fillStyle(0xffd860);
-    this.questBg.fillRect(x, y + 7, 3, h - 14);
-    this.questZone.setPosition(x, y).setSize(w, h);
-    this.questZone.input?.hitArea.setTo(0, 0, w, h);
-    this.questRect = { x, y, w, h };
+    this.info.layout();
+  }
+
+  // Chỗ khung góc phải dưới (toạ độ ảo): dòng báo đã lưu, khung xem nhanh Pokémon gửi PC đặt tránh / ngay trên khung này
+  get questRect() {
+    return this.info.rect;
   }
 
   // Tên địa điểm trượt xuống ở giữa phía trên khi vừa tới nơi mới

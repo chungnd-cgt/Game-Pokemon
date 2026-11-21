@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { FPS_STOPS, RESOLUTIONS, UI_SCALES, applyFpsLimit, applyResolution, fullscreen, resolutionLabel, uiScaleLabel } from '../game/display.js';
+import { KEY_ACTIONS, canBind, clearBinding, getBindings, keyName, setBinding } from '../game/keybinds.js';
 import { setSetting, settings } from '../game/settings.js';
 import { BLEED, fixToCamera, localX, textStyle, uiX } from './helpers.js';
 import { directionOf, isCancel, isConfirm, isTouchDevice } from './input.js';
@@ -11,8 +12,13 @@ import { directionOf, isCancel, isConfirm, isTouchDevice } from './input.js';
 //  chỉ cho bật toàn màn hình trong lúc người chơi vừa thả tay / bấm phím).
 //  Bàn phím: ↑ / ↓ chọn dòng, ← / → đổi giá trị (dòng không có giá trị: sang cột thẻ), xác nhận để bật / tắt / bấm,
 //  Tab đổi thẻ.
-//  Nút mở màn hình khác (Bản đồ vùng, Đổi diện mạo, Phím tắt...) đóng bảng và trả về { action, state }: màn hình gọi lo
+//  Nút mở màn hình khác (Bản đồ vùng, Đổi diện mạo...) đóng bảng và trả về { action, state }: màn hình gọi lo
 //  mở màn đó rồi mở lại bảng với state (giữ thẻ, dòng đang chọn và nháp chưa áp dụng).
+//  Dòng half: xếp 2 cột (thẻ Chung: các ô tích, các nút). ← / → đổi cột, ↑ / ↓ lên xuống theo hàng.
+//  Thẻ Điều khiển: bảng phím (Hành động | Phím chính | Phím phụ) ngay trong thẻ, cuộn bằng con lăn / phím hướng. Bấm vào ô
+//  (hoặc chọn rồi bấm xác nhận): ô nhấp nháy "…", phím bấm tiếp theo được gán (kể cả Esc / Enter); bấm lại ô đó hoặc bấm
+//  ra chỗ khác là thôi; Delete bỏ phím của ô. Đổi phím có tác dụng ngay (không chờ Áp dụng), trùng phím hành động khác thì
+//  hai bên đổi cho nhau (dòng bị đổi sáng vàng), không đổi được (hành động bắt buộc mất hết phím) thì sáng đỏ.
 
 const PX = 40;
 const PY = 28;
@@ -47,7 +53,13 @@ const C = {
   title: '#c3c6d0',
 };
 
-const ROW_H = { segment: 100, select: 100, slider: 96, check: 60, button: 68, info: 34 };
+const ROW_H = { segment: 100, select: 100, slider: 96, check: 60, button: 68, info: 34, keys: 0 };
+const HALF_H = { check: 50, button: 68 }; // dòng 2 cột
+// Bảng phím trong thẻ Điều khiển
+const KEY = { rowH: 36, slotW: 150, slotH: 30, head: 34, foot: 6 };
+const KEY_TOP = BODY_Y + 18 + KEY.head; // dòng đầu bảng
+const KEY_VISIBLE = Math.floor((BODY_Y + BODY_H - KEY.foot - KEY_TOP) / KEY.rowH);
+const KEY_GOLD = '#ffc94a';
 // Danh sách xổ xuống: số cột, cỡ mỗi ô
 const DROP = { cols: 2, h: 34, gap: 4, pad: 8 }; // gọn để không đè hàng nút đáy bảng
 const bold = (size, color = C.text, extra = {}) => textStyle(size, color, { fontStyle: 'bold', stroke: '#0c0d10', strokeThickness: 3, ...extra });
@@ -61,11 +73,18 @@ function currentValues() {
     lighting: settings.lighting !== false,
     weather: settings.weather !== false,
     catchPreview: settings.catchPreview !== false,
+    repelAuto: settings.repelAuto !== false,
+    repelAsk: settings.repelAsk === true,
+    npcNames: settings.npcNames !== false,
+    playerNames: settings.playerNames !== false,
+    showDpad: settings.showDpad === true,
+    touchRelative: settings.touchRelative === true,
     uiScale: UI_SCALES.includes(settings.uiScale) ? settings.uiScale : 0,
   };
 }
 
-// Các thẻ và dòng trong thẻ. opts: { hasMap, account (tên đăng nhập, tài khoản chưa có tên thì email), game }
+// Các thẻ và dòng trong thẻ. opts: { hasMap, account (tên đăng nhập, tài khoản chưa có tên thì email), game,
+// lobby (mở từ màn đăng nhập: bỏ các nút cần đang ở trong game) }
 function buildTabs(opts) {
   const fsNote = fullscreen.available ? null
     : isTouchDevice() ? 'Máy này không hỗ trợ. Mẹo: "Thêm vào Màn hình chính" để chơi toàn màn hình.' : 'Trình duyệt không hỗ trợ.';
@@ -79,9 +98,8 @@ function buildTabs(opts) {
         { type: 'select', key: 'resolution', label: 'Độ phân giải',
           options: RESOLUTIONS.map((value) => ({ value, label: resolutionLabel(value) })) },
         { type: 'slider', key: 'fpsLimit', label: 'Giới hạn FPS', stops: FPS_STOPS, format: (v) => (v ? `${v} FPS` : 'Theo màn hình') },
-        { type: 'info', text: () => `Đang chạy: ${Math.round(opts.game?.loop?.actualFps ?? 0)} FPS  ·  30 FPS giúp đỡ tốn pin trên điện thoại` },
-        { type: 'check', key: 'lighting', label: 'Ánh sáng ngày đêm' },
-        { type: 'check', key: 'weather', label: 'Hiệu ứng thời tiết' },
+        { type: 'check', half: true, key: 'lighting', label: 'Ánh sáng ngày đêm' },
+        { type: 'check', half: true, key: 'weather', label: 'Hiệu ứng thời tiết' },
       ],
     },
     {
@@ -90,24 +108,27 @@ function buildTabs(opts) {
       rows: [
         // Phóng to cột đội hình, cột nút, thanh phím tắt... trên bản đồ (game/display.js: hudScaleFor)
         { type: 'slider', key: 'uiScale', label: 'Cỡ giao diện', stops: UI_SCALES, format: uiScaleLabel },
-        { type: 'check', key: 'catchPreview', label: 'Xem nhanh Pokémon gửi vào PC' },
-        ...(opts.hasMap ? [{ type: 'button', label: 'Bản đồ vùng', action: 'map' }] : []),
-        { type: 'button', label: 'Đổi diện mạo', action: 'look' },
+        // Repel hết hiệu lực: tự dùng thêm cái cùng loại / dừng lại hỏi (bật cả hai thì hỏi)
+        { type: 'check', half: true, key: 'repelAuto', label: 'Tự dùng lại Repel' },
+        { type: 'check', half: true, key: 'repelAsk', label: 'Hỏi khi Repel hết' },
+        { type: 'check', half: true, key: 'catchPreview', label: 'Xem nhanh khi gửi PC' },
+        { type: 'check', half: true, key: 'npcNames', label: 'Tên NPC' },
+        { type: 'check', half: true, key: 'playerNames', label: 'Tên người chơi' },
+        { type: 'check', half: true, key: 'showDpad', label: 'Hiện D-Pad' },
+        { type: 'check', half: true, key: 'touchRelative', label: 'Cần gạt tương đối' },
+        ...(opts.hasMap ? [{ type: 'button', half: true, label: 'Bản đồ vùng', action: 'map' }] : []),
+        // Màn đăng nhập (lobby): chưa có nhân vật nên không đổi diện mạo được
+        ...(opts.lobby ? [] : [{ type: 'button', half: true, label: 'Đổi diện mạo', action: 'look' }]),
         ...(opts.account ? [
           { type: 'info', text: () => `Tài khoản: ${opts.account}` },
-          { type: 'button', label: 'Đăng xuất', action: 'logout' },
+          { type: 'button', half: true, label: 'Đăng xuất', action: 'logout' },
         ] : []),
       ],
     },
     {
       id: 'controls',
       label: 'Điều khiển',
-      rows: [
-        { type: 'info', text: () => 'Di chuyển: phím hướng, hoặc chạm / nhấn chuột vào bản đồ rồi kéo (cần gạt).' },
-        { type: 'info', text: () => 'Thao tác: phím xác nhận, hoặc chạm vào người / đồ vật ngay cạnh nhân vật.' },
-        { type: 'info', text: () => 'Người chơi khác: chuột phải / chạm đúp để Xem chi tiết hoặc Giao dịch.' },
-        { type: 'button', label: 'Phím tắt bàn phím', action: 'keys' },
-      ],
+      rows: [{ type: 'keys' }],
     },
   ];
 }
@@ -115,7 +136,7 @@ function buildTabs(opts) {
 const focusable = (row) => row.type !== 'info' && !row.disabled;
 
 export class SettingsPanel {
-  // opts: { depth, hasMap, account, state (từ lần mở trước), onApplied(keys) }
+  // opts: { depth, hasMap, account, lobby, state (từ lần mở trước), onApplied(keys) }
   constructor(scene, router, opts = {}) {
     this.scene = scene;
     this.router = router;
@@ -132,6 +153,12 @@ export class SettingsPanel {
     this.bounds = new Phaser.Geom.Rectangle(PX, PY, PW, PH);
     this.pressed = null; // nút đang nhấn (kích hoạt lúc thả tay đúng trên nút đó)
     this.sliding = null; // thanh trượt đang kéo { row, x0, w }
+    // Bảng phím: dòng / ô (0 chính, 1 phụ) đang chọn, cuộn, ô đang chờ phím
+    this.krow = 0;
+    this.kcol = 0;
+    this.kscroll = 0;
+    this.capturing = null;
+    this.kflash = new Map(); // id hành động -> { kind: 'swap' | 'error', token }
 
     // Bảng vẽ theo khung 960x720, dời vào giữa màn hình rộng
     this.container = scene.add.container(uiX(scene), 0).setDepth(this.depth);
@@ -182,13 +209,27 @@ export class SettingsPanel {
     this.scene.input.on('pointermove', this.onMove);
     this.scene.input.on('pointerup', this.onUp);
     this.scene.input.on('pointerupoutside', this.onUp);
-    this.ticker = this.scene.time.addEvent({ delay: 500, loop: true, callback: () => this.updateInfo() });
+    // Con lăn chuột: cuộn bảng phím
+    this.onWheel = (p, objs, dx, dy) => {
+      if (dy && this.keysTab && !this.dropdown) this.kscrollBy(Math.sign(dy));
+    };
+    this.scene.input.on('wheel', this.onWheel);
+    this.ticker = this.scene.time.addEvent({ delay: 500, loop: true, callback: () => {
+      this.updateInfo();
+      // Ô đang chờ phím nhấp nháy
+      if (this.capturing) {
+        this.blinkOn = !this.blinkOn;
+        this.dirty();
+      }
+    } });
     return new Promise((resolve) => {
       this.resolve = resolve;
       this.router.set(
         (e) => e.timeStamp >= openedAt && this.handleKey(e),
         (p) => {
           if (p.downTime < openedAt) return;
+          // Đang chờ phím mà bấm ra chỗ khác: thôi chờ
+          if (this.capturing) return this.stopCapture();
           if (p.rightButtonDown() || !this.bounds.contains(localX(this.scene, p), p.y)) this.finish(null);
         },
       );
@@ -197,7 +238,17 @@ export class SettingsPanel {
 
   // ---------- Bàn phím ----------
 
+  get keysTab() {
+    return this.rows.some((r) => r.type === 'keys');
+  }
+
   handleKey(e) {
+    // Ô bảng phím đang chờ: phím nào cũng là phím mới (kể cả Esc, Tab)
+    if (this.capturing) {
+      if (e.repeat) return;
+      e.preventDefault?.();
+      return this.capture(e.code);
+    }
     if (this.dropdown) return this.dropKey(e);
     if (e.code === 'Tab') {
       e.preventDefault?.();
@@ -214,8 +265,9 @@ export class SettingsPanel {
     }
     const rows = this.focusRows;
     const onFoot = this.row >= rows.length;
+    if (!onFoot && rows[this.row]?.type === 'keys') return this.keysKey(e, dir, confirm);
     if (dir === 'up' || dir === 'down') {
-      this.focusMain(Phaser.Math.Clamp(this.row + (dir === 'up' ? -1 : 1), 0, rows.length));
+      this.focusMain(this.lineStep(dir === 'up' ? -1 : 1));
       return;
     }
     if (onFoot) {
@@ -231,16 +283,35 @@ export class SettingsPanel {
     const row = rows[this.row];
     if (dir === 'left' || dir === 'right') {
       const step = dir === 'left' ? -1 : 1;
+      const at = this.focusAt?.[this.row];
       if (row.type === 'slider') this.stepSlider(row, step);
       else if (row.type === 'segment' || row.type === 'select') this.stepSegment(row, step, false);
+      // Dòng 2 cột: sang ô cùng hàng
+      else if (at && dir === 'right' && at.col === 0 && this.focusAt[this.row + 1]?.line === at.line) this.focusMain(this.row + 1);
+      else if (at && dir === 'left' && at.col === 1) this.focusMain(this.row - 1);
       else if (dir === 'left') this.focusSide();
     } else if (confirm) {
       this.activate(row);
     }
   }
 
+  // ↑ / ↓ trong nội dung: lên / xuống một hàng (dòng 2 cột: giữ cột nếu hàng kia có); hết hàng thì xuống hàng nút đáy
+  lineStep(step) {
+    const n = this.focusRows.length;
+    const at = this.focusAt?.[this.row];
+    if (!at || this.row >= n) return Phaser.Math.Clamp(this.row + step, 0, n);
+    const lines = this.focusAt.slice(0, n);
+    const target = at.line + step;
+    const same = lines.findIndex((a) => a.line === target && a.col === at.col);
+    if (same >= 0) return same;
+    const any = step > 0 ? lines.findIndex((a) => a.line >= target) : lines.findLastIndex((a) => a.line <= target);
+    if (any >= 0) return any;
+    return step > 0 ? n : this.row;
+  }
+
   selectTab(i) {
     if (i === this.tab && this.area === 'side') return;
+    this.capturing = null;
     this.tab = i;
     this.area = 'side';
     this.row = 0;
@@ -423,14 +494,37 @@ export class SettingsPanel {
     });
   }
 
+  // Dòng half xếp 2 cột (trái rồi phải, hết hàng mới xuống). focusAt[chỉ số dòng chọn được] = { line, col } cho ↑ ↓ ← →
   renderRows(g) {
     let y = BODY_Y + 18;
     let fi = 0;
+    let line = 0;
+    let col = 0; // cột của dòng half kế tiếp; 1 = hàng hiện tại đã có ô bên trái
+    let lineH = 0;
+    this.focusAt = [];
+    const endLine = () => {
+      if (!col) return;
+      y += lineH;
+      line++;
+      col = 0;
+    };
     for (const row of this.rows) {
       const index = focusable(row) ? fi++ : -1;
       const focused = this.area === 'main' && index === this.row;
+      if (row.half) {
+        const half = (MAIN_W - PAD * 2) / 2;
+        if (index >= 0) this.focusAt[index] = { line, col };
+        this[`row_${row.type}`](g, row, y, focused, index, { x: MAIN_X + PAD + col * half, w: half - 12 });
+        lineH = HALF_H[row.type] ?? ROW_H[row.type];
+        if (col) endLine();
+        else col = 1;
+        continue;
+      }
+      endLine();
+      if (index >= 0) this.focusAt[index] = { line, col: 0 };
       this[`row_${row.type}`](g, row, y, focused, index);
       y += ROW_H[row.type] + (row.note ? 26 : 0);
+      line++;
     }
   }
 
@@ -584,11 +678,12 @@ export class SettingsPanel {
     this.dyn.add(zone);
   }
 
-  row_check(g, row, y, focused, index) {
+  // cell: { x, w } khi xếp 2 cột (ô nhỏ hơn, chữ nhỏ hơn)
+  row_check(g, row, y, focused, index, cell = null) {
     const { scene } = this;
-    const x = MAIN_X + PAD;
-    const s = 38;
-    const by = y + 6;
+    const x = cell?.x ?? MAIN_X + PAD;
+    const s = cell ? 34 : 38;
+    const by = y + (cell ? 4 : 6);
     const on = this.draft[row.key];
     const pressed = this.pressed === row.key;
     g.fillStyle(0x000000, 0.5);
@@ -599,33 +694,181 @@ export class SettingsPanel {
     g.strokeRoundedRect(x, by, s, s, 7);
     if (on) {
       // Dấu tích trắng viền đen như hình mẫu
-      const pts = [[x + 8, by + 19], [x + 16, by + 28], [x + 32, by + 6]];
+      const k = s / 38;
+      const pts = [[x + 8 * k, by + 19 * k], [x + 16 * k, by + 28 * k], [x + 32 * k, by + 6 * k]];
       g.lineStyle(10, 0x0c0d10);
       g.strokePoints(pts.map(([px, py]) => ({ x: px, y: py })));
       g.lineStyle(6, 0xf2f3f5);
       g.strokePoints(pts.map(([px, py]) => ({ x: px, y: py })));
     }
-    const label = scene.add.text(x + s + 16, by + s / 2, row.label, bold(22)).setOrigin(0, 0.5);
+    const label = scene.add.text(x + s + (cell ? 12 : 16), by + s / 2, row.label, bold(cell ? 19 : 22)).setOrigin(0, 0.5);
     this.dyn.add(label);
-    const w = s + 16 + label.width + 12;
+    if (cell && label.width > cell.w - s - 12) label.setScale((cell.w - s - 12) / label.width);
+    const w = s + (cell ? 12 : 16) + label.displayWidth + 12;
     if (focused) focusRing(g, x - 6, by - 6, w + 6, s + 12);
-    this.hit(x - 6, by - 8, Math.max(w, 260), s + 16, row.key, () => {
+    this.hit(x - 6, by - 8, cell ? cell.w + 6 : Math.max(w, 260), s + 16, row.key, () => {
       this.area = 'main';
       this.row = index;
       this.draft[row.key] = !this.draft[row.key];
     });
   }
 
-  row_button(g, row, y, focused) {
+  row_button(g, row, y, focused, index, cell = null) {
     const { scene } = this;
-    const x = MAIN_X + PAD;
-    const w = Math.min(360, MAIN_W - PAD * 2);
+    const x = cell?.x ?? MAIN_X + PAD;
+    const w = cell?.w ?? Math.min(360, MAIN_W - PAD * 2);
     const h = 54;
     const id = `act:${row.action}`;
     drawButton(g, x, y + 4, w, h, 'gray', this.pressed === id);
     this.dyn.add(scene.add.text(x + w / 2, y + 4 + h / 2, row.label, bold(22)).setOrigin(0.5));
     if (focused) focusRing(g, x, y + 4, w, h);
     this.hit(x, y + 4, w, h, id, () => this.finish({ action: row.action }));
+  }
+
+  // ---------- Bảng phím (thẻ Điều khiển) ----------
+
+  row_keys(g, row, y, focused, index) {
+    const { scene } = this;
+    const x = MAIN_X + PAD;
+    const w = MAIN_W - PAD * 2;
+    const s1 = x + w - 16 - KEY.slotW;
+    const s0 = s1 - 10 - KEY.slotW;
+    const head = bold(18, KEY_GOLD);
+    this.dyn.add(scene.add.text(x + 8, y, 'Hành động', head));
+    this.dyn.add(scene.add.text(s0 + KEY.slotW / 2, y, 'Phím chính', head).setOrigin(0.5, 0));
+    this.dyn.add(scene.add.text(s1 + KEY.slotW / 2, y, 'Phím phụ', head).setOrigin(0.5, 0));
+    const n = KEY_ACTIONS.length;
+    const bindings = getBindings();
+    const active = focused; // đang chọn trong bảng (bàn phím)
+    for (let i = this.kscroll; i < Math.min(n, this.kscroll + KEY_VISIBLE); i++) {
+      const action = KEY_ACTIONS[i];
+      const top = KEY_TOP + (i - this.kscroll) * KEY.rowH;
+      const cy = top + KEY.rowH / 2;
+      const flash = this.kflash.get(action.id)?.kind;
+      const selected = active && i === this.krow;
+      const bg = flash === 'error' ? [0x7a2a2a, 0.9] : flash === 'swap' ? [0x7a6420, 0.9] : selected ? [0x2c4a86, 0.75] : i % 2 ? [0xffffff, 0.04] : null;
+      if (bg) {
+        g.fillStyle(bg[0], bg[1]);
+        g.fillRoundedRect(x, top + 2, w - 12, KEY.rowH - 4, 7);
+      }
+      const label = scene.add.text(x + 8, cy, action.label, bold(18, KEY_GOLD)).setOrigin(0, 0.5);
+      if (label.width > s0 - x - 16) label.setScale((s0 - x - 16) / label.width);
+      this.dyn.add(label);
+      [s0, s1].forEach((sx, col) => this.keySlot(g, i, col, bindings[action.id][col], sx, cy, index, selected && col === this.kcol));
+    }
+    // Thanh cuộn mảnh bên phải
+    if (n > KEY_VISIBLE) {
+      const trackH = KEY_VISIBLE * KEY.rowH - 6;
+      const thumbH = Math.max(30, (trackH * KEY_VISIBLE) / n);
+      const thumbY = KEY_TOP + 3 + ((trackH - thumbH) * this.kscroll) / (n - KEY_VISIBLE);
+      g.fillStyle(0x101114);
+      g.fillRoundedRect(x + w - 6, KEY_TOP + 3, 6, trackH, 3);
+      g.fillStyle(0x7a7d86);
+      g.fillRoundedRect(x + w - 6, thumbY, 6, thumbH, 3);
+    }
+  }
+
+  keySlot(g, row, col, code, sx, cy, index, selected) {
+    const { scene } = this;
+    const top = cy - KEY.slotH / 2;
+    const capturing = this.capturing?.row === row && this.capturing?.col === col;
+    const id = `key:${row}:${col}`;
+    if (capturing) {
+      g.fillStyle(this.blinkOn ? 0xffd860 : 0x8a6a20);
+      g.fillRoundedRect(sx, top, KEY.slotW, KEY.slotH, 7);
+    } else {
+      drawButton(g, sx, top, KEY.slotW, KEY.slotH, selected ? 'blue' : 'gray', this.pressed === id);
+    }
+    const label = capturing ? '…' : code ? keyName(code) : '—';
+    const color = capturing ? '#2a1a00' : code ? C.text : C.dim;
+    this.dyn.add(scene.add.text(sx + KEY.slotW / 2, cy, label, bold(capturing ? 22 : 17, color, capturing ? { strokeThickness: 0 } : {})).setOrigin(0.5));
+    this.hit(sx, top, KEY.slotW, KEY.slotH, id, () => {
+      this.area = 'main';
+      this.row = index;
+      this.krow = row;
+      this.kcol = col;
+      // Bấm lại đúng ô đang chờ: thôi chờ
+      this.capturing = capturing ? null : { row, col };
+      this.blinkOn = true;
+    });
+  }
+
+  // Phím hướng / xác nhận / Delete khi đang ở bảng phím
+  keysKey(e, dir, confirm) {
+    const last = KEY_ACTIONS.length - 1;
+    if (dir === 'up') {
+      if (this.krow > 0) this.kselect(this.krow - 1);
+    } else if (dir === 'down') {
+      if (this.krow < last) this.kselect(this.krow + 1);
+      else this.focusMain(this.row + 1); // xuống hàng nút đáy
+    } else if (dir === 'left') {
+      if (this.kcol === 1) this.kselect(this.krow, 0);
+      else this.focusSide();
+    } else if (dir === 'right') {
+      this.kselect(this.krow, 1);
+    } else if (confirm) {
+      this.capturing = { row: this.krow, col: this.kcol };
+      this.blinkOn = true;
+      this.dirty();
+    } else if (e.code === 'Delete' && !e.repeat) {
+      this.clearKey(this.krow, this.kcol);
+    }
+  }
+
+  kselect(row, col = this.kcol) {
+    this.krow = row;
+    this.kcol = col;
+    // Giữ dòng đang chọn nằm trong khung
+    if (row < this.kscroll) this.kscroll = row;
+    else if (row >= this.kscroll + KEY_VISIBLE) this.kscroll = row - KEY_VISIBLE + 1;
+    this.dirty();
+  }
+
+  kscrollBy(n) {
+    const next = Phaser.Math.Clamp(this.kscroll + n, 0, Math.max(0, KEY_ACTIONS.length - KEY_VISIBLE));
+    if (next === this.kscroll) return;
+    this.kscroll = next;
+    this.dirty();
+  }
+
+  stopCapture() {
+    this.capturing = null;
+    this.dirty();
+  }
+
+  // Phím vừa bấm khi ô đang chờ: Delete bỏ phím của ô, phím không gán được thì báo đỏ, còn lại gán (đổi chỗ nếu trùng)
+  capture(code) {
+    const { row, col } = this.capturing;
+    this.capturing = null;
+    const id = KEY_ACTIONS[row].id;
+    if (code === 'Delete') return this.clearKey(row, col);
+    if (!canBind(code)) return this.keyFlash(id, 'error');
+    const result = setBinding(id, col, code);
+    if (!result.ok) {
+      if (result.blocked) this.keyFlash(result.blocked, 'error');
+      return this.keyFlash(id, 'error');
+    }
+    for (const other of result.changed) this.keyFlash(other, 'swap');
+    this.dirty();
+  }
+
+  clearKey(row, col) {
+    const id = KEY_ACTIONS[row].id;
+    if (!getBindings()[id][col]) return this.dirty();
+    if (!clearBinding(id, col)) this.keyFlash(id, 'error');
+    else this.dirty();
+  }
+
+  // Dòng của hành động id sáng lên (vàng: vừa bị đổi phím, đỏ: không đổi được) rồi tắt
+  keyFlash(id, kind) {
+    const token = {};
+    this.kflash.set(id, { kind, token });
+    this.dirty();
+    this.scene.time.delayedCall(900, () => {
+      if (this.done || this.kflash.get(id)?.token !== token) return;
+      this.kflash.delete(id);
+      this.dirty();
+    });
   }
 
   renderFoot(g) {
@@ -659,6 +902,7 @@ export class SettingsPanel {
     zone.on('pointerup', () => {
       if (this.pressed !== id || this.done) return;
       this.pressed = null;
+      if (this.capturing && !id.startsWith('key:')) this.capturing = null;
       fn();
       this.dirty();
     });
@@ -674,6 +918,7 @@ export class SettingsPanel {
     scene.input.off('pointermove', this.onMove);
     scene.input.off('pointerup', this.onUp);
     scene.input.off('pointerupoutside', this.onUp);
+    scene.input.off('wheel', this.onWheel);
     document.removeEventListener('fullscreenchange', this.onFullscreen);
     document.removeEventListener('webkitfullscreenchange', this.onFullscreen);
     this.ticker?.remove();

@@ -121,6 +121,17 @@ Object.assign(ITEMS, {
     name: 'Lucky Egg', kind: 'held', held: 'luckyEgg', color: '#f8f0e0', price: 4000, icon: 'item-luckyEgg',
     desc: 'Cho Pokémon cầm: nhận thêm 50% EXP.',
   },
+  // Macho Brace (quà võ sư ở Khu Safari Effort, story/quests.js): EV nhận được gấp đôi, đổi lại Tốc độ trong trận giảm một nửa
+  machoBrace: {
+    name: 'Macho Brace', kind: 'held', held: 'machoBrace', color: '#d8a040', price: 3000, icon: 'item-machoBrace',
+    desc: 'Cho Pokémon cầm: EV nhận được sau mỗi trận gấp đôi, nhưng Tốc độ trong trận giảm một nửa.',
+  },
+  // Exp. Share (quà trợ lý Giáo sư Oak ở Pokémon Center Lò Gốm, story/quests.js): con cầm không ra trận vẫn nhận 50% EXP
+  // và đủ EV của Pokémon bị hạ (battle/formulas.js: expShares)
+  expShare: {
+    name: 'Exp. Share', kind: 'held', held: 'expShare', color: '#4a88e0', price: 3000, icon: 'item-expShare',
+    desc: 'Cho Pokémon cầm: không cần ra trận vẫn nhận 50% EXP và đủ EV khi đồng đội hạ Pokémon.',
+  },
   bicycle: {
     name: 'Xe đạp', kind: 'key', price: 0, icon: 'item-bicycle',
     desc: 'Đi nhanh hơn đi bộ. Bấm C để lên / xuống xe (chỉ đi được ngoài trời).',

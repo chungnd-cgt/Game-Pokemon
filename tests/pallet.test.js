@@ -337,7 +337,7 @@ test('cây quả mọng: trồng thành dãy 2-3 cây liền nhau trên một lu
   const maps = Object.values(MAPS).filter((m) => treesOf(m).length);
   assert.ok(maps.length >= 15, `chỉ có ${maps.length} bản đồ có cây`);
   for (const m of maps) {
-    if (m.id === 'town6') continue; // vườn quả Lò Gốm kiểm tra riêng
+    if (m.id === 'town6' || m.id === 'safariEffort') continue; // vườn quả Lò Gốm, luống quả khu Safari Effort: kiểm tra riêng
     const rows = rowsOf(m);
     assert.ok(rows.length >= 1 && rows.length <= 2, `${m.id}: ${rows.length} dãy`);
     for (const row of rows) assert.ok(row.length >= 2 && row.length <= 3, `${m.id}: dãy ${row.length} cây ở (${row[0].x},${row[0].y})`);

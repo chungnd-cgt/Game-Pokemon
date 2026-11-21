@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import {
-  abilityOf, calcDamage, canLoseItem, confusionDamage, entryOrder, escapeChance, expShares, hitCount, moveEffect, moveHits,
+  abilityOf, calcDamage, canLoseItem, confusionDamage, entryOrder, escapeChance, evYieldFor, expShares, hitCount, moveEffect, moveHits,
   playerGoesFirst, rollCatch, secondaryFactor, trappedBy, weatherHpChange,
 } from '../battle/formulas.js';
 import {
@@ -19,12 +19,12 @@ import { ABILITIES } from '../data/abilities.js';
 import { BAG_POCKETS, ITEMS, formatMoney } from '../data/items.js';
 import { CATEGORY_NAMES, MOVES, STRUGGLE } from '../data/moves.js';
 import { SPECIES } from '../data/monsters.js';
-import { NATURES } from '../data/natures.js';
-import { IV_MAX, STAGE_SHORT, STAT_KEYS, STAT_NAMES, STAT_SHORT } from '../data/stats.js';
+import { STAGE_SHORT, STAT_KEYS, STAT_NAMES } from '../data/stats.js';
 import { TYPES } from '../data/types.js';
 import { heldBerryTrigger, heldEffect } from '../game/heldItems.js';
 import { applyItem, itemProblem, needsMove } from '../game/itemUse.js';
 import { saveGame } from '../game/save.js';
+import { ballAllowed } from '../game/safari.js';
 import { settings } from '../game/settings.js';
 import { trainerBeaten } from '../game/trainers.js';
 import {
@@ -41,12 +41,11 @@ import { GBA_MON, fitScale, monSourceExists, pixelMon } from '../gfx/textures.js
 import { AbilityBanner } from '../ui/AbilityBanner.js';
 import { BagPanel } from '../ui/BagPanel.js';
 import { ButtonGrid, commandIcons, paintCommand, paintMove, renderCommand, renderMove } from '../ui/BattleMenus.js';
-import { BLEED, GENDER, centerStage, drawPanel, fitText, gradientRect, shade, textStyle, tweenAsync, wait } from '../ui/helpers.js';
-import { InputRouter, isCancel, isConfirm } from '../ui/input.js';
+import { BLEED, centerStage, drawPanel, fitText, gradientRect, shade, textStyle, tweenAsync, wait } from '../ui/helpers.js';
+import { InputRouter } from '../ui/input.js';
 import { Menu } from '../ui/Menu.js';
 import { MessageBox } from '../ui/MessageBox.js';
 import { CHIP_ROW, MonsterInfo } from '../ui/MonsterInfo.js';
-import { withShinyMark } from '../ui/shinyMark.js';
 import { typeBadge } from '../ui/TypeBadge.js';
 
 // Vị trí chân Pokémon trên bệ và chiều cao hiển thị (px)
@@ -134,6 +133,8 @@ export default class BattleScene extends Phaser.Scene {
     this.enemy = this.enemyTeam[0];
     markSeen(this.enemy.speciesId);
     this.zone = data.zone ?? 'meadow';
+    // Loại bóng ném được (game/safari.js: ballRule): 'normal' | 'safari' | 'any' | 'none'
+    this.ballRule = data.balls ?? 'normal';
     this.activeIndex = state.party.findIndex((m) => m.hp > 0);
     this.runAttempts = 0;
     this.lastAction = 0;
@@ -555,7 +556,7 @@ export default class BattleScene extends Phaser.Scene {
 
   // Trả về hành động dùng đồ, hoặc null nếu huỷ / không dùng được
   async chooseItem() {
-    const allow = (id) => BATTLE_KINDS.includes(ITEMS[id].kind) && !ITEMS[id].fieldOnly;
+    const allow = (id) => BATTLE_KINDS.includes(ITEMS[id].kind) && !ITEMS[id].fieldOnly && ballAllowed(id, ITEMS[id], this.ballRule);
     if (!Object.keys(ITEMS).some((id) => itemCount(id) > 0 && allow(id))) {
       await this.msg.show('Không có vật phẩm nào dùng được trong trận!');
       return null;
@@ -1990,8 +1991,10 @@ export default class BattleScene extends Phaser.Scene {
   // Con đang trên sân chạy thanh EXP và hiện từng cấp một; con khác chỉ báo bằng lời
   async awardExp() {
     const fighters = state.party.filter((m) => this.participants.has(m) && m.hp > 0);
+    // Cầm Exp. Share mà không ra trận: vẫn nhận 50% EXP và đủ EV (battle/formulas.js: expShares)
+    const sharers = state.party.filter((m) => !this.participants.has(m) && m.hp > 0 && ITEMS[m.heldItem]?.held === 'expShare');
     const evYield = SPECIES[baseSpeciesId(this.enemy)].evYield;
-    for (const { mon, amount } of expShares(this.enemy, fighters, { trainer: Boolean(this.trainer) })) {
+    for (const { mon, amount } of expShares(this.enemy, fighters, { trainer: Boolean(this.trainer), sharers })) {
       // Đang biến hình: tạm về dạng gốc để tính chỉ số / học chiêu theo loài gốc, xong thì khoác lại dạng biến hình
       const form = suspendBattleForm(mon);
       try {
@@ -2004,7 +2007,7 @@ export default class BattleScene extends Phaser.Scene {
 
   // Một Pokémon nhận EV và EXP: con đang trên sân chạy thanh EXP và hiện từng cấp một; con khác chỉ báo bằng lời
   async gainExpOf(mon, amount, evYield) {
-    gainEvs(mon, evYield);
+    gainEvs(mon, evYieldFor(mon, evYield)); // cầm Macho Brace: EV gấp đôi
     if (mon.level >= MAX_LEVEL) return;
     const onField = mon === this.active;
     await this.msg.show(`${mon.name} nhận được ${amount} EXP!`);
@@ -2200,8 +2203,8 @@ Quên: ${detail(MOVES[value])}` : ''}`),
       await this.msg.show(where === 'party'
         ? `${this.enemy.name} đã gia nhập đội hình của bạn.`
         : `Đội hình đã đủ 6, ${this.enemy.name} được gửi vào hộp PC.`);
-      if (where === 'storage' && settings.catchPreview) await this.catchPreview(this.enemy);
-      await this.endBattle('catch');
+      // Gửi vào PC: về bản đồ hiện bảng xem nhanh (ui/CatchPreview.js, WorldScene.onWake)
+      await this.endBattle('catch', where === 'storage' && settings.catchPreview !== false ? { preview: this.enemy } : {});
       return true;
     }
 
@@ -2215,66 +2218,6 @@ Quên: ${detail(MOVES[value])}` : ''}`),
     this.enemySprite.clearTint();
     await this.msg.show(['Ôi không! Nó đã thoát ra!', 'Tiếc quá! Suýt nữa thì được!', 'Chỉ thiếu một chút nữa thôi!'][shakes]);
     return false;
-  }
-
-  // Bảng xem nhanh Pokémon vừa gửi vào PC (bật / tắt trong Cài đặt): cấp, giới tính, tính cách, đặc tính, IV từng chỉ số.
-  // Bấm Enter / X / chuột để đóng
-  async catchPreview(mon) {
-    const species = SPECIES[mon.speciesId];
-    const nature = NATURES[mon.nature];
-    const ability = ABILITIES[mon.ability];
-    const [x, y, w, h] = [190, 60, 580, 420];
-    const c = this.add.container(0, 0).setDepth(40);
-    c.add(drawPanel(this, x, y, w, h, 20, true));
-    const text = (tx, ty, str, size, color = '#30343c', extra = {}) => {
-      const t = this.add.text(tx, ty, str, textStyle(size, color, extra));
-      c.add(t);
-      return t;
-    };
-    text(x + w / 2, y + 22, 'ĐÃ GỬI VÀO HỘP PC', 16, '#8a92a6', { fontStyle: 'bold' }).setOrigin(0.5, 0);
-    const key = pixelMon(this, mon.speciesId, '', GBA_MON, mon.shiny);
-    c.add(this.add.image(x + 110, y + 190, key).setOrigin(0.5, 1).setScale(fitScale(this, key, 150)));
-    // Pokémon shiny: chữ "S" vàng trước tên (như mọi màn khác)
-    const nameX = withShinyMark(this, (o) => c.add(o), mon, x + 34, y + 200, 28);
-    const name = fitText(text(nameX, y + 200, mon.name, 28, '#30343c', { fontStyle: 'bold' }), x + w - 34 - nameX - 30, 0.8);
-    const gender = GENDER[mon.gender];
-    if (gender) text(name.x + name.displayWidth + 6, y + 204, gender.symbol, 24, gender.color, { fontStyle: 'bold' });
-    text(x + 34, y + 240, `Lv${mon.level}  •  ${species.types.map((t) => TYPES[t].name).join(' / ')}`, 18, '#4a5266');
-
-    // Tính cách, đặc tính
-    const right = x + 230;
-    text(right, y + 56, 'TÍNH CÁCH', 13, '#8a92a6', { fontStyle: 'bold' });
-    text(right, y + 72, nature.name, 22, '#30343c', { fontStyle: 'bold' });
-    text(right, y + 100, nature.up ? `+${STAT_NAMES[nature.up]}  −${STAT_NAMES[nature.down]}` : 'Trung tính', 15, '#4a5266');
-    text(right, y + 130, 'ĐẶC TÍNH', 13, '#8a92a6', { fontStyle: 'bold' });
-    text(right, y + 146, `${ability?.name ?? '—'}${mon.hiddenAbility ? '  (ẩn)' : ''}`, 22, mon.hiddenAbility ? '#8a58d0' : '#30343c', { fontStyle: 'bold' });
-    text(right, y + 174, ability?.desc ?? '', 14, '#4a5266', { wordWrap: { width: w - 250 }, maxLines: 2 });
-
-    // IV: thanh theo 0-31, 31 tô xanh lá; tính cách tăng / giảm chỉ số nào thì tô tên chỉ số đỏ / xanh
-    text(x + 34, y + 280, 'IV', 13, '#8a92a6', { fontStyle: 'bold' });
-    const bars = this.add.graphics();
-    c.add(bars);
-    STAT_KEYS.forEach((stat, i) => {
-      const [col, row] = [i % 3, Math.floor(i / 3)];
-      const bx = x + 34 + col * 180;
-      const by = y + 300 + row * 44;
-      const iv = mon.ivs[stat];
-      const color = nature.up && stat === nature.up ? '#d04848' : nature.up && stat === nature.down ? '#3a78e0' : '#4a5266';
-      text(bx, by, STAT_SHORT[stat], 16, color, { fontStyle: 'bold' });
-      text(bx + 150, by, String(iv), 16, iv === IV_MAX ? '#2a9a48' : '#30343c', { fontStyle: 'bold' }).setOrigin(1, 0);
-      bars.fillStyle(0xdde0e8);
-      bars.fillRoundedRect(bx, by + 24, 150, 8, 4);
-      bars.fillStyle(iv === IV_MAX ? 0x3ab060 : iv >= 20 ? 0x48b0f8 : 0x9aa4b8);
-      bars.fillRoundedRect(bx, by + 24, Math.max(6, 150 * (iv / IV_MAX)), 8, 4);
-    });
-    const total = STAT_KEYS.reduce((sum, s) => sum + mon.ivs[s], 0);
-    text(x + w - 34, y + 280, `Tổng IV ${total}/${IV_MAX * 6}`, 14, '#4a5266', { fontStyle: 'bold' }).setOrigin(1, 0);
-
-    c.setAlpha(0);
-    this.tweens.add({ targets: c, alpha: 1, duration: 160 });
-    await new Promise((resolve) => this.router.set((e) => (isConfirm(e) || isCancel(e)) && resolve(), () => resolve()));
-    this.router.clear();
-    c.destroy();
   }
 
   // Pickup: hết trận, Pokémon trong đội có Pickup đang không cầm gì thì 10% nhặt được một món (cầm luôn trên tay).

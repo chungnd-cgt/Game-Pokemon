@@ -5,7 +5,7 @@ import { supabase } from './supabase.js';
 //  - broadcast 'move': mỗi bước đi / quay mặt (nhanh, không đợi presence); đứng yên một lúc thì cập nhật chỗ đứng vào presence
 //    để người vào sau thấy đúng chỗ
 //  - broadcast 'trade-request': lời mời giao dịch gửi tới một người trong bản đồ (online/trade.js, scenes/worldTrade.js)
-// me: { id, name, gender, look, badges, playTime, startedAt }
+// me: { id, name, gender, look, badges, playTime, startedAt, status ('battle' | 'afk' | null), follower ({ s, sh } | null) }
 
 // Tiết kiệm tin nhắn Realtime (gói miễn phí giới hạn số tin mỗi tháng / mỗi giây):
 //  - đứng một mình trên bản đồ: không gửi tin bước đi; chỗ đứng chỉ cập nhật vào presence khi đứng yên lâu hơn
@@ -32,8 +32,8 @@ export class MapPresence {
   }
 
   meta() {
-    const { id, name, gender, look, badges, playTime, startedAt } = this.me;
-    return { id, name, gender, look, badges, playTime, startedAt, ...this.pos };
+    const { id, name, gender, look, badges, playTime, startedAt, status, follower } = this.me;
+    return { id, name, gender, look, badges, playTime, startedAt, status: status ?? null, follower: follower ?? null, ...this.pos };
   }
 
   // Vào bản đồ mapId ở chỗ pos ({ x, y, facing }). Rời kênh bản đồ cũ.

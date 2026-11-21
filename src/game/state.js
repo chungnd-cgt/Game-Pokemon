@@ -30,6 +30,8 @@ function freshState() {
     flags: new Set(), // các mốc cốt truyện đã qua
     berryTrees: {}, // id cây -> thời điểm (ms) cây ra quả lại; không có = đang có quả
     repel: null, // { item, steps }: Repel đang có hiệu lực, còn steps bước
+    // Khu Safari (game/safari.js): hạn (ms, giờ thật) của vé Safari, vé Safari Effort, gói 24 giờ; 0 = không có
+    safari: { zoneUntil: 0, effortUntil: 0, passUntil: 0 },
     lastCenter: null, // nơi hồi phục gần nhất (Pokémon Center đã vào), null = ở nhà
     badges: new Set(), // huy hiệu gym đã nhận (data/badges.js)
     visited: new Set(), // khu vực đã đặt chân tới (data/region.js)

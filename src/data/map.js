@@ -5,6 +5,7 @@ import { GYM_MAPS } from './mapsGyms.js';
 import { VILLAGE_AREAS_A } from './mapsVillageAreasA.js';
 import { VILLAGE_AREAS_B } from './mapsVillageAreasB.js';
 import { CHAPTER5_MAPS } from './mapsChapter5.js';
+import { SAFARI_MAPS } from './mapsSafari.js';
 import { VILLAGE_MAPS } from './mapsVillages.js';
 import { furnishHouses } from './npcHouses.js';
 import { INDOOR_TILES, OUTDOOR_TILES, garlandLights, lanternPoleLights, streetLampLights } from './tiles.js';
@@ -322,7 +323,7 @@ for (let n = 1; n <= 8; n++) {
   MAP_DEFS[`vcenter${n}`] = { ...MAP_DEFS.center };
   MAP_DEFS[`vmart${n}`] = { ...MAP_DEFS.mart };
 }
-Object.assign(MAP_DEFS, CHAPTER2_MAPS, CHAPTER3_MAPS, CHAPTER4_MAPS, CHAPTER5_MAPS, VILLAGE_MAPS, VILLAGE_AREAS_A, VILLAGE_AREAS_B, GYM_MAPS);
+Object.assign(MAP_DEFS, CHAPTER2_MAPS, CHAPTER3_MAPS, CHAPTER4_MAPS, CHAPTER5_MAPS, VILLAGE_MAPS, VILLAGE_AREAS_A, VILLAGE_AREAS_B, GYM_MAPS, SAFARI_MAPS);
 // Nhà dân chưa có nội thất: dựng phòng và người ở (data/npcHouses.js), vài nhà vẫn khoá cửa
 furnishHouses(MAP_DEFS);
 

@@ -1,6 +1,7 @@
 import { SPECIES } from '../data/monsters.js';
 import { tradeEvolutionTarget } from '../game/evolution.js';
 import { playerName, state } from '../game/state.js';
+import { logSystem } from '../game/systemLog.js';
 import { TRADE_MIN_BADGES, applyTrade, canTrade } from '../game/trade.js';
 import { upload } from '../online/cloudSave.js';
 import { supabase } from '../online/supabase.js';
@@ -121,6 +122,7 @@ async function runTrade(world, id, partner) {
   try {
     const result = await new TradePanel(world, { id, meId: userId(world), partner }).open();
     if (result.status !== 'done') {
+      logSystem(`Giao dịch với ${partner?.name || 'người chơi'} không thành: ${result.reason}`, 'warn');
       await world.say(null, [result.reason]);
       return;
     }
@@ -148,6 +150,7 @@ async function finishTrade(world, view, resumed = false) {
     ...Object.keys(view.theirs.items ?? {}).length ? ['vật phẩm'] : [],
     ...view.theirs.money ? ['tiền'] : [],
   ];
+  logSystem(`Giao dịch với ${view.partnerName} thành công.${got.length ? ` Nhận: ${got.join(', ')}.` : ''}`, 'good');
   await world.say(null, [
     resumed ? `Nhận nốt giao dịch với ${view.partnerName}.` : `Giao dịch với ${view.partnerName} thành công!`,
     got.length ? `Bạn nhận được: ${got.join(', ')}.` : 'Bạn không nhận thêm gì.',

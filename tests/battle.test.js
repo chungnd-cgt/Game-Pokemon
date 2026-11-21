@@ -292,7 +292,7 @@ test('cốt truyện: mục tiêu đổi theo từng mốc', () => {
   assert.equal(objective('home'), 'Nói chuyện với mẹ');
   assert.equal(objective('route1'), 'Về nhà nói chuyện với mẹ');
   setFlag(F.MOM);
-  assert.equal(objective(), 'Ra bụi cỏ phía bắc thị trấn');
+  assert.equal(objective(), 'Đi về phía bắc thị trấn tìm giáo sư');
   setFlag(F.MET_OAK);
   assert.equal(objective(), 'Chọn Pokémon ở phòng thí nghiệm');
   setFlag(F.STARTER);

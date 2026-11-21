@@ -36,24 +36,29 @@ trình duyệt vẫn chơi tiếp được.
    6. [`supabase/sessions.sql`](supabase/sessions.sql): mỗi tài khoản chỉ chơi ở một nơi cùng lúc (xem *Một nơi chơi* bên dưới).
    7. [`supabase/usernames.sql`](supabase/usernames.sql): tên đăng nhập (xem *Tên đăng nhập* bên dưới). Thiếu file này thì
       không đăng ký / đăng nhập được.
+   8. [`supabase/safari.sql`](supabase/safari.sql): giờ máy chủ cho vé Khu Safari (xem *Khu Safari* bên dưới). Thiếu file này
+      thì không mua được vé Safari.
 4. Chép `.env.example` thành `.env.local`, điền **Project URL** và khoá **anon / publishable** (Project Settings → API Keys).
    Không bao giờ dùng khoá secret / service_role trong game. `.env.local` không được đưa lên git.
 
-**Luồng chơi:** mở game → bảng **Đăng nhập / Đăng ký / Quên mật khẩu** (`src/ui/AuthPanel.js`, HTML đè lên game). Đăng ký
+**Luồng chơi:** mở game → **màn đăng nhập riêng** (`src/ui/AuthPanel.js`, HTML che kín game): logo + ảnh minh hoạ +
+nền lấy từ [`src/assets/login/`](src/assets/login/README.md) (thiếu ảnh thì dùng mặc định), khung nhập, nút Đăng nhập /
+Đăng ký ngay dưới, nút Cài đặt ở góc (mở đúng bảng Cài đặt trong game, bỏ nút Đổi diện mạo vì chưa có nhân vật). Đăng ký
 nhập **tên đăng nhập + email + mật khẩu** (2 lần); đăng nhập bằng **tên đăng nhập + mật khẩu**; quên mật khẩu thì nhập email.
 Đăng nhập xong vào game luôn: tài khoản có bản lưu thì chơi tiếp, chưa có thì chọn diện mạo nhân vật rồi chơi mới (không còn menu Tiếp tục / Chơi
 mới / Xoá dữ liệu). **Đăng ký** khi bật "Confirm email": bấm link trong email thì game mở ở **tab mới** và tự đăng nhập; tab
 cũ chỉ báo "đã xác nhận ở tab mới", đóng đi là được (phiên đăng nhập nằm trong tab mới, mỗi tài khoản chỉ chơi ở một nơi).
 **Quên mật khẩu**: bấm link trong email → tab mới hỏi mật khẩu mới → vào game. Nút "Gửi lại email" chờ 60 giây giữa hai lần
-gửi (giới hạn của Supabase). Đăng nhập mà email chưa xác nhận thì có nút gửi lại email xác nhận. Đăng nhập lần đầu mà máy này
-còn bản lưu từ trước khi có tài khoản thì game hỏi có dùng bản đó cho tài khoản không. **Đăng xuất**: Cài đặt → Chung.
+gửi (giới hạn của Supabase). Đăng nhập mà email chưa xác nhận thì có nút gửi lại email xác nhận. Bản lưu cũ trên máy từ
+trước khi có tài khoản (khoá chung `pokemon-demo-save-v1`) không dùng nữa: đăng nhập xong là tự xoá. **Đăng xuất**: Cài đặt → Chung.
 Mỗi lần mở game (đóng tab / trình duyệt rồi mở lại) đều phải **đăng nhập lại**; tên đăng nhập lần trước được điền sẵn. Phiên
 đăng nhập chỉ cất trong sessionStorage (`src/online/supabase.js`) nên tải lại trang trong cùng tab (vd văng game bấm F5) thì
 vẫn còn.
 
 **Tên đăng nhập** (`src/online/username.js`, [`supabase/usernames.sql`](supabase/usernames.sql)): bỏ khoảng trắng 2 đầu; 1-18
-ký tự; chỉ chữ cái không dấu và số (không khoảng trắng, ký tự đặc biệt, biểu tượng); chữ cái đầu tự viết hoa (gõ `chung` thành
-`Chung`). Không trùng tên, không phân biệt hoa thường (`Chung` và `chung` là một; đăng nhập gõ hoa thường thế nào cũng được);
+ký tự; chỉ chữ cái không dấu và số (khoảng trắng, chữ có dấu, biểu tượng... tính là ký tự đặc biệt; sai thì báo chung "Tên đăng
+nhập chứa 1-18 ký tự (không ký tự đặc biệt)"; biểu tượng / emoji gõ hay dán vào ô thì bị bỏ, không hiện); chữ cái đầu tự viết
+hoa (gõ `chung` thành `Chung`). Chuyển giữa Đăng nhập / Đăng ký / Quên mật khẩu thì form được làm mới. Không trùng tên, không phân biệt hoa thường (`Chung` và `chung` là một; đăng nhập gõ hoa thường thế nào cũng được);
 email cũng không trùng (Supabase chặn). Tên lưu ở bảng `profiles` khi tạo tài khoản (trigger trên `auth.users`, trùng / sai
 quy tắc thì huỷ đăng ký); tài khoản không xác nhận email sau 1 ngày thì tên được nhả ra. Supabase chỉ đăng nhập được bằng
 email, nên game gọi `login_email(tên, mật khẩu)`: hàm kiểm tra mật khẩu ngay trong database, đúng thì trả về email để đăng nhập
@@ -137,7 +142,9 @@ trên đường dẫn bị xoá khỏi nội dung trước khi gửi.
 
 Người chơi cùng đứng ở một bản đồ thấy nhau (`src/scenes/worldPlayers.js`, kênh Supabase Realtime `map-<id>` trong
 `src/online/presence.js`): đúng diện mạo, tên hiện trên đầu, thấy nhau đi lại (mỗi bước gửi một tin, đứng yên thì cập nhật
-chỗ đứng cho người vào sau). Người chơi khác không chặn đường. Chọn một người: **chuột phải** (máy tính) hoặc **chạm đúp**
+chỗ đứng cho người vào sau), thấy cả **Pokémon đi theo** (con đầu đội) của người đó bước sau lưng. Trên đầu có tag
+**⚔ Đang đấu** khi người đó đang trong trận, **z z Z** khi AFK (không bấm phím / chạm gì 1 phút, hoặc đang ở tab khác).
+Người chơi khác không chặn đường. Chọn một người: **chuột phải** (máy tính) hoặc **chạm đúp**
 (điện thoại; nhấn đúp chuột trái cũng được) → menu nhỏ:
 
 - **Xem chi tiết:** thẻ Huấn luyện viên rút gọn của người đó: tên, thời gian chơi, ngày bắt đầu và hình nhân vật. Không hiện
@@ -453,6 +460,42 @@ thủ lĩnh và mục tiêu ở `src/story/chapter2.js`, nhiệm vụ các làng
   Bắt Pokémon khi đội đã đủ 6 con thì Pokémon tự vào ô trống đầu tiên của hộp.
   Nhiệm vụ phụ viết trong `src/story/quests.js` (nhiệm vụ cốt truyện ở các làng: xem mục Chương 2).
 
+## Khu Safari (Thành phố Lò Gốm)
+
+Nhà Safari (mái vàng, giữa Poké Mart và Gym Lò Gốm) dẫn vào hai khu. Bản đồ và bảng Pokémon: `src/data/mapsSafari.js`; vé /
+gói: `src/game/safari.js`; nhân viên, chặn cửa, hết giờ: `src/story/safari.js`. Cài đặt: chạy
+[`supabase/safari.sql`](supabase/safari.sql) (giờ máy chủ).
+
+- **Giờ máy chủ:** vé / gói tính theo giờ Supabase (`src/online/serverClock.js`, hỏi lúc mua vé và mỗi phút khi đang ở nhà /
+  khu Safari), chỉnh đồng hồ máy không kéo dài được. Thời gian vẫn trôi khi thoát game. Không kết nối được máy chủ thì không
+  bán vé.
+- **Nhà Safari:** quầy trái bán vé, quầy phải bán gói 24 giờ, bảo vệ đứng giữa hai cửa lớn phía bắc (trái: khu Safari, phải:
+  khu Safari Effort). Chưa có vé mà bước vào cửa thì bảo vệ chặn lại.
+- **Vé Safari** ₽10.000 / 30 phút, ra vào thoải mái khi còn giờ. Vé còn hạn thì không mua thêm được (không cộng dồn). Trong
+  khu ném được mọi loại bóng người chơi có; nhân viên ngay cổng trong khu bán bóng (cùng hàng với Poké Mart Lò Gốm) và cho ra
+  ngoài.
+- **Khu Safari** (56x44): 4 khu quanh đường giữa: Rừng Già (cỏ rậm), Đồi Đá, Đồng Cỏ Lớn, Hồ Ngọc (lướt nước, câu cá). Cấp
+  30-40. Tỉ lệ gặp: 1% Bulbasaur, Charmander, Squirtle, Eevee • 5% Kangaskhan, Scyther, Dratini, Lapras • 10% Exeggutor,
+  Arcanine, Ninetales, Vileplume, Victreebel, Starmie, Chansey.
+- **Vé Safari Effort** ₽10.000 / 20 phút (có gói 24 giờ: ₽2.000): khu luyện EV, 3 khu x 2 bãi cỏ, mỗi bãi đúng một loài cấp
+  10-12 cho +3 EV một chỉ số (Wigglytuff HP, Poliwrath Phòng thủ, Victreebel Tấn công, Alakazam Tấn công đặc biệt, Blastoise
+  Phòng thủ đặc biệt, Pidgeot Tốc độ). Mỗi chỉ số có một luống 2 cây quả giảm EV đúng chỉ số đó. Pokémon ở đây không bắt
+  được. Võ sư Thể lực ở sân tặng **Macho Brace** khi mang tới một Pokémon đã luyện từ 100 EV trở lên.
+- **Gói Safari 24 giờ** ₽55.000: ra vào khu Safari tự do 24 giờ, vé Safari Effort còn ₽2.000. Mỗi ngày (giờ Việt Nam) chỉ
+  mua được một lần, còn hạn thì không mua thêm.
+- Hết giờ khi đang trong khu: loa thông báo rồi đưa ra nhà Safari. Tab **Hệ thống** (khung góc phải dưới) báo lúc vào khu
+  (còn bao lâu) rồi nhắc theo mốc (`TICKET_MARKS` / `PASS_MARKS` trong `src/game/safari.js`): vé mỗi 5 phút, còn 5 phút thì
+  mỗi 2 phút (5, 3, 1), còn 1 phút thì mỗi 30 giây; gói 24 giờ mỗi 15 phút, 15 phút cuối như vé. Chỉ báo khi đang ở trong khu.
+  Thoát game / tab ẩn / mất mạng thì không báo gì; quay lại (mở game, mở lại tab, máy ngủ dậy) thì hỏi giờ máy chủ trước rồi
+  mới báo "Quay lại Khu Safari: còn …" đúng giờ (hết giờ trong lúc vắng mặt thì loa báo và đưa ra nhà Safari).
+- Giờ máy chủ chỉ hỏi lúc mua vé, khi vừa mở lại tab / máy vừa ngủ dậy và mỗi 10 phút khi đang ở nhà / khu Safari; giữa các lần
+  hỏi thì tự đếm bằng đồng hồ đơn điệu của trình duyệt (không đổi theo giờ hệ thống), nên không tốn lượt gọi máy chủ.
+
+**Macho Brace / Exp. Share** (đồ cầm, `battle/formulas.js`: `evYieldFor`, `expShares`, `effectiveSpeed`):
+- **Macho Brace:** EV nhận được gấp đôi, Tốc độ trong trận giảm một nửa. Quà Võ sư Thể lực (khu Safari Effort).
+- **Exp. Share:** con cầm không ra trận (còn chiến đấu được) vẫn nhận 50% EXP và đủ EV khi đồng đội hạ Pokémon; con ra trận
+  vẫn nhận đủ phần của mình. Quà trợ lý Giáo sư Oak ở Pokémon Center Lò Gốm khi Pokédex đã bắt đủ 30 loài.
+
 ## Liên minh Sơn Thủy
 
 Đủ 8 huy hiệu thì từ Thành phố Sương Mù đi về phía đông: **Đường Chiến Thắng** (lính gác kiểm tra 8 huy hiệu) → **Hang Vân Sơn** → **Cao nguyên Liên Minh**.
@@ -554,12 +597,22 @@ bấm nút, kéo thanh trượt; bàn phím: ↑ / ↓ chọn dòng, ← / → �
   thoại ngang ~130%, tối đa 150%). Màn hình hẹp (khung 4:3, điện thoại dọc) thì tự giảm cho thanh phím tắt và khung nhiệm vụ không
   chồng nhau (`hudScaleFor` trong
   `src/game/display.js`, `hudScale` / `hudSize` trong `src/ui/helpers.js`).
-  **Xem nhanh Pokémon gửi vào PC** (mặc định bật): đội đã đủ 6 mà bắt thêm thì Pokémon tự vào hộp PC; khi bật, ngay
-  sau khi bắt hiện bảng nhỏ cho biết cấp, giới tính, hệ, tính cách, đặc tính (đặc tính ẩn tô tím) và IV từng chỉ số; bấm phím
-  xác nhận / quay lại hoặc bấm chuột để đóng. **Bản đồ vùng** (khi đã có bản đồ), **Đổi diện mạo** (mở lại bảng tạo nhân vật,
-  đổi xong nhân vật trên bản đồ đổi ngay), email tài khoản đang đăng nhập và **Đăng xuất**.
-- **Điều khiển**: cách điều khiển bằng cần gạt / chạm (xem Chơi trên điện thoại) và **Phím tắt bàn phím** (xem mục Phím tắt
-  bên dưới). Không còn cài đặt riêng cho điện thoại hay máy tính: chuột và cảm ứng dùng chung một cách.
+  Các ô tích xếp 2 cột:
+  - **Tự dùng lại Repel** (mặc định bật): Repel hết hiệu lực thì tự dùng thêm một cái cùng loại nếu túi còn (không dừng lại,
+    chỉ hiện dòng báo nhỏ); túi hết thì chỉ báo hết như thường.
+  - **Hỏi khi Repel hết** (mặc định tắt): Repel hết hiệu lực thì dừng lại hỏi có dùng thêm không (Có / Không). Bật thì hỏi thay
+    cho tự dùng.
+  - **Xem nhanh khi gửi PC** (mặc định bật): đội đã đủ 6 mà bắt thêm thì Pokémon tự vào hộp PC; khi bật, về bản đồ hiện khung
+    nhỏ bên phải ngay trên khung nhiệm vụ (`src/ui/CatchPreview.js`, cùng tông túi đồ): cấp, giới tính, hệ, tính cách, đặc
+    tính (đặc tính ẩn tô tím) và IV từng chỉ số; đóng bằng ✕, phím xác nhận / quay lại hoặc bấm ra ngoài.
+  - **Tên NPC** / **Tên người chơi** (mặc định bật): tên trên đầu NPC (trừ NPC là Pokémon) / người chơi khác.
+  - **Hiện D-Pad** (mặc định tắt): nút điều hướng tròn cố định bên trái, cạnh cột nút menu (`src/ui/DPad.js`).
+  - **Cần gạt tương đối** (mặc định tắt): kéo quá vòng cần gạt thì tâm cần gạt dời theo ngón tay (xem Chơi trên điện thoại).
+
+  Các nút: **Bản đồ vùng** (khi đã có bản đồ), **Đổi diện mạo** (mở lại bảng tạo nhân vật, đổi xong nhân vật trên bản đồ đổi
+  ngay), tên tài khoản đang đăng nhập và **Đăng xuất**.
+- **Điều khiển**: bảng phím ngay trong thẻ (xem mục Phím tắt bên dưới). Không còn cài đặt riêng cho điện thoại hay máy tính:
+  chuột và cảm ứng dùng chung một cách.
 
 ### Chơi trên điện thoại
 
@@ -568,7 +621,11 @@ Không có phím chữ thập hay nút A / B: mọi thứ chạm trực tiếp t
 
 - **Di chuyển — cần gạt tròn** (`src/ui/Joystick.js`): chạm vào chỗ trống trên bản đồ rồi kéo, cần gạt hiện ngay dưới ngón
   tay; kéo về hướng nào thì đi hướng đó (4 hướng, theo trục kéo nhiều hơn), giữ là đi liên tục, thả tay là dừng. Chạm bắt đầu
-  trên nút / ô giao diện (cột nút, ô phím tắt, khung nhiệm vụ...) thì không thành cần gạt.
+  trên nút / ô giao diện (cột nút, ô phím tắt, khung nhiệm vụ...) thì không thành cần gạt. **Cần gạt tương đối** (Cài đặt →
+  Chung): kéo ngón tay ra quá vòng thì tâm cần gạt dời theo, đổi hướng chỉ cần kéo ngược một đoạn ngắn.
+- **D-Pad** (Cài đặt → Chung → Hiện D-Pad): nút tròn cố định bên trái (cạnh cột nút menu, trên thanh phím tắt), trông như
+  cần gạt; chạm / kéo trong vòng về hướng nào thì đi hướng đó, núm chạy theo ngón tay, thả tay là dừng. Dùng song song với
+  cần gạt kéo-thả.
 - **Thao tác — chạm thẳng:** chạm vào người / đồ vật / bảng hiệu / Pokémon đi theo ngay cạnh nhân vật (hoặc cách 2 ô thẳng
   hàng, vd y tá sau quầy) là quay về phía đó rồi nói chuyện / nhặt / xem; chạm vào chính nhân vật là thao tác với ô phía
   trước. Lời thoại chạm để đọc tiếp, menu / trận đấu / túi đồ chạm vào nút và ô; mở Cài đặt bằng nút bánh răng trên màn hình.
@@ -589,7 +646,7 @@ nạp xong thì hiện "Đang tải hình Pokémon… %" chờ nốt. Bản đ�
 
 ## Cách chơi
 
-Phím mặc định (mỗi hành động có **phím chính** và **phím phụ**, đổi được trong **Cài đặt → Phím tắt**):
+Phím mặc định (mỗi hành động có **phím chính** và **phím phụ**, đổi được trong **Cài đặt → Điều khiển**):
 
 | Phím mặc định | Tác dụng |
 | --- | --- |
@@ -607,19 +664,18 @@ Phím mặc định (mỗi hành động có **phím chính** và **phím phụ*
 
 Đi tới gờ đất theo chiều dốc xuống là tự nhảy qua (chỉ một chiều).
 
-### Phím tắt (Cài đặt → Phím tắt)
+### Phím tắt (Cài đặt → Điều khiển)
 
-Màn `src/ui/KeyBindings.js` liệt kê mọi hành động: Đi lên / xuống / sang trái / sang phải, Xác nhận / nói chuyện,
+Thẻ Điều khiển trong Cài đặt (`src/ui/SettingsPanel.js`) là bảng phím **Hành động | Phím chính | Phím phụ**, liệt kê mọi hành động: Đi lên / xuống / sang trái / sang phải, Xác nhận / nói chuyện,
 Quay lại / huỷ, Đội hình, Túi đồ, Pokédex, Thẻ HLV, Bản đồ vùng, Cài đặt, Xe đạp, Cưỡi thú, Ô phím tắt 1-6. Mỗi dòng có hai ô
 **Phím chính** / **Phím phụ** ghi tên phím ("M", "Enter", "Space", "↑", "Esc", "1", "Numpad 1"...).
 - Bấm vào ô (hoặc chọn ô bằng phím hướng rồi bấm phím xác nhận): ô nhấp nháy vàng "…", phím bấm tiếp theo được gán cho ô đó
   (Esc, Enter, Backspace... đều gán được; Tab không gán được). Bấm lại đúng phím cũ hoặc bấm chuột ra chỗ khác là thôi.
-- Ô đang chọn có nút ✕ nhỏ để bỏ phím (bàn phím: Delete). Không bỏ được phím cuối cùng của di chuyển / xác nhận / quay lại
+- Delete bỏ phím của ô đang chọn (hoặc đang chờ). Không bỏ được phím cuối cùng của di chuyển / xác nhận / quay lại
   (dòng sáng đỏ), nên không bao giờ bị kẹt trong menu.
 - Phím mới đang thuộc hành động khác thì **hai bên đổi phím cho nhau** (dòng bị đổi sáng vàng một lúc). Riêng **Quay lại** và
   **Cài đặt** được dùng chung phím (mặc định cùng Esc / X).
-- Nút **Khôi phục mặc định**. Danh sách dài thì cuộn bằng con lăn chuột / phím hướng. Đóng bằng ✕, phím quay lại hiện tại hoặc
-  bấm ra ngoài khung.
+- Danh sách dài thì cuộn bằng con lăn chuột / phím hướng. Đổi phím có tác dụng ngay, không cần bấm Áp dụng.
 - Phím nhận theo vị trí trên bàn phím (`KeyboardEvent.code`) nên vẫn dùng được khi đang bật bộ gõ tiếng Việt. Bảng phím lưu trong
   cài đặt của trình duyệt (`src/game/settings.js`, mục `keybinds`), thiếu / hỏng thì dùng phím mặc định. Code: `src/game/keybinds.js`
   (bảng hành động, đổi phím, tên phím), `src/ui/input.js` (xác nhận / quay lại / hướng theo bảng phím).
@@ -642,7 +698,14 @@ Bố cục màn hình trên bản đồ:
   Pokémon góc trái trên hoặc phím M; Bản đồ vùng và Phím tắt nằm trong Cài đặt). Nút **≡** ở góc dưới trái ẩn / hiện cột nút
   (nhớ cho lần sau).
 - **Đáy màn hình:** nút ≡, **ô tiền** (đồng ₽ + số tiền), rồi **6 ô phím tắt**, góc mỗi ô ghi phím của ô (mặc định 1-6).
-  **Góc phải dưới:** khung nhiệm vụ, bấm để thu gọn chỉ còn tiêu đề.
+  **Chỗ đi qua được** có ngôi sao vàng nhỏ lóe lên định kỳ (`WorldScene.findPassSpots` / `twinklePassSpots`): cửa các toà
+  nhà, mọi ô chuyển bản đồ (lối ra ở mép bản đồ, khúc sông nối hai bản đồ, cửa hang, cầu thang, cửa lớn trong nhà), ô dịch
+  chuyển trong gym, thảm cửa ra trong nhà. Lối ra rộng nhiều ô gộp thành một vùng.
+  **Góc phải dưới:** khung 2 tab **Hệ thống** / **Nhiệm vụ** (`src/ui/InfoPanel.js`). Nhiệm vụ: mục tiêu hiện tại. Hệ thống:
+  nhật ký thông báo có giờ [HH:MM:SS] (`src/game/systemLog.js`, giữ 50 dòng gần nhất trong phiên chơi): thời gian còn ở Khu
+  Safari, mua vé, giao dịch thành công / không thành, tự dùng Repel, không lưu được (chữ xanh lá); con lăn chuột để
+  xem dòng cũ, có dòng mới khi đang xem tab khác thì tab Hệ thống hiện số chưa đọc. Bấm tab đang chọn để thu gọn chỉ còn hàng
+  tab.
 - **Thẻ Huấn luyện viên** (phím **T** hoặc nút Thẻ HLV, `src/ui/TrainerCard.js`): tên, thời gian chơi, ngày bắt đầu (bản lưu cũ không
   có thì "—"), tổng số Pokémon (đội + PC), Pokédex đã bắt / đã gặp, số lần vô địch Liên minh, hình nhân vật trên bục, tiền,
   **khung 8 huy hiệu** (chưa có thì bóng đen; rê chuột xem tên huy hiệu và thành phố). Đóng: phím quay lại / phím Thẻ HLV / ✕
@@ -669,8 +732,10 @@ thì không có gì xảy ra.
 Mỗi vật phẩm chỉ nằm một ô (gán sang ô khác thì ô cũ trống), gán lại đúng ô đang có là bỏ gán.
 Trên bản đồ bấm phím của ô hoặc bấm chuột vào ô để dùng. Xe / thú cưỡi đang dùng thì ô sáng viền.
 Thanh phím tắt ẩn khi đang đánh trận, hội thoại hay mở menu.
-Khung nhiệm vụ hẹp, nhiệm vụ dài thì xuống dòng. Đồng hồ góc phải trên hiện buổi trong ngày (Ban ngày / Chiều / Ban đêm),
-giờ trong game (00:00-23:59) và **tên bản đồ đang đứng**.
+Khung nhiệm vụ hẹp, nhiệm vụ dài thì xuống dòng. Khung giờ góc phải trên: **Giờ máy** (trên), **Giờ game** (dưới, 00:00-23:59),
+icon buổi trong ngày (mặt trời / mặt trời lặn / trăng) trong vòng tròn viền màu theo buổi; **tên bản đồ đang đứng** in ngay dưới
+khung. Bảng Pokémon trong khu thu gọn thì chỉ còn một tab mảnh ◀ sát mép phải. Cột đội hình: ô chưa có Pokémon hiện chấm tròn
+xám. Góc trái dưới có khung nền bao cột nút tròn và hàng nút ≡ / tiền / phím tắt, chỗ nối uốn cong (`WorldHud.drawFrame`).
 
 **Câu cá:** không có phím riêng. Đứng quay mặt ra mặt nước rồi **bấm vào cần câu trong túi đồ** (bấm là dùng ngay, không hỏi
 Dùng / Gán phím tắt; xe đạp và thú cưỡi cũng vậy) hoặc dùng **ô phím tắt** đã gán cần câu. Không quay mặt ra mặt nước thì báo
@@ -915,7 +980,7 @@ src/
   battle/formulas.js   Công thức sát thương, bắt Pokémon, EXP, bỏ chạy
   battle/status.js     Trạng thái (độc, bỏng...), hiệu ứng tạm thời trong trận
   gfx/                 Pixel art bản đồ (đồ trang trí ngoài trời: decor.js), nhân vật, hiệu ứng
-  ui/                  Hộp thoại, menu, thanh máu, màn Phím tắt (KeyBindings.js), input.js (phím theo bảng phím)
+  ui/                  Hộp thoại, menu, thanh máu, Cài đặt (SettingsPanel.js, cả bảng phím), input.js (phím theo bảng phím)
   story/chapter1.js    Cốt truyện chương 1
   story/chapter2.js    Thủ lĩnh gym, mục tiêu hành trình, cổng huy hiệu
   story/league.js      Tứ Thiên Vương, Nhà vô địch, Điện vinh danh

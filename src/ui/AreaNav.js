@@ -8,9 +8,9 @@ import { fixToCamera, hudScale, hudSize, textStyle } from './helpers.js';
 
 const DEPTH = 100;
 const WIDTH = 256; // 5 ô Pokémon + cột nút thu gọn ▶ bên phải
-const TOP = 82; // ngay dưới khung đồng hồ 2 dòng (ui/WorldHud.js)
-const TAB_W = 30;
-const TAB_H = 64;
+const TOP = 92; // ngay dưới khung giờ + tên bản đồ (ui/WorldHud.js)
+const TAB_W = 20; // tab thu gọn mảnh sát mép phải (chỉ có mũi tên ◀)
+const TAB_H = 44;
 const ICON = 40;
 const GAP = 4;
 const PER_ROW = 5;
@@ -108,23 +108,18 @@ export class AreaNav {
     fixToCamera(c);
   }
 
-  // Tab thu gọn nằm sát mép phải: mũi tên + hình Poké Ball nhỏ
+  // Tab thu gọn mảnh nằm sát mép phải, chỉ có mũi tên ◀ (gọn, dễ nhìn)
   renderTab(c) {
     const { scene } = this;
     const g = scene.add.graphics();
-    g.fillStyle(DARK, 0.82);
-    g.fillRoundedRect(0, 0, TAB_W + 12, TAB_H, { tl: 10, bl: 10, tr: 0, br: 0 });
+    g.fillStyle(DARK, 0.85);
+    g.fillRoundedRect(0, 0, TAB_W + 10, TAB_H, { tl: 9, bl: 9, tr: 0, br: 0 });
+    g.lineStyle(2, 0x3d4c72, 0.9);
+    g.strokeRoundedRect(1, 1, TAB_W + 10, TAB_H - 2, { tl: 8, bl: 8, tr: 0, br: 0 });
     g.fillStyle(0xffd860);
     g.fillRect(0, 10, 3, TAB_H - 20);
-    g.fillStyle(0xffffff);
-    g.fillCircle(TAB_W / 2 + 2, 22, 8);
-    g.fillStyle(0xe83838);
-    g.slice(TAB_W / 2 + 2, 22, 8, Math.PI, 0, false);
-    g.fillPath();
-    g.fillStyle(DARK);
-    g.fillRect(TAB_W / 2 - 6, 21, 16, 2);
     c.add(g);
-    const arrow = scene.add.text(TAB_W / 2 + 2, 46, '◀', textStyle(14, '#ffffff', { fontStyle: 'bold' })).setOrigin(0.5);
+    const arrow = scene.add.text(TAB_W / 2 + 2, TAB_H / 2, '◀', textStyle(14, '#ffffff', { fontStyle: 'bold' })).setOrigin(0.5);
     c.add(arrow);
     const hit = scene.add.zone(TAB_W / 2, TAB_H / 2, TAB_W, TAB_H).setInteractive({ useHandCursor: true });
     hit.on('pointerover', () => arrow.setColor('#ffd860'));

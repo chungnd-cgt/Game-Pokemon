@@ -1,8 +1,8 @@
 import { setSetting, settings } from './settings.js';
 
 // Bảng phím: mỗi hành động có tối đa 2 phím (chính / phụ), ghi theo KeyboardEvent.code (vị trí phím trên bàn phím,
-// không theo ký tự) nên bật bộ gõ tiếng Việt (Telex / VNI) vẫn nhận đúng. Người chơi đổi phím trong Cài đặt → Phím tắt
-// (ui/KeyBindings.js), lưu trong cài đặt (game/settings.js, mục keybinds).
+// không theo ký tự) nên bật bộ gõ tiếng Việt (Telex / VNI) vẫn nhận đúng. Người chơi đổi phím trong Cài đặt → Điều khiển
+// (bảng phím trong ui/SettingsPanel.js), lưu trong cài đặt (game/settings.js, mục keybinds).
 //  required: hành động bắt buộc luôn còn ít nhất một phím (di chuyển, xác nhận, quay lại) để không bị kẹt trong menu
 export const KEY_ACTIONS = [
   { id: 'up', label: 'Đi lên', keys: ['ArrowUp', 'KeyW'], required: true },

@@ -61,6 +61,32 @@ function drawLuckyEgg() {
   return p.toCanvas();
 }
 
+// Macho Brace: vòng tạ nặng màu đồng, hai quả tạ tròn hai đầu
+function drawMachoBrace() {
+  const p = new PixelBuffer(16, 16);
+  p.rect(4, 7, 8, 2, '#8a6a30');
+  p.ellipse(3.5, 8, 2.5, 4, '#d8a040');
+  p.ellipse(12.5, 8, 2.5, 4, '#d8a040');
+  p.recolor('#a87a28', (x, y) => y > 9);
+  p.set(3, 6, '#f8e0a0');
+  p.set(12, 6, '#f8e0a0');
+  p.outline();
+  return p.toCanvas();
+}
+
+// Exp. Share: máy nhỏ màu xanh có màn hình sáng và ăng-ten
+function drawExpShare() {
+  const p = new PixelBuffer(16, 16);
+  p.rect(3, 5, 10, 9, '#4a88e0');
+  p.rect(5, 7, 6, 4, '#bff0ff');
+  p.rect(6, 8, 2, 2, '#58c070');
+  p.rect(11, 2, 1, 3, '#2a4a80');
+  p.set(11, 1, '#f05050');
+  p.recolor('#2f68b8', (x, y) => y > 11);
+  p.outline();
+  return p.toCanvas();
+}
+
 // Đồ tăng sức mạnh theo hệ: túi nhỏ buộc dây, màu theo hệ
 function drawBooster(color) {
   const p = new PixelBuffer(16, 16);
@@ -353,4 +379,6 @@ export function makeItemIcons(scene, monSprite = () => null) {
   for (const id of ['helixFossil', 'domeFossil', 'oldAmber']) addCanvasTexture(scene, ITEMS[id].icon, drawFossil(id, ITEMS[id].color));
   // Bóng vẽ mịn như ảnh SVG của các loại bóng khác: lọc tuyến tính khi thu nhỏ (không để răng cưa như pixel art)
   addCanvasTexture(scene, ITEMS.masterBall.icon, drawMasterBall()).setFilter(FILTER_LINEAR);
+  addCanvasTexture(scene, ITEMS.machoBrace.icon, drawMachoBrace());
+  addCanvasTexture(scene, ITEMS.expShare.icon, drawExpShare());
 }

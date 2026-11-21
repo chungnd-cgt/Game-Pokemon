@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
-import { formatMoney } from '../data/items.js';
 import { MAPS, SPAWN, resumePosition } from '../data/map.js';
-import { clearLegacySave, deleteSave, legacySave, loadGame, setSaveOwner, summarize, writeSave } from '../game/save.js';
+import { clearLegacySave, deleteSave, loadGame, setSaveOwner } from '../game/save.js';
 import { createMonster } from '../game/monster.js';
 import { currentUser, fetchUsername } from '../online/account.js';
 import { markDirty, startCloudSave } from '../online/cloudSave.js';
@@ -13,6 +12,7 @@ import { monImagesReady } from '../gfx/monImages.js';
 import { applyPlayerLook } from '../gfx/player.js';
 import { fitScale, pixelMon } from '../gfx/textures.js';
 import { CharacterCreator } from '../ui/CharacterCreator.js';
+import { SettingsPanel } from '../ui/SettingsPanel.js';
 import { BLEED, COLORS, centerStage, drawPanel, gradientRect, textStyle } from '../ui/helpers.js';
 import { InputRouter } from '../ui/input.js';
 import { Menu } from '../ui/Menu.js';
@@ -43,14 +43,16 @@ export default class TitleScene extends Phaser.Scene {
       bg.strokeCircle(cx, cy, r * 0.28);
     }
 
-    this.add.text(width / 2, 70, 'Pokémon', textStyle(84, '#ffe066', { fontStyle: 'bold', stroke: '#2a4a9a', strokeThickness: 14 })).setOrigin(0.5);
-    this.add.text(width / 2, 140, 'PHIÊN BẢN DEMO', textStyle(24, '#c8d8ff', { fontStyle: 'bold' })).setOrigin(0.5);
-    this.add.text(width / 2, 176, 'Hành trình vùng Sơn Thủy', textStyle(22, '#ffffff')).setOrigin(0.5);
-
+    // Chữ tiêu đề + 3 Pokémon (ẩn tạm khi mở Cài đặt từ màn đăng nhập: nền gọn như trong game)
+    this.titleParts = [
+      this.add.text(width / 2, 70, 'Pokémon', textStyle(84, '#ffe066', { fontStyle: 'bold', stroke: '#2a4a9a', strokeThickness: 14 })).setOrigin(0.5),
+      this.add.text(width / 2, 140, 'PHIÊN BẢN DEMO', textStyle(24, '#c8d8ff', { fontStyle: 'bold' })).setOrigin(0.5),
+      this.add.text(width / 2, 176, 'Hành trình vùng Sơn Thủy', textStyle(22, '#ffffff')).setOrigin(0.5),
+    ];
     for (const [id, x, flip] of TITLE_MONS) {
       const key = pixelMon(this, id);
       const sprite = this.add.image(x, 400, key).setOrigin(0.5, 1).setScale(fitScale(this, key, 192)).setFlipX(flip);
-      this.add.ellipse(x, 404, 140, 22, 0x000000, 0.2);
+      this.titleParts.push(sprite, this.add.ellipse(x, 404, 140, 22, 0x000000, 0.2));
       this.tweens.add({ targets: sprite, y: 388, duration: 900 + x, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
     }
 
@@ -77,14 +79,14 @@ export default class TitleScene extends Phaser.Scene {
     let fresh = false;
     // Link "đặt lại mật khẩu" trong email: đã có phiên tạm, đặt mật khẩu mới rồi vào game
     if (user && emailLink.recovery) {
-      user = await new AuthPanel().openNewPassword();
+      user = await this.authPanel().openNewPassword();
       fresh = true;
     }
     if (!user) {
       const linkError = emailLink.errorCode
         ? 'Link trong email đã hết hạn hoặc đã dùng rồi. Hãy đăng nhập, hoặc gửi lại email.' : null;
       clearLinkError();
-      user = await new AuthPanel({ error: linkError }).open();
+      user = await this.authPanel({ error: linkError }).open();
       fresh = true;
     }
 
@@ -92,12 +94,14 @@ export default class TitleScene extends Phaser.Scene {
     // Bị nơi khác giành quyền giữa chừng: dừng hẳn game (bảng "Đăng nhập lại" che lên trên)
     const onLost = () => this.game.pause();
     if (await claimSession(user, fresh, { onLost }) === 'taken') {
-      user = await new AuthPanel({ error: 'Tài khoản đã được mở ở tab hoặc thiết bị khác. Đăng nhập lại để chơi ở đây.' }).open();
+      user = await this.authPanel({ error: 'Tài khoản đã được mở ở tab hoặc thiết bị khác. Đăng nhập lại để chơi ở đây.' }).open();
       await claimSession(user, true, { onLost });
     }
 
     this.username = await fetchUsername(user);
     this.registry.set('user', { id: user.id, email: user.email, username: this.username });
+    // Bản lưu cũ từ trước khi có tài khoản (khoá chung trên máy): không dùng nữa, xoá đi
+    clearLegacySave();
     for (;;) {
       this.status('Đang tải bản lưu…');
       const { hasSave, offline } = await startCloudSave(user);
@@ -114,13 +118,23 @@ export default class TitleScene extends Phaser.Scene {
         this.status('Bản lưu bị lỗi, không tải được. Hãy liên hệ người làm game.', true);
         return;
       }
-      if (await this.adoptLegacySave()) {
-        markDirty();
-        if (this.continueGame()) return;
-      }
       await this.newGame();
       return;
     }
+  }
+
+  // Màn đăng nhập (ui/AuthPanel.js); nút Cài đặt ở góc mở đúng bảng Cài đặt trong game
+  authPanel(opts = {}) {
+    return new AuthPanel({ ...opts, onSettings: () => this.openSettings() });
+  }
+
+  // Bảng Cài đặt trong game (ui/SettingsPanel.js), mở từ màn đăng nhập (màn đăng nhập tạm ẩn trong lúc này). Bỏ các nút cần
+  // đang ở trong game (Đổi diện mạo...)
+  async openSettings() {
+    for (const part of this.titleParts) part.setVisible(false);
+    await new SettingsPanel(this, this.router, { depth: 60, lobby: true }).open();
+    this.router.clear();
+    for (const part of this.titleParts) part.setVisible(true);
   }
 
   // Test Playwright (chỉ dev): bản lưu riêng trên máy, đã qua chương 1, 4 huy hiệu, đội 3 con, túi có đồ; không mạng
@@ -177,20 +191,6 @@ export default class TitleScene extends Phaser.Scene {
     return true;
   }
 
-  // Tài khoản chưa có bản lưu mà máy này còn bản lưu từ trước khi có tài khoản: hỏi có dùng bản đó không (chỉ hỏi
-  // khi tài khoản chưa có gì). Đồng ý thì chép vào tài khoản và xoá bản cũ khỏi máy
-  async adoptLegacySave() {
-    const old = summarize(legacySave());
-    if (!old) return false;
-    const info = this.showSummary(old);
-    const yes = await this.confirm('Máy này có bản lưu từ trước khi có tài khoản. Dùng bản lưu đó cho tài khoản này?');
-    info.destroy();
-    if (!yes) return false;
-    writeSave(legacySave());
-    clearLegacySave();
-    return true;
-  }
-
   // Chơi mới: tạo nhân vật (bấm quay lại thì mở lại bảng tạo nhân vật, không có màn nào khác để về)
   async newGame() {
     this.status('');
@@ -201,21 +201,6 @@ export default class TitleScene extends Phaser.Scene {
     state.player = player;
     applyPlayerLook(this, state.player);
     this.go({ position: SPAWN, newGame: true });
-  }
-
-  // Khung thông tin bản lưu bên cạnh nút Tiếp tục
-  showSummary(s) {
-    const c = this.add.container(0, 0);
-    c.add(drawPanel(this, 660, 420, 270, 150, 16, true));
-    const minutes = Math.floor(s.playTime / 60);
-    const lead = s.lead ? `${s.lead.name} Lv${s.lead.level}` : 'Chưa có Pokémon';
-    c.add(this.add.text(684, 440, s.name ? `Bản lưu của ${s.name}` : 'Bản lưu', textStyle(18, '#8a92a6', { fontStyle: 'bold' })));
-    c.add(this.add.text(684, 468, [
-      lead,
-      `Pokédex: ${s.caught}   •   ${formatMoney(s.money)}`,
-      `Đã chơi: ${Math.floor(minutes / 60)} giờ ${minutes % 60} phút`,
-    ].join('\n'), textStyle(17, COLORS.text, { lineSpacing: 6 })));
-    return c;
   }
 
   // Chơi mới: bảng tuỳ chỉnh nhân vật (giới tính + diện mạo, ui/CharacterCreator.js). Tên = tên đăng nhập (không có thì

@@ -68,7 +68,7 @@ class InlineTip {
 
 // Túi đồ dạng khung bên phải màn hình: dải tab ngăn túi dọc bên TRÁI, đầu khung có tên ngăn + ô tìm kiếm (phím gõ ra chữ
 // là tìm, không phân biệt dấu; Backspace xoá, Esc / phím quay lại xoá chữ rồi đóng túi), vật phẩm xếp lưới 2 cột (icon,
-// tên, ×số lượng) cuộn bằng con lăn chuột / phím hướng. Phím hướng / xác nhận / quay lại theo Cài đặt → Phím tắt, trừ
+// tên, ×số lượng) cuộn bằng con lăn chuột / phím hướng. Phím hướng / xác nhận / quay lại theo Cài đặt → Điều khiển, trừ
 // phím gõ ra chữ (dành cho ô tìm kiếm). Rê chuột / di phím tới vật phẩm thì hiện mô tả (BagParts.ItemTip) cạnh khung.
 // open() trả về id vật phẩm được chọn, hoặc null nếu đóng túi.
 // opts:

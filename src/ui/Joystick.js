@@ -3,6 +3,9 @@
 // (4 hướng, theo trục kéo nhiều hơn), thả tay thì dừng. Chạm nhanh rồi thả (không kéo) là "chạm vào bản đồ" (onTap).
 // Không nhận chạm bắt đầu trên nút / ô của giao diện (Phaser báo có vật bấm được dưới con trỏ).
 // Cố định theo màn hình, vẽ trên mọi thứ của bản đồ nhưng dưới hộp thoại / menu.
+// Cài đặt → Chung → Cần gạt tương đối: kéo ngón tay ra quá vòng nền thì tâm cần gạt dời theo ngón tay (luôn cách ngón tay đúng
+// bán kính vòng), nên đổi hướng chỉ cần kéo ngược lại một đoạn ngắn thay vì kéo về tận chỗ chạm ban đầu.
+import { settings } from '../game/settings.js';
 
 const BASE_R = 64; // bán kính vòng nền
 const KNOB_R = 28; // bán kính núm
@@ -67,14 +70,24 @@ export class Joystick {
 
   move(p) {
     if (p.id !== this.pointerId) return;
-    const dx = p.x - this.start.x;
-    const dy = p.y - this.start.y;
-    const dist = Math.hypot(dx, dy);
+    let dx = p.x - this.start.x;
+    let dy = p.y - this.start.y;
+    let dist = Math.hypot(dx, dy);
     if (!this.dragging) {
       if (dist < DRAG_START) return;
       this.dragging = true;
       this.base.setPosition(this.start.x, this.start.y).setVisible(true);
       this.knob.setVisible(true);
+    }
+    // Cần gạt tương đối: tâm dời theo ngón tay khi kéo quá vòng nền
+    if (settings.touchRelative === true && dist > BASE_R) {
+      const k = (dist - BASE_R) / dist;
+      this.start.x += dx * k;
+      this.start.y += dy * k;
+      this.base.setPosition(this.start.x, this.start.y);
+      dx = p.x - this.start.x;
+      dy = p.y - this.start.y;
+      dist = BASE_R;
     }
     const k = Math.min(1, BASE_R / Math.max(dist, 1));
     this.knob.setPosition(this.start.x + dx * k, this.start.y + dy * k);

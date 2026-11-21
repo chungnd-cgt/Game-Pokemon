@@ -7,6 +7,7 @@ import { hasFlag, itemCount, markCaught, playerName, setFlag, state, useItem } f
 import { CHAPTER2_NPCS, badgeGate, objective2 } from './chapter2.js';
 import { F_CHAMPION, LEAGUE_NPCS } from './league.js';
 import { POSTGAME_NPCS, confirmChoice, fossilFound, momPostgame, oakPostgame, postgameObjective, postgameStep } from './postgame.js';
+import { SAFARI_NPCS, safariBlocker } from './safari.js';
 import { QUEST_NPCS, questTaken } from './quests.js';
 import { RIVAL_NPCS, RIVAL_PICK, rivalStarter, rivalTrainer, rivalTrigger } from './rival.js';
 import { ROCKET_NPCS, rocketObjective, rocketTrigger } from './rocket.js';
@@ -58,7 +59,7 @@ const MOM_HINT = { home2f: 'Xuống tầng 1 nói chuyện với mẹ', home: 'N
 
 // Mục tiêu hiện tại, hiện ở góc màn hình. mapId: bản đồ đang đứng (mặc định: phòng ngủ lúc mới chơi)
 export function objective(mapId = 'home2f') {
-  if (!hasFlag(F.MET_OAK)) return hasFlag(F.MOM) ? 'Ra bụi cỏ phía bắc thị trấn' : MOM_HINT[mapId] ?? 'Về nhà nói chuyện với mẹ';
+  if (!hasFlag(F.MET_OAK)) return hasFlag(F.MOM) ? 'Đi về phía bắc thị trấn tìm giáo sư' : MOM_HINT[mapId] ?? 'Về nhà nói chuyện với mẹ';
   if (!hasFlag(F.STARTER)) return 'Chọn Pokémon ở phòng thí nghiệm';
   if (!hasFlag(F.QUEST_DONE)) {
     const n = questProgress();
@@ -312,7 +313,7 @@ STORY_NPCS.push(
       }
     },
   },
-  ...RIVAL_NPCS, ...ROCKET_NPCS, ...CHAPTER2_NPCS, ...LEAGUE_NPCS, ...QUEST_NPCS, ...VILLAGE_NPCS, ...POSTGAME_NPCS,
+  ...RIVAL_NPCS, ...ROCKET_NPCS, ...CHAPTER2_NPCS, ...LEAGUE_NPCS, ...QUEST_NPCS, ...VILLAGE_NPCS, ...POSTGAME_NPCS, ...SAFARI_NPCS,
 );
 
 // ---------- Hội thoại theo giai đoạn ----------
@@ -528,6 +529,9 @@ async function rivalPicksAndBattles(world) {
 
 // Người chơi sắp bước vào ô (x, y): trả về sự kiện (hàm async) để chặn bước đi, hoặc null
 export function stepBlocker(world, x, y) {
+  // Nhà Safari: chưa có vé thì bảo vệ chặn ở cửa lớn (story/safari.js)
+  const safari = safariBlocker(world, x, y);
+  if (safari) return safari;
   // Lối phía bắc sang Tuyến đường 2 chỉ mở khi xong nhiệm vụ của Giáo sư Oak
   if (world.map.id === 'route1' && world.map.warpAt(x, y)?.to === 'route2' && !hasFlag(F.QUEST_DONE)) {
     return () => world.say(null, ['Bạn nhớ lời Giáo sư Oak dặn: bắt Pokémon đầu tiên rồi quay lại báo cho ông đã.']);

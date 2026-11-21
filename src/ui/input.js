@@ -1,6 +1,6 @@
 import { DIRECTION_ACTIONS, matches } from '../game/keybinds.js';
 
-// Phím xác nhận / quay lại / hướng đi theo bảng phím người chơi đặt (game/keybinds.js, Cài đặt → Phím tắt)
+// Phím xác nhận / quay lại / hướng đi theo bảng phím người chơi đặt (game/keybinds.js, Cài đặt → Điều khiển)
 export const isConfirm = (e) => !e.repeat && matches(e, 'confirm');
 export const isCancel = (e) => !e.repeat && matches(e, 'cancel');
 export const directionOf = (e) => DIRECTION_ACTIONS.find((d) => matches(e, d)) ?? null;

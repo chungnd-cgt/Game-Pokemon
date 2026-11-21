@@ -1,7 +1,7 @@
 import { ITEMS, formatMoney } from '../data/items.js';
 import { SPECIES } from '../data/monsters.js';
 import { TYPES } from '../data/types.js';
-import { createMonster } from '../game/monster.js';
+import { createMonster, evTotal } from '../game/monster.js';
 import { addCaught, hasFlag, itemCount, setFlag, state, useItem } from '../game/state.js';
 
 // Nhiệm vụ phụ: nói chuyện với NPC để nhận nhiệm vụ, làm xong quay lại nhận thưởng.
@@ -12,6 +12,7 @@ import { addCaught, hasFlag, itemCount, setFlag, state, useItem } from '../game/
 //   trainers: [id]         thắng hết các nhà huấn luyện này
 //   caught: n              Pokédex đã bắt được n loài
 //   badge: id              đã có huy hiệu
+//   evTotal: n             trong đội có Pokémon đã luyện được tổng cộng n EV trở lên (chỉ cho xem)
 // Vật phẩm nhặt trên đường có quest: '<id>' chỉ hiện khi đã nhận nhiệm vụ đó (xem objectVisible).
 
 export const questTaken = (id) => hasFlag(`quest:${id}`);
@@ -35,6 +36,10 @@ export function questMissing(need) {
     if (left) missing.push(`Còn ${left} nhà huấn luyện chưa đánh bại.`);
   }
   if (need.caught && state.dex.caught.size < need.caught) missing.push(`Pokédex đã bắt: ${state.dex.caught.size}/${need.caught} loài.`);
+  if (need.evTotal) {
+    const best = Math.max(0, ...state.party.map(evTotal));
+    if (best < need.evTotal) missing.push(`Mang theo một Pokémon đã luyện ${need.evTotal} EV trở lên (nhiều nhất trong đội: ${best}).`);
+  }
   return missing;
 }
 
@@ -142,6 +147,36 @@ const eeveeGift = {
 
 export const QUEST_NPCS = [
   eeveeGift,
+  // Exp. Share: trợ lý Giáo sư Oak ở Pokémon Center Lò Gốm, tặng khi Pokédex đã bắt đủ 30 loài
+  questNpc({
+    id: 'q-expshare', sprite: 'npc-aide', name: 'Trợ lý Giáo sư', map: 'center6', x: 11, y: 7, facing: 'left', fixed: true,
+    quest: {
+      id: 'expShare',
+      ask: ['Chào bạn! Tôi là trợ lý của Giáo sư Oak, đi khắp vùng thu thập dữ liệu Pokédex.',
+        'Giáo sư gửi theo một món quà cho nhà huấn luyện nào đã bắt được 30 loài Pokémon.'],
+      hint: ['Bắt đủ 30 loài rồi quay lại gặp tôi nhé. Khu Safari ngay trong thành phố có nhiều loài lắm đấy!'],
+      done: ['Ồ, 30 loài rồi! Giáo sư Oak chắc chắn sẽ rất vui.', 'Đây là Exp. Share, quà của Giáo sư gửi bạn.'],
+      after: ['Cho Pokémon cầm Exp. Share thì dù không ra trận, nó vẫn nhận một nửa EXP và đủ EV khi đồng đội hạ Pokémon.',
+        'Rất hợp để luyện Pokémon yếu đó!'],
+      need: { caught: 30 },
+      reward: ['expShare', 1],
+    },
+  }),
+  // Macho Brace: võ sư ở sân Khu Safari Effort, tặng khi mang tới một Pokémon đã luyện từ 100 EV trở lên
+  questNpc({
+    id: 'q-machobrace', sprite: 'npc-hiker', name: 'Võ sư Thể lực', map: 'safariEffort', x: 8, y: 26, facing: 'up', fixed: true,
+    quest: {
+      id: 'machoBrace',
+      ask: ['Hà! Cậu cũng tới đây luyện EV à? Ta là võ sư, cả đời chỉ biết rèn sức.',
+        'Mang tới cho ta xem một Pokémon đã luyện được 100 EV trở lên, ta sẽ tặng món bảo bối của ta.'],
+      hint: ['Hạ Pokémon ở các bãi cỏ quanh đây là có EV. Luyện tới 100 rồi mang tới cho ta xem!'],
+      done: ['Tốt lắm! Cơ bắp rắn chắc thế này là nhờ luyện tập chăm chỉ.', 'Cầm lấy Macho Brace, món bảo bối của ta!'],
+      after: ['Pokémon cầm Macho Brace nhận EV gấp đôi, nhưng nặng nề nên chậm đi một nửa trong trận.',
+        'Luyện EV thì cầm, đánh thật thì tháo ra nhé!'],
+      need: { evTotal: 100 },
+      reward: ['machoBrace', 1],
+    },
+  }),
   questNpc({
     id: 'q-poison', sprite: 'npc-boy', name: 'Nhóc Bin', map: 'town2', x: 12, y: 14, facing: 'down', wander: 1,
     quest: {

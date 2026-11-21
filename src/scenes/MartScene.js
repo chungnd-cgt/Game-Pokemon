@@ -20,8 +20,9 @@ export default class MartScene extends Phaser.Scene {
   // data.tier: bậc hàng của thị trấn này (cửa hàng ở thị trấn sau có nhiều hàng hơn)
   init(data) {
     this.townTier = data?.tier ?? 0;
-    // Quầy bán hàng riêng (Trung tâm thương mại), không có thì bán theo bậc
-    this.stock = data?.stock ? STORE_STOCK[data.stock] : null;
+    // Quầy bán hàng riêng (Trung tâm thương mại) hoặc danh sách hàng truyền vào (vd nhân viên Khu Safari chỉ bán bóng),
+    // không có thì bán theo bậc
+    this.stock = data?.items ?? (data?.stock ? STORE_STOCK[data.stock] : null);
   }
 
   create() {

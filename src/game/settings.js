@@ -11,9 +11,16 @@ const DEFAULTS = {
   uiScale: 0, // cỡ giao diện trên bản đồ (game/display.js: UI_SCALES): 0 = tự động theo cỡ màn hình, 1.15 = 115%...
   resolution: 'screen', // độ phân giải (game/display.js: RESOLUTIONS): 'screen' theo màn hình | 'WxH' vd '1920x1080'
   areaNavOpen: true, // bảng Pokémon trong khu đang mở hay thu vào cạnh phải
-  questOpen: true, // khung nhiệm vụ góc phải dưới đang mở hay thu gọn chỉ còn tiêu đề
+  questOpen: true, // khung góc phải dưới (Hệ thống / Nhiệm vụ) đang mở hay thu gọn chỉ còn hàng tab
+  hudTab: 'quest', // tab đang chọn của khung đó: 'quest' (Nhiệm vụ) | 'system' (Hệ thống, ui/InfoPanel.js)
   hudMenuOpen: true, // cột nút menu bên trái (Đội hình, Túi đồ...) đang hiện hay thu lại vào nút ≡
-  catchPreview: true, // đội đã đủ 6, bắt thêm thì Pokémon vào PC: hiện bảng xem nhanh (IV, tính cách, đặc tính)
+  catchPreview: true, // đội đã đủ 6, bắt thêm thì Pokémon vào PC: về bản đồ hiện bảng xem nhanh (IV, tính cách, đặc tính)
+  repelAuto: true, // Repel hết hiệu lực: tự dùng thêm một cái cùng loại nếu túi còn (túi hết thì thôi)
+  repelAsk: false, // Repel hết hiệu lực: dừng lại hỏi có dùng tiếp không (bật thì hỏi thay cho tự dùng)
+  npcNames: true, // tên trên đầu NPC
+  playerNames: true, // tên trên đầu người chơi khác
+  showDpad: false, // phím chữ thập cảm ứng cố định trên màn hình (ui/DPad.js)
+  touchRelative: false, // cần gạt cảm ứng tương đối: kéo quá vòng thì tâm cần gạt dời theo ngón tay (ui/Joystick.js)
   keybinds: null, // phím người chơi tự đặt { hànhĐộng: [phím chính, phím phụ] } (game/keybinds.js); null / thiếu: phím mặc định
 };
 

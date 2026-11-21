@@ -1,6 +1,7 @@
 import { timeOfDay } from '../game/clock.js';
 import { SPECIES } from './monsters.js';
 import { EXTRA_ENCOUNTERS } from './extra/index.js';
+import { SAFARI_ENCOUNTERS } from './mapsSafari.js';
 
 // Bảng Pokémon hoang dã theo từng khu. Cấp tăng dần theo khu (khu đầu dễ, khu sau mạnh hơn) và
 // dạng tiến hoá chỉ xuất hiện ở khu sau, hiếm hơn. Khu nào dùng bảng nào khai báo ở bản đồ (data/map.js: areas, water).
@@ -558,4 +559,4 @@ export function levelRange(zone) {
 }
 
 // Bảng Pokémon hoang dã ở các khu mở rộng (data/extra/)
-Object.assign(ENCOUNTERS, EXTRA_ENCOUNTERS);
+Object.assign(ENCOUNTERS, EXTRA_ENCOUNTERS, SAFARI_ENCOUNTERS);

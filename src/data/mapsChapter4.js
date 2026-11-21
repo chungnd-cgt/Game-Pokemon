@@ -87,7 +87,7 @@ export const CHAPTER4_MAPS = {
       'TT............................TT',
       'TT............................TT',
       'TT............................TT',
-      'TT....................PP=PP...TT',
+      'TT..................s.PP=PP...TT',
       'TTaaa=aaQaa=aaaQa=......=..s..TT',
       'TTaaa=aaaaa=aaaaa=......=.....TT',
       '================================',
@@ -119,7 +119,8 @@ export const CHAPTER4_MAPS = {
     buildings: [
       { type: 'center', x: 3, y: 4, w: 5, h: 4, door: { x: 5, y: 7 }, to: 'center6' },
       { type: 'mart', x: 10, y: 4, w: 4, h: 4, door: { x: 11, y: 7 }, to: 'mart6' },
-      { type: 'house', x: 16, y: 4, w: 4, h: 4, door: { x: 17, y: 7 }, to: null, roof: 'houseRed' },
+      // Nhà Safari (data/mapsSafari.js): cổng vào Khu Safari và Khu Safari Effort
+      { type: 'house', x: 16, y: 4, w: 4, h: 4, door: { x: 17, y: 7 }, to: 'safariGate', roof: 'houseYellow' },
       { type: 'gym', x: 22, y: 3, w: 5, h: 4, door: { x: 24, y: 6 }, to: 'gym5', roof: 'gymFire' },
       { type: 'house', x: 3, y: 14, w: 4, h: 4, door: { x: 4, y: 17 }, to: null, roof: 'houseYellow' },
       { type: 'house', x: 24, y: 14, w: 4, h: 4, door: { x: 25, y: 17 }, to: null, roof: 'houseRed' },
@@ -128,6 +129,7 @@ export const CHAPTER4_MAPS = {
       '14,19': ['VƯỜN QUẢ MỌNG LÒ GỐM', 'Đủ các loại quả hồi phục và quả giảm EV.', 'Đứng trước cây bấm Enter để hái, 2-3 ngày sau cây lại ra quả.'],
       '8,11': ['THÀNH PHỐ LÒ GỐM', 'Lò gốm đỏ lửa ngày đêm, đất sét nặn nên trăm thứ đồ.'],
       '27,8': ['GYM LÒ GỐM', 'Thủ lĩnh: Nung, nghệ nhân giữ lửa lò gốm.', 'Chuyên dùng Pokémon hệ Lửa.'],
+      '20,7': ['NHÀ SAFARI', 'Bắt Pokémon hiếm, có loài không gặp ở nơi nào khác!', 'Có cả Khu Safari Effort để luyện EV.'],
     },
     objects: [
       ...berryRow('t6', 4, 21, ['pomeg', 'kelpsy', 'qualot']),

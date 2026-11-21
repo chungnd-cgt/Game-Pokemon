@@ -17,7 +17,7 @@ export const HOTBAR_RIGHT = LEFT + HOTBAR_SIZE * SLOT + (HOTBAR_SIZE - 1) * GAP;
 
 const DRAG_START = 8; // nhấn giữ rồi kéo quá chừng này px mới tính là kéo (ít hơn là bấm để dùng)
 
-// Thanh phím tắt góc dưới màn hình: 6 ô, góc mỗi ô ghi phím của ô đó (mặc định 1-6, đổi trong Cài đặt → Phím tắt).
+// Thanh phím tắt góc dưới màn hình: 6 ô, góc mỗi ô ghi phím của ô đó (mặc định 1-6, đổi trong Cài đặt → Điều khiển).
 // Mở túi đồ thì thanh vẫn hiện: kéo icon vật phẩm thả vào ô để gán (hoặc chọn vật phẩm -> "Gán phím tắt", hoặc bấm phím
 // của ô). Bấm phím của ô hoặc bấm chuột vào ô để dùng (cưỡi thú, câu cá,
 // dùng thuốc...); ô còn trống thì không làm gì. Kéo icon từ ô này thả sang ô khác là đổi chỗ hai ô.

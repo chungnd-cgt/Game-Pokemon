@@ -1,7 +1,7 @@
 import { STATUS_INFO } from '../battle/status.js';
 import { ITEMS } from '../data/items.js';
 import { expProgress } from '../game/monster.js';
-import { state } from '../game/state.js';
+import { PARTY_SIZE, state } from '../game/state.js';
 import { fitScale, pixelMon } from '../gfx/textures.js';
 import { GENDER, cssColor, fitText, fixToCamera, hpColor, hudScale, textStyle } from './helpers.js';
 import { withShinyMark } from './shinyMark.js';
@@ -83,11 +83,24 @@ export class PartyPanel {
     this.container = null;
     this.slots = [];
     this.hover = -1;
-    if (!state.party.length) return;
     const { scene } = this;
     const c = scene.add.container(0, 0).setDepth(DEPTH).setVisible(this.visible);
     this.container = c;
     state.party.forEach((mon, i) => this.slot(c, mon, i));
+    // Ô chưa có Pokémon (đang mang 2/6 thì 4 ô dưới): chấm tròn xám đúng chỗ chân dung
+    const empty = scene.add.graphics();
+    for (let i = state.party.length; i < PARTY_SIZE; i++) {
+      const { x, y } = this.center(i);
+      empty.fillStyle(0x000000, 0.25);
+      empty.fillCircle(x + 1, y + 2, 10);
+      empty.fillStyle(0x2c3550, 0.85);
+      empty.fillCircle(x, y, 10);
+      empty.lineStyle(2, 0x5a6684, 0.9);
+      empty.strokeCircle(x, y, 10);
+      empty.fillStyle(0xffffff, 0.12);
+      empty.fillCircle(x - 3, y - 3, 4);
+    }
+    c.add(empty);
     // Ô thông tin khi rê chuột (tên, cấp, % HP)
     this.tip = scene.add.text(0, 0, '', textStyle(14, '#ffffff', {
       fontStyle: 'bold', backgroundColor: 'rgba(20,26,44,0.92)', padding: { x: 10, y: 5 }, lineSpacing: 2,
