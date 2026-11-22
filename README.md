@@ -487,7 +487,9 @@ gói: `src/game/safari.js`; nhân viên, chặn cửa, hết giờ: `src/story/s
   (còn bao lâu) rồi nhắc theo mốc (`TICKET_MARKS` / `PASS_MARKS` trong `src/game/safari.js`): vé mỗi 5 phút, còn 5 phút thì
   mỗi 2 phút (5, 3, 1), còn 1 phút thì mỗi 30 giây; gói 24 giờ mỗi 15 phút, 15 phút cuối như vé. Chỉ báo khi đang ở trong khu.
   Thoát game / tab ẩn / mất mạng thì không báo gì; quay lại (mở game, mở lại tab, máy ngủ dậy) thì hỏi giờ máy chủ trước rồi
-  mới báo "Quay lại Khu Safari: còn …" đúng giờ (hết giờ trong lúc vắng mặt thì loa báo và đưa ra nhà Safari).
+  mới báo "Quay lại Khu Safari: còn …" đúng giờ. Thoát / văng game khi đang trong khu thì vào lại vẫn đứng ở chỗ cũ trong
+  khu; nếu đã hết giờ trong lúc vắng mặt thì được đưa thẳng về Pokémon Center đã vào gần nhất (chưa vào Center nào thì về
+  nhà), tab Hệ thống báo hết thời gian (không có loa). Hết giờ khi đang chơi trong khu thì loa báo rồi đưa ra nhà Safari.
 - Giờ máy chủ chỉ hỏi lúc mua vé, khi vừa mở lại tab / máy vừa ngủ dậy và mỗi 10 phút khi đang ở nhà / khu Safari; giữa các lần
   hỏi thì tự đếm bằng đồng hồ đơn điệu của trình duyệt (không đổi theo giờ hệ thống), nên không tốn lượt gọi máy chủ.
 

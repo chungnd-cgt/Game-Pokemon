@@ -1,7 +1,7 @@
 import { CELL, WORLD_SCALE } from '../config.js';
 import { followStyle } from '../data/followStyle.js';
 import { currentLook, resolveLook } from '../data/playerCustom.js';
-import { planSteps, stepFacing, trimQueue } from '../game/movePath.js';
+import { batchSteps, planSteps, stepFacing, trimQueue } from '../game/movePath.js';
 import { settings } from '../game/settings.js';
 import { playerName, state } from '../game/state.js';
 import { RIDE_SEAT, rideTexture } from '../gfx/mounts.js';
@@ -14,8 +14,8 @@ import { showTrainerCard } from '../ui/TrainerCard.js';
 import { onTradeRequest, requestTrade } from './worldTrade.js';
 
 // Người chơi khác trên bản đồ (online/presence.js): hình nhân vật theo diện mạo của họ, tên trên đầu, đi lại mượt theo từng
-// bước (tin bước đi đến ~2 lần/giây kèm các ô đã đi qua: xếp hàng rồi đi lại đúng đường đó từng ô, sắp hết hàng thì đi
-// chậm lại một chút cho khỏi đứng chờ tin sau, dồn nhiều thì đi nhanh lên). Chọn một người: chuột phải (máy tính) hoặc chạm đúp (điện thoại, chuột trái nhấn đúp cũng được) -> menu nhỏ
+// bước (tin bước đi đến 1–2 lần/giây tuỳ bản đồ đông hay vắng, kèm các ô đã đi qua: xếp hàng rồi đi lại đúng đường đó từng
+// ô, sắp hết hàng thì đi chậm lại một chút cho khỏi đứng chờ tin sau, dồn nhiều hơn một tin thì đi nhanh lên). Chọn một người: chuột phải (máy tính) hoặc chạm đúp (điện thoại, chuột trái nhấn đúp cũng được) -> menu nhỏ
 // "Xem chi tiết" (thẻ HLV rút gọn: không có huy hiệu, tiền, Pokédex) / "Giao dịch" (scenes/worldTrade.js).
 // Người chơi khác không chặn đường (đi xuyên qua nhau được). Đi xe đạp / cưỡi Arcanine / cưỡi Lapras / lướt Surf thì
 // vẽ đúng như vậy (xe đạp; người ngồi trên thú cưỡi hoặc khối nước, nhấp nhô theo sóng).
@@ -27,6 +27,10 @@ const STEP_MS = 230;
 // Thời gian một bước theo cách di chuyển (giống WorldScene), nhịp chân thú cưỡi
 const VEHICLE_STEP_MS = { bike: 100, ride: 90, surf: 225, waterRide: 100 };
 const MOUNT_BEAT_MS = { ride: 90, waterRide: 110, surf: 160 };
+const MOVE_GAP = 500; // nhịp gửi tin bước đi khi tin không ghi (bản cũ), online/presence.js
+const stepMs = (o) => VEHICLE_STEP_MS[o.vehicle] ?? STEP_MS;
+// Số bước một tin của người đó chở (theo nhịp họ đang gửi và cách di chuyển)
+const batchOf = (o) => batchSteps(o.gap ?? MOVE_GAP, stepMs(o));
 const WATER = ['surf', 'waterRide'];
 const DOUBLE_TAP_MS = 350;
 const DEPTH = 10;
@@ -242,8 +246,10 @@ function syncPlayers(world, list) {
       if (changedLook || (meta.vehicle ?? null) !== o.vehicle || (meta.rideArt ?? null) !== (o.meta.rideArt ?? null)) applyVehicle(world, o);
       applyStatus(world, o);
       applyFollower(world, o);
-      // Chỗ đứng trong presence (cập nhật khi đứng yên): sửa lại nếu lỡ mất tin bước đi
-      if (!o.walking && Number.isFinite(meta.x) && (meta.x !== o.pos.x || meta.y !== o.pos.y)) moveOther(world, meta.id, meta);
+      // Chỗ đứng trong presence (cập nhật khi đứng yên): sửa lại nếu lỡ mất tin bước đi. Presence cũ hơn tin bước đi đã
+      // nhận (người đó vẫn đang đi, chưa cập nhật presence) thì bỏ qua, không kéo về chỗ cũ
+      const fresh = (meta.moveAt ?? 0) >= (o.moveAt ?? 0);
+      if (fresh && !o.walking && Number.isFinite(meta.x) && (meta.x !== o.pos.x || meta.y !== o.pos.y)) moveOther(world, meta.id, meta);
     }
   }
   for (const id of [...world.others.keys()]) if (!seen.has(id)) removeOther(world, id);
@@ -263,7 +269,7 @@ function addOther(world, meta) {
   // pos: ô cuối cùng đã biết (đích của hàng đợi); mover: chỗ đang vẽ (px); queue: các bước chưa đi (game/movePath.js)
   const o = {
     meta, pos, facing, endFacing: facing, sprite, shadow, label, lastTap: 0, moving: false, walking: false,
-    mover: { x, y }, queue: [], at: pos,
+    mover: { x, y }, queue: [], at: pos, moveAt: meta.moveAt ?? 0, gap: MOVE_GAP,
   };
   applyVehicle(world, o);
   applyStatus(world, o);
@@ -423,9 +429,12 @@ function moveOther(world, id, pos) {
     applyVehicle(world, o);
   }
   if (pos.facing) o.endFacing = pos.facing;
+  if (Number.isFinite(pos.moveAt)) o.moveAt = Math.max(o.moveAt ?? 0, pos.moveAt);
+  if (Number.isFinite(pos.gap)) o.gap = pos.gap;
   const steps = planSteps(o.pos, pos);
   if (steps.length) o.pos = { x: steps.at(-1).x, y: steps.at(-1).y };
-  o.queue = trimQueue([...o.queue, ...steps]);
+  // Giữ tối đa chừng 2 tin + vài bước (gửi thưa / đi nhanh thì mỗi tin chở nhiều bước hơn)
+  o.queue = trimQueue([...o.queue, ...steps], batchOf(o) * 2 + 4);
   if (!o.walking) walkNext(world, o);
 }
 
@@ -457,9 +466,9 @@ function walkNext(world, o) {
   o.moving = true;
   o.foot = o.foot === 'left' ? 'right' : 'left';
   setFrame(o.sprite, o.facing, o.art ? 'stand' : o.foot);
-  // Sắp hết hàng (tin sau chưa tới): đi chậm lại chút; dồn nhiều bước: đi nhanh lên cho kịp
+  // Sắp hết hàng (tin sau chưa tới): đi chậm lại chút; dồn hơn một tin: đi nhanh lên cho kịp
   const left = o.queue.length;
-  const ms = (VEHICLE_STEP_MS[o.vehicle] ?? STEP_MS) * (left === 0 ? 1.15 : left > 4 ? 0.7 : 1);
+  const ms = stepMs(o) * (left === 0 ? 1.15 : left > batchOf(o) + 1 ? 0.7 : 1);
   followerStep(world, o, prev, ms);
   world.tweens.add({
     targets: o.mover, x, y, duration: ms,

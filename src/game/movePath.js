@@ -36,12 +36,34 @@ export function planSteps(from, msg) {
   return steps;
 }
 
-// Hàng đợi bước quá dài (mạng chập chờn, tin đến dồn): bỏ bớt, hiện luôn ở gần cuối rồi đi nốt vài bước
+// Hàng đợi bước quá dài (mạng chập chờn, tin đến dồn): bỏ bớt, hiện luôn ở gần cuối rồi đi nốt vài bước.
+// max: chừng 2 tin (worldPlayers.js tính theo batchSteps), mặc định ứng với đi bộ, gửi mỗi 500ms
 export function trimQueue(queue, max = 10, keep = 3) {
   if (queue.length <= max) return queue;
   const rest = queue.slice(-keep);
   return [{ ...rest[0], jump: true }, ...rest.slice(1)];
 }
+
+// Nhịp gửi theo số người khác trong bản đồ (online/presence.js). Broadcast tới cả kênh nên số tin tăng theo bình phương số
+// người (n người cùng đi -> n × (n - 1) lượt nhận): đông thì gửi thưa hơn, mỗi tin chở nhiều ô hơn (path), bên nhận vẫn đi
+// đúng từng ô, chỉ trễ hơn chút.
+//  - gap: ms giữa hai tin bước đi. Đi nhanh nhất ~90ms/ô -> 1000ms ~11 ô/tin, vừa MAX_TRAIL
+//  - track: ms đứng yên rồi mới cập nhật chỗ đứng vào presence (tin presence chở cả diện mạo, nặng hơn tin bước đi;
+//    tin bước đi đã có chỗ đứng, presence chỉ để người vào sau thấy đúng chỗ). Luôn > gap: tin bước đi cuối gửi xong trước
+const CROWD = [
+  { others: 6, gap: 1000, track: 4000 }, // 7 người trở lên
+  { others: 3, gap: 750, track: 2500 }, // 4–6 người
+  { others: 1, gap: 500, track: 1500 }, // 2–3 người
+];
+export const TRACK_ALONE = 2500;
+
+export function crowdPace(others) {
+  const tier = CROWD.find((t) => others >= t.others);
+  return tier ? { gap: tier.gap, track: tier.track } : { gap: CROWD.at(-1).gap, track: TRACK_ALONE };
+}
+
+// Số bước một tin bước đi chở (tin gửi mỗi gap ms, mỗi bước stepMs ms)
+export const batchSteps = (gap, stepMs) => Math.max(1, Math.ceil(gap / stepMs));
 
 // Hướng mặt khi bước từ a sang b
 export function stepFacing(a, b, fallback = 'down') {

@@ -1,9 +1,10 @@
 import { ITEMS, formatMoney, martStock } from '../data/items.js';
-import { MAPS } from '../data/map.js';
+import { HOME_RESPAWN, MAPS } from '../data/map.js';
 import {
   PASS_MARKS, SAFARI, TICKET_MARKS, buyEffortTicket, buyPass, buyZoneTicket, crossedMark, effortLeft, effortOpen, effortPrice,
   formatLeft, markLabel, passActive, passLeft, ticketActive, zoneLeft, zoneOpen,
 } from '../game/safari.js';
+import { state } from '../game/state.js';
 import { logSystem } from '../game/systemLog.js';
 import { serverNow, sinceSync, syncServerClock } from '../online/serverClock.js';
 
@@ -232,8 +233,24 @@ export function safariTick(world) {
     }
     prevLeft = left;
   }
+  const away = Boolean(pending?.back) && zone;
   pending = null;
   if (!expired) return null;
+  // Hết giờ trong lúc vắng mặt (thoát game / game văng / tab ẩn rồi vào lại): đưa thẳng về Pokémon Center đã vào gần nhất
+  // (chưa vào Center nào thì về nhà), chỉ báo ở tab Hệ thống
+  if (away) {
+    return async () => {
+      if (world.map.id !== id) return;
+      const spot = state.lastCenter ?? HOME_RESPAWN;
+      await world.warpTo({ to: spot.map, tx: spot.x, ty: spot.y, facing: spot.facing ?? 'up' });
+      // Tên nơi về: Pokémon Center nào cũng cùng tên, ghi thêm thành phố có Center đó
+      const place = MAPS[spot.map];
+      const town = place?.indoor && place.exit ? MAPS[place.exit.to]?.name : null;
+      const where = place ? `${place.name}${town ? ` (${town})` : ''}` : 'nơi hồi phục';
+      logSystem(`Hết thời gian ở ${ZONE_NAME[id]} khi bạn vắng mặt: đã đưa bạn về ${where}.`, 'warn');
+    };
+  }
+  // Hết giờ khi đang chơi trong khu: loa báo rồi đưa ra nhà Safari
   return async () => {
     await world.say(null, ['Loa: "Ding-dong! Hết giờ rồi! Cảm ơn quý khách đã ghé Khu Safari."']);
     if (world.map.id === id) await leaveZone(world, id);

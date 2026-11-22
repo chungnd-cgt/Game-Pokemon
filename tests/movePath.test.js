@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { planSteps, stepFacing, trimQueue } from '../src/game/movePath.js';
+import { TRACK_ALONE, batchSteps, crowdPace, planSteps, stepFacing, trimQueue } from '../src/game/movePath.js';
 
 test('đi theo path từng ô, rẽ góc không đi chéo', () => {
   const steps = planSteps({ x: 0, y: 0 }, { x: 1, y: 1, path: [[1, 0]] });
@@ -37,6 +37,27 @@ test('hàng đợi quá dài: nhảy tới gần cuối', () => {
   const q = Array.from({ length: 12 }, (_, i) => ({ x: i + 1, y: 0 }));
   assert.deepEqual(trimQueue(q), [{ x: 10, y: 0, jump: true }, { x: 11, y: 0 }, { x: 12, y: 0 }]);
   assert.equal(trimQueue(q.slice(0, 5)).length, 5);
+});
+
+test('đông người thì gửi thưa hơn, presence luôn cập nhật sau tin bước đi cuối', () => {
+  assert.equal(crowdPace(0).track, TRACK_ALONE);
+  assert.equal(crowdPace(1).gap, 500);
+  assert.equal(crowdPace(2).gap, 500);
+  assert.equal(crowdPace(3).gap, 750);
+  assert.equal(crowdPace(5).gap, 750);
+  assert.equal(crowdPace(6).gap, 1000);
+  assert.equal(crowdPace(30).gap, 1000);
+  for (let n = 0; n <= 10; n++) assert.ok(crowdPace(n).track > crowdPace(n).gap);
+  // Gửi thưa nhất, đi nhanh nhất (thú cưỡi ~90ms/ô): một tin vẫn vừa MAX_TRAIL (24 ô) trong online/presence.js
+  assert.ok(batchSteps(crowdPace(99).gap, 90) <= 24);
+});
+
+test('số bước mỗi tin: đi bộ gửi mỗi 500ms giữ đúng ngưỡng cũ (cắt ở 10, đi nhanh khi còn > 4)', () => {
+  const b = batchSteps(500, 230);
+  assert.equal(b * 2 + 4, 10);
+  assert.equal(b + 1, 4);
+  assert.equal(batchSteps(1000, 100), 10);
+  assert.equal(batchSteps(0, 230), 1);
 });
 
 test('hướng mặt theo bước', () => {
