@@ -2,14 +2,13 @@ import '@fontsource/nunito/700.css';
 import '@fontsource/nunito/800.css';
 import Phaser from 'phaser';
 import { applyFpsLimit, applyResolution, gameSizeFor, watchResolution } from './game/display.js';
+import { initialTextResolution, installHiRes, setTextResolution } from './game/hires.js';
 import { state } from './game/state.js';
 import { installErrorLog } from './online/errorLog.js';
 import BattleScene from './scenes/BattleScene.js';
 import BootScene from './scenes/BootScene.js';
 import MartScene from './scenes/MartScene.js';
-import PokedexScene from './scenes/PokedexScene.js';
 import RegionMapScene from './scenes/RegionMapScene.js';
-import SummaryScene from './scenes/SummaryScene.js';
 import TitleScene from './scenes/TitleScene.js';
 import WorldScene from './scenes/WorldScene.js';
 import './cheats/chung.js'; // cheat tên "Chung" (gỡ: xoá dòng này + file src/cheats/chung.js)
@@ -24,19 +23,21 @@ export async function startGame() {
 
   // Cỡ game theo độ phân giải đang chọn (Theo màn hình: theo tỉ lệ cửa sổ) ngay từ đầu, các màn hình dựng đúng cỡ luôn
   const { width, height } = gameSizeFor();
+  // Chữ vẽ đủ nét cho màn hình đang dùng (game/hires.js)
+  setTextResolution(initialTextResolution());
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
     width,
     height,
     backgroundColor: '#000000',
-    // Chuột phải = huỷ / đóng menu (Menu, Summary, bản đồ vùng): không hiện menu chuột phải của trình duyệt
+    // Chuột phải = huỷ / đóng menu (Menu, bản đồ vùng): không hiện menu chuột phải của trình duyệt
     disableContextMenu: true,
     scale: {
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
     },
-    scene: [BootScene, TitleScene, WorldScene, BattleScene, PokedexScene, MartScene, SummaryScene, RegionMapScene],
+    scene: [BootScene, TitleScene, WorldScene, BattleScene, MartScene, RegionMapScene],
   });
 
   // Lỗi JavaScript của người chơi gửi lên Supabase (supabase/errors.sql), kèm cảnh / bản đồ đang chơi
@@ -51,6 +52,7 @@ export async function startGame() {
     applyFpsLimit(game);
     applyResolution(game);
     watchResolution(game);
+    installHiRes(game);
   });
 
   // Đếm thời gian chơi theo đồng hồ thật (cả lúc đánh trận, mua sắm), trừ lúc ở màn hình chính

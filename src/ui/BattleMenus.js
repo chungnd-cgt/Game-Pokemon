@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { fitScale } from '../gfx/textures.js';
-import { cssColor, localX, shade, textStyle } from './helpers.js';
+import { cssColor, localX, localY, shade, textStyle } from './helpers.js';
 import { directionOf, isCancel, isConfirm } from './input.js';
 
 // Giao diện trong trận kiểu MMO: khay nút lớn (ButtonGrid: bảng lệnh 2x2 có icon, bảng chiêu theo màu hệ).
@@ -24,13 +24,13 @@ function starPoints(cx, cy, outer, inner, n, rot = -Math.PI / 2) {
 }
 
 const ICONS = {
-  // Chiến đấu: tia nổ cam, lõi vàng
+  // Chiến đấu: tia nổ vàng, lõi vàng nhạt
   'cmd-fight': (g) => {
     g.fillStyle(OUTLINE);
     g.fillPoints(starPoints(32, 32, 31, 15, 10, -Math.PI / 2 + 0.15), true);
-    g.fillStyle(0xff7a2a);
+    g.fillStyle(0xffc020);
     g.fillPoints(starPoints(32, 32, 27, 12.5, 10, -Math.PI / 2 + 0.15), true);
-    g.fillStyle(0xffe066);
+    g.fillStyle(0xfff0a0);
     g.fillPoints(starPoints(32, 32, 16, 8, 8, -Math.PI / 2), true);
     g.fillStyle(0xffffff, 0.9);
     g.fillCircle(29, 29, 4);
@@ -98,13 +98,33 @@ const ICONS = {
   },
 };
 
+// Bản xám (key-grey): cùng hình, mọi màu đổi sang xám theo độ sáng (nút lệnh chưa chọn trong trận, ui/BattlePanel.js)
+const toGrey = (c) => {
+  const v = Math.round(((c >> 16) & 255) * 0.3 + ((c >> 8) & 255) * 0.59 + (c & 255) * 0.11);
+  const k = Math.round(70 + v * 0.55); // nén về dải xám vừa (không đen kịt, không trắng chói)
+  return (k << 16) | (k << 8) | k;
+};
+function greyProxy(g) {
+  return new Proxy(g, {
+    get(target, prop) {
+      if (prop === 'fillStyle') return (color, alpha) => target.fillStyle(toGrey(color), alpha);
+      if (prop === 'lineStyle') return (w, color, alpha) => target.lineStyle(w, toGrey(color), alpha);
+      const v = target[prop];
+      return typeof v === 'function' ? v.bind(target) : v;
+    },
+  });
+}
+
 export function commandIcons(scene) {
   for (const [key, draw] of Object.entries(ICONS)) {
-    if (scene.textures.exists(key)) continue;
-    const g = scene.make.graphics({ x: 0, y: 0 }, false);
-    draw(g);
-    g.generateTexture(key, 64, 64);
-    g.destroy();
+    for (const grey of [false, true]) {
+      const k = grey ? `${key}-grey` : key;
+      if (scene.textures.exists(k)) continue;
+      const g = scene.make.graphics({ x: 0, y: 0 }, false);
+      draw(grey ? greyProxy(g) : g);
+      g.generateTexture(k, 64, 64);
+      g.destroy();
+    }
   }
 }
 
@@ -122,21 +142,38 @@ export class ButtonGrid {
     this.items = items;
     this.columns = opts.columns ?? 2;
     this.cancelable = opts.cancelable ?? true;
+    // opts.outside: false thì bấm ra ngoài không huỷ (chỉ Esc / chuột phải / finish(null))
+    this.outside = opts.outside ?? true;
+    // opts.hoverOnly: mở ra chưa chọn ô nào; rê chuột vào ô nào thì chọn ô đó, rời ô thì bỏ chọn (onChange(null, -1)).
+    // Phím mũi tên bắt đầu từ ô đầu
+    this.hoverOnly = Boolean(opts.hoverOnly);
     this.paint = opts.paint;
     this.onChange = opts.onChange;
-    this.bounds = new Phaser.Geom.Rectangle(x, y, width, height);
+    // Bấm ra ngoài vùng này là huỷ (mặc định: khung nút; opts.bounds: vùng rộng hơn, vd cả ô nội dung cột lệnh trận đấu)
+    const b = opts.bounds ?? { x, y, w: width, h: height };
+    this.bounds = new Phaser.Geom.Rectangle(b.x, b.y, b.w, b.h);
     this.container = scene.add.container(0, 0).setDepth(opts.depth ?? 20);
     const pad = opts.pad ?? 10;
     const gap = opts.gap ?? 8;
     const tray = scene.add.graphics();
+    if (opts.tray !== false) this.drawTray(tray, x, y, width, height);
+    this.container.add(tray);
+    const rows = opts.rows ?? Math.ceil(items.length / this.columns); // opts.rows: giữ cỡ ô khi ít nút
+    this.layout(scene, opts, x, y, width, height, pad, gap, rows);
+  }
+
+  // Khay nền (opts.tray: false thì không vẽ, vd danh sách trong cột phải trận đấu đã có khung riêng)
+  drawTray(tray, x, y, width, height) {
     tray.fillStyle(0x000000, 0.3);
     tray.fillRoundedRect(x + 3, y + 6, width, height, 18);
     tray.fillStyle(TRAY, 0.97);
     tray.fillRoundedRect(x, y, width, height, 18);
     tray.lineStyle(2, TRAY_EDGE);
     tray.strokeRoundedRect(x + 1, y + 1, width - 2, height - 2, 17);
-    this.container.add(tray);
-    const rows = Math.ceil(items.length / this.columns);
+  }
+
+  layout(scene, opts, x, y, width, height, pad, gap, rows) {
+    const { items } = this;
     const w = (width - pad * 2 - gap * (this.columns - 1)) / this.columns;
     const h = (height - pad * 2 - gap * (rows - 1)) / rows;
     this.cells = items.map((item, i) => {
@@ -148,6 +185,7 @@ export class ButtonGrid {
       opts.render(cell, item, w, h);
       const zone = scene.add.zone(0, 0, w, h).setInteractive({ useHandCursor: true });
       zone.on('pointerover', () => this.select(i));
+      zone.on('pointerout', () => this.hoverOnly && this.index === i && this.select(-1));
       zone.on('pointerdown', (p) => {
         if (p.rightButtonDown()) return;
         this.select(i);
@@ -159,7 +197,7 @@ export class ButtonGrid {
     });
     this.index = -1;
     this.cells.forEach((_, i) => this.draw(i, false));
-    this.select(Phaser.Math.Clamp(opts.index ?? 0, 0, items.length - 1));
+    if (!this.hoverOnly) this.select(Phaser.Math.Clamp(opts.index ?? 0, 0, items.length - 1));
   }
 
   draw(i, selected) {
@@ -174,8 +212,8 @@ export class ButtonGrid {
     if (i === this.index || this.done) return;
     if (this.index >= 0) this.draw(this.index, false);
     this.index = i;
-    this.draw(i, true);
-    this.onChange?.(this.items[i], i);
+    if (i >= 0) this.draw(i, true);
+    this.onChange?.(i >= 0 ? this.items[i] : null, i);
   }
 
   open() {
@@ -186,7 +224,7 @@ export class ButtonGrid {
         (e) => e.timeStamp >= openedAt && this.handleKey(e),
         (p) => {
           if (p.downTime < openedAt || !this.cancelable) return;
-          if (p.rightButtonDown() || !this.bounds.contains(localX(this.scene, p), p.y)) this.finish(null);
+          if (p.rightButtonDown() || (this.outside && !this.bounds.contains(localX(this.scene, p), localY(this.scene, p)))) this.finish(null);
         },
       );
     });
@@ -196,6 +234,10 @@ export class ButtonGrid {
     const i = this.index;
     const c = this.columns;
     const n = this.items.length;
+    if (i < 0 && directionOf(e)) {
+      this.select(0);
+      return;
+    }
     switch (directionOf(e)) {
       case 'left': if (i % c > 0) this.select(i - 1); return;
       case 'right': if (i % c < c - 1 && i + 1 < n) this.select(i + 1); return;
@@ -208,6 +250,7 @@ export class ButtonGrid {
 
   confirm() {
     const item = this.items[this.index];
+    if (!item) return;
     if (item.blocked) this.finish({ blocked: item.blocked });
     else if (!item.disabled) this.finish(item.value);
   }

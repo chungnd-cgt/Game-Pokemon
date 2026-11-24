@@ -2,7 +2,7 @@ import { ITEMS } from '../data/items.js';
 import { itemCount, state } from '../game/state.js';
 import { fitScale } from '../gfx/textures.js';
 import { HOTBAR_ACTIONS, bindingsVersion, keysFor, shortKeyName } from '../game/keybinds.js';
-import { hudScale, hudSize, textStyle } from './helpers.js';
+import { hudScale, textStyle } from './helpers.js';
 
 const DEPTH = 100;
 const SLOT = 46;
@@ -14,6 +14,14 @@ const DARK = 0x141a2c;
 export const HOTBAR_SIZE = 6;
 // Mép phải thanh phím tắt (ui/WorldHud.js đặt dòng báo "Đã lưu" bên phải chỗ này)
 export const HOTBAR_RIGHT = LEFT + HOTBAR_SIZE * SLOT + (HOTBAR_SIZE - 1) * GAP;
+
+// Cụm góc trái dưới (nút ≡, ô tiền, thanh phím tắt, cột nút menu, khung nền) nhỏ hơn phần giao diện còn lại: hệ số cỡ
+// giao diện x CORNER, neo theo góc trái dưới màn hình (ui/WorldHud.js dùng chung)
+export const CORNER = 0.8;
+export function cornerSize(scene) {
+  const s = hudScale(scene) * CORNER;
+  return { width: scene.scale.width / s, height: scene.scale.height / s, s };
+}
 
 const DRAG_START = 8; // nhấn giữ rồi kéo quá chừng này px mới tính là kéo (ít hơn là bấm để dùng)
 
@@ -79,7 +87,7 @@ export class Hotbar {
     this.zones = [];
     this.tip?.destroy();
     this.tip = null;
-    const { height, s } = hudSize(scene);
+    const { height, s } = cornerSize(scene);
     this.container.setScale(s);
     const top = height - 16 - SLOT;
     for (let i = 0; i < HOTBAR_SIZE; i++) {
@@ -187,7 +195,7 @@ export class Hotbar {
 
   // Ô nằm dưới điểm (px, py) trên màn hình, hoặc -1 (thả vật phẩm kéo từ túi đồ)
   slotAt(px, py) {
-    const { height, s } = hudSize(this.scene);
+    const { height, s } = cornerSize(this.scene);
     px /= s;
     py /= s;
     const top = height - 16 - SLOT;
@@ -200,7 +208,7 @@ export class Hotbar {
 
   // Vùng thanh phím tắt (bấm chuột ở đây không đóng túi đồ)
   contains(px, py) {
-    const { height, s } = hudSize(this.scene);
+    const { height, s } = cornerSize(this.scene);
     px /= s;
     py /= s;
     const top = height - 16 - SLOT;

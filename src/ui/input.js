@@ -44,19 +44,27 @@ export class HeldKeys {
   }
 }
 
-// Mỗi lúc chỉ một thành phần (hộp thoại, menu...) được nhận phím/chuột
+// Mỗi lúc chỉ một thành phần (hộp thoại, menu...) được nhận phím/chuột.
+// fallback { key, pointer }: khi không thành phần nào đang giữ (set) thì phím / chuột chuyển cho fallback (trên bản đồ:
+// các cửa sổ nổi, ui/Windows.js). Đang có thành phần giữ thì fallback không nhận gì
 export class InputRouter {
   constructor(scene) {
     this.onKey = null;
     this.onPointer = null;
-    const key = (e) => this.onKey?.(e);
-    const pointer = (p) => this.onPointer?.(p);
+    this.fallback = null;
+    const key = (e) => (this.active ? this.onKey?.(e) : this.fallback?.key?.(e));
+    const pointer = (p) => (this.active ? this.onPointer?.(p) : this.fallback?.pointer?.(p));
     scene.input.keyboard.on('keydown', key);
     scene.input.on('pointerdown', pointer);
     scene.events.once('shutdown', () => {
       scene.input.keyboard.off('keydown', key);
       scene.input.off('pointerdown', pointer);
     });
+  }
+
+  // Đang có thành phần giữ phím / chuột (hộp thoại, menu, câu hỏi...)
+  get active() {
+    return Boolean(this.onKey || this.onPointer);
   }
 
   set(onKey, onPointer = null) {

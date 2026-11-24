@@ -1,9 +1,11 @@
+import { MOVES } from './moves.js';
 import { TYPES } from './types.js';
 
 // kind: 'ball' (bonus = hệ số bắt) • 'heal' (hồi HP: heal điểm, hoặc healPct tỉ lệ HP tối đa) • 'revive' (hồi sinh, revivePct tỉ lệ HP)
 //       'cure' (chữa trạng thái trong cure) • 'pp' (hồi pp điểm PP cho một chiêu) • 'ev' (giảm EV của chỉ số ev)
 //       'evolution' (đá tiến hoá) • 'held' (chỉ để Pokémon cầm, xem held) • 'key' (vật phẩm quan trọng: không bán, không cầm)
 //       'repel' (đuổi Pokémon hoang dã yếu hơn trong steps bước) • 'escape' (Escape Rope: về nơi hồi phục gần nhất)
+//       'tm' (đĩa kỹ năng: dạy chiêu teaches, mất sau khi dùng; xem TMS)
 // rod: cần câu ('oldRod' | 'goodRod' | 'superRod') • mount: thú cưỡi ('ride' trên cạn | 'waterRide' dưới nước), species: loài chở
 // berry: quả mọng hái trên cây • fieldOnly: chỉ dùng được ngoài trận
 // held: tác dụng khi Pokémon cầm: 'everstone' (không tiến hoá) • 'leftovers' (hồi 1/16 HP mỗi lượt)
@@ -148,13 +150,14 @@ Object.assign(ITEMS, {
     price: 0, icon: 'item-hmSurf', color: '#4a90e0',
     desc: 'Dạy chiêu Surf cho Pokémon hệ Nước (và vài loài khác). Pokémon biết Surf chở bạn lướt nước. Không mất khi dùng.',
   },
-  // Quà của mẹ khi vừa nhận Pokémon đầu tiên
+  // Quà của mẹ khi vừa nhận Pokémon đầu tiên. hidden: không hiện trong túi đồ (vẫn nằm trong state.bag để biết đã nhận):
+  // Bản đồ vùng mở bằng nút bản đồ góc phải trên (ui/WorldHud.js), Hộp huy hiệu xem trong Thẻ HLV (ui/TrainerCard.js)
   townMap: {
-    name: 'Bản đồ vùng', kind: 'key', price: 0, icon: 'item-townMap', color: '#e8d8a8',
-    desc: 'Bản đồ vùng Sơn Thủy, đánh dấu chỗ bạn đang đứng. Bấm N để xem.',
+    name: 'Bản đồ vùng', kind: 'key', price: 0, icon: 'item-townMap', color: '#e8d8a8', hidden: true,
+    desc: 'Bản đồ vùng Sơn Thủy, đánh dấu chỗ bạn đang đứng. Bấm nút bản đồ góc phải trên để xem.',
   },
   badgeCase: {
-    name: 'Hộp huy hiệu', kind: 'key', price: 0, icon: 'item-badgeCase', color: '#a83a3a',
+    name: 'Hộp huy hiệu', kind: 'key', price: 0, icon: 'item-badgeCase', color: '#a83a3a', hidden: true,
     desc: 'Hộp đựng huy hiệu gym của mẹ tặng. Dùng để xem các huy hiệu đã có.',
   },
   // Gói hàng Team Rocket cướp của Poké Mart Lục Bình (chương 1)
@@ -251,6 +254,60 @@ for (const [id, name, color, effect, desc] of BERRIES) {
 export const BERRY_IDS = BERRIES.map(([id]) => id);
 
 // Hàng của Poké Mart mở dần theo tiến độ (bậc 0: lúc mới bắt đầu, xem progressTier ở story/chapter1.js).
+// Đĩa kỹ năng (TM): dạy chiêu teaches, mất sau khi dùng (như game gốc thế hệ đầu); HM thì dùng mãi. Pokémon học được
+// đĩa khi (game/tms.js: canLearnDisc): chiêu cùng hệ với Pokémon, có trong bộ chiêu học theo cấp, loài nằm trong learners,
+// Pokémon có hệ trong types, hoặc chiêu thông dụng (universal) — trừ vài loài không học được đĩa nào.
+// Nguồn: quầy đĩa ở Trung tâm thương mại (STORE_STOCK.tms, như Celadon), thủ lĩnh gym tặng đĩa sở trường (GYM_TMS),
+// vài đĩa hiếm nhặt trên đường (data/maps*), vài nhà dân tặng (story/residents.js)
+const TMS = [
+  // Quầy đĩa Trung tâm thương mại
+  ['tmMegaPunch', 'megaPunch', 3000, { types: ['fighting', 'normal'], sold: true }],
+  ['tmMegaKick', 'megaKick', 3000, { types: ['fighting', 'normal'], sold: true }],
+  ['tmTakeDown', 'takeDown', 3000, { universal: true, sold: true }],
+  ['tmBodySlam', 'bodySlam', 4000, { universal: true, sold: true }],
+  ['tmSubmission', 'submission', 3000, { sold: true }],
+  ['tmDoubleTeam', 'doubleTeam', 2000, { universal: true, sold: true }],
+  ['tmReflect', 'reflect', 2000, { universal: true, sold: true }],
+  ['tmLightScreen', 'lightScreen', 2000, { universal: true, sold: true }],
+  ['tmSwift', 'swift', 2000, { universal: true, sold: true }],
+  ['tmRest', 'rest', 2000, { universal: true, sold: true }],
+  ['tmSunnyDay', 'sunnyDay', 3000, { universal: true, sold: true }],
+  ['tmRainDance', 'rainDance', 3000, { universal: true, sold: true }],
+  // Thủ lĩnh gym tặng (chiêu sở trường của gym)
+  ['tmAirSlash', 'airSlash', 3000, {}],
+  ['tmGigaDrain', 'gigaDrain', 3000, {}],
+  ['tmThunderbolt', 'thunderbolt', 3000, {}],
+  ['tmWaterPulse', 'waterPulse', 3000, {}],
+  ['tmFlamethrower', 'flamethrower', 3000, {}],
+  ['tmRockSlide', 'rockSlide', 3000, {}],
+  ['tmPsychic', 'psychic', 3000, {}],
+  ['tmIceBeam', 'iceBeam', 3000, {}],
+  // Nhặt trên đường (hiếm) / nhà dân tặng (ít)
+  ['tmEarthquake', 'earthquake', 3000, {}],
+  ['tmShadowBall', 'shadowBall', 3000, {}],
+  ['tmSludgeBomb', 'sludgeBomb', 3000, {}],
+  ['tmBrickBreak', 'brickBreak', 3000, {}],
+  ['tmThunderWave', 'thunderWave', 2000, { types: ['electric'] }],
+  ['tmEnergyBall', 'energyBall', 3000, {}],
+];
+TMS.forEach(([id, move, price, opts], i) => {
+  const m = MOVES[move];
+  const no = String(i + 1).padStart(2, '0');
+  ITEMS[id] = {
+    name: `TM${no} ${m.name}`, kind: 'tm', teaches: move, price, icon: `item-${id}`, color: cssHex(TYPES[m.type].color),
+    ...(opts.types ? { types: opts.types } : {}), ...(opts.universal ? { universal: true } : {}),
+    desc: `Đĩa kỹ năng: dạy chiêu ${m.name} (hệ ${TYPES[m.type].name}${m.power ? `, sức mạnh ${m.power}` : ''}). Mất sau khi dùng.`,
+  };
+});
+// Đĩa sở trường thủ lĩnh gym tặng khi thắng (story/chapter2.js)
+export const GYM_TMS = {
+  wind: 'tmAirSlash', grass: 'tmGigaDrain', electric: 'tmThunderbolt', water: 'tmWaterPulse',
+  fire: 'tmFlamethrower', rock: 'tmRockSlide', psychic: 'tmPsychic', ice: 'tmIceBeam',
+};
+function cssHex(color) {
+  return typeof color === 'number' ? `#${color.toString(16).padStart(6, '0')}` : color;
+}
+
 // Cửa hàng ở các thị trấn sau này dùng bậc cao hơn: đầu game chỉ có đồ cơ bản, càng về sau càng nhiều hàng tốt.
 // Đá tiến hoá chỉ bán ở Trung tâm thương mại; đồ cầm tăng sức mạnh (Charcoal...), Leftovers, Lucky Egg không bán,
 // chỉ nhận từ thủ lĩnh gym và nhiệm vụ phụ (cửa hàng vẫn mua lại).
@@ -268,10 +325,11 @@ export const martStock = (tier) => MART_TIERS.slice(0, tier + 1).flat();
 export const STORE_STOCK = {
   general: [...martStock(2), 'rareCandy'],
   stones: [...STONES.map(([id]) => id), 'everstone'],
+  tms: TMS.filter(([, , , opts]) => opts.sold).map(([id]) => id),
 };
 
-// Pokémon cầm được mọi vật phẩm trừ vật phẩm quan trọng
-export const canHold = (id) => ITEMS[id].kind !== 'key';
+// Pokémon cầm được mọi vật phẩm trừ vật phẩm quan trọng và đĩa kỹ năng
+export const canHold = (id) => ITEMS[id].kind !== 'key' && ITEMS[id].kind !== 'tm';
 
 // Bán lại cho cửa hàng được một nửa giá
 export const sellPrice = (id) => ITEMS[id].sell ?? Math.floor(ITEMS[id].price / 2);
@@ -279,21 +337,23 @@ export const sellPrice = (id) => ITEMS[id].sell ?? Math.floor(ITEMS[id].price / 
 export const formatMoney = (n) => `${n.toLocaleString('vi-VN')}₽`;
 
 // Các ngăn túi đồ (tab), như túi đồ game gốc. item: vật phẩm lấy icon làm biểu tượng của ngăn
+// Ngăn túi: Vật phẩm (thuốc, hồi sinh, chữa trạng thái, Repel, Escape Rope, đá tiến hoá, Rare Candy...), Bóng, Quả mọng,
+// Kỹ năng (đĩa TM / HM), Phụ kiện (đồ cho Pokémon cầm + vật phẩm quan trọng; sau này thêm quần áo, nón, cánh...)
 export const BAG_POCKETS = [
-  { id: 'heal', name: 'Hồi phục', item: 'potion' },
+  { id: 'item', name: 'Vật phẩm', item: 'potion' },
   { id: 'ball', name: 'Bóng', item: 'ball' },
   { id: 'berry', name: 'Quả mọng', item: 'oranBerry' },
-  { id: 'item', name: 'Vật phẩm', item: 'rareCandy' },
-  { id: 'key', name: 'Quan trọng', item: 'bicycle' },
+  { id: 'tm', name: 'Kỹ năng', item: 'hmSurf' },
+  { id: 'held', name: 'Phụ kiện', item: 'leftovers' },
 ];
-const HEAL_KINDS = ['heal', 'revive', 'cure', 'pp'];
 
 // Ngăn túi chứa vật phẩm id
 export function pocketOf(id) {
   const item = ITEMS[id];
-  if (item.kind === 'key') return 'key';
+  if (item.teaches) return 'tm';
+  if (item.kind === 'key') return 'held';
   if (item.kind === 'ball') return 'ball';
   if (item.berry) return 'berry';
-  if (HEAL_KINDS.includes(item.kind)) return 'heal';
+  if (item.kind === 'held') return 'held';
   return 'item';
 }

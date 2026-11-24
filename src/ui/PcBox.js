@@ -8,24 +8,29 @@ import { STAT_NAMES } from '../data/stats.js';
 import { TYPES } from '../data/types.js';
 import { BOX_SLOTS, boxCount, monAt, moveMon, releaseMon, releaseProblem } from '../game/storage.js';
 import { PARTY_SIZE, state } from '../game/state.js';
+import { logSystem } from '../game/systemLog.js';
 import { fitScale, pixelMon } from '../gfx/textures.js';
-import { GENDER, closeButton, cssColor, drawHpBar, drawPanel, fitText, fixToCamera, followCenter, hpColor, hpLabel, localX, monTag, textStyle, uiX } from './helpers.js';
+import { GENDER, closeButton, cssColor, drawHpBar, drawPanel, fitText, hpLabel, monTag, textStyle } from './helpers.js';
 import { directionOf, isCancel, isConfirm } from './input.js';
 import { typeBadges } from './TypeBadge.js';
 import { shinyGap, shinyMark } from './shinyMark.js';
+import { FloatWindow } from './Windows.js';
 
-// Hộp Pokémon trong PC kiểu game gốc: bên trái là thông tin con đang chọn, giữa là lưới hộp 6 x 5 ô (nhiều hộp, đổi bằng
-// ◀ ▶ / con lăn chuột / Q E), bên phải là cột đội hình 6 ô và thùng rác.
-//  - Kéo thả Pokémon giữa hộp và đội hình: thả lên con khác là đổi chỗ, thả vào ô trống là chuyển sang
-//  - Kéo vào thùng rác là thả Pokémon (hỏi lại, mặc định "Không")
-//  - Bàn phím: mũi tên di con trỏ, Enter nhấc / đặt Pokémon, Esc huỷ nhấc / đóng máy
+// Hộp Pokémon trong PC: cửa sổ nổi trên bản đồ (ui/Windows.js; kéo dải tiêu đề để dời, mở song song với túi đồ / thẻ
+// HLV...), giao diện bản đồ vẫn hiện. Bên trái là thông tin con đang
+// chọn, bên phải là lưới hộp 6 x 5 ô (nhiều hộp, đổi bằng ◀ ▶ / con lăn chuột / Q E), dưới lưới là thùng rác. Không có cột
+// đội hình riêng: dùng luôn cột đội hình góc trái trên của bản đồ (ui/PartyPanel.js, opts.party).
+//  - Kéo thả Pokémon giữa hộp và cột đội hình: thả lên con khác là đổi chỗ, thả vào ô trống là chuyển sang
+//  - Kéo vào thùng rác là thả Pokémon (hỏi lại, mặc định "Không"); báo ở tab Hệ thống (kèm đồ đang cầm được trả vào túi)
+//  - Bàn phím: mũi tên di con trỏ (← ở cột đầu sang cột đội hình), Enter nhấc / đặt Pokémon, Esc huỷ nhấc / đóng máy
+//  - ✕ / phím quay lại (không đang nhấc Pokémon) là đóng
 // Logic đổi chỗ / thả nằm trong game/storage.js
 
-const PANEL = { x: 16, y: 12, w: 928, h: 556 };
-const INFO = { x: 34, y: 30, w: 202, h: 520 };
-const GRID = { x: 252, y: 96, cols: 6, rows: 5, cell: 72 };
-const PARTY = { x: 702, y: 62, w: 222, h: 62, gap: 6 };
-const TRASH = { x: 702, y: 482, w: 222, h: 64 };
+const HEAD = 40; // dải tiêu đề (kéo để dời cửa sổ)
+const PANEL = { x: 236, y: 12, w: 708, h: 556 + HEAD };
+const INFO = { x: 254, y: 30 + HEAD, w: 202, h: 520 };
+const GRID = { x: 482, y: 96 + HEAD, cols: 6, rows: 5, cell: 72 };
+const TRASH = { x: 472, y: 482 + HEAD, w: 452, h: 64 };
 const DRAG_START = 8;
 const ACCENT = 0xf0b030;
 const DROP = 0x38c068;
@@ -37,62 +42,90 @@ const slotRect = ({ area, k }) => {
     const row = Math.floor(k / GRID.cols);
     return { x: GRID.x + col * GRID.cell + 3, y: GRID.y + row * GRID.cell + 3, w: GRID.cell - 6, h: GRID.cell - 6 };
   }
-  if (area === 'party') return { x: PARTY.x, y: PARTY.y + k * (PARTY.h + PARTY.gap), w: PARTY.w, h: PARTY.h };
   return { ...TRASH };
 };
 
 export class PcBox {
-  // opts.ask(câu hỏi) → Promise<boolean>, opts.say(lines) → Promise, opts.onChange(): đội hình vừa đổi
-  constructor(scene, router, opts) {
+  // opts.windows: WindowManager • opts.ask(câu hỏi) → Promise<boolean> • opts.onChange(): đội hình vừa đổi
+  // opts.party: cột đội hình (ui/PartyPanel.js) • opts.ghostDepth: depth của hình Pokémon đang kéo
+  constructor(scene, opts) {
     this.scene = scene;
-    this.router = router;
     this.opts = opts;
     this.depth = opts.depth ?? 102;
     this.page = 0;
-    this.cursor = { area: state.storage.length ? 'box' : 'party', k: 0 };
+    this.party = opts.party;
+    // Hộp chưa có Pokémon: con trỏ đứng ở con đầu đội hình (khung thông tin không trống)
+    this.cursor = { area: state.storage.some(Boolean) ? 'box' : 'party', k: 0 };
     this.held = null; // đang nhấc bằng bàn phím: { area, k }
     this.press = null; // đang nhấn chuột: { slot, x, y, ghost }
     this.locked = false; // đang hỏi / thông báo: bỏ qua chuột
-    this.container = scene.add.container(0, 0).setDepth(this.depth);
-    this.content = scene.add.container(0, 0).setDepth(this.depth + 0.1);
-    this.cursorG = scene.add.graphics().setDepth(this.depth + 0.2);
-    this.info = scene.add.container(0, 0).setDepth(this.depth + 0.1);
+    this.win = new FloatWindow(opts.windows, {
+      id: 'pc', rect: { ...PANEL }, dragRect: { x: PANEL.x, y: PANEL.y, w: PANEL.w - 50, h: HEAD + 6 },
+      onKey: (e) => this.onKey(e), onClose: () => this.cleanup(),
+    });
+    this.container = scene.add.container(0, 0);
+    this.content = scene.add.container(0, 0);
+    this.cursorG = scene.add.graphics();
+    this.info = scene.add.container(0, 0);
     this.buildBase();
-    // Cố định theo màn hình, dời vào giữa màn hình rộng
-    for (const o of [this.container, this.content, this.cursorG, this.info]) fixToCamera(o).setX(uiX(scene));
-    followCenter(scene, [this.container, this.content, this.cursorG, this.info]);
+    // Thứ tự vẽ trong cửa sổ: khung, nội dung hộp, thông tin, viền con trỏ
+    for (const o of [this.container, this.content, this.info, this.cursorG]) this.win.add(o);
+    // Mượn cột đội hình: rê chuột chọn, nhấn để nhấc / kéo
+    this.party.hooks = {
+      hover: (k) => !this.locked && !this.press && this.setCursor({ area: 'party', k }),
+      down: (k, p) => this.pressSlot({ area: 'party', k }, p),
+    };
     this.render();
   }
 
+  // Đưa cửa sổ lên màn hình, nghe chuột (kéo Pokémon, con lăn đổi hộp)
   open() {
-    return new Promise((resolve) => {
-      this.resolve = resolve;
-      this.bindKeys();
-      this.onPointerMove = (p) => this.dragMove(p);
-      this.onPointerUp = (p) => this.dragEnd(p);
-      this.onWheel = (p, objs, dx, dy) => {
-        const x = localX(this.scene, p);
-        if (!this.locked && dy && x >= GRID.x && x <= GRID.x + GRID.cols * GRID.cell && p.y >= GRID.y - 60 && p.y <= GRID.y + GRID.rows * GRID.cell) this.turnPage(Math.sign(dy));
-      };
-      this.scene.input.on('pointermove', this.onPointerMove);
-      this.scene.input.on('pointerup', this.onPointerUp);
-      this.scene.input.on('wheel', this.onWheel);
-    });
+    this.onPointerMove = (p) => this.dragMove(p);
+    this.onPointerUp = (p) => this.dragEnd(p);
+    this.onWheel = (p, objs, dx, dy) => {
+      const { x, y } = this.pt(p);
+      const over = [...this.opts.windows.list].reverse().find((w) => w.contains(p)) === this.win;
+      if (over && !this.locked && dy && x >= GRID.x && x <= GRID.x + GRID.cols * GRID.cell && y >= GRID.y - 60 && y <= GRID.y + GRID.rows * GRID.cell) this.turnPage(Math.sign(dy));
+    };
+    this.scene.input.on('pointermove', this.onPointerMove);
+    this.scene.input.on('pointerup', this.onPointerUp);
+    this.scene.input.on('wheel', this.onWheel);
+    return this.opts.windows.open(this.win);
   }
 
-  bindKeys() {
-    this.router.set((e) => this.onKey(e));
+  // Toạ độ con trỏ trong khung thiết kế (trừ phần cửa sổ đã kéo dời)
+  pt(p) {
+    return this.win.local(p);
   }
 
   close() {
     if (this.press?.ghost) return;
+    this.win.close();
+  }
+
+  cleanup() {
+    if (this.closed) return;
+    this.closed = true;
     this.scene.input.off('pointermove', this.onPointerMove);
     this.scene.input.off('pointerup', this.onPointerUp);
     this.scene.input.off('wheel', this.onWheel);
-    this.router.clear();
     this.noteTimer?.remove();
-    for (const o of [this.container, this.content, this.cursorG, this.info]) o.destroy();
-    this.resolve?.();
+    this.flipTimer?.remove();
+    this.press?.ghost?.destroy();
+    this.party.hooks = null;
+    this.party.mark(null);
+    this.opts.onClose?.();
+  }
+
+  // Nhấn vào ô slot (hộp hoặc hàng đội hình): đang nhấc bằng bàn phím thì đặt xuống, không thì bắt đầu nhấn (kéo được)
+  pressSlot(slot, p) {
+    if (this.locked) return;
+    if (slot.area !== 'trash') this.setCursor(slot);
+    if (this.held) {
+      this.dropHeld(slot);
+      return;
+    }
+    if (this.monOf(slot)) this.press = { slot: { ...slot }, x: p.x, y: p.y, ghost: null };
   }
 
   // ---------- Khung cố định: nền, tiêu đề, ô bấm ----------
@@ -103,6 +136,10 @@ export class PcBox {
     add(drawPanel(scene, PANEL.x, PANEL.y, PANEL.w, PANEL.h, 18, true));
     const g = scene.add.graphics();
     add(g);
+    // Dải tiêu đề (kéo để dời cửa sổ)
+    g.fillStyle(0x2c3550);
+    g.fillRoundedRect(PANEL.x + 6, PANEL.y + 6, PANEL.w - 12, HEAD, { tl: 14, tr: 14, bl: 4, br: 4 });
+    add(scene.add.text(PANEL.x + 24, PANEL.y + 6 + HEAD / 2, 'Hộp Pokémon', textStyle(19, '#ffffff', { fontStyle: 'bold' })).setOrigin(0, 0.5));
     // Khung thông tin bên trái
     g.fillStyle(0xeef2f8);
     g.fillRoundedRect(INFO.x, INFO.y, INFO.w, INFO.h, 12);
@@ -118,8 +155,7 @@ export class PcBox {
     g.strokeRoundedRect(TRASH.x, TRASH.y, TRASH.w, TRASH.h, 12);
     drawTrashCan(g, TRASH.x + 34, TRASH.y + TRASH.h / 2);
     add(scene.add.text(TRASH.x + 64, TRASH.y + TRASH.h / 2, 'Thả Pokémon', textStyle(18, '#c04040', { fontStyle: 'bold' })).setOrigin(0, 0.5));
-    add(scene.add.text(PARTY.x + 4, PANEL.y + 22, 'Đội hình', textStyle(22, '#3a4660', { fontStyle: 'bold' })));
-    add(closeButton(scene, PANEL.x + PANEL.w - 34, PANEL.y + 34, () => !this.locked && !this.press && this.close()));
+    add(closeButton(scene, PANEL.x + PANEL.w - 26, PANEL.y + 6 + HEAD / 2, () => !this.locked && !this.press && this.close(), 26));
     // Mũi tên đổi hộp
     for (const [dx, label, dir] of [[26, '◀', -1], [GRID.cols * GRID.cell - 26, '▶', 1]]) {
       const t = scene.add.text(GRID.x + dx, GRID.y - 32, label, textStyle(24, '#ffffff', { stroke: '#4a7aa8', strokeThickness: 5 }))
@@ -128,25 +164,13 @@ export class PcBox {
       t.flip = dir;
       add(t);
     }
-    // Ô bấm cho từng ô hộp / đội hình / thùng rác
-    const slots = [
-      ...Array.from({ length: BOX_SLOTS }, (_, k) => ({ area: 'box', k })),
-      ...Array.from({ length: PARTY_SIZE }, (_, k) => ({ area: 'party', k })),
-      { area: 'trash', k: 0 },
-    ];
+    // Ô bấm cho từng ô hộp / thùng rác (hàng đội hình: cột đội hình góc trái, xem party.hooks)
+    const slots = [...Array.from({ length: BOX_SLOTS }, (_, k) => ({ area: 'box', k })), { area: 'trash', k: 0 }];
     for (const slot of slots) {
       const r = slotRect(slot);
       const zone = scene.add.zone(r.x + r.w / 2, r.y + r.h / 2, r.w, r.h).setInteractive({ useHandCursor: slot.area !== 'trash' });
       zone.on('pointerover', () => !this.locked && !this.press && slot.area !== 'trash' && this.setCursor(slot));
-      zone.on('pointerdown', (p) => {
-        if (this.locked) return;
-        if (slot.area !== 'trash') this.setCursor(slot);
-        if (this.held) {
-          this.dropHeld(slot);
-          return;
-        }
-        if (this.monOf(slot)) this.press = { slot: { ...slot }, x: p.x, y: p.y, ghost: null };
-      });
+      zone.on('pointerdown', (p) => this.pressSlot(slot, p));
       add(zone);
     }
   }
@@ -183,39 +207,6 @@ export class PcBox {
       const mon = this.monOf(slot);
       if (mon) this.drawMonIcon(mon, r.x + r.w / 2, r.y + r.h / 2 + 2, 52, isLifted(slot), [r.x + r.w - 10, r.y + 10]);
     }
-    for (let k = 0; k < PARTY_SIZE; k++) {
-      const slot = { area: 'party', k };
-      const r = slotRect(slot);
-      const mon = this.monOf(slot);
-      g.fillStyle(mon ? 0xe4f0fa : 0xf2f4f8);
-      g.fillRoundedRect(r.x, r.y, r.w, r.h, 12);
-      if (!mon) {
-        g.lineStyle(2, 0xd0d6e2);
-        g.strokeRoundedRect(r.x + 1, r.y + 1, r.w - 2, r.h - 2, 12);
-        add(scene.add.text(r.x + r.w / 2, r.y + r.h / 2, 'Trống', textStyle(15, '#a8b0c0')).setOrigin(0.5));
-        continue;
-      }
-      const dim = isLifted(slot);
-      this.drawMonIcon(mon, r.x + 32, r.y + r.h / 2, 48, dim, [r.x + 52, r.y + 12]);
-      const alpha = dim ? 0.35 : 1;
-      // Pokémon shiny: chữ "S" vàng trước tên
-      const mark = mon.shiny ? shinyMark(scene, r.x + 62, r.y + 8, 17).setAlpha(alpha) : null;
-      if (mark) add(mark);
-      const nx = r.x + 62 + (mark ? mark.width + shinyGap(17) : 0);
-      const lv = scene.add.text(r.x + r.w - 10, r.y + 10, `Lv${mon.level}`, textStyle(14, '#6a7286')).setOrigin(1, 0).setAlpha(alpha);
-      add(lv);
-      // Biệt danh dài: thu nhỏ / cắt bớt để không đè lên cấp
-      add(fitText(scene.add.text(nx, r.y + 8, mon.name, textStyle(17, '#30343c', { fontStyle: 'bold' })), lv.x - lv.width - 6 - nx, 0.8).setAlpha(alpha));
-      // Thanh HP; trạng thái xấu / kiệt sức thì nhãn ở cuối thanh
-      const tag = monTag(scene, r.x + r.w - 10, r.y + 45, mon, 10);
-      if (tag) add(tag.setOrigin(1, 0.5).setPadding(4, 1).setAlpha(alpha));
-      const barW = r.w - 74 - (tag ? tag.width + 6 : 0);
-      const ratio = Math.max(0, mon.hp / mon.maxHp);
-      g.fillStyle(0x3a4250, alpha);
-      g.fillRoundedRect(r.x + 62, r.y + 40, barW, 10, 5);
-      g.fillStyle(hpColor(ratio), alpha);
-      if (ratio > 0) g.fillRoundedRect(r.x + 64, r.y + 42, Math.max(6, (barW - 4) * ratio), 6, 3);
-    }
     this.drawCursor();
     this.renderInfo();
   }
@@ -246,8 +237,15 @@ export class PcBox {
       g.strokeRoundedRect(r.x - 2, r.y - 2, r.w + 4, r.h + 4, 12);
     };
     const target = this.press?.ghost ? this.press.target : null;
-    if (target) ring(target, target.area === 'trash' ? DANGER : DROP);
-    else if (this.cursor) ring(this.cursor, this.held ? DROP : ACCENT);
+    const shown = target ?? this.cursor;
+    if (shown && shown.area !== 'party') ring(shown, target ? (target.area === 'trash' ? DANGER : DROP) : this.held ? DROP : ACCENT);
+    // Hàng đội hình: sáng viền ngay trên cột đội hình góc trái
+    const lifted = this.press?.ghost ? this.press.slot : this.held;
+    this.party.mark({
+      cursor: !target && !this.held && this.cursor?.area === 'party' ? this.cursor.k : -1,
+      target: target?.area === 'party' ? target.k : !target && this.held && this.cursor?.area === 'party' ? this.cursor.k : -1,
+      lifted: lifted?.area === 'party' ? lifted.k : -1,
+    });
   }
 
   // Thông tin Pokémon đang trỏ / đang kéo ở khung bên trái
@@ -351,13 +349,13 @@ export class PcBox {
     this.render();
   }
 
-  // Báo lỗi nhỏ dưới lưới hộp (không mở hộp thoại)
-  note(text) {
+  // Báo nhỏ đè lên thùng rác (không mở hộp thoại): lỗi nền đỏ, ok: nền xanh
+  note(text, ok = false) {
     this.noteText?.destroy();
     this.noteTimer?.remove();
-    this.noteText = this.scene.add.text(GRID.x + (GRID.cols * GRID.cell) / 2, GRID.y + GRID.rows * GRID.cell + 34, text, textStyle(15, '#ffffff', {
-      fontStyle: 'bold', backgroundColor: 'rgba(200,64,64,0.92)', padding: { x: 12, y: 6 }, align: 'center',
-      wordWrap: { width: GRID.cols * GRID.cell, useAdvancedWrap: true },
+    this.noteText = this.scene.add.text(TRASH.x + TRASH.w / 2, TRASH.y + TRASH.h / 2, text, textStyle(15, '#ffffff', {
+      fontStyle: 'bold', backgroundColor: ok ? 'rgba(40,140,90,0.95)' : 'rgba(200,64,64,0.95)', padding: { x: 12, y: 6 }, align: 'center',
+      fixedWidth: TRASH.w - 24, wordWrap: { width: TRASH.w - 48, useAdvancedWrap: true },
     })).setOrigin(0.5).setScrollFactor(0).setDepth(this.depth + 0.5);
     this.container.add(this.noteText);
     this.noteTimer = this.scene.time.delayedCall(2200, () => this.noteText?.destroy());
@@ -365,14 +363,14 @@ export class PcBox {
 
   // ---------- Kéo thả ----------
 
-  slotAt(px, py) {
+  // Ô dưới con trỏ p (hộp / hàng đội hình ở cột góc trái / thùng rác), hoặc null
+  slotAt(p) {
+    const { x: px, y: py } = this.pt(p);
     if (px >= GRID.x && px < GRID.x + GRID.cols * GRID.cell && py >= GRID.y && py < GRID.y + GRID.rows * GRID.cell) {
       return { area: 'box', k: Math.floor((py - GRID.y) / GRID.cell) * GRID.cols + Math.floor((px - GRID.x) / GRID.cell) };
     }
-    for (let k = 0; k < PARTY_SIZE; k++) {
-      const r = slotRect({ area: 'party', k });
-      if (px >= r.x && px <= r.x + r.w && py >= r.y - PARTY.gap / 2 && py <= r.y + r.h + PARTY.gap / 2) return { area: 'party', k };
-    }
+    const k = this.party.slotAt(p.x, p.y, true);
+    if (k >= 0) return { area: 'party', k };
     if (px >= TRASH.x && px <= TRASH.x + TRASH.w && py >= TRASH.y && py <= TRASH.y + TRASH.h) return { area: 'trash', k: 0 };
     return null;
   }
@@ -385,13 +383,13 @@ export class PcBox {
       press.mon = this.monOf(press.slot);
       press.slot.page = this.page;
       const key = pixelMon(this.scene, press.mon.speciesId, '', 28, press.mon.shiny);
-      press.ghost = this.scene.add.image(p.x, p.y, key).setScale(fitScale(this.scene, key, 64)).setScrollFactor(0).setDepth(this.depth + 1);
+      press.ghost = this.scene.add.image(p.x, p.y, key).setScale(fitScale(this.scene, key, 64)).setScrollFactor(0).setDepth(this.opts.ghostDepth ?? this.depth + 1);
       this.render();
     }
     press.ghost.setPosition(p.x, p.y - 6);
     // Giữ trên mũi tên ◀ ▶ một lúc thì lật hộp (mang Pokémon sang hộp khác)
-    const lx = localX(this.scene, p);
-    const arrow = Math.abs(p.y - (GRID.y - 32)) < 24 && (Math.abs(lx - (GRID.x + 26)) < 26 ? -1 : Math.abs(lx - (GRID.x + GRID.cols * GRID.cell - 26)) < 26 ? 1 : 0);
+    const { x: lx, y: ly } = this.pt(p);
+    const arrow = Math.abs(ly - (GRID.y - 32)) < 24 && (Math.abs(lx - (GRID.x + 26)) < 26 ? -1 : Math.abs(lx - (GRID.x + GRID.cols * GRID.cell - 26)) < 26 ? 1 : 0);
     if (arrow && !this.flipTimer) {
       this.flipTimer = this.scene.time.delayedCall(450, () => {
         this.flipTimer = null;
@@ -401,7 +399,7 @@ export class PcBox {
       this.flipTimer.remove();
       this.flipTimer = null;
     }
-    const target = this.slotAt(localX(this.scene, p), p.y);
+    const target = this.slotAt(p);
     const same = target && press.target && target.area === press.target.area && target.k === press.target.k;
     if (!same) {
       press.target = target;
@@ -417,7 +415,7 @@ export class PcBox {
     this.flipTimer = null;
     if (!press.ghost) return; // chỉ bấm: con trỏ đã chuyển tới ô đó
     press.ghost.destroy();
-    const target = this.slotAt(localX(this.scene, p), p.y);
+    const target = this.slotAt(p);
     const from = { area: press.slot.area, i: press.slot.area === 'box' ? press.slot.page * BOX_SLOTS + press.slot.k : press.slot.k };
     if (target) this.cursor = target.area === 'trash' ? this.cursor : target;
     this.render();
@@ -456,16 +454,14 @@ export class PcBox {
     if (yes) {
       const { held, kept } = releaseMon(from);
       this.opts.onChange?.();
-      this.render();
-      await this.opts.say([
-        `${mon.name} đã được thả về tự nhiên. Tạm biệt, ${mon.name}!`,
-        ...(held && kept ? [`Đã cất ${ITEMS[held].name} ${mon.name} đang cầm vào túi.`] : []),
-        ...(held && !kept ? [`Túi đã đầy ${ITEMS[held].name}, không cất thêm được.`] : []),
-      ]);
+      // Báo ở tab Hệ thống (khung góc phải dưới), không mở hộp thoại
+      logSystem(`${mon.name} (Lv${mon.level}) đã được thả về tự nhiên.`);
+      if (held && kept) logSystem(`${ITEMS[held].name} mà ${mon.name} đang cầm đã được trả vào túi.`, 'good');
+      if (held && !kept) logSystem(`Túi đã đầy ${ITEMS[held].name}, không cất được món ${mon.name} đang cầm.`, 'warn');
+      this.note(`Đã thả ${mon.name}`, true);
     }
     this.locked = false;
-    this.bindKeys();
-    this.render();
+    if (!this.closed) this.render();
   }
 
   // ---------- Bàn phím ----------
@@ -499,23 +495,26 @@ export class PcBox {
     this.renderInfo();
   }
 
+  // Cột đội hình nằm bên trái hộp (cột góc trái màn hình), thùng rác dưới lưới hộp
   stepCursor(cur, [dx, dy]) {
     const { area, k } = cur;
+    // Hàng cuối của cột đội hình con trỏ tới được: con cuối, hoặc ô trống ngay sau nếu đang nhấc Pokémon từ hộp
+    const lastParty = Math.min(PARTY_SIZE - 1, Math.max(0, state.party.length - (this.held?.area === 'box' ? 0 : 1)));
     if (area === 'box') {
       const col = k % GRID.cols;
       const row = Math.floor(k / GRID.cols);
-      if (dx > 0 && col === GRID.cols - 1) return { area: 'party', k: Math.min(PARTY_SIZE - 1, row) };
+      if (dx < 0 && col === 0) return { area: 'party', k: Math.min(lastParty, row) };
+      if (dy > 0 && row === GRID.rows - 1) return { area: 'trash', k: 0 };
       const c = Phaser.Math.Clamp(col + dx, 0, GRID.cols - 1);
       const r = Phaser.Math.Clamp(row + dy, 0, GRID.rows - 1);
       return { area, k: r * GRID.cols + c };
     }
     if (area === 'party') {
-      if (dx < 0) return { area: 'box', k: Math.min(GRID.rows - 1, k) * GRID.cols + GRID.cols - 1 };
-      if (dy > 0 && k === PARTY_SIZE - 1) return { area: 'trash', k: 0 };
-      return { area, k: Phaser.Math.Clamp(k + dy, 0, PARTY_SIZE - 1) };
+      if (dx > 0) return { area: 'box', k: Math.min(GRID.rows - 1, k) * GRID.cols };
+      return { area, k: Phaser.Math.Clamp(k + dy, 0, lastParty) };
     }
-    if (dy < 0) return { area: 'party', k: PARTY_SIZE - 1 };
-    if (dx < 0) return { area: 'box', k: BOX_SLOTS - 1 };
+    if (dy < 0) return { area: 'box', k: (GRID.rows - 1) * GRID.cols };
+    if (dx < 0) return { area: 'party', k: lastParty };
     return cur;
   }
 }

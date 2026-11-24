@@ -1,4 +1,4 @@
-// Dữ liệu cho màn Pokédex (scenes/PokedexScene.js), không phụ thuộc Phaser nên kiểm thử được bằng node:test:
+// Dữ liệu cho màn Pokédex (ui/dex/DexWindow.js), không phụ thuộc Phaser nên kiểm thử được bằng node:test:
 // lọc danh sách (ẩn loài chưa gặp, tìm theo tên / số), bộ chiêu học khi lên cấp, nơi xuất hiện, toạ độ biểu đồ lục giác.
 import { ENCOUNTERS } from '../../data/encounters.js';
 import LEARNSETS from '../../data/learnsets.json' with { type: 'json' };
@@ -97,6 +97,22 @@ export function dexLocations(slug) {
   return [...found.values()]
     .map(({ allDay, times, ...loc }) => ({ ...loc, times: allDay ? [] : [...times] }))
     .sort((a, b) => order.indexOf(a.mapId) - order.indexOf(b.mapId) || METHOD_ORDER.indexOf(a.method) - METHOD_ORDER.indexOf(b.method));
+}
+
+// Nơi xuất hiện gom một dòng mỗi bản đồ: [{ mapId, mapName, land, water, times, min, max }]
+// land: bụi cỏ / cỏ rậm / trong hang • water: lướt nước / câu cá • times: các buổi xuất hiện (đủ 3 buổi nếu có cả ngày)
+export function dexPlaces(slug) {
+  const places = new Map();
+  for (const loc of dexLocations(slug)) {
+    const p = places.get(loc.mapId) ?? { mapId: loc.mapId, mapName: loc.mapName, land: false, water: false, times: new Set(), min: Infinity, max: -Infinity };
+    if (WATER_METHODS.includes(loc.method)) p.water = true;
+    else p.land = true;
+    for (const t of loc.times.length ? loc.times : ['day', 'dusk', 'night']) p.times.add(t);
+    p.min = Math.min(p.min, loc.min);
+    p.max = Math.max(p.max, loc.max);
+    places.set(loc.mapId, p);
+  }
+  return [...places.values()];
 }
 
 export const levelText = ({ min, max }) => (min === max ? `Lv ${min}` : `Lv ${min}-${max}`);

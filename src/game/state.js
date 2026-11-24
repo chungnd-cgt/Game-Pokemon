@@ -1,4 +1,5 @@
 import { DEX_BY_SLUG } from '../data/pokedex.js';
+import { CURRENT_REGION } from '../data/regions.js';
 import { healMonster } from './monster.js';
 
 export const PARTY_SIZE = 6;
@@ -27,7 +28,7 @@ function freshState() {
     pendingBattle: null, // trận đang đánh dở (lưu giữa trận): { wild } | { trainer, name, forfeit }
     itemRespawn: {}, // id đồ vật nhặt lại được (Rare Candy) -> thời điểm (ms) lại có
     hotbar: [null, null, null, null, null, null], // 6 ô phím tắt vật phẩm (ui/Hotbar.js)
-    flags: new Set(), // các mốc cốt truyện đã qua
+    flags: new Set(['gymTms']), // các mốc cốt truyện đã qua (gymTms: ván mới đã có sẵn, xem game/save.js)
     berryTrees: {}, // id cây -> thời điểm (ms) cây ra quả lại; không có = đang có quả
     repel: null, // { item, steps }: Repel đang có hiệu lực, còn steps bước
     // Khu Safari (game/safari.js): hạn (ms, giờ thật) của vé Safari, vé Safari Effort, gói 24 giờ; 0 = không có
@@ -36,6 +37,7 @@ function freshState() {
     badges: new Set(), // huy hiệu gym đã nhận (data/badges.js)
     visited: new Set(), // khu vực đã đặt chân tới (data/region.js)
     hallOfFame: [], // các lần vô địch Liên minh: { at, team: [{ speciesId, name, level, shiny }] }
+    evolved: 0, // số lần Pokémon của người chơi đã tiến hoá (Charmander -> Charmeleon -> Charizard = 2), hiện ở Pokédex
     tradesDone: new Set(), // id các giao dịch với người chơi khác đã nhận vào bản lưu (online/trade.js): không nhận hai lần
     playTime: 0, // giây
     startedAt: Date.now(), // lúc bắt đầu chơi mới (ms, hiện trên Thẻ Huấn luyện viên); bản lưu cũ không có thì null
@@ -58,7 +60,13 @@ export const hasFlag = (flag) => state.flags.has(flag);
 export const playerName = () => state.player?.name || 'Bạn';
 export const setFlag = (flag) => state.flags.add(flag);
 
+// OT (huấn luyện viên gốc): người đầu tiên có Pokémon này. Gắn lúc về tay người chơi lần đầu (bắt, được tặng); đổi cho
+// người chơi khác vẫn giữ OT cũ (mon.ot đã có thì không đổi), chỉ mất khi thả Pokémon đi.
+// mon.ball: loại bóng đã bắt (BattleScene đặt trước khi gọi); được tặng / nhận thì coi như Poké Ball
 export function addCaught(mon) {
+  mon.ot ??= playerName();
+  mon.ball ??= 'ball';
+  mon.region ??= CURRENT_REGION; // vùng bắt được (data/regions.js)
   markCaught(mon.speciesId);
   if (state.party.length < PARTY_SIZE) {
     state.party.push(mon);

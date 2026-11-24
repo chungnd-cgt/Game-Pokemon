@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { FPS_STOPS, RESOLUTIONS, UI_SCALES, applyFpsLimit, applyResolution, fullscreen, resolutionLabel, uiScaleLabel } from '../game/display.js';
 import { KEY_ACTIONS, canBind, clearBinding, getBindings, keyName, setBinding } from '../game/keybinds.js';
+import { applyHiRes } from '../game/hires.js';
 import { setSetting, settings } from '../game/settings.js';
 import { BLEED, fixToCamera, localX, textStyle, uiX } from './helpers.js';
 import { directionOf, isCancel, isConfirm, isTouchDevice } from './input.js';
@@ -12,7 +13,7 @@ import { directionOf, isCancel, isConfirm, isTouchDevice } from './input.js';
 //  chỉ cho bật toàn màn hình trong lúc người chơi vừa thả tay / bấm phím).
 //  Bàn phím: ↑ / ↓ chọn dòng, ← / → đổi giá trị (dòng không có giá trị: sang cột thẻ), xác nhận để bật / tắt / bấm,
 //  Tab đổi thẻ.
-//  Nút mở màn hình khác (Bản đồ vùng, Đổi diện mạo...) đóng bảng và trả về { action, state }: màn hình gọi lo
+//  Nút mở màn hình khác (Đổi diện mạo...) đóng bảng và trả về { action, state }: màn hình gọi lo
 //  mở màn đó rồi mở lại bảng với state (giữ thẻ, dòng đang chọn và nháp chưa áp dụng).
 //  Dòng half: xếp 2 cột (thẻ Chung: các ô tích, các nút). ← / → đổi cột, ↑ / ↓ lên xuống theo hàng.
 //  Thẻ Điều khiển: bảng phím (Hành động | Phím chính | Phím phụ) ngay trong thẻ, cuộn bằng con lăn / phím hướng. Bấm vào ô
@@ -70,6 +71,7 @@ function currentValues() {
     display: fullscreen.active ? 'full' : 'window',
     resolution: RESOLUTIONS.includes(settings.resolution) ? settings.resolution : 'screen',
     fpsLimit: FPS_STOPS.includes(settings.fpsLimit) ? settings.fpsLimit : 0,
+    sharp: settings.sharp !== false,
     lighting: settings.lighting !== false,
     weather: settings.weather !== false,
     catchPreview: settings.catchPreview !== false,
@@ -83,7 +85,7 @@ function currentValues() {
   };
 }
 
-// Các thẻ và dòng trong thẻ. opts: { hasMap, account (tên đăng nhập, tài khoản chưa có tên thì email), game,
+// Các thẻ và dòng trong thẻ. opts: { account (tên đăng nhập, tài khoản chưa có tên thì email), game,
 // lobby (mở từ màn đăng nhập: bỏ các nút cần đang ở trong game) }
 function buildTabs(opts) {
   const fsNote = fullscreen.available ? null
@@ -98,6 +100,7 @@ function buildTabs(opts) {
         { type: 'select', key: 'resolution', label: 'Độ phân giải',
           options: RESOLUTIONS.map((value) => ({ value, label: resolutionLabel(value) })) },
         { type: 'slider', key: 'fpsLimit', label: 'Giới hạn FPS', stops: FPS_STOPS, format: (v) => (v ? `${v} FPS` : 'Theo màn hình') },
+        { type: 'check', half: true, key: 'sharp', label: 'Hiển thị sắc nét' },
         { type: 'check', half: true, key: 'lighting', label: 'Ánh sáng ngày đêm' },
         { type: 'check', half: true, key: 'weather', label: 'Hiệu ứng thời tiết' },
       ],
@@ -116,7 +119,6 @@ function buildTabs(opts) {
         { type: 'check', half: true, key: 'playerNames', label: 'Tên người chơi' },
         { type: 'check', half: true, key: 'showDpad', label: 'Hiện D-Pad' },
         { type: 'check', half: true, key: 'touchRelative', label: 'Cần gạt tương đối' },
-        ...(opts.hasMap ? [{ type: 'button', half: true, label: 'Bản đồ vùng', action: 'map' }] : []),
         // Màn đăng nhập (lobby): chưa có nhân vật nên không đổi diện mạo được
         ...(opts.lobby ? [] : [{ type: 'button', half: true, label: 'Đổi diện mạo', action: 'look' }]),
         ...(opts.account ? [
@@ -136,7 +138,7 @@ function buildTabs(opts) {
 const focusable = (row) => row.type !== 'info' && !row.disabled;
 
 export class SettingsPanel {
-  // opts: { depth, hasMap, account, lobby, state (từ lần mở trước), onApplied(keys) }
+  // opts: { depth, account, lobby, state (từ lần mở trước), onApplied(keys) }
   constructor(scene, router, opts = {}) {
     this.scene = scene;
     this.router = router;
@@ -415,6 +417,7 @@ export class SettingsPanel {
     }
     if (keys.includes('fpsLimit')) applyFpsLimit(this.scene.game);
     if (keys.includes('resolution')) applyResolution(this.scene.game, this.draft.resolution);
+    if (keys.includes('sharp')) applyHiRes(this.scene.game);
     this.baseline = { ...this.draft };
     this.onApplied(keys);
   }

@@ -337,19 +337,40 @@ export function expGain(defeated, level = defeated.level, { trainer = false, spl
   return Math.floor(base * scale) + 1;
 }
 
+// Tốc độ nhận EXP của game: ít hơn công thức gốc (EXP_RATE) cho lên cấp chậm lại. Pokémon đã tiến hoá nhận ít hơn nữa
+// (dạng tiến hoá như cần nhiều EXP hơn, lên cấp lâu hơn): chưa tiến hoá x1, đã tiến hoá 1 lần x0.8, 2 lần x0.65
+export const EXP_RATE = 0.6;
+const STAGE_RATE = [1, 0.8, 0.65];
+let PREVO = null; // loài -> loài trước khi tiến hoá
+
+// Số lần đã tiến hoá của loài (Charmander 0, Charmeleon 1, Charizard 2; Vaporeon 1)
+export function evolutionStage(speciesId) {
+  if (!PREVO) {
+    PREVO = {};
+    for (const [id, sp] of Object.entries(SPECIES)) for (const e of sp.evolution ?? []) PREVO[e.to] ??= id;
+  }
+  let n = 0;
+  for (let id = speciesId; PREVO[id] && n < 3; id = PREVO[id]) n++;
+  return n;
+}
+
+// Hệ số EXP của Pokémon nhận (theo loài gốc khi đang biến hình)
+export const expRate = (mon) => EXP_RATE * STAGE_RATE[Math.min(STAGE_RATE.length - 1, evolutionStage(baseSpeciesId(mon)))];
+
 // Chia EXP như Gen 5: các Pokémon đã ra sân đấu với nó và còn đứng (participants) chia nhau, mỗi con tính theo cấp của mình;
-// cầm Lucky Egg x1.5. Trả về [{ mon, amount }]
+// cầm Lucky Egg x1.5; nhân hệ số expRate (tốc độ EXP của game, dạng tiến hoá). Trả về [{ mon, amount }] (ít nhất 1)
 // sharers: Pokémon cầm Exp. Share không ra trận (còn chiến đấu được): mỗi con nhận 50% EXP như khi tự hạ một mình
 // (con ra trận vẫn nhận đủ phần của mình, không bị chia bớt)
 export function expShares(defeated, participants, { trainer = false, sharers = [] } = {}) {
   if (!participants.length) return [];
   const egg = (mon) => (ITEMS[mon.heldItem]?.held === 'luckyEgg' ? 1.5 : 1);
+  const final = (mon, exp) => Math.max(1, Math.floor(exp * egg(mon) * expRate(mon)));
   return [
     ...participants.map((mon) => ({
-      mon, amount: Math.floor(expGain(defeated, mon.level, { trainer, split: participants.length }) * egg(mon)),
+      mon, amount: final(mon, expGain(defeated, mon.level, { trainer, split: participants.length })),
     })),
     ...sharers.filter((mon) => !participants.includes(mon)).map((mon) => ({
-      mon, amount: Math.floor(expGain(defeated, mon.level, { trainer, split: 1 }) * 0.5 * egg(mon)), shared: true,
+      mon, amount: final(mon, expGain(defeated, mon.level, { trainer, split: 1 }) * 0.5), shared: true,
     })),
   ];
 }

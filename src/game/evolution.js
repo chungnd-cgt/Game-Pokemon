@@ -1,6 +1,6 @@
 import { SPECIES } from '../data/monsters.js';
 import { learnMoves, movesAtLevel, recalcStats } from './monster.js';
-import { markCaught } from './state.js';
+import { markCaught, state } from './state.js';
 
 // Loài mà Pokémon sẽ tiến hoá thành, hoặc null.
 // item: đá tiến hoá đang dùng. Không có item thì xét tiến hoá theo cấp (Everstone đang cầm thì không tiến hoá).
@@ -10,6 +10,9 @@ export function evolutionTarget(mon, item = null) {
     if (evo.trade) continue;
     if (evo.item) {
       if (evo.item === item) return evo.to;
+    } else if (evo.happiness != null) {
+      // Tiến hoá khi đủ thân thiết (evo.happiness, 0..255) lúc lên cấp; evo.level (nếu có) là cấp tối thiểu
+      if (!item && mon.heldItem !== 'everstone' && (mon.happiness ?? 0) >= evo.happiness && mon.level >= (evo.level ?? 1)) return evo.to;
     } else if (!item && mon.heldItem !== 'everstone' && mon.level >= evo.level) {
       return evo.to;
     }
@@ -41,6 +44,7 @@ export function evolve(mon, to) {
     : keep ? mon.ability : species.abilities.normal[Math.min(slot, species.abilities.normal.length - 1)];
   recalcStats(mon);
   markCaught(to);
+  state.evolved = (state.evolved ?? 0) + 1; // đếm số lần tiến hoá (Pokédex)
 
   return learnMoves(mon, [...species.evolutionMoves, ...movesAtLevel(species, mon.level)]);
 }

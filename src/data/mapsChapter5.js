@@ -1,4 +1,5 @@
 import { CAVE_TILES, INDOOR_TILES, OUTDOOR_TILES } from './tiles.js';
+import { widen } from './widen.js';
 
 // Liên minh vùng Sơn Thủy: Sương Mù -> Đường Chiến Thắng (lính gác kiểm tra đủ 8 huy hiệu) -> Hang Vân Sơn
 // -> Cao nguyên Liên Minh -> sảnh Liên minh -> 4 phòng Tứ Thiên Vương -> phòng Nhà vô địch.
@@ -15,6 +16,40 @@ const hall = (name, theme) => ({
   fallback: '#',
   entry: { x: 6, y: 10 },
 });
+
+// Phòng 13 x 12 ô ở giữa, lúc nạp nới thêm LEAGUE_DX ô mỗi bên và 3 hàng phía dưới thành đại sảnh 35 x 15 kín màn hình
+// (data/widen.js): hai cánh sảnh có hàng cột đá thẳng hàng với cột trong phòng, chậu cây sát tường sau. Thiên Vương / Nhà
+// vô địch (story/league.js) khai báo toạ độ theo phòng 13 ô rồi cộng LEAGUE_DX
+export const LEAGUE_DX = 11;
+const hallWing = (x, y, edge) => {
+  const d = edge === 'left' ? LEAGUE_DX - 1 - x : x; // 0: sát phòng
+  if (y === 2) return d % 4 === 2 ? 'p' : '.';
+  return y % 2 === 1 && d % 4 === 3 ? 'o' : '.';
+};
+const hallBottom = (y, width) => [...Array(width)].map((_, x) => (y === 13 && (x % 4 === 1) ? 'o' : '.')).join('');
+// Hai cánh sảnh Liên minh (hàng 2-8, cánh phải là ảnh gương cánh trái) và 6 hàng phía dưới
+const LOBBY_WING = [
+  'kk.kk.kk...',
+  '...........',
+  '.bb.....bb.',
+  '...........',
+  '.p..ttt..p.',
+  '...........',
+  '...........',
+];
+const lobbyWing = (x, y, edge) => {
+  const row = LOBBY_WING[y - 2];
+  return edge === 'left' ? row[x] : row[row.length - 1 - x];
+};
+const LOBBY_BOTTOM = [
+  '...................................',
+  '....o......bb.........bb......o....',
+  '...................................',
+  '....o......bb.........bb......o....',
+  '...................................',
+  'p.................................p',
+];
+const bigHall = (def) => widen(def, { left: LEAGUE_DX, bottom: 3, side: hallWing, bottomRow: hallBottom });
 
 const ROOM = [
       '#############',
@@ -293,8 +328,10 @@ export const CHAPTER5_MAPS = {
     },
   },
 
-  // Sảnh Liên minh: hồi phục, mua đồ, cửa lớn phía sau dẫn vào phòng Tứ Thiên Vương
-  leagueLobby: {
+  // Sảnh Liên minh: hồi phục, mua đồ, cửa lớn phía sau dẫn vào phòng Tứ Thiên Vương. Quầy 13 ô ở giữa, lúc nạp nới
+  // thành sảnh 35 x 15 (lobbyWing / LOBBY_BOTTOM): tủ cúp sát tường, ghế chờ, bàn nước hai bên, hàng cột và chậu cây ở
+  // nửa dưới, cửa ra ở tường dưới
+  leagueLobby: widen({
     name: 'Sảnh Liên minh',
     indoor: true,
     theme: 'league',
@@ -312,28 +349,28 @@ export const CHAPTER5_MAPS = {
       '......E......',
     ],
     entry: { x: 6, y: 7 },
-    rugs: [[5, 4, 7, 7, '#5a3a88', '#e8c050']], // thảm tím viền vàng dẫn tới cửa lớn
+    rugs: [[5, 4, 7, 13, '#5a3a88', '#e8c050']], // thảm tím viền vàng từ cửa ra dẫn tới cửa lớn
     heal: { x: 2, y: 4, facing: 'up' },
     warps: [{ x: 6, y: 1, to: 'elite1', tx: 6, ty: 10, facing: 'up', oneWay: true, resetLeague: true }],
-  },
+  }, { left: LEAGUE_DX, bottom: 6, side: lobbyWing, bottomRow: (y) => LOBBY_BOTTOM[y - 9], exitDown: true }),
 
-  elite1: {
+  elite1: bigHall({
     ...hall('Phòng Thiên Vương Lan', 'elitePoison'),
     rows: ROOM,
     rugs: [[5, 3, 7, 11, '#5a2e78', '#7ad060']], // thảm dẫn từ cửa vào tới chỗ Thiên Vương
     // Thắng Thiên Vương thì cửa phong ấn mở, đi qua cửa lớn sang phòng kế tiếp (không quay lại được)
     objects: [{ x: 6, y: 2, kind: 'gate', look: 'seal', id: 'elite1-seal', flag: 'league:e1' }],
     warps: [{ x: 6, y: 1, to: 'elite2', tx: 6, ty: 10, facing: 'up', oneWay: true }],
-  },
-  elite2: {
+  }),
+  elite2: bigHall({
     ...hall('Phòng Thiên Vương Võ', 'eliteFighting'),
     rows: ROOM,
     rugs: [[5, 3, 7, 11, '#8a2a20', '#f0c860']], // thảm dẫn từ cửa vào tới chỗ Thiên Vương
     // Thắng Thiên Vương thì cửa phong ấn mở, đi qua cửa lớn sang phòng kế tiếp (không quay lại được)
     objects: [{ x: 6, y: 2, kind: 'gate', look: 'seal', id: 'elite2-seal', flag: 'league:e2' }],
     warps: [{ x: 6, y: 1, to: 'elite3', tx: 6, ty: 10, facing: 'up', oneWay: true }],
-  },
-  elite3: {
+  }),
+  elite3: bigHall({
     ...hall('Phòng Thiên Vương Huyền', 'eliteGhost'),
     dark: true,
     rows: ROOM,
@@ -341,17 +378,17 @@ export const CHAPTER5_MAPS = {
     // Thắng Thiên Vương thì cửa phong ấn mở, đi qua cửa lớn sang phòng kế tiếp (không quay lại được)
     objects: [{ x: 6, y: 2, kind: 'gate', look: 'seal', id: 'elite3-seal', flag: 'league:e3' }],
     warps: [{ x: 6, y: 1, to: 'elite4', tx: 6, ty: 10, facing: 'up', oneWay: true }],
-  },
-  elite4: {
+  }),
+  elite4: bigHall({
     ...hall('Phòng Thiên Vương Long', 'eliteDragon'),
     rows: ROOM,
     rugs: [[5, 3, 7, 11, '#22408a', '#e8c060']], // thảm dẫn từ cửa vào tới chỗ Thiên Vương
     // Thắng Thiên Vương thì cửa phong ấn mở, đi qua cửa lớn sang phòng kế tiếp (không quay lại được)
     objects: [{ x: 6, y: 2, kind: 'gate', look: 'seal', id: 'elite4-seal', flag: 'league:e4' }],
     warps: [{ x: 6, y: 1, to: 'champion', tx: 6, ty: 10, facing: 'up', oneWay: true }],
-  },
+  }),
 
-  champion: {
+  champion: bigHall({
     ...hall('Phòng Nhà vô địch', 'champion'),
     rugs: [[5, 3, 7, 11, '#b02828', '#f0c838']], // thảm đỏ viền vàng tới chỗ Nhà vô địch
     rows: [
@@ -368,5 +405,5 @@ export const CHAPTER5_MAPS = {
       '.............',
       '.............',
     ],
-  },
+  }),
 };

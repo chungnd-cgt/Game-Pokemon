@@ -362,6 +362,7 @@ export function makeItemIcons(scene, monSprite = () => null) {
     let canvas = null;
     if (item.kind === 'evolution') canvas = drawStone(item.color, id.replace('Stone', ''));
     else if (item.held === 'boost') canvas = drawBooster(item.color);
+    else if (item.kind === 'tm') canvas = drawDisc(item.color); // đĩa kỹ năng: màu theo hệ chiêu
     if (canvas) addCanvasTexture(scene, item.icon, canvas);
   }
   addCanvasTexture(scene, ITEMS.everstone.icon, drawEverstone());

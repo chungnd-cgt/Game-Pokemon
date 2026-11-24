@@ -1,10 +1,10 @@
 import { formatMoney } from '../data/items.js';
 import { gameClock } from '../game/clock.js';
 import { setSetting, settings } from '../game/settings.js';
-import { state } from '../game/state.js';
+import { itemCount, state } from '../game/state.js';
 import { HUD_PHASE_ICON } from '../gfx/textures.js';
 import { hudSize, textStyle } from './helpers.js';
-import { HOTBAR_RIGHT, MONEY_W } from './Hotbar.js';
+import { CORNER, HOTBAR_RIGHT, MONEY_W, cornerSize } from './Hotbar.js';
 import { InfoPanel } from './InfoPanel.js';
 import { drawCardIcon } from './TrainerCard.js';
 
@@ -22,7 +22,9 @@ const PHASE_R = 18; // bán kính vòng tròn đựng icon buổi
 const CLOCK_ICON = 24;
 const PHASE_RING = { day: 0xffd860, dusk: 0xff9a50, night: 0x9ab8ff };
 // Khung nền góc trái dưới (bao cột nút tròn và hàng nút ≡ / tiền / phím tắt), chỗ nối uốn cong
-const FRAME_FILL = 0x10151f;
+const FRAME_FILL = 0x0b0e16; // nền đen đặc (không trong suốt) của khung góc trái dưới và khung giờ
+const BLACK = 0x0b0e16;
+const ARC = 34; // cột nút menu cong: nút dưới cùng lệch sang phải chừng này px so với nút trên cùng
 const FRAME_EDGE = 0x3d4c72;
 const NOTE_WRAP = 540; // dòng báo dài (vd gán phím tắt) xuống dòng ở chừng này px
 
@@ -88,7 +90,7 @@ function drawIcon(g, type, cx, cy) {
 }
 
 // Màu viền nút tròn theo chức năng
-const RINGS = { party: 0xe85050, bag: 0xe8a030, dex: 0xd84848, trainer: 0x48b878, settings: 0x9aa4bc };
+const RINGS = { party: 0xe85050, bag: 0xe8a030, dex: 0xd84848, trainer: 0x48b878, settings: 0x9aa4bc, map: 0x58b8f0 };
 // Cột nút tròn bên trái (Đội hình mở bằng cột Pokémon góc trái trên nên không có nút riêng)
 const MENU_ITEMS = [
   { id: 'bag', label: 'Túi đồ' },
@@ -113,12 +115,13 @@ export function drawRoundIcon(g, type, cx, cy) {
 
 // Giao diện trên bản đồ: giờ & tên bản đồ (trên phải; bảng Pokémon trong khu ngay dưới, ui/AreaNav.js), cột đội hình
 // (trên trái, ui/PartyPanel.js), cột nút tròn có nhãn bên trái ngay trên thanh phím tắt (Túi đồ / Pokédex / Thẻ HLV /
-// Cài đặt; Bản đồ vùng và Phím tắt nằm trong Cài đặt), nút ≡ cạnh thanh phím tắt ẩn / hiện cột nút, khung góc phải dưới
+// Cài đặt; Phím tắt nằm trong Cài đặt), nút ≡ cạnh thanh phím tắt ẩn / hiện cột nút, nút Bản đồ vùng tròn ngay bên trái
+// khung giờ (chỉ hiện khi đã nhận Bản đồ vùng từ mẹ), khung góc phải dưới
 // có 2 tab Hệ thống / Nhiệm vụ (ui/InfoPanel.js; bấm tab đang chọn để thu gọn / mở ra).
 // Cỡ giao diện (helpers.js hudScale): mọi phần nằm trong một container root, xếp theo cỡ ảo (hudSize) rồi phóng to theo
 // hệ số. Hệ số đổi thì WorldScene huỷ (destroy) và tạo lại. Riêng cột nút tròn (menuRoot) giữ cỡ 100% (phóng to thì đè lên
 // cột đội hình), chỉ dời theo hàng nút ≡ / thanh phím tắt đã phóng to
-// actions: { bag, dex, trainer, settings } – hàm gọi khi bấm nút
+// actions: { bag, dex, trainer, settings, map } – hàm gọi khi bấm nút
 export class WorldHud {
   constructor(scene, actions) {
     this.scene = scene;
@@ -131,7 +134,16 @@ export class WorldHud {
       return o;
     };
     this.fixed = fixed;
-    this.menuRoot = scene.add.container(0, 0).setScrollFactor(0).setDepth(DEPTH);
+    // Cụm góc trái dưới nhỏ hơn (Hotbar.js: CORNER), neo góc trái dưới: nút ≡ và ô tiền trong cornerRoot (toạ độ ảo
+    // cornerSize); cột nút tròn và khung nền co CORNER lần (toạ độ = toạ độ màn hình / CORNER)
+    const cs = cornerSize(scene);
+    this.cornerRoot = scene.add.container(0, 0).setScrollFactor(0).setDepth(DEPTH).setScale(cs.s);
+    this.cornerFixed = (o) => {
+      o.setScrollFactor(0);
+      this.cornerRoot.add(o);
+      return o;
+    };
+    this.menuRoot = scene.add.container(0, 0).setScrollFactor(0).setDepth(DEPTH).setScale(CORNER);
     this.menuFixed = (o) => {
       o.setScrollFactor(0);
       this.menuRoot.add(o);
@@ -156,10 +168,20 @@ export class WorldHud {
     })).setOrigin(1, 0));
     this.clockParts = [this.clockBg, this.localLabel, this.gameLabel, this.localTime, this.gameTime, this.clockIcon, this.mapName];
     this.phase = 'day';
+    // Nút Bản đồ vùng (tròn, bên trái khung giờ): ẩn tới khi nhận Bản đồ vùng
+    this.mapBtn = { g: fixed(scene.add.graphics()), zone: fixed(scene.add.zone(0, 0, ROUND * 2 + 4, ROUND * 2 + 4)), hover: false };
+    this.mapBtn.zone.on('pointerover', () => this.drawMapButton(true));
+    this.mapBtn.zone.on('pointerout', () => this.drawMapButton(false));
+    this.mapBtn.zone.on('pointerdown', (p, lx, ly, e) => {
+      e?.stopPropagation();
+      this.actions.map?.();
+    });
+    this.hasMap = null;
     this.layoutClock();
+    this.applyMapButton();
 
     // Khung nền góc trái dưới (dưới cột nút và hàng nút ≡ / tiền / phím tắt): toạ độ màn hình, vẽ lại khi bố trí lại
-    this.frame = scene.add.graphics().setScrollFactor(0).setDepth(DEPTH - 1);
+    this.frame = scene.add.graphics().setScrollFactor(0).setDepth(DEPTH - 1).setScale(CORNER);
 
     // Báo đã lưu / đã gán phím tắt: chỗ trống giữa thanh phím tắt và khung nhiệm vụ (xem showSaveNote).
     // Nằm trên các menu, túi đồ (đang kéo đồ vào ô phím tắt vẫn thấy): ngoài root, toạ độ màn hình
@@ -169,11 +191,11 @@ export class WorldHud {
 
     // Nút ≡ cạnh thanh phím tắt: ẩn / hiện cột nút tròn
     this.expanded = settings.hudMenuOpen !== false;
-    this.toggleBtn = this.makeSquareButton(16, height - 16 - BTN, () => this.toggleMenu());
+    this.toggleBtn = this.makeSquareButton(16, cs.height - 16 - BTN, () => this.toggleMenu());
     // Ô tiền giữa nút ≡ và thanh phím tắt (như game MMO): icon đồng ₽ + số tiền, cập nhật mỗi khi tiền đổi
     const mx = 16 + BTN + 8;
-    const my = height - 16 - BTN;
-    this.moneyBg = fixed(scene.add.graphics());
+    const my = cs.height - 16 - BTN;
+    this.moneyBg = this.cornerFixed(scene.add.graphics());
     this.moneyBg.fillStyle(DARK, 0.8);
     this.moneyBg.fillRoundedRect(mx, my + 8, MONEY_W, BTN - 16, 10);
     this.moneyBg.lineStyle(2, 0xffffff, 0.18);
@@ -182,8 +204,8 @@ export class WorldHud {
     this.moneyBg.fillCircle(mx + 18, my + BTN / 2, 9);
     this.moneyBg.fillStyle(0xf8e080);
     this.moneyBg.fillCircle(mx + 17, my + BTN / 2 - 1, 6);
-    this.moneyCoin = fixed(scene.add.text(mx + 18, my + BTN / 2, '₽', textStyle(11, '#7a5010', { fontStyle: 'bold' })).setOrigin(0.5));
-    this.moneyText = fixed(scene.add.text(mx + 32, my + BTN / 2, '', textStyle(15, '#ffffff', { fontStyle: 'bold' })).setOrigin(0, 0.5));
+    this.moneyCoin = this.cornerFixed(scene.add.text(mx + 18, my + BTN / 2, '₽', textStyle(11, '#7a5010', { fontStyle: 'bold' })).setOrigin(0.5));
+    this.moneyText = this.cornerFixed(scene.add.text(mx + 32, my + BTN / 2, '', textStyle(15, '#ffffff', { fontStyle: 'bold' })).setOrigin(0, 0.5));
     this.moneyShown = null;
     this.buttons = MENU_ITEMS.map((item) => this.makeRoundButton(item, () => this.actions[item.id]?.()));
     this.layoutMenu();
@@ -192,7 +214,7 @@ export class WorldHud {
 
   makeSquareButton(x, y, onClick) {
     const { scene } = this;
-    const g = this.fixed(scene.add.graphics());
+    const g = this.cornerFixed(scene.add.graphics());
     const draw = (hover) => {
       g.clear();
       g.fillStyle(DARK, hover ? 0.95 : 0.8);
@@ -201,7 +223,7 @@ export class WorldHud {
       g.strokeRoundedRect(x + 1, y + 1, BTN - 2, BTN - 2, 9);
       drawIcon(g, 'menu', x + BTN / 2, y + BTN / 2);
     };
-    const zone = this.fixed(scene.add.zone(x + BTN / 2, y + BTN / 2, BTN, BTN)).setInteractive({ useHandCursor: true });
+    const zone = this.cornerFixed(scene.add.zone(x + BTN / 2, y + BTN / 2, BTN, BTN)).setInteractive({ useHandCursor: true });
     zone.on('pointerover', () => draw(true));
     zone.on('pointerout', () => draw(false));
     zone.on('pointerdown', (p, lx, ly, e) => {
@@ -223,9 +245,11 @@ export class WorldHud {
       const { cx, cy } = btn;
       const pillW = ROUND + 10 + label.width + 14;
       g.clear();
-      // Viên nhãn phía sau nút tròn
-      g.fillStyle(DARK, hover ? 0.92 : 0.72);
+      // Viên nhãn phía sau nút tròn (đen đặc, thò ra ngoài khung cột)
+      g.fillStyle(hover ? 0x1c2338 : BLACK, 1);
       g.fillRoundedRect(cx, cy - 13, pillW, 26, 13);
+      g.lineStyle(1.5, FRAME_EDGE, 0.85);
+      g.strokeRoundedRect(cx + 0.5, cy - 12.5, pillW - 1, 25, 12.5);
       // Nút tròn: bóng đổ, nền tối, viền màu theo chức năng
       g.fillStyle(0x000000, 0.3);
       g.fillCircle(cx + 1, cy + 3, ROUND);
@@ -270,7 +294,7 @@ export class WorldHud {
     const cx = x + CLOCK_W - 8 - PHASE_R; // tâm vòng tròn buổi
     const cy = y + CLOCK_H / 2;
     const g = this.clockBg.clear();
-    g.fillStyle(DARK, 0.8);
+    g.fillStyle(BLACK, 1);
     g.fillRoundedRect(x, y, CLOCK_W, CLOCK_H, 10);
     g.lineStyle(2, FRAME_EDGE, 0.9);
     g.strokeRoundedRect(x + 1, y + 1, CLOCK_W - 2, CLOCK_H - 2, 9);
@@ -285,6 +309,33 @@ export class WorldHud {
     this.gameTime.setPosition(right, y + 35);
     this.clockIcon.setPosition(cx, cy);
     this.mapName.setPosition(width - 18, y + CLOCK_H + 4);
+    this.mapBtn.cx = x - 10 - ROUND;
+    this.mapBtn.cy = cy;
+    this.mapBtn.zone.setPosition(this.mapBtn.cx, cy);
+    this.drawMapButton();
+  }
+
+  drawMapButton(hover = this.mapBtn.hover) {
+    const b = this.mapBtn;
+    b.hover = hover;
+    b.g.clear();
+    drawRoundIcon(b.g, 'map', b.cx, b.cy);
+    if (hover) {
+      b.g.lineStyle(2, 0xffffff, 0.6);
+      b.g.strokeCircle(b.cx, b.cy, ROUND + 1);
+    }
+  }
+
+  // Hiện nút Bản đồ vùng khi đã có Bản đồ vùng và giao diện đang hiện
+  applyMapButton() {
+    const show = Boolean(this.hasMap) && this.visible !== false;
+    this.mapBtn.g.setVisible(show);
+    this.mapBtn.zone.setVisible(show);
+    if (show) this.mapBtn.zone.setInteractive({ useHandCursor: true });
+    else {
+      this.mapBtn.zone.disableInteractive();
+      if (this.mapBtn.hover) this.drawMapButton(false);
+    }
   }
 
   // Khung nền góc trái dưới (toạ độ màn hình): hàng dưới bao nút ≡, ô tiền, thanh phím tắt; cột nút đang hiện thì nối thêm
@@ -294,23 +345,30 @@ export class WorldHud {
     if (this.visible === false) return;
     const { scene } = this;
     const { s } = hudSize(scene);
-    const H = scene.scale.height;
+    const H = scene.scale.height / CORNER; // khung co CORNER lần quanh góc trên trái: toạ độ trong khung
     const L = 6 * s;
     const B = H - 5 * s;
     const barTop = H - (16 + BTN + 9) * s;
     const barRight = (HOTBAR_RIGHT + 9) * s;
     const r = 12 * s;
-    g.fillStyle(FRAME_FILL, 0.62);
+    g.fillStyle(FRAME_FILL, 1);
     g.lineStyle(2, FRAME_EDGE, 0.85);
     g.beginPath();
     if (this.expanded && this.buttons?.length) {
+      // Khung cột hẹp, chỉ ôm các nút tròn (nhãn chữ thò ra ngoài khung), mép phải cong theo cột nút
       const f = 16 * s; // bán kính chỗ uốn cong giữa cột và hàng dưới
-      const colRight = Math.max(...this.buttons.map((b) => b.label.getBounds().right)) + 10;
       const top = Math.min(...this.buttons.map((b) => b.cy)) - ROUND - 10;
+      const edge = (y) => this.columnX(y) + ROUND + 9;
+      const right0 = edge(top);
       g.moveTo(L + r, top);
-      g.lineTo(colRight - r, top);
-      g.arc(colRight - r, top + r, r, -Math.PI / 2, 0);
-      g.lineTo(colRight, barTop - f);
+      g.lineTo(right0 - r, top);
+      g.arc(right0 - r, top + r, r, -Math.PI / 2, 0);
+      const yEnd = barTop - f;
+      for (let i = 1; i <= 16; i++) {
+        const y = top + r + ((yEnd - top - r) * i) / 16;
+        g.lineTo(edge(y), y);
+      }
+      const colRight = edge(yEnd);
       g.arc(colRight + f, barTop - f, f, Math.PI, Math.PI / 2, true);
       g.lineTo(barRight - r, barTop);
       g.arc(barRight - r, barTop + r, r, -Math.PI / 2, 0);
@@ -336,15 +394,26 @@ export class WorldHud {
     g.strokePath();
   }
 
-  // Xếp cột nút tròn ngay trên nút ≡ / thanh phím tắt (toạ độ màn hình: cột không phóng to, hàng nút ≡ thì có)
+  // Tâm x của cột nút tại độ cao y: cột cong (nút càng xuống dưới càng lệch phải, như cung tròn quanh góc trái dưới)
+  columnX(y) {
+    const ys = this.buttons.map((b) => b.cy);
+    const [y0, y1] = [Math.min(...ys), Math.max(...ys)];
+    const t = y1 > y0 ? Math.max(0, Math.min(1.25, (y - y0) / (y1 - y0))) : 0;
+    return 16 + ROUND + ARC * t * t;
+  }
+
+  // Xếp cột nút tròn ngay trên nút ≡ / thanh phím tắt theo đường cong (toạ độ màn hình: cột không phóng to, hàng nút ≡ thì
+  // có)
   layoutMenu() {
     const { s } = hudSize(this.scene);
-    const bottom = this.scene.scale.height - (16 + BTN + 12) * s - ROUND;
+    const bottom = this.scene.scale.height / CORNER - (16 + BTN + 12) * s - ROUND;
     this.buttons.forEach((b, i) => {
-      b.cx = 16 + ROUND;
       b.cy = bottom - (this.buttons.length - 1 - i) * STEP;
-      b.draw();
     });
+    for (const b of this.buttons) {
+      b.cx = this.columnX(b.cy);
+      b.draw();
+    }
   }
 
   // Huỷ hết (đổi cỡ giao diện: WorldScene tạo lại)
@@ -352,6 +421,7 @@ export class WorldHud {
     this.info.destroy();
     this.frame.destroy();
     this.root.destroy();
+    this.cornerRoot.destroy();
     this.menuRoot.destroy();
     this.saveNote.destroy();
     this.mapBanner?.destroy();
@@ -386,6 +456,7 @@ export class WorldHud {
     if (visible) this.toggleBtn.zone.setInteractive();
     else this.toggleBtn.zone.disableInteractive();
     this.info.setVisible(visible);
+    this.applyMapButton();
     this.applyMenuVisibility();
     this.drawFrame();
   }
@@ -393,6 +464,11 @@ export class WorldHud {
   // mapName: tên bản đồ • phase: 'day' | 'dusk' | 'night' (icon và màu vòng tròn buổi)
   update(objective, mapName, phase = 'day') {
     this.info.setQuest(objective);
+    const hasMap = itemCount('townMap') > 0;
+    if (hasMap !== this.hasMap) {
+      this.hasMap = hasMap;
+      this.applyMapButton();
+    }
     const now = new Date();
     const local = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     if (local !== this.localTime.text) this.localTime.setText(local);

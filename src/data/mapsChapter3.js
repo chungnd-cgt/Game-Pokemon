@@ -1,3 +1,4 @@
+import { roomy } from './indoorLayout.js';
 import { berryRow } from './berryRows.js';
 import { INDOOR_TILES, OUTDOOR_TILES } from './tiles.js';
 
@@ -195,7 +196,7 @@ export const CHAPTER3_MAPS = {
       ...berryRow('r5', 5, 17, ['hondew', 'grepa', 'tamato']),
       { x: 8, y: 2, kind: 'item', id: 'route5-rare-candy', item: 'rareCandy', qty: 1, respawnDays: 3 },
       { x: 2, y: 26, kind: 'item', id: 'r5-full-heal', item: 'fullHeal', qty: 1 },
-      { x: 37, y: 6, kind: 'item', id: 'r5-ultra-ball', item: 'ultraBall', qty: 1 },
+      { x: 37, y: 6, kind: 'item', id: 'r5-tm-brick-break', item: 'tmBrickBreak', qty: 1 }, // đĩa kỹ năng hiếm
       { x: 37, y: 26, kind: 'item', id: 'r5-bike-wheel', item: 'bikeWheel', qty: 1, quest: 'bike' },
       { x: 2, y: 20, kind: 'item', id: 'r5-revive', item: 'revive', qty: 1 },
       { x: 26, y: 16, kind: 'item', id: 'r5-magnet', item: 'magnet', qty: 1 },
@@ -326,7 +327,7 @@ export const CHAPTER3_MAPS = {
       { x: 2, y: 24, kind: 'item', id: 'r6-full-heal', item: 'fullHeal', qty: 1 },
       { x: 32, y: 8, kind: 'item', id: 'r6-max-repel', item: 'maxRepel', qty: 1 },
       { x: 27, y: 24, kind: 'item', id: 'r6-bike-seat', item: 'bikeSeat', qty: 1, quest: 'bike' },
-      { x: 19, y: 6, kind: 'item', id: 'r6-hyper-potion', item: 'hyperPotion', qty: 1 },
+      { x: 19, y: 6, kind: 'item', id: 'r6-tm-sludge-bomb', item: 'tmSludgeBomb', qty: 1 }, // đĩa kỹ năng hiếm
       { x: 18, y: 5, kind: 'item', id: 'r6-mystic-water', item: 'mysticWater', qty: 1 },
       { x: 2, y: 2, kind: 'item', id: 'r6-water-stone', item: 'waterStone', qty: 1 },
     ],
@@ -387,7 +388,7 @@ export const CHAPTER3_MAPS = {
   },
 
   // Tiệm xe đạp Đèn Lồng: xe bày trên kệ, ông chủ đứng sau quầy
-  bikeShop: {
+  bikeShop: roomy({
     name: 'Tiệm xe đạp',
     indoor: true,
     theme: 'mart',
@@ -405,10 +406,10 @@ export const CHAPTER3_MAPS = {
     ],
     shelfGoods: 'bikes', // kệ 'k' trưng bày xe đạp (gfx/interior.js)
     entry: { x: 3, y: 6 },
-  },
+  }, 'mart'),
 
   // Trung tâm thương mại Sông Nước: quầy tạp hoá (trái), quầy đá tiến hoá (phải), bán và mua lại mọi thứ
-  store5: {
+  store5: roomy({
     name: 'Trung tâm thương mại',
     indoor: true,
     theme: 'mart',
@@ -427,7 +428,7 @@ export const CHAPTER3_MAPS = {
       '.......E.......',
     ],
     entry: { x: 7, y: 8 },
-  },
+  }, 'mart'),
 
 
 

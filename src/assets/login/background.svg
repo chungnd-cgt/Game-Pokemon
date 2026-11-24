@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#121a3a"/>
+      <stop offset="0.32" stop-color="#1f3062"/>
+      <stop offset="0.58" stop-color="#335f9b"/>
+      <stop offset="0.8" stop-color="#6d8dbd"/>
+      <stop offset="0.93" stop-color="#cdb6c4"/>
+      <stop offset="1" stop-color="#f3c99a"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="1340" cy="590" r="460" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff4c8" stop-opacity="0.95"/>
+      <stop offset="0.18" stop-color="#ffe3a2" stop-opacity="0.6"/>
+      <stop offset="0.45" stop-color="#f2c08c" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#f2c08c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="sun" cx="0.5" cy="0.4" r="0.6">
+      <stop offset="0" stop-color="#fffbe6"/>
+      <stop offset="1" stop-color="#ffe09a"/>
+    </radialGradient>
+    <linearGradient id="far" x1="0" y1="440" x2="0" y2="760" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9fa6d4"/><stop offset="1" stop-color="#dcc8d0"/>
+    </linearGradient>
+    <linearGradient id="mid" x1="0" y1="420" x2="0" y2="760" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7f88c2"/><stop offset="0.7" stop-color="#a7a2c8"/><stop offset="1" stop-color="#d8c2c8"/>
+    </linearGradient>
+    <linearGradient id="hill" x1="0" y1="540" x2="0" y2="760" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5262a0"/><stop offset="0.65" stop-color="#7d7fb2"/><stop offset="1" stop-color="#c8b4c4"/>
+    </linearGradient>
+    <linearGradient id="mist" x1="0" y1="590" x2="0" y2="760" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f3dccd" stop-opacity="0"/>
+      <stop offset="0.65" stop-color="#f3dccd" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#f8d2a8" stop-opacity="0.75"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="745" x2="0" y2="1080" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f1c897"/>
+      <stop offset="0.09" stop-color="#a9bfd8"/>
+      <stop offset="0.35" stop-color="#6e9bcb"/>
+      <stop offset="0.7" stop-color="#3f6ea8"/>
+      <stop offset="1" stop-color="#25467f"/>
+    </linearGradient>
+    <linearGradient id="mirror" x1="0" y1="745" x2="0" y2="830" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6d71aa" stop-opacity="0.35"/><stop offset="1" stop-color="#6d71aa" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="waterGlow" cx="1340" cy="760" r="320" gradientUnits="userSpaceOnUse" gradientTransform="translate(1340 760) scale(1 0.45) translate(-1340 -760)">
+      <stop offset="0" stop-color="#ffe6b0" stop-opacity="0.55"/><stop offset="1" stop-color="#ffe6b0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cliffL" x1="0" y1="600" x2="0" y2="1080" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3d8172"/><stop offset="0.5" stop-color="#2b5f62"/><stop offset="1" stop-color="#173149"/>
+    </linearGradient>
+    <linearGradient id="rimL" x1="120" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9fe0c8" stop-opacity="0"/><stop offset="1" stop-color="#9fe0c8" stop-opacity="0.22"/>
+    </linearGradient>
+    <linearGradient id="rimR" x1="1640" y1="0" x2="1800" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd9a0" stop-opacity="0.2"/><stop offset="1" stop-color="#ffd9a0" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="leaf" cx="0.35" cy="0.3" r="0.75">
+      <stop offset="0" stop-color="#5aa86a"/><stop offset="0.6" stop-color="#2f7a4c"/><stop offset="1" stop-color="#1d5638"/>
+    </radialGradient>
+    <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6a4632"/><stop offset="1" stop-color="#2c1a14"/>
+    </linearGradient>
+    <linearGradient id="sail" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff8e4"/><stop offset="1" stop-color="#e9cf9c"/>
+    </linearGradient>
+    <radialGradient id="vignette" cx="0.5" cy="0.45" r="0.78">
+      <stop offset="0.6" stop-color="#0a1024" stop-opacity="0"/><stop offset="1" stop-color="#0a1024" stop-opacity="0.5"/>
+    </radialGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6"/></filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <linearGradient id="cl0" gradientUnits="userSpaceOnUse" x1="0" y1="295.0" x2="0" y2="385.0">
+      <stop offset="0" stop-color="#d4dcef"/><stop offset="0.6" stop-color="#a9b6d6"/><stop offset="1" stop-color="#7f8fbb"/></linearGradient><linearGradient id="cl1" gradientUnits="userSpaceOnUse" x1="0" y1="192.0" x2="0" y2="256.8">
+      <stop offset="0" stop-color="#d4dcef"/><stop offset="0.6" stop-color="#a9b6d6"/><stop offset="1" stop-color="#7f8fbb"/></linearGradient><linearGradient id="cl2" gradientUnits="userSpaceOnUse" x1="0" y1="227.5" x2="0" y2="313.0">
+      <stop offset="0" stop-color="#d4dcef"/><stop offset="0.6" stop-color="#a9b6d6"/><stop offset="1" stop-color="#7f8fbb"/></linearGradient>
+  </defs>
+
+  <!-- Bầu trời, sao, mặt trời -->
+  <rect width="1920" height="760" fill="url(#sky)"/>
+  <circle cx="629" cy="73" r="0.9" fill="#f4f1ff" opacity="0.39"/><circle cx="129" cy="210" r="0.9" fill="#f4f1ff" opacity="0.4"/><circle cx="806" cy="108" r="2.1" fill="#f4f1ff" opacity="0.58"/><circle cx="1574" cy="63" r="1.1" fill="#f4f1ff" opacity="0.7"/><circle cx="1116" cy="39" r="2.1" fill="#f4f1ff" opacity="0.57"/><circle cx="1855" cy="33" r="1.1" fill="#f4f1ff" opacity="0.51"/><circle cx="291" cy="60" r="1.3" fill="#f4f1ff" opacity="0.66"/><circle cx="1302" cy="55" r="2.1" fill="#f4f1ff" opacity="0.7"/><circle cx="138" cy="38" r="1.1" fill="#f4f1ff" opacity="0.62"/><circle cx="700" cy="111" r="1.1" fill="#f4f1ff" opacity="0.73"/><circle cx="479" cy="236" r="2.1" fill="#f4f1ff" opacity="0.62"/><circle cx="666" cy="188" r="2.1" fill="#f4f1ff" opacity="0.89"/><circle cx="242" cy="176" r="1.3" fill="#f4f1ff" opacity="0.43"/><circle cx="939" cy="30" r="0.9" fill="#f4f1ff" opacity="0.77"/><circle cx="610" cy="283" r="2.1" fill="#f4f1ff" opacity="0.62"/><circle cx="1518" cy="41" r="0.9" fill="#f4f1ff" opacity="0.87"/><circle cx="134" cy="285" r="2.1" fill="#f4f1ff" opacity="0.9"/><circle cx="1565" cy="125" r="1.6" fill="#f4f1ff" opacity="0.84"/><circle cx="672" cy="377" r="1.3" fill="#f4f1ff" opacity="0.44"/><circle cx="240" cy="38" r="1.3" fill="#f4f1ff" opacity="0.42"/><circle cx="486" cy="166" r="1.6" fill="#f4f1ff" opacity="0.39"/><circle cx="1681" cy="330" r="2.1" fill="#f4f1ff" opacity="0.5"/><circle cx="1682" cy="384" r="1.1" fill="#f4f1ff" opacity="0.4"/><circle cx="304" cy="269" r="0.9" fill="#f4f1ff" opacity="0.62"/><circle cx="1128" cy="116" r="0.9" fill="#f4f1ff" opacity="0.43"/><circle cx="619" cy="63" r="2.1" fill="#f4f1ff" opacity="0.87"/><circle cx="1810" cy="277" r="2.1" fill="#f4f1ff" opacity="0.57"/><circle cx="770" cy="55" r="1.6" fill="#f4f1ff" opacity="0.38"/><circle cx="147" cy="95" r="1.1" fill="#f4f1ff" opacity="0.41"/><circle cx="1149" cy="54" r="2.1" fill="#f4f1ff" opacity="0.43"/><circle cx="211" cy="155" r="0.9" fill="#f4f1ff" opacity="0.39"/><circle cx="411" cy="160" r="1.3" fill="#f4f1ff" opacity="0.88"/><circle cx="237" cy="203" r="1.6" fill="#f4f1ff" opacity="0.61"/><circle cx="606" cy="70" r="1.3" fill="#f4f1ff" opacity="0.76"/><circle cx="991" cy="94" r="2.1" fill="#f4f1ff" opacity="0.55"/><circle cx="1445" cy="130" r="0.9" fill="#f4f1ff" opacity="0.73"/><circle cx="511" cy="156" r="1.1" fill="#f4f1ff" opacity="0.55"/><circle cx="439" cy="224" r="2.1" fill="#f4f1ff" opacity="0.53"/><circle cx="439" cy="327" r="1.1" fill="#f4f1ff" opacity="0.79"/><circle cx="446" cy="214" r="1.3" fill="#f4f1ff" opacity="0.75"/><circle cx="1880" cy="319" r="1.6" fill="#f4f1ff" opacity="0.49"/><circle cx="1878" cy="383" r="1.3" fill="#f4f1ff" opacity="0.39"/><circle cx="212" cy="196" r="1.3" fill="#f4f1ff" opacity="0.46"/><circle cx="1600" cy="200" r="1.3" fill="#f4f1ff" opacity="0.79"/><circle cx="179" cy="269" r="1.6" fill="#f4f1ff" opacity="0.78"/><circle cx="1430" cy="199" r="1.1" fill="#f4f1ff" opacity="0.59"/>
+  <g opacity="0.85" transform="translate(240 120)"><circle r="2.2" fill="#fff"/><path d="M-7 0H7M0-7V7" stroke="#fff" stroke-width="0.9" opacity="0.6"/></g><g opacity="0.85" transform="translate(1650 70)"><circle r="2.2" fill="#fff"/><path d="M-7 0H7M0-7V7" stroke="#fff" stroke-width="0.9" opacity="0.6"/></g><g opacity="0.85" transform="translate(560 60)"><circle r="2.2" fill="#fff"/><path d="M-7 0H7M0-7V7" stroke="#fff" stroke-width="0.9" opacity="0.6"/></g><g opacity="0.85" transform="translate(1800 300)"><circle r="2.2" fill="#fff"/><path d="M-7 0H7M0-7V7" stroke="#fff" stroke-width="0.9" opacity="0.6"/></g>
+  <rect width="1920" height="760" fill="url(#sunGlow)"/>
+  <circle cx="1340" cy="600" r="92" fill="url(#sun)"/>
+  <g fill="url(#cl0)" opacity="0.82">
+      <ellipse cx="280" cy="345" rx="78.0" ry="46.0"/>
+      <ellipse cx="208.0" cy="361.0" rx="58.0" ry="30.0"/>
+      <ellipse cx="360.0" cy="357.0" rx="62.0" ry="34.0"/>
+      <ellipse cx="288.0" cy="371.0" rx="150.0" ry="20.0"/>
+    </g><g fill="url(#cl1)" opacity="0.82">
+      <ellipse cx="850" cy="228" rx="56.16" ry="33.12"/>
+      <ellipse cx="798.16" cy="239.52" rx="41.76" ry="21.599999999999998"/>
+      <ellipse cx="907.6" cy="236.64" rx="44.64" ry="24.48"/>
+      <ellipse cx="855.76" cy="246.72" rx="108.0" ry="14.399999999999999"/>
+    </g><g fill="url(#cl2)" opacity="0.82">
+      <ellipse cx="1630" cy="275" rx="74.1" ry="43.699999999999996"/>
+      <ellipse cx="1561.6" cy="290.2" rx="55.099999999999994" ry="28.5"/>
+      <ellipse cx="1706.0" cy="286.4" rx="58.9" ry="32.3"/>
+      <ellipse cx="1637.6" cy="299.7" rx="142.5" ry="19.0"/>
+    </g>
+  <g fill="none" stroke="#25305a" stroke-width="3.2" stroke-linecap="round" opacity="0.75">
+    <path d="M620 300 q12 -11 24 0 q12 -11 24 0"/>
+    <path d="M582 346 q9 -8 18 0 q9 -8 18 0"/>
+    <path d="M680 338 q10 -9 20 0 q10 -9 20 0"/>
+  </g>
+
+  <!-- Dãy núi xa, núi có tuyết, đồi gần (đỉnh bo tròn bằng nét viền cùng màu) -->
+  <path d="M0 560 L180 500 L300 540 L450 468 L560 520 L700 446 L820 520 L980 470 L1100 530 L1260 500 L1380 522 L1560 470 L1700 520 L1840 462 L1920 500 V760 H0 Z"
+    fill="url(#far)" stroke="url(#far)" stroke-width="16" stroke-linejoin="round" opacity="0.8"/>
+  <path d="M0 600 L120 540 L210 575 L330 430 L470 545 L600 480 L760 590 L900 505 L1040 590 L1180 470 L1320 565 L1460 440 L1620 540 L1740 480 L1920 560 V760 H0 Z"
+    fill="url(#mid)" stroke="url(#mid)" stroke-width="14" stroke-linejoin="round"/>
+  <g fill="#f4f0fb" stroke="#f4f0fb" stroke-width="6" stroke-linejoin="round" opacity="0.95">
+    <path d="M330 430 L374 466 L356 460 L342 472 L326 462 L312 470 L300 466 Z"/>
+    <path d="M1180 470 L1224 500 L1206 494 L1192 505 L1176 495 L1160 503 L1145 500 Z"/>
+    <path d="M1460 440 L1514 474 L1494 467 L1478 478 L1462 468 L1444 476 L1422 474 Z"/>
+  </g>
+  <path d="M0 700 C60 640 110 560 170 555 C230 550 250 640 300 690 C330 620 400 575 470 575 C540 575 580 690 640 760 H0 Z" fill="url(#hill)"/>
+  <path d="M1270 760 C1300 680 1340 640 1400 640 C1440 580 1500 575 1560 560 C1620 545 1660 560 1700 575 C1760 540 1820 560 1860 600 C1890 620 1920 620 1920 640 V760 Z" fill="url(#hill)"/>
+  <rect y="590" width="1920" height="170" fill="url(#mist)"/>
+
+  <!-- Mặt nước: ánh mặt trời phản chiếu, bóng núi mờ, sóng nhỏ -->
+  <rect y="745" width="1920" height="335" fill="url(#water)"/>
+  <rect y="745" width="1920" height="85" fill="url(#mirror)"/>
+  <rect y="745" width="1920" height="3" fill="#ffe2b4" opacity="0.7"/>
+  <ellipse cx="1340" cy="770" rx="330" ry="120" fill="url(#waterGlow)"/>
+  <rect x="1190.0" y="756" width="300" height="5" rx="2.5" fill="#ffe8b6" opacity="0.6"/><rect x="1220.0" y="782" width="240" height="5" rx="2.5" fill="#ffe8b6" opacity="0.5"/><rect x="1245.0" y="810" width="190" height="4" rx="2.0" fill="#ffe8b6" opacity="0.45"/><rect x="1265.0" y="842" width="150" height="4" rx="2.0" fill="#ffe8b6" opacity="0.38"/><rect x="1285.0" y="878" width="110" height="4" rx="2.0" fill="#ffe8b6" opacity="0.3"/><rect x="1300.0" y="918" width="80" height="3" rx="1.5" fill="#ffe8b6" opacity="0.24"/><rect x="1313.0" y="962" width="54" height="3" rx="1.5" fill="#ffe8b6" opacity="0.18"/><rect x="1323.0" y="1010" width="34" height="3" rx="1.5" fill="#ffe8b6" opacity="0.12"/>
+  <path d="M560 885 q10.0 -7 20.0 0 t20.0 0" fill="none" stroke="#dcefff" stroke-width="3" stroke-linecap="round" opacity="0.35"/><path d="M900 905 q11.5 -7 23.0 0 t23.0 0" fill="none" stroke="#dcefff" stroke-width="3" stroke-linecap="round" opacity="0.3"/><path d="M1040 960 q12.5 -7 25.0 0 t25.0 0" fill="none" stroke="#dcefff" stroke-width="3" stroke-linecap="round" opacity="0.28"/><path d="M700 1010 q13.5 -7 27.0 0 t27.0 0" fill="none" stroke="#dcefff" stroke-width="3" stroke-linecap="round" opacity="0.22"/><path d="M1500 990 q12.5 -7 25.0 0 t25.0 0" fill="none" stroke="#dcefff" stroke-width="3" stroke-linecap="round" opacity="0.25"/><path d="M360 960 q11.0 -7 22.0 0 t22.0 0" fill="none" stroke="#dcefff" stroke-width="3" stroke-linecap="round" opacity="0.25"/><path d="M1180 1040 q14.0 -7 28.0 0 t28.0 0" fill="none" stroke="#dcefff" stroke-width="3" stroke-linecap="round" opacity="0.2"/><path d="M1560 880 q10.0 -7 20.0 0 t20.0 0" fill="none" stroke="#dcefff" stroke-width="3" stroke-linecap="round" opacity="0.3"/>
+
+  <!-- Thuyền buồm (bên trái mặt hồ) và bóng dưới nước -->
+  <g opacity="0.22">
+    <path d="M404 850 L536 850 Q528 840 506 836 L434 836 Q412 840 404 850 Z" fill="#1d1410"/>
+    <path d="M474 852 L474 930 L522 856 Z M467 852 L467 915 L430 856 Z" fill="#f6e6c4" filter="url(#soft)"/>
+  </g>
+  <ellipse cx="470" cy="852" rx="96" ry="7" fill="none" stroke="#d9ecfb" stroke-width="2" opacity="0.45"/>
+  <ellipse cx="470" cy="864" rx="130" ry="10" fill="none" stroke="#d9ecfb" stroke-width="1.6" opacity="0.25"/>
+  <line x1="470" y1="722" x2="470" y2="826" stroke="#3e2a1f" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M474 730 Q518 772 534 818 L474 818 Z" fill="url(#sail)"/>
+  <path d="M466 744 Q446 784 424 818 L466 818 Z" fill="#f2deb4"/>
+  <path d="M470 722 L492 729 L470 736 Z" fill="#e0564a"/>
+  <path d="M398 822 L542 822 Q532 844 506 849 L434 849 Q408 844 398 822 Z" fill="url(#hull)"/>
+  <path d="M404 824 L536 824" stroke="#8a6248" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+
+  <!-- Vách đá hai bên với cây -->
+  <path d="M0 640 C40 610 120 600 175 640 C215 670 225 760 260 820 C300 880 320 960 300 1080 H0 Z" fill="url(#cliffL)"/>
+  <path d="M0 640 C40 610 120 600 175 640 C215 670 225 760 260 820 C300 880 320 960 300 1080 H0 Z" fill="url(#rimL)"/>
+  <circle cx="156.6" cy="604.8" r="44" fill="#123a2c" opacity="0.5"/><circle cx="150" cy="596" r="44" fill="url(#leaf)"/><circle cx="84.0" cy="636.0" r="40" fill="#123a2c" opacity="0.5"/><circle cx="78" cy="628" r="40" fill="url(#leaf)"/><circle cx="200.8" cy="634.4" r="32" fill="#123a2c" opacity="0.5"/><circle cx="196" cy="628" r="32" fill="url(#leaf)"/><circle cx="122.5" cy="658.0" r="30" fill="#123a2c" opacity="0.5"/><circle cx="118" cy="652" r="30" fill="url(#leaf)"/>
+  <path d="M1920 620 C1860 590 1790 600 1750 640 C1715 690 1700 780 1670 860 C1640 940 1630 1010 1650 1080 H1920 Z" fill="url(#cliffL)"/>
+  <path d="M1920 620 C1860 590 1790 600 1750 640 C1715 690 1700 780 1670 860 C1640 940 1630 1010 1650 1080 H1920 Z" fill="url(#rimR)"/>
+  <circle cx="1845.7" cy="603.6" r="38" fill="#123a2c" opacity="0.5"/><circle cx="1840" cy="596" r="38" fill="url(#leaf)"/><circle cx="1792.0" cy="624.0" r="40" fill="#123a2c" opacity="0.5"/><circle cx="1786" cy="616" r="40" fill="url(#leaf)"/><circle cx="1894.8" cy="630.4" r="32" fill="#123a2c" opacity="0.5"/><circle cx="1890" cy="624" r="32" fill="url(#leaf)"/><circle cx="1824.2" cy="651.6" r="28" fill="#123a2c" opacity="0.5"/><circle cx="1820" cy="646" r="28" fill="url(#leaf)"/>
+
+  <!-- Tối nhẹ ở mép, hạt nhiễu mịn (chống vằn màu ở chỗ chuyển màu) -->
+  <rect width="1920" height="1080" fill="url(#vignette)"/>
+  <rect width="1920" height="1080" filter="url(#grain)" opacity="0.05"/>
+</svg>

@@ -29,16 +29,6 @@ export function setupTrade(world) {
   world.events.once('shutdown', () => world.trade.requests?.destroy());
 }
 
-// Quầy giao dịch trong Pokémon Center (def: NPC trong data/npcs.js; đã ở trong runEvent): hướng dẫn cách giao dịch
-export async function tradeCounter(world, def) {
-  await world.say(def.name, [
-    `Muốn giao dịch với người chơi khác thì cả hai cần từ ${TRADE_MIN_BADGES} huy hiệu và cùng đứng trong Pokémon Center.`,
-    'Chuột phải (máy tính) hoặc chạm đúp (điện thoại) vào người chơi đó rồi chọn Giao dịch.',
-    'Có thể đổi Pokémon (tối đa 5 con, phải chừa lại 1 con), vật phẩm, quả mọng và tiền. Huỷ giữa chừng thì không ai mất gì!',
-    canTrade() ? 'Bạn đã đủ huy hiệu rồi, chúc giao dịch vui vẻ!' : `Bạn đang có ${state.badges.size} huy hiệu. Cố lên nhé!`,
-  ]);
-}
-
 // Lý do chưa giao dịch được với other (meta người chơi trong online/presence.js), hoặc null
 function tradeProblem(world, other) {
   if (!isPokeCenter(world.map)) return 'Chỉ giao dịch được trong Pokémon Center.';

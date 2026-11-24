@@ -99,14 +99,19 @@ test('người ở đổi Pokémon: muốn loài hay gặp quanh khu đó, đưa
   }
 });
 
-test('người ở thách đấu: đội hình theo cấp Pokémon mạnh nhất của người chơi', async () => {
+test('người ở thách đấu: đội hình theo cấp của khu (không theo đội người chơi)', async () => {
+  const { residentLevel } = await import('../src/story/residents.js');
   resetState();
   const def = HOUSE_RESIDENTS.find((r) => r.resident?.kind === 'battle');
-  state.party = [createMonster('pikachu', 30)];
+  state.party = [createMonster('mewtwo', 70)];
   const world = fakeWorld([true]);
   await residentTalk(world, def);
   const team = world.log.battles[0].trainer.team;
-  assert.ok(team.length >= 1 && team.every(([, lv]) => lv >= 27 && lv <= 29));
+  const lv = residentLevel(def);
+  assert.ok(team.length >= 1 && team.every(([, l], i) => l === lv + i));
+  // Thị trấn Lục Bình (đầu game): đội người ở cấp thấp dù người chơi có Pokémon cấp cao
+  const town1 = HOUSE_RESIDENTS.filter((r) => r.resident?.kind === 'battle' && r.map.includes('town1'));
+  for (const r of town1) assert.ok(residentLevel(r) <= 10, `${r.id}: Lv${residentLevel(r)}`);
 });
 
 test('nhà dân: có nhà 2-3 người, có nhà nuôi Pokémon đi lại trong nhà (không tới cửa ra); mỗi nhà đúng một chủ nhà', () => {

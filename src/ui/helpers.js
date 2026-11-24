@@ -7,8 +7,10 @@ const { Color } = Phaser.Display;
 // Khung thiết kế 960x720 nằm giữa màn hình rộng: lệch sang phải chừng này px (0 khi màn hình 4:3).
 // Bảng / menu vẽ theo toạ độ trong khung: đặt container ở x = uiX(scene), đổi toạ độ chuột: p.x - uiX(scene)
 export const uiX = (scene) => Math.round((scene.scale.width - GAME_WIDTH) / 2);
-// Toạ độ x của con trỏ trong khung thiết kế (dùng để so với vị trí nút / ô trong bảng)
-export const localX = (scene, p) => p.x - uiX(scene);
+// Toạ độ con trỏ trong khung thiết kế (dùng để so với vị trí nút / ô trong bảng). Màn có camera riêng thu nhỏ (trận đấu
+// dạng cửa sổ nổi: battleStage) thì đổi qua camera đó (scene.stagePoint)
+export const localX = (scene, p) => (scene.stagePoint ? scene.stagePoint(p).x : p.x - uiX(scene));
+export const localY = (scene, p) => (scene.stagePoint ? scene.stagePoint(p).y : p.y);
 
 // Cỡ giao diện trên bản đồ (game/display.js: hudScaleFor; WorldScene đặt scene.hudScale). Các phần giao diện (cột đội hình,
 // thanh phím tắt...) xếp chỗ theo cỡ "ảo" hudSize = cỡ màn hình / hệ số, rồi phóng to cả cụm theo hệ số (container.setScale).
@@ -49,6 +51,78 @@ export function centerStage(scene) {
   scene.events.once('shutdown', () => scene.scale.off('resize', place));
 }
 
+// Trận đấu là cửa sổ nổi (bản đồ tạm dừng, mờ tối phía sau). Toạ độ trong trận: sân 960x548 + hộp thoại ở x 0..960,
+// y 0..712; cột lệnh bên phải x 972..1272 (ui/BattlePanel.js); thanh tiêu đề phía trên (y -50..-6). BATTLE_FRAME bao cả
+// khung, thu nhỏ tối đa BATTLE_ZOOM lần cho vừa màn hình. Kéo thanh tiêu đề để dời cửa sổ (nhớ chỗ trong lúc chơi)
+export const BATTLE_ZOOM = 0.62;
+export const BATTLE_FRAME = { x: -12, y: -50, w: 1296, h: 774 };
+// Khoảng trống trong suốt phía trên khung: biểu tượng góc trái (2 quả cầu va nhau) nổi lên trên thanh tiêu đề
+export const BATTLE_BLEED = 24;
+const battleOffset = { x: 0, y: 0 };
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+// Chỗ camera trận đấu trên màn hình { x, y, w, h, z, top } (gồm cả khoảng trống phía trên khung: top px màn hình).
+// WorldScene vẽ khung lúc mở ra quanh phần khung (bỏ phần top)
+export function battleRect(scene) {
+  const { width, height } = scene.scale;
+  // Màn hình thấp (điện thoại nằm ngang): cửa sổ to hết cỡ cho chữ đọc được
+  const small = (scene.scale.displaySize?.height ?? 720) < 600;
+  const fullH = BATTLE_FRAME.h + BATTLE_BLEED;
+  const z = Math.min(small ? 1 : BATTLE_ZOOM, (width - 24) / BATTLE_FRAME.w, (height - 8) / fullH);
+  const w = Math.round(BATTLE_FRAME.w * z);
+  const h = Math.round(fullH * z);
+  const x = Math.round(clamp((width - w) / 2 + battleOffset.x, 0, Math.max(0, width - w)));
+  const y = Math.round(clamp((height - h) / 2 + battleOffset.y, 0, Math.max(0, height - h)));
+  return { x, y, w, h, z, top: Math.round(BATTLE_BLEED * z) };
+}
+
+// Kéo cửa sổ trận đấu (px màn hình), giữ trong màn hình
+export function moveBattle(scene, dx, dy) {
+  const r = battleRect(scene);
+  const { width, height } = scene.scale;
+  battleOffset.x = clamp(r.x + dx, 0, Math.max(0, width - r.w)) - (width - r.w) / 2;
+  battleOffset.y = clamp(r.y + dy, 0, Math.max(0, height - r.h)) - (height - r.h) / 2;
+}
+
+// Camera của trận đấu: chỉ vẽ trong battleRect, thu nhỏ cả khung cho vừa. Chuột đổi qua camera (stagePoint).
+// scene.placeStage(): đặt lại (sau khi kéo cửa sổ)
+// Camera phụ scene.overlayCam phủ cả màn hình, cùng phép biến đổi với camera chính (cùng chỗ, cùng tỉ lệ): chỉ vẽ những
+// đối tượng được phép tràn ra ngoài khung trận đấu (showOverlay, vd ô chi tiết chiêu ui/BattlePanel.js); mọi đối tượng
+// khác thêm vào scene đều bị camera này bỏ qua
+export function battleStage(scene) {
+  const cam = scene.cameras.main;
+  const over = scene.cameras.add(0, 0, scene.scale.width, scene.scale.height);
+  over.inputEnabled = false;
+  const hide = (go) => {
+    go.cameraFilter |= over.id;
+  };
+  scene.events.on('addedtoscene', hide);
+  scene.events.once('shutdown', () => scene.events.off('addedtoscene', hide));
+  scene.overlayCam = over;
+  const place = () => {
+    const r = battleRect(scene);
+    const F = BATTLE_FRAME;
+    const cx = F.x + F.w / 2;
+    const cy = F.y - BATTLE_BLEED + (F.h + BATTLE_BLEED) / 2;
+    cam.setViewport(r.x, r.y, r.w, r.h).setZoom(r.z).centerOn(cx, cy);
+    const { width, height } = scene.scale;
+    over.setViewport(0, 0, width, height).setZoom(r.z)
+      .centerOn(cx - (r.x + r.w / 2 - width / 2) / r.z, cy - (r.y + r.h / 2 - height / 2) / r.z);
+  };
+  place();
+  // Nền trong suốt: khoảng trống phía trên khung để lộ bản đồ phía sau (khung tự vẽ nền, ui/BattlePanel.js)
+  cam.setBackgroundColor('rgba(0,0,0,0)');
+  scene.placeStage = place;
+  scene.stagePoint = (p) => cam.getWorldPoint(p.x, p.y);
+  // Toạ độ trên màn hình của điểm (x, y) trong trận
+  scene.stageToScreen = (x, y) => ({
+    x: cam.x + cam.width / 2 + (x - cam.scrollX - cam.width / 2) * cam.zoom,
+    y: cam.y + cam.height / 2 + (y - cam.scrollY - cam.height / 2) * cam.zoom,
+  });
+  scene.scale.on('resize', place);
+  scene.events.once('shutdown', () => scene.scale.off('resize', place));
+}
+
 export const COLORS = {
   ink: 0x2c3550, // viền khung
   text: '#30343c',
@@ -68,10 +142,12 @@ export const textStyle = (size, color = COLORS.text, extra = {}) => {
 };
 
 // flat = true: nền trắng trơn, không có dải màu nửa dưới
-export function drawPanel(scene, x, y, w, h, radius = 16, flat = false) {
+export function drawPanel(scene, x, y, w, h, radius = 16, flat = false, shadow = true) {
   const g = scene.add.graphics();
-  g.fillStyle(0x000000, 0.22);
-  g.fillRoundedRect(x + 4, y + 6, w, h, radius);
+  if (shadow) {
+    g.fillStyle(0x000000, 0.22);
+    g.fillRoundedRect(x + 4, y + 6, w, h, radius);
+  }
   g.fillStyle(COLORS.ink);
   g.fillRoundedRect(x, y, w, h, radius);
   g.fillStyle(0xffffff);

@@ -1,12 +1,14 @@
 import {
   onSignedIn, PASSWORD_MIN, resendConfirmation, sendPasswordReset, setNewPassword, signInWithUsername, signUp, usernameAvailable,
 } from '../online/account.js';
+import PKG from '../../package.json' with { type: 'json' };
 import { lastLogin, setLastLogin } from '../online/supabase.js';
 import { capitalizeFirst, checkUsername, stripPictographs } from '../online/username.js';
 
 // Màn đăng nhập / đăng ký / quên mật khẩu / đặt mật khẩu mới: một màn riêng che kín game (HTML, không vẽ trong Phaser, để
 // gõ được tiếng Việt, trình duyệt gợi ý lưu mật khẩu và bàn phím điện thoại hiện đúng kiểu). Phím gõ không lọt xuống game.
-//  Góc trên trái: phiên bản • giữa: logo + ảnh minh hoạ (ảnh riêng trong src/assets/login/, xem README ở đó) • khung nhập •
+//  Góc trên trái: phiên bản (package.json) • giữa: logo canh giữa (ảnh riêng trong src/assets/login/, xem README ở đó) •
+//  khung nhập (nền mờ kính, thấy ảnh nền phía sau) •
 //  hai nút ngay dưới khung • góc dưới phải: nút Cài đặt (mở đúng bảng Cài đặt trong game: opts.onSettings, TitleScene).
 //  open(): trả về user khi đã đăng nhập xong • openNewPassword(): tab mở ra từ link "đặt lại mật khẩu" trong email
 // Đăng ký: tên đăng nhập + email + mật khẩu (2 lần). Đăng nhập: tên đăng nhập + mật khẩu. Quên mật khẩu: email.
@@ -15,11 +17,11 @@ import { capitalizeFirst, checkUsername, stripPictographs } from '../online/user
 //  Tab cũ ở màn 'sent' / 'resetSent' (báo đã gửi email, nút Gửi lại email); tab mới đăng nhập xong thì tab cũ chỉ báo
 //  "đã đăng nhập ở tab khác" chứ không vào game theo (phiên nằm trong tab mới, mỗi tài khoản chỉ chơi ở một nơi).
 
-// Ảnh riêng cho màn này: src/assets/login/logo.*, art.*, background.* (png / jpg / webp / gif / svg). Thiếu ảnh nào thì
-// dùng mặc định: logo chữ, không có ảnh minh hoạ, nền xanh như màn hình chính
-const FILES = import.meta.glob('../assets/login/*.{png,jpg,jpeg,webp,gif,svg}', { eager: true, query: '?url', import: 'default' });
+// Ảnh riêng cho màn này: src/assets/login/logo.*, background.* (png / jpg / webp / gif / svg). Thiếu ảnh nào thì
+// dùng mặc định: logo chữ, nền xanh như màn hình chính
+const FILES = import.meta.glob('../assets/login/{logo,background}.{png,jpg,jpeg,webp,gif,svg}', { eager: true, query: '?url', import: 'default' });
 const imageNamed = (name) => Object.entries(FILES).find(([path]) => new RegExp(`/${name}\\.[a-z]+$`, 'i').test(path))?.[1] ?? null;
-const IMAGES = { logo: imageNamed('logo'), art: imageNamed('art'), background: imageNamed('background') };
+const IMAGES = { logo: imageNamed('logo'), background: imageNamed('background') };
 const PIXEL_MAX = 256; // ảnh nhỏ hơn chừng này (ảnh pixel) thì phóng to giữ nét vuông, không nhoè
 
 const CSS = `
@@ -31,18 +33,18 @@ const CSS = `
 #auth .page { min-height: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center;
   justify-content: center; padding: 40px 16px 70px; }
 #auth .ver { position: fixed; top: 8px; left: 12px; font-size: 13px; font-weight: 800; color: #c8d8ff; text-shadow: 0 1px 3px #000a; }
-#auth .hero { display: flex; align-items: flex-end; justify-content: center; max-width: 100%; margin-bottom: -14px;
+#auth .hero { display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 14px;
   pointer-events: none; }
 #auth .hero img { display: block; filter: drop-shadow(0 8px 16px rgba(0,0,0,.35)); }
 #auth .logo { position: relative; z-index: 1; max-width: min(420px, 46vw); max-height: 230px; }
-#auth .art { max-width: min(480px, 48vw); max-height: 360px; margin-left: -36px; }
 #auth .logo-text { margin-bottom: 26px; text-align: center; }
 #auth .logo-text .t { font-size: 76px; font-weight: 800; line-height: 1; color: #ffe066; -webkit-text-stroke: 10px #2a4a9a;
   paint-order: stroke fill; filter: drop-shadow(0 6px 10px rgba(0,0,0,.45)); }
 #auth .logo-text .s { margin-top: 8px; font-size: 20px; font-weight: 700; color: #fff; text-shadow: 0 2px 4px #0009; }
 #auth form { position: relative; z-index: 2; width: min(360px, 100%); }
-#auth .card { box-sizing: border-box; padding: 18px 20px 14px; background: rgba(20, 30, 56, .9); border: 2px solid #4a88e0;
-  border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+#auth .card { box-sizing: border-box; padding: 18px 20px 14px; background: rgba(20, 30, 56, .22); border: 2px solid rgba(120, 170, 240, .5);
+  border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.3); -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  backdrop-filter: blur(10px) saturate(1.2); }
 #auth .card h3 { margin: 0 0 12px; font-size: 19px; font-weight: 800; color: #ffe066; text-align: center; }
 #auth .field + .field { margin-top: 10px; }
 #auth input { width: 100%; box-sizing: border-box; padding: 11px 12px; border: 2px solid #3a4a6c; border-radius: 10px;
@@ -82,13 +84,11 @@ const CSS = `
 @media (max-height: 640px) {
   #auth .page { padding-top: 30px; }
   #auth .logo { max-height: 130px; }
-  #auth .art { max-height: 210px; }
   #auth .logo-text { margin-bottom: 18px; }
   #auth .logo-text .t { font-size: 54px; -webkit-text-stroke-width: 8px; }
 }
 @media (max-height: 470px) {
   #auth .page { padding: 26px 16px 16px; }
-  #auth .hero .art { display: none; }
   #auth .hero { margin-bottom: 10px; }
   #auth .logo { max-height: 70px; }
   #auth .logo-text { margin-bottom: 0; }
@@ -96,9 +96,7 @@ const CSS = `
   #auth .logo-text .s { display: none; }
 }
 @media (max-width: 560px) {
-  #auth .hero { flex-direction: column; align-items: center; }
   #auth .logo { max-width: 80vw; }
-  #auth .art { margin: -10px 0 0; max-width: 78vw; max-height: 200px; }
 }
 `;
 
@@ -176,7 +174,7 @@ export class AuthPanel {
     this.root.id = 'auth';
     this.root.innerHTML = `
       <div class="page"><div class="hero"></div><form novalidate></form></div>
-      <div class="ver">Phiên bản demo</div>
+      <div class="ver">v${PKG.version}</div>
       ${this.onSettings ? `<button type="button" class="opts" aria-label="Cài đặt">${GEAR}<span>Cài đặt</span></button>` : ''}`;
     this.buildHero();
     this.form = this.root.querySelector('form');
@@ -195,7 +193,7 @@ export class AuthPanel {
     });
   }
 
-  // Logo + ảnh minh hoạ (ảnh riêng nếu có), nền
+  // Logo (ảnh riêng nếu có) canh giữa, nền
   buildHero() {
     const hero = this.root.querySelector('.hero');
     const img = (src, cls) => {
@@ -215,7 +213,6 @@ export class AuthPanel {
       hero.insertAdjacentHTML('beforeend', `<div class="logo-text"><div class="t">Pokémon</div>
         <div class="s">Hành trình vùng Sơn Thủy</div></div>`);
     }
-    if (IMAGES.art) img(IMAGES.art, 'art');
     if (IMAGES.background) {
       this.root.classList.add('has-bg');
       this.root.style.setProperty('--bg', `url("${IMAGES.background}")`);

@@ -1,4 +1,5 @@
 import { ITEMS, formatMoney, martStock } from '../data/items.js';
+import { SAFARI_DX } from '../data/indoorLayout.js';
 import { HOME_RESPAWN, MAPS } from '../data/map.js';
 import {
   PASS_MARKS, SAFARI, TICKET_MARKS, buyEffortTicket, buyPass, buyZoneTicket, crossedMark, effortLeft, effortOpen, effortPrice,
@@ -28,7 +29,7 @@ const SAFARI_MAPS = ['safariGate', 'safariZone', 'safariEffort'];
 const RESYNC_MS = 10 * 60 * 1000;
 const GAP_MS = 5000;
 // Chỗ đứng trong nhà Safari khi ra khỏi từng khu (trước cửa lớn tương ứng)
-const GATE_SPOT = { safariZone: { x: 3, y: 2 }, safariEffort: { x: 10, y: 2 } };
+const GATE_SPOT = { safariZone: { x: 3 + SAFARI_DX, y: 2 }, safariEffort: { x: 10 + SAFARI_DX, y: 2 } };
 
 // Giờ máy chủ để mua vé: { now } hoặc báo lỗi rồi trả về null
 async function serverTime(world, speaker) {
@@ -148,9 +149,9 @@ async function effortWardenTalk(world) {
 }
 
 export const SAFARI_NPCS = [
-  { id: 'safari-ticket', sprite: 'npc-clerk', name: TICKET, map: 'safariGate', x: 1, y: 3, facing: 'down', fixed: true, onTalk: ticketTalk },
-  { id: 'safari-pass', sprite: 'npc-aide', name: PASS, map: 'safariGate', x: 12, y: 3, facing: 'down', fixed: true, onTalk: passTalk },
-  { id: 'safari-guard', sprite: 'npc-ace', name: GUARD, map: 'safariGate', x: 6, y: 2, facing: 'down', fixed: true, onTalk: guardTalk },
+  { id: 'safari-ticket', sprite: 'npc-clerk', name: TICKET, map: 'safariGate', x: 1 + SAFARI_DX, y: 3, facing: 'down', fixed: true, onTalk: ticketTalk },
+  { id: 'safari-pass', sprite: 'npc-aide', name: PASS, map: 'safariGate', x: 12 + SAFARI_DX, y: 3, facing: 'down', fixed: true, onTalk: passTalk },
+  { id: 'safari-guard', sprite: 'npc-ace', name: GUARD, map: 'safariGate', x: 6 + SAFARI_DX, y: 2, facing: 'down', fixed: true, onTalk: guardTalk },
   { id: 'safari-warden', sprite: 'npc-guide', name: WARDEN, map: 'safariZone', x: 31, y: 39, facing: 'left', fixed: true, onTalk: wardenTalk },
   { id: 'effort-warden', sprite: 'npc-guide', name: WARDEN, map: 'safariEffort', x: 22, y: 27, facing: 'left', fixed: true, onTalk: effortWardenTalk },
 ];

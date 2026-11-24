@@ -2,7 +2,7 @@ import { TILE } from '../config.js';
 import { MAPS } from '../data/map.js';
 import { dirtGrid, drawDecorTall, drawDecorTile, drawDirt } from './decor.js';
 import { drawInterior } from './interior.js';
-import { PixelBuffer, addCanvasTexture, addSheetTexture, dither, hash, makeCanvas, px, shadeHex } from './pixel.js';
+import { PixelBuffer, addCanvasTexture, dither, hash, makeCanvas, px, scale2x, shadeHex } from './pixel.js';
 
 // Vẽ mỗi bản đồ thành 4 lớp ảnh pixel (mỗi ô 16x16):
 //  <map>-ground  : nền (cỏ, đường, sàn, tường)
@@ -1352,8 +1352,13 @@ function clearedTile(map, ch) {
 // Texture của một bản đồ: nền, vật thể, lớp trên (ngọn cây), 3 khung động (nước, hoa) và bản "đã thắng" của gym.
 // Vẽ khi người chơi bước vào bản đồ (ensureMapTextures), không vẽ sẵn cả trăm bản đồ lúc khởi động (trước kia mất
 // hàng chục giây và ~300MB bộ nhớ trên điện thoại)
-const MAP_LAYERS = ['ground', 'objects', 'over', 'anim', 'ground-cleared', 'objects-cleared'];
-const KEEP_MAPS = 6; // giữ texture của chừng này bản đồ đi qua gần nhất (đi ra vào nhà / tuyến đường không phải vẽ lại)
+const MAP_LAYERS = ['ground', 'objects', 'over', 'anim-0', 'anim-1', 'anim-2', 'ground-cleared', 'objects-cleared'];
+const KEEP_MAPS = 4; // giữ texture của chừng này bản đồ đi qua gần nhất (đi ra vào nhà / tuyến đường không phải vẽ lại)
+// Lớp bản đồ vẽ ở 16px/ô rồi phóng x2 kiểu Scale2x (bo tròn bậc thang, lọc tuyến tính): mịn hơn ô vuông GBA. Texture to
+// gấp MAP_RES lần nên WorldScene hiển thị x WORLD_SCALE / MAP_RES. Khung động (nước, hoa) là texture riêng `${id}-anim-${i}`
+// (ghép thành một dải thì bản đồ rộng nhất vượt cỡ texture tối đa 4096 của điện thoại)
+export const MAP_RES = 2;
+const addMapTexture = (scene, key, canvas) => addCanvasTexture(scene, key, scale2x(canvas));
 const recentMaps = [];
 
 function buildMapTextures(scene, map) {
@@ -1367,10 +1372,10 @@ function buildMapTextures(scene, map) {
   else if (map.cave) drawCave(map, ground.ctx, objects.ctx, anim.map((a) => a.ctx));
   else drawOutdoor(map, ground.ctx, objects.ctx, over.ctx, anim.map((a) => a.ctx));
 
-  addCanvasTexture(scene, `${map.id}-ground`, ground.canvas);
-  addCanvasTexture(scene, `${map.id}-objects`, objects.canvas);
-  addCanvasTexture(scene, `${map.id}-over`, over.canvas);
-  addSheetTexture(scene, `${map.id}-anim`, anim.map((a) => a.canvas), anim.map((_, i) => String(i)));
+  addMapTexture(scene, `${map.id}-ground`, ground.canvas);
+  addMapTexture(scene, `${map.id}-objects`, objects.canvas);
+  addMapTexture(scene, `${map.id}-over`, over.canvas);
+  anim.forEach((a, i) => addMapTexture(scene, `${map.id}-anim-${i}`, a.canvas));
 
   // Gym đã có huy hiệu (GameMap.cleared): bản vẽ riêng, ô gió (gym gió tắt quạt), sàn băng, miệng lò thành sàn thường.
   // WorldScene dùng `${id}-ground-cleared` / `${id}-objects-cleared` khi gym đã thắng
@@ -1379,8 +1384,8 @@ function buildMapTextures(scene, map) {
     const g2 = makeCanvas(W, H);
     const o2 = makeCanvas(W, H);
     drawInterior(calm, g2.ctx, o2.ctx);
-    addCanvasTexture(scene, `${map.id}-ground-cleared`, g2.canvas);
-    addCanvasTexture(scene, `${map.id}-objects-cleared`, o2.canvas);
+    addMapTexture(scene, `${map.id}-ground-cleared`, g2.canvas);
+    addMapTexture(scene, `${map.id}-objects-cleared`, o2.canvas);
   }
 }
 

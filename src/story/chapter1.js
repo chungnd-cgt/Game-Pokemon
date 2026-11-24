@@ -1,4 +1,5 @@
 import { ITEMS } from '../data/items.js';
+import { HOME_DX, LAB_DX } from '../data/indoorLayout.js';
 import { MAPS } from '../data/map.js';
 import { SPECIES } from '../data/monsters.js';
 import { DEX_BY_SLUG } from '../data/pokedex.js';
@@ -34,8 +35,8 @@ export const F = {
 // Nhiệm vụ của Giáo sư Oak: bắt Pokémon đầu tiên (không tính Pokémon khởi đầu)
 const QUEST_TARGET = 1;
 // Phòng thí nghiệm: chỗ hai đứa đứng trước bàn Giáo sư Oak sau khi chọn Pokémon
-const PLAYER_SPOT = { x: 5, y: 6 };
-const GARY_SPOT = { x: 7, y: 6 };
+const PLAYER_SPOT = { x: 5 + LAB_DX, y: 6 };
+const GARY_SPOT = { x: 7 + LAB_DX, y: 6 };
 // Thị trấn Lục Bình: vùng trước cửa Hang Thạch Nhũ [x1, y1, x2, y2]; bước vào lúc chuẩn bị lên đường là Gary ra đấu lại
 const CAVE_APPROACH = [24, 6, 29, 7];
 // Ba Pokémon khởi đầu thường; Pikachu là bóng bí mật, phải từ chối cả ba con này mới chọn được
@@ -52,6 +53,16 @@ export function questProgress() {
   const starter = playerStarter();
   const starterId = starter ? DEX_BY_SLUG[starter].id : null;
   return Math.min(QUEST_TARGET, [...state.dex.caught].filter((id) => id !== starterId).length);
+}
+
+// Nhiệm vụ bắt Pokémon đầu tiên: người chơi cứ ném bóng mà không đánh yếu Pokémon hoang dã thì có thể hết sạch bóng và
+// kẹt (chưa có tiền mua thêm, lối sang Tuyến đường 2 bị chặn). Nên quả bóng ĐẦU TIÊN ném ra (chưa bắt được con nào) chắc
+// chắn bắt được; các lần sau tính tỉ lệ như thường. Gọi mỗi lần ném bóng; trả về true nếu lần ném này chắc chắn bắt được
+const FIRST_BALL = 'firstBallThrown';
+export function firstCatchThrow() {
+  if (hasFlag(FIRST_BALL)) return false;
+  setFlag(FIRST_BALL);
+  return Boolean(playerStarter()) && questProgress() < QUEST_TARGET;
 }
 
 // Lời nhắc tìm mẹ theo chỗ đang đứng (mẹ ngồi ở phòng khách tầng 1)
@@ -135,7 +146,7 @@ export const STORY_NPCS = [
   },
   {
     // Mẹ ngồi trên sofa bên phải bàn nước ở tầng 1 (seated: ngồi yên, quay mặt vào bàn, không đứng dậy quay theo người chơi)
-    id: 'mom', sprite: 'npc-mom', name: 'Mẹ', map: 'home', x: 7, y: 4, facing: 'left', fixed: true, seated: true,
+    id: 'mom', sprite: 'npc-mom', name: 'Mẹ', map: 'home', x: 7 + HOME_DX, y: 4, facing: 'left', fixed: true, seated: true,
     async onTalk(world) {
       if (!hasFlag(F.MOM)) {
         // Chưa gặp mẹ mà đã đi gặp Giáo sư (bỏ qua mẹ, hoặc thua trận về nhà): đưa thuốc rồi nói tiếp như bình thường
@@ -171,7 +182,7 @@ export const STORY_NPCS = [
     },
   },
   {
-    id: 'aide', sprite: 'npc-aide', name: 'Trợ lý', map: 'lab', x: 10, y: 7, facing: 'left', wander: 1,
+    id: 'aide', sprite: 'npc-aide', name: 'Trợ lý', map: 'lab', x: 10 + LAB_DX, y: 7, facing: 'left', wander: 1,
     async onTalk(world) {
       await world.say('Trợ lý', hasFlag(F.MET_OAK)
         ? ['Giáo sư Oak là chuyên gia hàng đầu về Pokémon đấy!', 'Ông ấy đang nghiên cứu để hoàn thiện Pokédex.']
@@ -180,7 +191,7 @@ export const STORY_NPCS = [
   },
   {
     // Gary ở trên phòng mình (tầng 2 nhà Gary) cho tới khi bạn nhận Pokémon; lúc đó mới chạy sang phòng thí nghiệm (rivalPicksAndBattles)
-    id: 'gary-home', sprite: 'npc-gary', name: 'Gary', map: 'garyHome2f', x: 5, y: 4, facing: 'down', wander: 1,
+    id: 'gary-home', sprite: 'npc-gary', name: 'Gary', map: 'garyHome2f', x: 5 + HOME_DX, y: 4, facing: 'down', wander: 1,
     show: () => !hasFlag(F.STARTER),
     async onTalk(world) {
       await world.say('Gary', hasFlag(F.MET_OAK)
@@ -189,7 +200,7 @@ export const STORY_NPCS = [
     },
   },
   {
-    id: 'oak', sprite: 'npc-oak', name: 'Giáo sư Oak', map: 'lab', x: 6, y: 3, facing: 'down', fixed: true,
+    id: 'oak', sprite: 'npc-oak', name: 'Giáo sư Oak', map: 'lab', x: 6 + LAB_DX, y: 3, facing: 'down', fixed: true,
     show: () => hasFlag(F.MET_OAK),
     onTalk: (world) => talkToOak(world),
   },
@@ -294,7 +305,7 @@ export const STORY_NPCS = [
 STORY_NPCS.push(
   {
     // Chị gái Gary ở nhà, kể Gary đang ở đâu; lần đầu gặp sau khi Gary rời Pallet thì tặng Repel
-    id: 'daisy', sprite: 'npc-woman', name: 'Chị Đào', map: 'garyHome', x: 5, y: 3, facing: 'down', wander: 1,
+    id: 'daisy', sprite: 'npc-woman', name: 'Chị Đào', map: 'garyHome', x: 5 + HOME_DX, y: 3, facing: 'down', wander: 1,
     async onTalk(world) {
       const name = 'Chị Đào';
       if (!hasFlag(F.STARTER)) {
@@ -453,7 +464,9 @@ export async function useObject(world, obj) {
     return;
   }
 
-  state.party = [createMonster(obj.species, 5)];
+  const starter = createMonster(obj.species, 5);
+  starter.ot = playerName();
+  state.party = [starter];
   markCaught(obj.species);
   setFlag(F.STARTER);
   setFlag(`starter:${obj.species}`);
@@ -504,7 +517,7 @@ async function rivalPicksAndBattles(world) {
   await world.say('Giáo sư Oak', ['Trận đấu hay lắm! Để ta hồi phục Pokémon cho cả hai đứa.']);
   await world.fadeHeal();
   await world.say('Gary', [
-    'Tớ sẽ ra bụi cỏ luyện cho Pokémon của tớ mạnh hơn nữa!',
+    'Tớ sẽ huấn luyện cho Pokémon của tớ mạnh hơn nữa!',
     `Hứa nhé ${playerName()}: tớ đi trước tới Thị trấn Lục Bình. Trước khi lên đường rời Lục Bình, tụi mình đấu lại một trận!`,
     'Lần đó thì cậu đừng hòng thắng. Gặp lại sau nhé, đồ chậm chạp!',
   ]);
@@ -589,9 +602,9 @@ async function momGift(world) {
   world.facePlayerTo(mom);
   await world.say('Mẹ', ['Phù... may mà kịp! Giáo sư Oak gọi điện bảo con sắp lên đường rồi.', 'Đường đi xa lắm, mẹ có mấy thứ cho con đây.']);
   await world.giveItem('townMap');
-  await world.say('Mẹ', ['Bản đồ vùng Sơn Thủy đó. Lạc đường thì bấm {key:map} mà xem nhé.']);
+  await world.say('Mẹ', ['Bản đồ vùng Sơn Thủy đó. Lạc đường thì bấm vào nút bản đồ ở góc trên bên phải mà xem nhé.']);
   await world.giveItem('badgeCase');
-  await world.say('Mẹ', ['Còn đây là hộp đựng huy hiệu. Thắng gym nào thì cất huy hiệu vào đây cho cẩn thận!', 'Đi đường cẩn thận nha con!']);
+  await world.say('Mẹ', ['Còn đây là hộp đựng huy hiệu. Thắng gym nào thì cất huy hiệu vào đây cho cẩn thận, mở Thẻ HLV là xem được!', 'Đi đường cẩn thận nha con!']);
   setFlag(F.MOM_GIFT);
   await world.walkNpcTo(mom, doorstep);
   await world.npcEntersDoor(mom, home);

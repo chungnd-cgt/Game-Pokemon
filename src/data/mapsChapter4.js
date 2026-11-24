@@ -1,3 +1,4 @@
+import { roomy } from './indoorLayout.js';
 import { berryRow } from './berryRows.js';
 import { CAVE_TILES, INDOOR_TILES, OUTDOOR_TILES } from './tiles.js';
 
@@ -208,7 +209,7 @@ export const CHAPTER4_MAPS = {
       { x: 2, y: 28, kind: 'item', id: 'r8-ultra-ball', item: 'ultraBall', qty: 2 },
       { x: 12, y: 27, kind: 'item', id: 'r8-revive', item: 'revive', qty: 1 },
       { x: 24, y: 12, kind: 'item', id: 'r8-hard-stone', item: 'hardStone', qty: 1 },
-      { x: 28, y: 12, kind: 'item', id: 'r8-max-repel', item: 'maxRepel', qty: 1 },
+      { x: 28, y: 12, kind: 'item', id: 'r8-tm-shadow-ball', item: 'tmShadowBall', qty: 1 }, // đĩa kỹ năng hiếm
     ],
   },
 
@@ -272,7 +273,7 @@ export const CHAPTER4_MAPS = {
 
   // Viện Hoá thạch Núi Đá (nhà phía đông nam thành phố): Tiến sĩ Thạch đứng sau bàn thí nghiệm, máy hồi sinh hoá thạch
   // kê sát tường sau lưng (story/postgame.js: reviveFossils)
-  fossilLab: {
+  fossilLab: roomy({
     name: 'Viện Hoá thạch Núi Đá',
     indoor: true,
     theme: 'lab',
@@ -294,7 +295,7 @@ export const CHAPTER4_MAPS = {
       '10,2': ['Sách "Pokémon cổ đại vùng Sơn Thủy". Có hình Omanyte, Kabuto và Aerodactyl.'],
     },
     entry: { x: 5, y: 7 },
-  },
+  }, 'lab'),
 
   // Tuyến đường 9: Rừng Tre ven suối, từ Núi Đá (bắc) xuống cửa Hang Sơn Động. Đường từ phía bắc ra khoảng trống giữa rừng
   // tre (lối cụt sang đông tới rặng tre cỏ rậm, có đồ), rồi theo đường mòn phía tây vòng vèo xuống bờ suối (đầu tây bờ bắc
@@ -355,7 +356,7 @@ export const CHAPTER4_MAPS = {
     },
     objects: [
       ...berryRow('r9', 33, 27, ['pecha', 'oran', 'sitrus']),
-      { x: 3, y: 18, kind: 'item', id: 'r9-hyper-potion', item: 'hyperPotion', qty: 1 },
+      { x: 3, y: 18, kind: 'item', id: 'r9-tm-earthquake', item: 'tmEarthquake', qty: 1 }, // đĩa kỹ năng hiếm
       { x: 37, y: 2, kind: 'item', id: 'r9-ultra-ball', item: 'ultraBall', qty: 2 },
       { x: 2, y: 28, kind: 'item', id: 'r9-revive', item: 'revive', qty: 1 },
       { x: 20, y: 21, kind: 'item', id: 'r9-max-revive', item: 'maxRevive', qty: 1 },

@@ -1,5 +1,7 @@
 import { BADGES } from '../data/badges.js';
+import { GYM_TMS, ITEMS } from '../data/items.js';
 import { MAPS } from '../data/map.js';
+import { GYM_DX } from '../data/mapsGyms.js';
 import { state } from '../game/state.js';
 import { leagueObjective } from './league.js';
 import { VILLAGES, villageDone, villageGate, villageObjective } from './villages.js';
@@ -22,11 +24,11 @@ export const GYMS = [
   { badge: 'ice', village: 'v8', place: 'town9', reach: 'Đi theo Tuyến đường 10 tới Làng Đèo Tuyết', city: 'Thành phố Sương Mù', gym: 'Gym Sương Mù' },
 ];
 
-// Thủ lĩnh gym: nói chuyện để thách đấu; thắng thì nhận huy hiệu, quà và tiền thưởng
+// Thủ lĩnh gym: nói chuyện để thách đấu; thắng thì nhận huy hiệu, quà, đĩa kỹ năng sở trường của gym (GYM_TMS) và tiền thưởng
 // gift: quà thêm (vd: HM) { item, line }
 function leader({ badgeId, name, sprite, map, team, intro, lose, after, reward, rewardLine, gift }) {
   return {
-    id: `leader-${badgeId}`, sprite, name, map, x: 8, y: 2, facing: 'down', fixed: true, sight: 0,
+    id: `leader-${badgeId}`, sprite, name, map, x: 8 + GYM_DX, y: 2, facing: 'down', fixed: true, sight: 0,
     team, prize: 100, noRematch: true, leader: true, intro, lose, after, gift,
     async onDefeat(world) {
       const b = badge(badgeId);
@@ -38,6 +40,11 @@ function leader({ badgeId, name, sprite, map, team, intro, lose, after, reward, 
       if (gift) {
         await world.say(name, [gift.line]);
         await world.giveItem(gift.item);
+      }
+      const tm = GYM_TMS[badgeId];
+      if (tm) {
+        await world.say(name, [`Còn đây là ${ITEMS[tm].name}, chiêu sở trường của gym ta. Dùng cho tốt nhé!`]);
+        await world.giveItem(tm);
       }
       const left = BADGES.length - state.badges.size;
       await world.say(name, [left > 0

@@ -16,8 +16,8 @@ import {
   transformBlocked,
 } from '../battle/transform.js';
 import { ABILITIES } from '../data/abilities.js';
-import { BAG_POCKETS, ITEMS, formatMoney } from '../data/items.js';
-import { CATEGORY_NAMES, MOVES, STRUGGLE } from '../data/moves.js';
+import { BAG_POCKETS, ITEMS, formatMoney, pocketOf } from '../data/items.js';
+import { MOVES, STRUGGLE } from '../data/moves.js';
 import { SPECIES } from '../data/monsters.js';
 import { STAGE_SHORT, STAT_KEYS, STAT_NAMES } from '../data/stats.js';
 import { TYPES } from '../data/types.js';
@@ -32,29 +32,29 @@ import {
 } from '../game/monster.js';
 import { addCaught, blackoutLoss, healParty, itemCount, markSeen, state, useItem } from '../game/state.js';
 import { Ambience } from '../gfx/ambience.js';
-import { effectivenessHint, moveNotes } from '../battle/moveInfo.js';
 import { playMoveFx } from '../gfx/moveFx.js';
 import { attachShinySparkle, shinyBurst } from '../gfx/shinyFx.js';
 import { hash } from '../gfx/pixel.js';
 import { BATTLE_CHAR_SCALE } from '../gfx/player.js';
-import { GBA_MON, fitScale, monSourceExists, pixelMon } from '../gfx/textures.js';
+import { GBA_MON, fitScale, monViewKey, pixelMon } from '../gfx/textures.js';
+import { firstCatchThrow } from '../story/chapter1.js';
 import { AbilityBanner } from '../ui/AbilityBanner.js';
-import { BagPanel } from '../ui/BagPanel.js';
-import { ButtonGrid, commandIcons, paintCommand, paintMove, renderCommand, renderMove } from '../ui/BattleMenus.js';
-import { BLEED, centerStage, drawPanel, fitText, gradientRect, shade, textStyle, tweenAsync, wait } from '../ui/helpers.js';
+import { ButtonGrid, commandIcons } from '../ui/BattleMenus.js';
+import {
+  CONTENT, CommandTray, ItemList, MOVE_GRID, PARTY_GRID, drawBattleFrame, moveHint, moveTipBuilder, paintMoveRow, paintPartyCell,
+  renderMoveRow, renderPartyCell, showTip,
+} from '../ui/BattlePanel.js';
+import { BLEED, battleStage, drawPanel, fitText, gradientRect, shade, textStyle, tweenAsync, wait } from '../ui/helpers.js';
 import { InputRouter } from '../ui/input.js';
 import { Menu } from '../ui/Menu.js';
 import { MessageBox } from '../ui/MessageBox.js';
 import { CHIP_ROW, MonsterInfo } from '../ui/MonsterInfo.js';
-import { typeBadge } from '../ui/TypeBadge.js';
 
 // Vị trí chân Pokémon trên bệ và chiều cao hiển thị (px)
 const ENEMY_POS = { x: 690, y: 276 };
 const PLAYER_POS = { x: 250, y: 516 };
-// Nhãn loại chiêu trong khung thông tin chiêu
-const CATEGORY_STYLE = { physical: { color: 0xe06030 }, special: { color: 0x4a78d8 }, status: { color: 0x8a90a0 } };
-const ENEMY_SIZE = 192; // sprite GBA 64px x3 (pixel to bằng pixel bản đồ)
-const PLAYER_SIZE = 240; // sprite 80px x3
+const ENEMY_SIZE = 150;
+const PLAYER_SIZE = 185;
 const BALL_SCALE = 0.45;
 // Màn hình rộng: khung trận 960x720 nằm giữa, nền vẽ tràn ra hai bên (ui/helpers.js: centerStage)
 const LEFT = -BLEED;
@@ -86,21 +86,17 @@ const PALETTES = {
   },
 };
 
-// Loại vật phẩm dùng được từ túi trong trận, và các ngăn túi hiện trong trận
+// Loại vật phẩm dùng được từ túi trong trận; danh sách túi trong trận xếp theo thứ tự ngăn túi (bóng, thuốc, quả mọng...)
 const BATTLE_KINDS = ['ball', 'heal', 'revive', 'cure', 'pp'];
-const BATTLE_POCKETS = BAG_POCKETS.filter((p) => ['heal', 'ball', 'berry'].includes(p.id));
-// Túi đồ trong trận nhớ ngăn / chữ tìm / vị trí con trỏ giữa các lượt và các trận
-const bagMemory = {};
+const POCKET_ORDER = BAG_POCKETS.map((p) => p.id);
 
-// Bảng lệnh 2x2 có icon (ui/BattleMenus.js): Chiến đấu, Pokémon / Túi, Chạy
+// 4 nút lệnh có icon ở cột phải (ui/BattlePanel.js: CommandTray): Chiến đấu, Pokémon / Túi, Chạy
 const ACTIONS = [
   { label: 'Chiến đấu', value: 'fight', color: 0xe05050, icon: 'cmd-fight' },
   { label: 'Pokémon', value: 'party', color: 0x40b060, icon: 'cmd-ball' },
-  { label: 'Túi', value: 'bag', color: 0xe8a020, icon: 'cmd-bag' },
-  { label: 'Chạy', value: 'run', color: 0x4a88e0, icon: 'cmd-run' },
+  { label: 'Túi đồ', value: 'bag', color: 0xe8a020, icon: 'cmd-bag' },
+  { label: 'Bỏ chạy', value: 'run', color: 0x4a88e0, icon: 'cmd-run' },
 ];
-// Khay lệnh góc phải dưới (nhô lên trên hộp thoại một chút)
-const COMMAND_TRAY = { x: 596, y: 522, width: 352, height: 190 };
 
 // Thời tiết: câu báo khi bắt đầu / kết thúc, tên lớp chắn
 const WEATHER_START = {
@@ -137,9 +133,8 @@ export default class BattleScene extends Phaser.Scene {
     this.ballRule = data.balls ?? 'normal';
     this.activeIndex = state.party.findIndex((m) => m.hp > 0);
     this.runAttempts = 0;
-    this.lastAction = 0;
-    // Ô chiêu vừa chọn: lượt sau con trỏ vẫn ở đó, đổi Pokémon ra sân thì về ô đầu (xem sendOut)
-    this.lastMoveIndex = 0;
+    // Túi đồ nhớ dòng vừa chọn giữa các lượt trong trận này (trận mới thì về dòng đầu)
+    this.bagMemory = null;
     this.finished = false;
     this.leveled = new Set();
     // Pokémon của người chơi đã ra sân đấu với Pokémon đối thủ hiện tại (chia EXP khi hạ nó), đặt lại khi đối thủ đổi con
@@ -163,11 +158,15 @@ export default class BattleScene extends Phaser.Scene {
 
   create() {
     this.input.mouse?.disableContextMenu();
-    centerStage(this);
+    battleStage(this); // cửa sổ nổi giữa màn hình (ui/helpers.js)
     this.router = new InputRouter(this);
     this.drawBackground();
     // Ngoài trời: ánh sáng theo giờ và mưa giống bản đồ (phủ lên nền và Pokémon, không phủ giao diện)
     this.ambience = new Ambience(this, { area: { y: 0, h: 548 }, depth: 1, rainDepth: 4.5 });
+    // Trận đấu là cửa sổ nổi có camera thu nhỏ (ui/helpers.js: battleStage): lớp tối / mưa / tuyết vẽ theo khung trận
+    // (không ghim theo màn hình), nếu không sẽ lệch khỏi khung. Lớp phủ bắt đầu ở x = 0, rộng bằng màn hình (>= 960)
+    const amb = this.ambience;
+    for (const o of [amb.overlay, amb.rain, amb.splash, amb.snow, amb.hail, amb.sand, amb.dust]) o?.setScrollFactor(1);
     this.ambience.apply({ indoor: !this.outdoor, weather: this.fieldWeather });
     // Lớp nắng vàng khi trời nắng gắt
     this.sunLight = this.add.rectangle(LEFT, 0, SPAN, 548, 0xffd070, 0.22).setOrigin(0).setDepth(1.5)
@@ -203,17 +202,24 @@ export default class BattleScene extends Phaser.Scene {
     this.enemyInfo.setVisible(false);
     this.playerInfo = new MonsterInfo(this, 520, 356, true);
     this.playerInfo.setVisible(false);
-    this.msg = new MessageBox(this, this.router, 12, 548, 936, 164);
+    // Hộp thoại rộng hết khối trái, sát đáy khung
+    this.msg = new MessageBox(this, this.router, 0, 548, 960, 164, { radius: 12, shadow: false });
     // Tên đặc tính bật lên khi đặc tính có tác dụng (Sturdy, Magic Guard, Intimidate...)
     this.abilityBanner = new AbilityBanner(this);
     commandIcons(this);
+    // Khung cửa sổ: thanh tiêu đề (kéo được), ô nội dung và 4 nút lệnh bên phải (ui/BattlePanel.js)
+    drawBattleFrame(this, state.player?.name || 'Bạn', this.trainer ? this.trainer.name : `${this.enemy.name} hoang dã`);
+    this.commands = new CommandTray(this, this.router, ACTIONS);
+
     // Lấp lánh định kỳ quanh Pokémon shiny đang trên sân (bật / tắt khi đổi Pokémon, xem updateShinyFx)
     this.shinyFx = {
       enemy: attachShinySparkle(this, this.enemySprite, { interval: 1300, depth: 9 }).setVisible(false),
       player: attachShinySparkle(this, this.playerSprite, { interval: 1300, depth: 9 }).setVisible(false),
     };
 
-    this.cameras.main.fadeIn(350);
+    // Hiện dần cả cửa sổ (không dùng fadeIn của camera: phủ đen cả khoảng trống trong suốt phía trên khung)
+    const cam = this.cameras.main.setAlpha(0);
+    this.tweens.add({ targets: cam, alpha: 1, duration: 350 });
     this.runBattle().catch((err) => console.error('Lỗi trận đấu:', err));
   }
 
@@ -392,38 +398,53 @@ export default class BattleScene extends Phaser.Scene {
     // Đang cuồng nộ (Outrage): bị khoá vào chiêu, không chọn được hành động khác
     const locked = this.lockedMove(this.active);
     if (locked) return { type: 'move', move: locked };
-    for (;;) {
-      this.msg.setText(`${this.active.name} sẽ làm gì?`, true);
-      const choice = await new ButtonGrid(this, this.router, {
-        ...COMMAND_TRAY, columns: 2, items: ACTIONS, index: this.lastAction, cancelable: false,
-        paint: paintCommand, render: (cell, item, w, h) => renderCommand(this, cell, item, w, h),
-      }).open();
-      this.lastAction = ACTIONS.findIndex((a) => a.value === choice);
+    const action = await this.pickAction();
+    this.commands.idle();
+    return action;
+  }
 
-      if (choice === 'fight') {
-        if (!this.active.moves.some((m) => canUseMove(this.active, m))) {
-          await this.msg.show(`${this.active.name} không còn chiêu nào dùng được!`);
-          return { type: 'move', move: STRUGGLE };
-        }
-        const move = await this.chooseMove();
-        if (move) return { type: 'move', move };
-      } else if (choice === 'bag') {
-        const action = await this.chooseItem();
-        if (action) return action;
-      } else if (choice === 'party') {
-        const index = await this.chooseMonster(false);
-        if (index === null) continue;
-        const mon = state.party[index];
-        if (index === this.activeIndex) await this.msg.show(`${mon.name} đang chiến đấu rồi!`);
-        else if (mon.hp <= 0) await this.msg.show(`${mon.name} đã gục, không thể chiến đấu!`);
-        else if (!(await this.trapped('rút về'))) return { type: 'switch', index };
-      } else if (this.trainer) {
-        await this.msg.show('Không thể bỏ chạy khỏi trận đấu với nhà huấn luyện!');
-      } else if (this.abilityActive(this.active, 'runAway') || !(await this.trapped('chạy trốn'))) {
-        // Run Away: luôn chạy thoát khỏi Pokémon hoang dã, kể cả khi bị giữ chân
-        return { type: 'run' };
-      }
+  // Chọn lệnh ở 4 nút cột phải; lệnh có danh sách (chiêu / Pokémon / túi) mở trong ô nội dung phía trên. Đang mở danh sách
+  // mà bấm nút lệnh khác thì chuyển sang lệnh đó; bấm lại nút đang mở thì đóng danh sách
+  async pickAction() {
+    for (;;) {
+      this.msg.setText(`${this.active.name} sẽ làm gì?`);
+      const pending = this.commands.takePending();
+      // Mỗi lượt bắt đầu lại từ đầu: 4 nút xám, Enter / Space là Chiến đấu (không nhớ lệnh lượt trước)
+      const choice = pending ?? (await this.commands.open());
+      if (pending) this.commands.mark(pending);
+      const action = await this.runCommand(choice);
+      if (action) return action;
+      // Danh sách vừa đóng vì bấm lại chính nút đó: chỉ đóng, không mở lại
+      if (this.commands.pending === choice) this.commands.pending = null;
     }
+  }
+
+  // Lệnh đã chọn: trả về hành động của lượt, hoặc null (huỷ / không làm được, chọn lại)
+  async runCommand(choice) {
+    if (choice === 'fight') {
+      if (!this.active.moves.some((m) => canUseMove(this.active, m))) {
+        await this.msg.show(`${this.active.name} không còn chiêu nào dùng được!`);
+        return { type: 'move', move: STRUGGLE };
+      }
+      const move = await this.chooseMove();
+      if (move) return { type: 'move', move };
+    } else if (choice === 'bag') {
+      const action = await this.chooseItem();
+      if (action) return action;
+    } else if (choice === 'party') {
+      const index = await this.chooseMonster(false);
+      if (index === null) return null;
+      const mon = state.party[index];
+      if (index === this.activeIndex) await this.msg.show(`${mon.name} đang chiến đấu rồi!`);
+      else if (mon.hp <= 0) await this.msg.show(`${mon.name} đã gục, không thể chiến đấu!`);
+      else if (!(await this.trapped('rút về'))) return { type: 'switch', index };
+    } else if (this.trainer) {
+      await this.msg.show('Không thể bỏ chạy khỏi trận đấu với nhà huấn luyện!');
+    } else if (this.abilityActive(this.active, 'runAway') || !(await this.trapped('chạy trốn'))) {
+      // Run Away: luôn chạy thoát khỏi Pokémon hoang dã, kể cả khi bị giữ chân
+      return { type: 'run' };
+    }
+    return null;
   }
 
   // Chiêu đang bị khoá vào (Outrage), hoặc null. Đã quên chiêu đó (học chiêu mới giữa trận) thì hết cuồng nộ
@@ -446,10 +467,7 @@ export default class BattleScene extends Phaser.Scene {
   }
 
   async chooseMove() {
-    const info = this.add.container(0, 0).setDepth(20);
-    info.add(drawPanel(this, 644, 548, 304, 164));
-    const detail = this.add.container(0, 0);
-    info.add(detail);
+    // Ô nội dung cột phải: 4 dòng chiêu (tên, loại chiêu + hệ, PP); rê vào chiêu nào thì ô chi tiết hiện bên trái
 
     // Luôn hiện đủ 4 ô chiêu, ô trống ghi "—" như game gốc. Chiêu không dùng được (hết PP, bị phong ấn, bị khiêu khích)
     // hiện xám nhưng vẫn bấm được: báo lý do rồi chọn lại
@@ -459,7 +477,7 @@ export default class BattleScene extends Phaser.Scene {
       const pp = mon.pp[id];
       const sealed = mon.disabled?.move === id;
       const taunted = mon.taunted && m.category === 'status';
-      const tag = sealed ? 'BỊ PHONG ẤN' : taunted ? 'BỊ KHIÊU KHÍCH' : pp === 0 ? 'HẾT PP' : TYPES[m.type].name;
+      const tag = sealed ? 'BỊ PHONG ẤN' : taunted ? 'BỊ KHIÊU KHÍCH' : null;
       const usable = canUseMove(mon, id);
       return {
         label: m.name, tag, pp, maxPp: movePpMax(mon, id), value: m, color: TYPES[m.type].color,
@@ -468,21 +486,29 @@ export default class BattleScene extends Phaser.Scene {
     });
     while (items.length < 4) items.push({ label: '—', disabled: true, color: 0x8a90a0 });
 
-    // Con trỏ ở ô chiêu đã chọn lượt trước (kể cả khi chiêu đó giờ không dùng được); đổi Pokémon thì về ô đầu (sendOut)
-    const index = items[this.lastMoveIndex]?.value ? this.lastMoveIndex : Math.max(0, items.findIndex((i) => !i.disabled));
-    const choice = await new ButtonGrid(this, this.router, {
-      x: 12, y: 548, width: 620, height: 164, columns: 2, items, index, pad: 12, gap: 10,
-      paint: paintMove, render: (cell, item, w, h) => renderMove(this, cell, item, w, h),
-      onChange: ({ value: m }) => this.drawMoveInfo(detail, m, mon),
-    }).open();
-    info.destroy();
+    // Mở ra chưa chọn chiêu nào: rê chuột vào chiêu nào thì sáng chiêu đó và hiện ô chi tiết bên cạnh (phím mũi tên bắt đầu
+    // từ chiêu đầu)
+    let tip = null;
+    let grid = null;
+    const hint = moveHint(this);
+    grid = new ButtonGrid(this, this.router, {
+      ...MOVE_GRID, items, bounds: CONTENT, tray: false, cancelable: false, hoverOnly: true,
+      paint: paintMoveRow, render: (cell, item, w, h) => renderMoveRow(this, cell, item, w, h),
+      onChange: (item, i) => {
+        tip?.destroy();
+        const m = item?.value;
+        tip = m ? showTip(this, null, grid?.cells?.[i]?.cell.y ?? MOVE_GRID.y + 40 + i * 80, moveTipBuilder(this, m, SPECIES[this.enemy.speciesId].types)) : null;
+      },
+    });
+    this.commands.cancelSub = () => grid.finish(null);
+    const choice = await grid.open();
+    tip?.destroy();
+    hint.destroy();
     if (choice?.blocked) {
-      // Bấm vào chiêu không dùng được: báo lý do rồi mở lại bảng chiêu, con trỏ vẫn ở ô đó
-      this.lastMoveIndex = items.findIndex((i) => i.blocked === choice.blocked);
+      // Bấm vào chiêu không dùng được: báo lý do rồi mở lại bảng chiêu
       await this.msg.show(choice.blocked);
       return this.chooseMove();
     }
-    if (choice) this.lastMoveIndex = mon.moves.indexOf(choice.id);
     return choice;
   }
 
@@ -494,66 +520,6 @@ export default class BattleScene extends Phaser.Scene {
     return `Chiêu ${name} đã hết PP!`;
   }
 
-  // Khung thông tin chiêu đang chọn: hệ, loại chiêu, sức mạnh / độ chính xác, hiệu ứng phụ, thanh PP, mức khắc chế đối thủ
-  drawMoveInfo(c, m, mon) {
-    c.removeAll(true);
-    if (!m) return;
-    const x0 = 664;
-    const badge = typeBadge(this, x0, 574, m.type, { size: 15 });
-    c.add(badge);
-    // nhãn loại chiêu: vật lý (cam, hình nổ), đặc biệt (xanh, vòng tròn), trạng thái (xám)
-    const cat = CATEGORY_STYLE[m.category];
-    const cx = x0 + badge.badgeWidth + 8;
-    const label = this.add.text(cx + 26, 574, CATEGORY_NAMES[m.category], textStyle(14, '#ffffff', { fontStyle: 'bold' })).setOrigin(0, 0.5);
-    const pill = this.add.graphics();
-    pill.fillStyle(cat.color);
-    pill.fillRoundedRect(cx, 562, label.width + 34, 24, 12);
-    pill.fillStyle(0xffffff);
-    if (m.category === 'physical') {
-      const pts = [];
-      for (let i = 0; i < 12; i++) {
-        const r = i % 2 ? 3 : 7;
-        const a = (i / 12) * Math.PI * 2;
-        pts.push({ x: cx + 14 + Math.cos(a) * r, y: 574 + Math.sin(a) * r });
-      }
-      pill.fillPoints(pts, true);
-    } else if (m.category === 'special') {
-      pill.lineStyle(2, 0xffffff);
-      pill.strokeCircle(cx + 14, 574, 6.5);
-      pill.fillCircle(cx + 14, 574, 3);
-    } else {
-      pill.fillCircle(cx + 14, 574, 6);
-      pill.fillStyle(cat.color);
-      pill.fillCircle(cx + 16, 572, 4);
-    }
-    c.add([pill, label]);
-
-    const stat = (text, x, y, color = '#3a4256') => c.add(this.add.text(x, y, text, textStyle(17, color, { fontStyle: 'bold' })));
-    stat(`Sức mạnh  ${m.power || (m.fixedDamage || m.weightPower ? '?' : '—')}`, x0, 592);
-    stat(`Chính xác  ${m.accuracy ? `${m.accuracy}%` : '—'}`, x0 + 136, 592);
-
-    const notes = moveNotes(m);
-    const desc = notes.length ? notes.slice(0, 2).join(' • ') : m.category === 'status' ? 'Chiêu hỗ trợ' : 'Không có hiệu ứng phụ';
-    c.add(this.add.text(x0, 616, desc, textStyle(14, '#5a6276', { wordWrap: { width: 268 }, maxLines: 2, lineSpacing: 2 })));
-
-    // Thanh PP: xanh, còn dưới nửa thì vàng, dưới 1/4 thì đỏ
-    const pp = mon.pp[m.id] ?? 0;
-    const ppMax = movePpMax(mon, m.id);
-    const ratio = pp / ppMax;
-    c.add(this.add.text(x0, 660, 'PP', textStyle(15, '#6a7286', { fontStyle: 'bold' })));
-    const bar = this.add.graphics();
-    bar.fillStyle(0x3a4256);
-    bar.fillRoundedRect(x0 + 28, 663, 150, 12, 6);
-    bar.fillStyle(ratio > 0.5 ? 0x48c060 : ratio > 0.25 ? 0xe8b830 : 0xe04848);
-    if (pp > 0) bar.fillRoundedRect(x0 + 30, 665, Math.max(8, 146 * ratio), 8, 4);
-    c.add(bar);
-    c.add(this.add.text(x0 + 186, 659, `${pp}/${ppMax}`, textStyle(16, ratio > 0.25 ? '#3a4256' : '#c83838', { fontStyle: 'bold' })));
-
-    // Mức khắc chế với đối thủ đang đấu (theo hệ)
-    const hint = effectivenessHint(m, SPECIES[this.enemy.speciesId].types);
-    if (hint) c.add(this.add.text(x0, 684, hint.label, textStyle(16, hint.color, { fontStyle: 'bold' })));
-  }
-
   // Trả về hành động dùng đồ, hoặc null nếu huỷ / không dùng được
   async chooseItem() {
     const allow = (id) => BATTLE_KINDS.includes(ITEMS[id].kind) && !ITEMS[id].fieldOnly && ballAllowed(id, ITEMS[id], this.ballRule);
@@ -561,13 +527,19 @@ export default class BattleScene extends Phaser.Scene {
       await this.msg.show('Không có vật phẩm nào dùng được trong trận!');
       return null;
     }
-    // Túi đồ dạng khung bên phải (ui/BagPanel.js): dải tab ngăn bên trái, ô tìm kiếm, lưới 2 cột, ô mô tả dưới lưới
-    this.msg.setText('Dùng vật phẩm nào?', true);
-    const id = await new BagPanel(this, this.router, {
-      x: 452, y: 12, width: 496, height: 526, depth: 20,
-      pockets: BATTLE_POCKETS, allow, memory: bagMemory, tipSide: 'inside',
-    }).open();
+    // Một cột vật phẩm dùng được trong ô nội dung cột phải; rê vào dòng nào thì hộp thoại hiện mô tả
+    const ids = Object.keys(ITEMS)
+      .filter((k) => itemCount(k) > 0 && allow(k))
+      .map((k, i) => ({ k, i, p: POCKET_ORDER.indexOf(pocketOf(k)) }))
+      .sort((a, b) => a.p - b.p || a.i - b.i)
+      .map((e) => e.k);
+    // Rê vào vật phẩm không hiện chữ / ô chi tiết gì; chỉ báo khi dùng không được (vd thuốc chữa tê liệt cho Pokémon
+    // không bị tê liệt: báo rồi chọn lại, không mất lượt)
+    const list = new ItemList(this, this.router, { ids, index: Math.max(0, ids.indexOf(this.bagMemory)) });
+    this.commands.cancelSub = () => list.finish(null);
+    const id = await list.open();
     if (!id) return null;
+    this.bagMemory = id;
 
     const item = ITEMS[id];
     if (item.kind === 'ball') {
@@ -611,22 +583,19 @@ export default class BattleScene extends Phaser.Scene {
   // forced = true khi Pokémon đang đánh bị gục: bắt buộc chọn, không huỷ được
   async chooseMonster(forced, title = null) {
     for (;;) {
-      // 6 Pokémon vẫn nằm gọn trên hộp thoại (y = 548)
-      const index = await new Menu(this, this.router, {
-        x: 110, y: 20, width: 740, height: 80 + state.party.length * 72,
-        title: title ?? (forced ? 'Chọn Pokémon tiếp theo' : 'Pokémon'),
-        rowHeight: 66,
-        cancelable: !forced,
+      // Ô nội dung cột phải: 2 cột x 3 (đủ 6 con); Pokémon đã gục thì mờ (ui/BattlePanel.js)
+      // Lưới hình đơn giản (gục thì xám), không có ô chi tiết khi rê chuột
+      this.msg.setText(title ?? (forced ? 'Chọn Pokémon tiếp theo.' : `${this.active.name} sẽ làm gì?`));
+      const grid = new ButtonGrid(this, this.router, {
+        ...PARTY_GRID, bounds: CONTENT, cancelable: false, tray: false,
+        items: state.party.map((mon, i) => ({ mon, value: i, active: i === this.activeIndex })),
         // Bắt buộc chọn thì con trỏ đứng sẵn ở Pokémon đầu tiên còn chiến đấu được
         index: forced ? state.party.findIndex((m) => m.hp > 0) : this.activeIndex,
-        items: state.party.map((mon, i) => ({
-          mon,
-          value: i,
-          // Pokémon đã gục: hình mờ, thanh HP trống (ui/Menu.js)
-          tag: i === this.activeIndex ? 'Đang chiến đấu' : '',
-          tagColor: i === this.activeIndex ? '#3a8a50' : undefined,
-        })),
-      }).open();
+        paint: paintPartyCell, render: (cell, item) => renderPartyCell(this, cell, item),
+      });
+      // Bắt buộc chọn (Pokémon vừa gục) thì bấm nút lệnh không đóng được bảng
+      this.commands.cancelSub = forced ? null : () => grid.finish(null);
+      const index = await grid.open();
       if (index === null) return null;
       if (!forced || state.party[index].hp > 0) return index;
       await this.msg.show(`${state.party[index].name} đã gục, không thể chiến đấu!`);
@@ -1514,7 +1483,7 @@ export default class BattleScene extends Phaser.Scene {
       this.enemySprite.setTexture(key);
       return this.enemyScale;
     }
-    const hasBack = monSourceExists(this, `mon-${mon.speciesId}-back`);
+    const hasBack = monViewKey(this, mon.speciesId, '-back') !== `mon-${mon.speciesId}`;
     const key = pixelMon(this, mon.speciesId, hasBack ? '-back' : '', 80, shiny);
     this.playerSprite.setTexture(key).setFlipX(!hasBack);
     return fitScale(this, key, PLAYER_SIZE);
@@ -1954,12 +1923,11 @@ export default class BattleScene extends Phaser.Scene {
 
   async sendOut(index, entry = true) {
     this.activeIndex = index;
-    this.lastMoveIndex = 0; // Pokémon khác ra sân: con trỏ chiêu về ô đầu
     const mon = this.active;
     clearVolatile(mon);
     this.participants.add(mon);
     // Có ảnh mặt sau thì dùng, không thì lật ngang ảnh mặt trước
-    const hasBack = monSourceExists(this, `mon-${mon.speciesId}-back`);
+    const hasBack = monViewKey(this, mon.speciesId, '-back') !== `mon-${mon.speciesId}`;
     const key = pixelMon(this, mon.speciesId, hasBack ? '-back' : '', 80, mon.shiny);
     this.playerSprite
       .setTexture(key)
@@ -2174,7 +2142,9 @@ Quên: ${detail(MOVES[value])}` : ''}`),
     await tweenAsync(this, { targets: ball, y: ENEMY_POS.y - 22 + ball.size / 2, duration: 520, ease: 'Bounce.out' });
 
     // Mỗi lần lắc: nghiêng trái, nghiêng phải rồi đứng lại, xoay quanh đáy bóng
-    const { caught, shakes } = rollCatch(this.enemy, item.bonus);
+    // Nhiệm vụ bắt Pokémon đầu tiên: quả bóng đầu tiên ném ra chắc chắn bắt được (không kẹt vì hết bóng)
+    const sure = firstCatchThrow();
+    const { caught, shakes } = sure ? { caught: true, shakes: 3 } : rollCatch(this.enemy, item.bonus);
     const baseX = ball.x;
     for (let i = 0; i < shakes; i++) {
       await wait(this, 420);
@@ -2198,6 +2168,7 @@ Quên: ${detail(MOVES[value])}` : ''}`),
       await this.msg.show(`Tuyệt vời! Bạn đã bắt được ${this.enemy.name}!`);
       // Bắt được cũng nhận EXP và EV như khi hạ gục (như từ Gen 5), chia cho các Pokémon đã ra sân và còn đứng
       await this.awardExp();
+      this.enemy.ball = itemId; // loại bóng đã bắt (hiện trong bảng chi tiết Pokémon)
       const where = addCaught(this.enemy);
       this.saveResult('catch');
       await this.msg.show(where === 'party'
@@ -2251,13 +2222,11 @@ Quên: ${detail(MOVES[value])}` : ''}`),
     this.naturalCure(this.active);
     if (result !== 'lose') await this.pickup();
     this.router.clear();
-    const cam = this.cameras.main;
-    await new Promise((resolve) => {
-      cam.once('camerafadeoutcomplete', resolve);
-      cam.fadeOut(450);
-    });
+    await tweenAsync(this, { targets: this.cameras.main, alpha: 0, duration: 450 });
     // Pokémon nào lên cấp trong trận thì về bản đồ mới xét tiến hoá (như game gốc)
-    this.scene.wake('World', { result, leveled: [...this.leveled], persist: this.persist, ...extra });
+    // Bản đồ vẫn chạy phía sau cửa sổ trận đấu (chỉ bị khoá thao tác): báo kết quả trận
+    const world = this.scene.get('World');
     this.scene.stop();
+    world.endBattleWindow({ result, leveled: [...this.leveled], persist: this.persist, ...extra });
   }
 }

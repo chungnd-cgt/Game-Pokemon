@@ -21,6 +21,9 @@ const DRAG_START = 8; // kéo quá chừng này px mới tính là kéo thả (�
 // shiny), thanh HP và thanh EXP mảnh; đồ đang cầm hiện icon nhỏ góc phải, trạng thái xấu là viên màu cạnh tên; kiệt sức thì
 // cả hàng xám đi. Rê chuột: sáng viền, hiện % HP. Bấm: mở thẳng màn chi tiết Pokémon. Kéo thả hàng này lên hàng khác: đổi chỗ.
 // Cỡ giao diện (helpers.js hudScale): vẽ theo toạ độ ảo, container phóng to theo hệ số
+// Màn khác mượn cột (hộp PC: kéo thả giữa hộp và đội hình): đặt hooks = { hover(i), down(i, p) } thì rê chuột / nhấn vào
+// hàng gọi hooks thay cho xem chi tiết / đổi chỗ; mark({ cursor, target, lifted }) sáng viền hàng con trỏ (vàng), hàng sắp
+// thả (xanh), làm mờ hàng đang nhấc; chỉ số >= số Pokémon là ô trống (chấm tròn) ngay sau con cuối
 export class PartyPanel {
   // top: mép trên • onPick(index): bấm vào Pokémon thứ index • onSwap(a, b): kéo ô a thả lên ô b
   constructor(scene, top, onPick, onSwap) {
@@ -34,6 +37,8 @@ export class PartyPanel {
     this.slots = [];
     this.press = null; // đang nhấn giữ một ô: { i, x, y, ghost }
     this.hover = -1;
+    this.hooks = null;
+    this.marks = null;
     this.onPointerMove = (p) => this.dragMove(p);
     this.onPointerUp = (p) => this.dragEnd(p);
     scene.input.on('pointermove', this.onPointerMove);
@@ -66,16 +71,42 @@ export class PartyPanel {
     return { x: 16 + ROW_H / 2, y: this.top + ROW_H / 2 + i * STEP };
   }
 
-  // Hàng dưới điểm (px, py) trên màn hình, hoặc -1
-  slotAt(px, py) {
+  // Hàng dưới điểm (px, py) trên màn hình, hoặc -1. withEmpty: tính cả ô trống (trả về chỗ đứng cuối đội = số Pokémon)
+  slotAt(px, py, withEmpty = false) {
     const s = hudScale(this.scene);
     px /= s;
     py /= s;
-    for (let i = 0; i < state.party.length; i++) {
+    const n = withEmpty ? PARTY_SIZE : state.party.length;
+    for (let i = 0; i < n; i++) {
       const { y } = this.center(i);
-      if (px >= 12 && px <= 16 + ROW_W + 4 && Math.abs(py - y) <= ROW_H / 2 + 3) return i;
+      if (px >= 12 && px <= 16 + ROW_W + 4 && Math.abs(py - y) <= ROW_H / 2 + 3) return Math.min(i, state.party.length);
     }
     return -1;
+  }
+
+  // Sáng viền theo màn đang mượn cột (xem hooks ở đầu lớp); null: bỏ hết
+  mark(marks) {
+    this.marks = marks;
+    this.applyMarks();
+  }
+
+  applyMarks() {
+    const m = this.marks ?? {};
+    this.slots.forEach((s, i) => {
+      s.draw(i === m.cursor, i === m.target);
+      s.icon.setAlpha(i === m.lifted ? 0.25 : s.fainted ? 0.55 : 1);
+    });
+    const g = this.markG;
+    if (!g) return;
+    g.clear();
+    // Ô trống ngay sau con cuối: vòng quanh chấm tròn
+    const n = state.party.length;
+    for (const [i, color] of [[m.cursor, 0xffd860], [m.target, 0x58d8ff]]) {
+      if (i !== n || n >= PARTY_SIZE) continue;
+      const { x, y } = this.center(i);
+      g.lineStyle(3, color, 0.95);
+      g.strokeCircle(x, y, 15);
+    }
   }
 
   render() {
@@ -101,12 +132,15 @@ export class PartyPanel {
       empty.fillCircle(x - 3, y - 3, 4);
     }
     c.add(empty);
+    this.markG = scene.add.graphics();
+    c.add(this.markG);
     // Ô thông tin khi rê chuột (tên, cấp, % HP)
     this.tip = scene.add.text(0, 0, '', textStyle(14, '#ffffff', {
       fontStyle: 'bold', backgroundColor: 'rgba(20,26,44,0.92)', padding: { x: 10, y: 5 }, lineSpacing: 2,
     })).setOrigin(0, 0.5).setVisible(false);
     c.add(this.tip);
     fixToCamera(c).setScale(hudScale(scene));
+    if (this.marks) this.applyMarks();
   }
 
   slot(c, mon, i) {
@@ -187,11 +221,15 @@ export class PartyPanel {
     }
     fitText(name, right - nx, 0.8);
     const zone = scene.add.zone(left + ROW_W / 2, y, ROW_W, ROW_H).setInteractive({ useHandCursor: true });
-    zone.on('pointerover', () => !this.press?.ghost && this.setHover(i));
-    zone.on('pointerout', () => this.hover === i && !this.press?.ghost && this.setHover(-1));
+    zone.on('pointerover', () => {
+      if (this.hooks) this.hooks.hover?.(i);
+      else if (!this.press?.ghost) this.setHover(i);
+    });
+    zone.on('pointerout', () => !this.hooks && this.hover === i && !this.press?.ghost && this.setHover(-1));
     zone.on('pointerdown', (p, lx, ly, e) => {
       e?.stopPropagation();
-      this.press = { i, x: p.x, y: p.y, ghost: null };
+      if (this.hooks) this.hooks.down?.(i, p);
+      else this.press = { i, x: p.x, y: p.y, ghost: null };
     });
     c.add(zone);
     this.slots.push({ draw, icon, mon, ratio, fainted });

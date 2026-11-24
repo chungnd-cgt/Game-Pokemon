@@ -101,7 +101,7 @@ for (const size of SIZES) {
       await idle(page);
 
       // Nhà dân có người ở
-      await world(page, `w.loadMap('nh-town1-13-15', { x: 3, y: 6 }, 'up'); w.refreshFollower();`);
+      await world(page, `w.loadMap('nh-town1-13-15', { x: 15, y: 12 }, 'up'); w.refreshFollower();`);
       await page.waitForTimeout(800);
       await shot(page, size.name, '09-house');
       expect(errors).toEqual([]);
@@ -162,9 +162,11 @@ test.describe('phone-land: cỡ giao diện', () => {
         const s = w.hudScale;
         const c = w.partyPanel.center(4);
         const party = w.partyPanel.slotAt(c.x * s, c.y * s);
-        const top = (w.scale.height / s - 16 - 46) * s;
-        const left = (16 + 46 + 8 + 118 + 8 + 2 * 52 + 23) * s;
-        return { party, hotbar: w.hotbar.slotAt(left, top + 23 * s), s };
+        // Cụm góc trái dưới nhỏ hơn: hệ số giao diện x CORNER (ui/Hotbar.js)
+        const k = s * 0.8;
+        const top = (w.scale.height / k - 16 - 46) * k;
+        const left = (16 + 46 + 8 + 118 + 8 + 2 * 52 + 23) * k;
+        return { party, hotbar: w.hotbar.slotAt(left, top + 23 * k), s };
       `);
       expect(hit.s).toBe(scale);
       expect(hit.party).toBe(4);

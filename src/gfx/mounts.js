@@ -1,5 +1,5 @@
 import { WORLD_SCALE } from '../config.js';
-import { PixelBuffer, addSheetTexture, shadeHex, upscaleCanvas } from './pixel.js';
+import { PixelBuffer, addSheetTexture, shadeHex, smoothUpscale } from './pixel.js';
 
 // Thú cưỡi trên bản đồ (Arcanine trên cạn, Lapras dưới nước, khối nước khi lướt bằng chiêu Surf): sprite pixel riêng,
 // to hơn hẳn người chơi (cao / rộng khoảng 1,5-2 lần), 3 hướng (down: quay mặt về phía màn hình, up: quay lưng,
@@ -583,14 +583,14 @@ export function puffTextures(scene) {
   dust.ellipse(5, 5.2, 4.6, 1.8, '#e4d6b4');
   dust.recolor('#f6eedc', (x, y) => y <= 2 || (y === 3 && x >= 5 && x <= 7));
   dust.recolor('#cbb88e', (x, y) => y >= 6);
-  scene.textures.addCanvas('fx-dust-puff', upscaleCanvas(dust.toCanvas(), WORLD_SCALE));
+  scene.textures.addCanvas('fx-dust-puff', smoothUpscale(dust.toCanvas(), WORLD_SCALE));
   const drop = new PixelBuffer(7, 8);
   drop.rect(3, 0, 1, 2, FOAM);
   drop.rect(1, 2, 1, 2, SPRAY);
   drop.rect(5, 2, 1, 2, SPRAY);
   drop.ellipse(3.5, 5.6, 3.2, 1.9, FOAM);
   drop.recolor(SPRAY, (x, y) => y >= 7);
-  scene.textures.addCanvas('fx-splash', upscaleCanvas(drop.toCanvas(), WORLD_SCALE));
+  scene.textures.addCanvas('fx-splash', smoothUpscale(drop.toCanvas(), WORLD_SCALE));
 }
 
 // Tạo (một lần) 2 sheet texture `ride-<loài>` (lớp dưới) và `ride-<loài>-over` (lớp trên), frame `<hướng>-<nhịp>`
@@ -601,8 +601,8 @@ export function rideTexture(scene, speciesId) {
     for (const v of RIDE_VIEWS) {
       for (const f of [0, 1]) {
         const parts = rideLayers(speciesId, v, f);
-        layers.under.push(upscaleCanvas(parts.under.toCanvas(), WORLD_SCALE));
-        layers.over.push(upscaleCanvas(parts.over.toCanvas(), WORLD_SCALE));
+        layers.under.push(smoothUpscale(parts.under.toCanvas(), WORLD_SCALE));
+        layers.over.push(smoothUpscale(parts.over.toCanvas(), WORLD_SCALE));
       }
     }
     addSheetTexture(scene, key, layers.under, RIDE_FRAMES);

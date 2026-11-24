@@ -35,6 +35,8 @@ const CHAT = [
 const GIFTS = [
   ['potion', 3], ['superPotion', 2], ['pokeBall', 5], ['greatBall', 3], ['oranBerry', 3], ['pechaBerry', 2], ['cheriBerry', 2],
   ['repel', 3], ['antidote', 3], ['fullHeal', 1], ['revive', 1], ['ether', 1],
+  // Đĩa kỹ năng: vài nhà mới tặng
+  ['tmThunderWave', 1], ['tmEnergyBall', 1],
 ];
 // Đổi Pokémon: loài hiếm họ đưa (chỉ chọn loài khu đó không có), biệt danh, đồ cầm sẵn
 const RARE = [
@@ -89,9 +91,25 @@ export function residentTrade(def) {
   const items = TRADE_ITEMS.filter((id) => ITEMS[id] && ITEMS[id].kind !== 'key');
   return { want, give, nickname: pick(NICKNAMES, (seed + seed2) % 1), item: items.length ? pick(items, seed2 * 7 % 1) : null };
 }
-export function residentTeam(def, party = state.party) {
-  const top = Math.max(5, ...party.map((m) => m.level));
-  const level = Math.max(5, Math.min(70, top - 3));
+// Cấp đội của người ở thách đấu: theo KHU (không theo đội người chơi, trước kia đội có con Lv50 thì người ở thị trấn đầu
+// game cũng Lv47). Mỗi bản đồ ngoài trời quanh nhà (bản đồ ngoài cửa và các bản đồ nối với nó) lấy cấp cao nhất của
+// Pokémon hoang dã trên cạn (bụi cỏ, hang); lấy bản đồ DỄ nhất trong số đó (đường đã đi tới khu này, không phải hang / tuyến
+// phía trước), cộng 1. Không tính lướt nước / câu cá (hồ ở thị trấn đầu game có Pokémon cấp giữa hành trình)
+export function residentLevel(def) {
+  const outer = MAPS[def.map]?.exit?.to;
+  const maps = new Set([outer]);
+  for (const w of MAPS[outer]?.warps ?? []) if (MAPS[w.to] && !MAPS[w.to].indoor) maps.add(w.to);
+  const tops = [];
+  for (const id of maps) {
+    const levels = (MAPS[id]?.areas ?? []).flatMap((a) => (ENCOUNTERS[a.table] ?? []).map((e) => e.max));
+    if (levels.length) tops.push(Math.max(...levels));
+  }
+  const level = tops.length ? Math.min(...tops) : 5;
+  return Math.max(5, Math.min(70, level + 1));
+}
+
+export function residentTeam(def) {
+  const level = residentLevel(def);
   return pick(validTeams(), def.resident.seed).map((id, i) => [id, level + i]);
 }
 
@@ -179,6 +197,7 @@ async function tradeTalk(world, def) {
   if (!(await world.ask(`Đổi ${mine.name} Lv${mine.level} lấy ${giveName} "${nickname}"?`, def.name))) return;
   const got = createMonster(give, mine.level);
   got.name = nickname;
+  got.ot = def.name; // Pokémon của người ở: OT là họ
   if (item) got.heldItem = item;
   markSeen(give);
   markCaught(give);

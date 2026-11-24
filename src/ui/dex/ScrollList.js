@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
 
 // Vùng cuộn có mặt nạ (Pokédex: danh sách chiêu thức, nơi xuất hiện): nội dung dài hơn khung thì cuộn bằng con lăn,
-// thanh cuộn mảnh ở mép phải (chừa 10px bên phải cho thanh cuộn khi đặt nội dung).
+// thanh cuộn mảnh ở mép phải (chừa 10px bên phải cho thanh cuộn khi đặt nội dung). colors: { track, thumb } của thanh cuộn
 export class ScrollList {
-  constructor(scene, x, y, w, h) {
+  constructor(scene, x, y, w, h, colors = {}) {
     Object.assign(this, { scene, x, y, w, h, offset: 0, contentH: 0 });
+    this.colors = { track: 0xdde3ee, thumb: 0x8a94b4, ...colors };
     this.content = scene.add.container(x, y);
     this.shape = scene.make.graphics({ x: 0, y: 0 }, false);
     this.shape.fillStyle(0xffffff);
@@ -56,9 +57,9 @@ export class ScrollList {
     const x = this.x + this.w - 5;
     const thumbH = Math.max(20, (this.h * this.h) / this.contentH);
     const thumbY = this.y + (this.h - thumbH) * (this.offset / (this.contentH - this.h));
-    g.fillStyle(0xdde3ee);
+    g.fillStyle(this.colors.track);
     g.fillRoundedRect(x, this.y, 5, this.h, 2.5);
-    g.fillStyle(0x8a94b4);
+    g.fillStyle(this.colors.thumb);
     g.fillRoundedRect(x, thumbY, 5, thumbH, 2.5);
   }
 }

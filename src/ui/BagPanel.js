@@ -1,12 +1,12 @@
 import Phaser from 'phaser';
 import { BAG_POCKETS, ITEMS } from '../data/items.js';
-import { itemCount, state } from '../game/state.js';
+import { itemCount } from '../game/state.js';
 import { fitScale } from '../gfx/textures.js';
 import { ItemTip } from './BagParts.js';
 import { bagItems, pocketCounts, searchKey } from './bagSearch.js';
-import { closeButton, fitText, fixToCamera, followCenter, localX, textStyle, uiX } from './helpers.js';
+import { closeButton, fitText, fixToCamera, followCenter, localX, localY, textStyle, uiX } from './helpers.js';
+import { FloatWindow } from './Windows.js';
 import { directionOf, isCancel, isConfirm } from './input.js';
-import { HOTBAR_ACTIONS, keysFor, shortKeyName } from '../game/keybinds.js';
 
 // Màu khung túi đồ (tối, cùng tông thanh phím tắt / khung mô tả vật phẩm)
 const C = {
@@ -69,7 +69,7 @@ class InlineTip {
 // Túi đồ dạng khung bên phải màn hình: dải tab ngăn túi dọc bên TRÁI, đầu khung có tên ngăn + ô tìm kiếm (phím gõ ra chữ
 // là tìm, không phân biệt dấu; Backspace xoá, Esc / phím quay lại xoá chữ rồi đóng túi), vật phẩm xếp lưới 2 cột (icon,
 // tên, ×số lượng) cuộn bằng con lăn chuột / phím hướng. Phím hướng / xác nhận / quay lại theo Cài đặt → Điều khiển, trừ
-// phím gõ ra chữ (dành cho ô tìm kiếm). Rê chuột / di phím tới vật phẩm thì hiện mô tả (BagParts.ItemTip) cạnh khung.
+// phím gõ ra chữ (dành cho ô tìm kiếm). Rê chuột / di phím tới vật phẩm thì hiện mô tả nhỏ (BagParts.ItemTip) ngay dưới ô.
 // open() trả về id vật phẩm được chọn, hoặc null nếu đóng túi.
 // opts:
 //  x, y, width, height  khung ngoài (bao cả dải tab lẫn khung vật phẩm)        depth, fixed (ghim vào màn hình khi camera trôi)
@@ -79,8 +79,13 @@ class InlineTip {
 //  title                tiêu đề thay cho tên ngăn (vd "Chọn đồ cho ô 3")
 //  hotbar               thanh phím tắt (ui/Hotbar.js): kéo icon vật phẩm thả vào ô để gán, bấm phím của ô để gán
 //  onAssign(slot, id)   gán vật phẩm id vào ô phím tắt slot       hotkey(e): phím -> ô (0-5) hoặc null
-//  tipSide              'left' | 'right': khung mô tả nằm bên nào của túi; 'inside': ô mô tả trong khung, dưới lưới
+//  tipSide              'inside': ô mô tả trong khung, dưới lưới; null: không mô tả; mặc định: mô tả nhỏ ngay dưới ô vật phẩm
 //  count(id)            số lượng (mặc định game/state.js itemCount)
+//  windows              cửa sổ nổi trên bản đồ (ui/Windows.js: WindowManager): túi là một cửa sổ kéo được, mở song song
+//                       với cửa sổ khác; không dùng open() / router mà gọi lại: onPick(id) khi chọn vật phẩm,
+//                       onGive(monIndex, id) khi kéo vật phẩm thả vào Pokémon ở cột đội hình, dropItem(p, id) cho cửa sổ
+//                       khác nhận vật phẩm thả vào (vd ô đồ cầm của bảng chi tiết Pokémon: trả về true nếu đã nhận).
+//                       dragOver(p | null): đang kéo vật phẩm tới p (để cửa sổ khác sáng chỗ thả); ghostDepth: depth icon đang kéo
 export class BagPanel {
   constructor(scene, router, opts) {
     this.scene = scene;
@@ -105,7 +110,15 @@ export class BagPanel {
     };
     this.cellW = (this.grid.w - GAP) / 2;
     this.visibleRows = Math.max(1, Math.floor((this.grid.h + GAP) / (CELL_H + GAP)));
-    this.container = scene.add.container(0, 0).setDepth(this.depth);
+    if (opts.windows) {
+      // Cửa sổ nổi: kéo bằng dải tiêu đề của khung vật phẩm (trừ nút ✕)
+      this.win = new FloatWindow(opts.windows, {
+        id: 'bag', rect: { x, y, w: width, h: height }, dragRect: { x: this.body.x, y, w: this.body.w - 56, h: OUT + 46 },
+        onKey: (e) => this.handleKey(e), onClose: () => this.cleanup(),
+      });
+      this.container = this.win.root;
+      opts.fixed = true;
+    } else this.container = scene.add.container(0, 0).setDepth(this.depth);
     this.tabLayer = scene.add.container(0, 0);
     this.headLayer = scene.add.container(0, 0);
     this.gridLayer = scene.add.container(0, 0);
@@ -114,10 +127,18 @@ export class BagPanel {
     if (opts.tipSide === 'inside') {
       this.tip = new InlineTip(scene, this.container, this.body.x + PAD, this.body.y + this.body.h - FOOT_H - DESC_H + 4, this.body.w - PAD * 2);
       this.inlineTip = true;
+    } else if (this.win) {
+      // Mô tả nằm trong cửa sổ (đi theo khi kéo cửa sổ), trên lưới vật phẩm
+      this.tip = new ItemTip(scene, 0, { inside: true, limitY: () => scene.scale.height - this.win.oy });
+      this.container.add(this.tip.container);
     } else this.tip = opts.tipSide === null ? null : new ItemTip(scene, this.depth + 2);
-    this.rebuild(true);
-    // Trên bản đồ (cố định theo màn hình): dời vào giữa màn hình rộng
-    if (opts.fixed) {
+    this.rebuild();
+    if (this.win) {
+      this.container.bringToTop(this.tip.container);
+      opts.windows.open(this.win);
+      this.listen();
+    } else if (opts.fixed) {
+      // Trên bản đồ (cố định theo màn hình): dời vào giữa màn hình rộng
       fixToCamera(this.container).setX(uiX(scene));
       followCenter(scene, [this.container]);
     }
@@ -141,7 +162,7 @@ export class BagPanel {
     g.strokeRoundedRect(body.x + 1, body.y + 1, body.w - 2, body.h - 2, 17);
     this.container.add(g);
     // Nút ✕ đóng túi
-    this.container.add(closeButton(scene, body.x + body.w - 28, body.y + 26, () => this.finish(null), 28));
+    this.container.add(closeButton(scene, body.x + body.w - 28, body.y + 26, () => this.close(), 28));
   }
 
   // Dải tab dọc bên trái: icon + tên ngăn, ngăn đang mở nối liền với khung, có vạch vàng; ngăn trống mờ đi
@@ -180,7 +201,7 @@ export class BagPanel {
       zone.on('pointerover', () => !on && draw(true));
       zone.on('pointerout', () => draw(false));
       // đổi ngăn ở khung hình sau: không xoá tab đang nhận sự kiện chuột
-      zone.on('pointerdown', () => scene.time.delayedCall(0, () => !this.done && this.setPocket(i, true)));
+      zone.on('pointerdown', () => scene.time.delayedCall(0, () => !this.done && this.setPocket(i)));
       this.tabLayer.add([g, img, label, zone]);
     });
     if (this.opts.fixed) fixToCamera(this.tabLayer);
@@ -193,9 +214,7 @@ export class BagPanel {
     this.caretTween?.remove();
     const searching = Boolean(searchKey(this.query));
     const name = this.opts.title ?? (searching ? 'Tìm kiếm' : this.pockets[this.pocket].name);
-    const title = scene.add.text(body.x + PAD + 4, body.y + 12, name, textStyle(23, '#ffffff', { fontStyle: 'bold' }));
-    const sub = scene.add.text(title.x + title.width + 10, body.y + 20, `${this.list.length} món`, textStyle(14, '#8a96b8'));
-    this.headLayer.add([title, sub]);
+    this.headLayer.add(scene.add.text(body.x + PAD + 4, body.y + 12, name, textStyle(23, '#ffffff', { fontStyle: 'bold' })));
 
     const fx = body.x + PAD;
     const fy = body.y + 50;
@@ -256,18 +275,11 @@ export class BagPanel {
       const icon = scene.add.image(-w / 2 + 26, 0, item.icon).setScale(fitScale(scene, item.icon, 36));
       // Vật phẩm quan trọng không có dòng số lượng: tên nằm giữa ô
       const name = scene.add.text(-w / 2 + 52, item.kind === 'key' ? 0 : -10, item.name, textStyle(16, '#ffffff', { fontStyle: 'bold' })).setOrigin(0, 0.5);
-      // Đã gán phím tắt: nhãn phím của ô (như trên thanh phím tắt; ô không có phím thì số ô) nhỏ ở góc phải
-      // (tên chừa chỗ cho nhãn, không đè lên nhau)
-      const slot = this.opts.hotbar ? (state.hotbar ?? []).indexOf(id) : -1;
-      const slotLabel = slot >= 0 ? shortKeyName(keysFor(HOTBAR_ACTIONS[slot])[0]) || `${slot + 1}` : '';
       // Tên dài quá ô thì thu nhỏ chữ (vẫn dài thì cắt bớt kèm "…")
-      fitText(name, w - 52 - 10 - (slot >= 0 ? 16 + slotLabel.length * 8 : 0), 0.72);
+      fitText(name, w - 52 - 10, 0.72);
       cell.add([bg, icon, name]);
       if (item.kind !== 'key') {
         cell.add(scene.add.text(-w / 2 + 52, 12, `×${this.count(id)}`, textStyle(14, '#a8b4d0', { fontStyle: 'bold' })).setOrigin(0, 0.5));
-      }
-      if (slot >= 0) {
-        cell.add(scene.add.text(w / 2 - 8, 12, slotLabel, textStyle(12, '#141a2c', { fontStyle: 'bold', backgroundColor: '#ffd860', padding: { x: 5, y: 1 } })).setOrigin(1, 0.5));
       }
       const zone = scene.add.zone(0, 0, w, CELL_H).setInteractive({ useHandCursor: true });
       zone.on('pointerover', () => {
@@ -342,22 +354,26 @@ export class BagPanel {
     g.fillRoundedRect(tx, top, 6, h, 3);
   }
 
-  // Dựng lại danh sách (đổi ngăn / đổi chữ tìm), giữ con trỏ ở vị trí đã nhớ của ngăn đó
-  rebuild(first = false) {
+  // Dựng lại danh sách (mở túi / đổi ngăn / đổi chữ tìm). Không tự sáng ô nào: con trỏ chỉ nhớ vị trí của ngăn đó, rê chuột
+  // hoặc bấm phím hướng / xác nhận mới sáng ô
+  rebuild() {
     this.list = bagItems({ count: this.count, pocket: this.pocket, query: this.query, allow: this.opts.allow, pockets: this.pockets });
     this.hover = -1;
     this.scroll = 0;
     this.index = -1;
+    this.focused = false;
     this.drawTabs();
     this.drawHead();
     this.drawGrid();
     const remembered = this.memory.index[this.memoryKey()] ?? 0;
     const at = this.list.length ? Phaser.Math.Clamp(remembered, 0, this.list.length - 1) : -1;
-    if (at >= 0) this.select(at, !first);
-    else {
-      this.layout();
-      this.tip?.hide();
+    this.index = at;
+    if (at >= 0) {
+      const row = Math.floor(at / 2);
+      if (row >= this.visibleRows) this.scroll = row - this.visibleRows + 1;
     }
+    this.layout();
+    this.tip?.hide();
   }
 
   memoryKey() {
@@ -396,8 +412,9 @@ export class BagPanel {
       this.tip.hide();
       return;
     }
-    const left = (this.opts.tipSide ?? 'left') === 'left';
-    this.tip.show(id, left ? this.rect.x - 8 : this.rect.right + 8, c.cell.y, left);
+    if (this.inlineTip) return this.tip.show(id);
+    // Mô tả nhỏ ngay dưới ô vật phẩm (không vừa đáy màn hình thì lật lên trên ô)
+    this.tip.showBelow(id, c.cell.x - this.cellW / 2, c.cell.y + CELL_H / 2 + 4, this.cellW, c.cell.y - CELL_H / 2 - 4);
   }
 
   scrollBy(rows) {
@@ -409,7 +426,7 @@ export class BagPanel {
     this.showTip();
   }
 
-  setPocket(i, fromMouse = false) {
+  setPocket(i) {
     const n = this.pockets.length;
     const next = ((i % n) + n) % n;
     const searching = Boolean(searchKey(this.query));
@@ -419,7 +436,7 @@ export class BagPanel {
     // bấm sang ngăn khác thì thôi tìm kiếm
     this.query = '';
     this.memory.query = '';
-    this.rebuild(fromMouse);
+    this.rebuild();
   }
 
   // Bấm vào ô tìm kiếm: đặt ô nhập HTML trong suốt đè đúng chỗ ô (gõ được tiếng Việt, điện thoại hiện bàn phím).
@@ -437,7 +454,7 @@ export class BagPanel {
       const r = scene.game.canvas.getBoundingClientRect();
       const k = r.width / scene.scale.width;
       Object.assign(input.style, {
-        position: 'fixed', left: `${r.left + (uiX(scene) + field.x + 36) * k}px`, top: `${r.top + field.y * k}px`,
+        position: 'fixed', left: `${r.left + (uiX(scene) + (this.win?.ox ?? 0) + field.x + 36) * k}px`, top: `${r.top + ((this.win?.oy ?? 0) + field.y) * k}px`,
         width: `${(field.w - 72) * k}px`, height: `${34 * k}px`, fontSize: `${16 * k}px`, zIndex: 30, boxSizing: 'border-box',
         border: '0', outline: 'none', background: 'transparent', color: 'transparent', caretColor: 'transparent', padding: '0',
       });
@@ -473,11 +490,20 @@ export class BagPanel {
     this.rebuild();
   }
 
-  open() {
-    const openedAt = performance.now();
+  // Toạ độ con trỏ trong khung thiết kế (cửa sổ nổi: trừ phần đã kéo dời)
+  pt(p) {
+    return this.win ? this.win.local(p) : { x: localX(this.scene, p), y: localY(this.scene, p) };
+  }
+
+  // Con lăn chuột / kéo thả vật phẩm
+  listen() {
     const { scene } = this;
     this.onWheel = (p, objs, dx, dy) => {
-      if (dy && this.rect.contains(localX(scene, p), p.y)) this.scrollBy(Math.sign(dy));
+      if (this.win && this.opts.windows.router.active) return;
+      const at = this.pt(p);
+      // Cửa sổ nổi: chỉ cuộn túi khi túi đang ở trên cùng chỗ con trỏ
+      if (this.win && [...this.opts.windows.list].reverse().find((w) => w.contains(p)) !== this.win) return;
+      if (dy && this.rect.contains(at.x, at.y)) this.scrollBy(Math.sign(dy));
     };
     this.onMove = (p) => this.dragMove(p);
     this.onUp = (p) => this.dragEnd(p);
@@ -485,6 +511,18 @@ export class BagPanel {
     scene.input.on('pointermove', this.onMove);
     scene.input.on('pointerup', this.onUp);
     scene.input.keyboard?.addCapture('TAB');
+  }
+
+  // Sau khi dùng vật phẩm (cửa sổ nổi): vẽ lại danh sách theo số lượng mới, giữ ngăn đang xem
+  refresh() {
+    if (this.done) return;
+    this.rebuild();
+  }
+
+  open() {
+    const openedAt = performance.now();
+    const { scene } = this;
+    this.listen();
     return new Promise((resolve) => {
       this.resolve = resolve;
       this.router.set(
@@ -492,7 +530,8 @@ export class BagPanel {
         (p) => {
           if (p.downTime < openedAt) return;
           if (p.rightButtonDown()) return this.finish(null);
-          const inside = this.rect.contains(localX(scene, p), p.y) || this.opts.hotbar?.contains(p.x, p.y);
+          const at = this.pt(p);
+          const inside = this.rect.contains(at.x, at.y) || this.opts.hotbar?.contains(p.x, p.y);
           if (!inside) this.finish(null);
         },
       );
@@ -547,7 +586,7 @@ export class BagPanel {
     // Esc luôn là nút thoát của ô tìm kiếm; phím quay lại (không phải phím gõ chữ) cũng vậy: có chữ thì xoá, không thì đóng
     if ((e.code === 'Escape' || (!typing && isCancel(e))) && !e.repeat) {
       if (this.query) this.setQuery('');
-      else this.finish(null);
+      else this.close();
       return;
     }
     if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -565,7 +604,15 @@ export class BagPanel {
 
   confirm() {
     const id = this.list[this.index];
-    if (id) this.finish(id);
+    if (!id) return;
+    if (this.win) this.opts.onPick?.(id);
+    else this.finish(id);
+  }
+
+  // Đóng túi (nút ✕, phím quay lại): cửa sổ nổi thì đóng cửa sổ, không thì kết thúc open() với null
+  close() {
+    if (this.win) this.win.close();
+    else this.finish(null);
   }
 
   // ---------- Kéo thả vào thanh phím tắt ----------
@@ -577,7 +624,7 @@ export class BagPanel {
       if (!(this.opts.hotbar || this.opts.party) || Math.hypot(p.x - press.x, p.y - press.y) < DRAG_START) return;
       const id = this.list[press.i];
       const icon = ITEMS[id].icon;
-      const ghost = this.scene.add.container(p.x, p.y).setDepth(this.depth + 6);
+      const ghost = this.scene.add.container(p.x, p.y).setDepth(this.opts.ghostDepth ?? this.depth + 6);
       ghost.add([this.scene.add.ellipse(2, 20, 34, 10, 0x000000, 0.25), this.scene.add.image(0, 0, icon).setScale(fitScale(this.scene, icon, 44))]);
       this.drag = { id, ghost: fixToCamera(ghost) };
       this.cells[press.i].cell.setAlpha(0.4);
@@ -586,6 +633,7 @@ export class BagPanel {
     this.drag.ghost.setPosition(p.x, p.y);
     this.opts.hotbar?.highlight(this.opts.hotbar.slotAt(p.x, p.y));
     this.opts.party?.highlight(this.opts.party.slotAt(p.x, p.y));
+    this.opts.dragOver?.(p);
   }
 
   dragEnd(p) {
@@ -595,7 +643,8 @@ export class BagPanel {
     if (!this.drag) {
       // Nhấn rồi thả trên đúng vật phẩm đó: chọn
       const c = this.cells?.[press.i];
-      if (c && Math.abs(localX(this.scene, p) - c.cell.x) <= this.cellW / 2 && Math.abs(p.y - c.cell.y) <= CELL_H / 2) this.confirm();
+      const at = this.pt(p);
+      if (c && Math.abs(at.x - c.cell.x) <= this.cellW / 2 && Math.abs(at.y - c.cell.y) <= CELL_H / 2) this.confirm();
       return;
     }
     const { id, ghost } = this.drag;
@@ -607,20 +656,33 @@ export class BagPanel {
     hotbar?.highlight(-1);
     const mon = this.opts.party ? this.opts.party.slotAt(p.x, p.y) : -1;
     this.opts.party?.highlight(-1);
+    this.opts.dragOver?.(null);
     if (slot >= 0) {
       this.opts.onAssign?.(slot, id);
       this.drawGrid();
       this.layout();
     } else if (mon >= 0) {
-      // Thả vào Pokémon ở cột đội hình: cho cầm (đóng túi, màn hình gọi lo hỏi đổi đồ đang cầm...)
-      this.finish({ give: mon, id });
+      // Thả vào Pokémon ở cột đội hình: cho cầm (cửa sổ nổi: gọi onGive; không thì đóng túi, màn hình gọi lo)
+      if (this.win) this.opts.onGive?.(mon, id);
+      else this.finish({ give: mon, id });
+    } else if (this.win) {
+      // Thả vào cửa sổ khác nhận vật phẩm (vd ô đồ cầm của bảng chi tiết Pokémon)
+      this.opts.dropItem?.(p, id);
     }
   }
 
   finish(value) {
     if (this.done) return;
-    this.done = true;
     this.router.clear();
+    this.cleanup();
+    this.container.destroy();
+    this.resolve?.(value);
+  }
+
+  // Gỡ các bộ nghe sự kiện, ô nhập, icon đang kéo (cửa sổ nổi: gọi khi cửa sổ đóng, root do WindowManager huỷ)
+  cleanup() {
+    if (this.done) return;
+    this.done = true;
     const { scene } = this;
     scene.input.off('wheel', this.onWheel);
     scene.input.off('pointermove', this.onMove);
@@ -632,7 +694,5 @@ export class BagPanel {
     this.opts.hotbar?.highlight(-1);
     this.caretTween?.remove();
     this.tip?.destroy();
-    this.container.destroy();
-    this.resolve?.(value);
   }
 }

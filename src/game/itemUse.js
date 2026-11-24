@@ -10,6 +10,16 @@ import { MAX_LEVEL, expToReach, gainExp, maxPp, reduceEv, restorePp } from './mo
 // Vật phẩm này cần chọn thêm một chiêu (Leppa Berry)
 export const needsMove = (id) => ITEMS[id].kind === 'pp';
 
+// Thuốc / quả chữa trạng thái mà Pokémon không bị trạng thái đó: nói rõ (vd "Pikachu hiện không bị tê liệt.")
+function cureMiss(mon, item) {
+  const names = item.cure.map((s) => STATUS_INFO[s]?.name).filter(Boolean);
+  if (item.confusion) names.push('rối loạn');
+  if (!names.length) return 'Không có tác dụng.';
+  if (names.length >= 4) return `${mon.name} hiện không bị trạng thái xấu nào.`;
+  const list = names.length > 1 ? `${names.slice(0, -1).join(', ')} hay ${names[names.length - 1]}` : names[0];
+  return `${mon.name} hiện không bị ${list}.`;
+}
+
 // Vì sao không dùng được (câu thông báo), hoặc null nếu dùng được. moveId: chiêu đã chọn (với Leppa)
 export function itemProblem(id, mon, { inBattle = false, moveId = null } = {}) {
   const item = ITEMS[id];
@@ -25,7 +35,7 @@ export function itemProblem(id, mon, { inBattle = false, moveId = null } = {}) {
     case 'heal':
       return mon.hp >= mon.maxHp ? `HP của ${mon.name} đang đầy.` : null;
     case 'cure':
-      return item.cure.includes(mon.status) || (item.confusion && mon.confused) ? null : 'Không có tác dụng.';
+      return item.cure.includes(mon.status) || (item.confusion && mon.confused) ? null : cureMiss(mon, item);
     case 'pp':
       if (moveId) return mon.pp[moveId] >= maxPp(moveId) ? `PP của ${MOVES[moveId].name} đang đầy.` : null;
       return mon.moves.every((m) => mon.pp[m] >= maxPp(m)) ? `PP các chiêu của ${mon.name} đều đầy.` : null;

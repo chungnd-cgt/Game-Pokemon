@@ -1,11 +1,12 @@
 import { WORLD_SCALE } from '../config.js';
 import { LOOKS, PLAYER_BASE_LOOKS } from '../data/characterLooks.js';
 import { currentLook, resolveLook } from '../data/playerCustom.js';
-import { addSheetTexture, makeCanvas } from './pixel.js';
+import { addSheetTexture, makeCanvas, smoothUpscale } from './pixel.js';
 import { DIRS, LH, PLAYER_FRAMES, bikerPixels, characterPixels } from './playerArt.js';
 
-// Texture nhân vật pixel art: hình vẽ trên lưới logic 16x24 (gfx/playerArt.js), phóng to x3 (nearest) thành frame 48x72 để
-// 1 pixel nhân vật = 1 pixel ô bản đồ (ô 16px hiển thị x3). Mỗi nhân vật có 3 hướng (down/up/side, side = nhìn sang trái) x 3 frame.
+// Texture nhân vật: hình vẽ trên lưới logic 16x24 (gfx/playerArt.js), phóng to x3 thành frame 48x72 (cùng cỡ ô bản đồ
+// 16px hiển thị x3). Phóng to MỊN (pixel.js: smoothUpscale, bo tròn bậc thang, lọc tuyến tính) chứ không giữ ô vuông GBA.
+// Mỗi nhân vật có 3 hướng (down/up/side, side = nhìn sang trái) x 3 frame.
 
 export { PLAYER_FRAMES };
 const PIX = WORLD_SCALE; // mỗi pixel logic = PIX pixel trên texture
@@ -15,18 +16,18 @@ export const CHAR_HEIGHT = LH * PIX * CHAR_SCALE;
 // Trong trận đấu: frame 48x72 x 8/3 = 128x192 (mỗi pixel logic thành đúng 8px)
 export const BATTLE_CHAR_SCALE = 2; // 1 điểm ảnh nhân vật = 6 điểm ảnh màn hình trong trận
 
-// Phóng to lưới logic thành canvas (mỗi pixel thành ô PIX x PIX)
+// Lưới logic thành canvas cỡ gốc rồi phóng to mịn PIX lần
 function toScaledCanvas(p) {
-  const { canvas, ctx } = makeCanvas(p.w * PIX, p.h * PIX);
+  const { canvas, ctx } = makeCanvas(p.w, p.h);
   for (let y = 0; y < p.h; y++) {
     for (let x = 0; x < p.w; x++) {
       const c = p.data[y * p.w + x];
       if (!c) continue;
       ctx.fillStyle = c;
-      ctx.fillRect(x * PIX, y * PIX, PIX, PIX);
+      ctx.fillRect(x, y, 1, 1);
     }
   }
-  return canvas;
+  return smoothUpscale(canvas, PIX);
 }
 
 // Ghép các frame thành spritesheet. Texture đã có (cùng cỡ) thì vẽ lại ngay trên canvas cũ: sprite đang dùng texture đó

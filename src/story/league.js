@@ -1,3 +1,4 @@
+import { LEAGUE_DX } from '../data/mapsChapter5.js';
 import { SPECIES } from '../data/monsters.js';
 import { DEX_BY_SLUG } from '../data/pokedex.js';
 import { hasFlag, playerName, setFlag, state } from '../game/state.js';
@@ -76,7 +77,7 @@ export function resetLeague() {
 }
 
 const eliteNpc = ({ n, id, name, sprite, map, team, intro, lose, after }) => ({
-  id, sprite, name, map, x: 6, y: 3, facing: 'down', fixed: true, sight: 0,
+  id, sprite, name, map, x: 6 + LEAGUE_DX, y: 3, facing: 'down', fixed: true, sight: 0,
   team, prize: 120, noRematch: true, elite: true, intro, lose, after,
   async onDefeat(world) {
     setFlag(`league:e${n}`);
@@ -89,7 +90,7 @@ const eliteNpc = ({ n, id, name, sprite, map, team, intro, lose, after }) => ({
 export const LEAGUE_NPCS = [
   ...ELITES.map(eliteNpc),
   {
-    ...CHAMPION, x: 6, y: 3, facing: 'down', fixed: true, sight: 0, prize: 200, noRematch: true, elite: true,
+    ...CHAMPION, x: 6 + LEAGUE_DX, y: 3, facing: 'down', fixed: true, sight: 0, prize: 200, noRematch: true, elite: true,
     intro: 'Cuối cùng cũng có người tới được đây. Tôi là Khôi, Nhà vô địch vùng Sơn Thủy. Tôi đã đi khắp vùng này, từ ruộng lúa tới đỉnh tuyết. Cho tôi xem hành trình của cậu đã tạo nên điều gì!',
     lose: 'Thì ra là vậy... Cậu mạnh thật. Từ hôm nay, cậu là Nhà vô địch mới!',
     after: 'Hãy luôn giữ trái tim của một nhà huấn luyện, Nhà vô địch ạ.',
@@ -105,7 +106,7 @@ export const LEAGUE_NPCS = [
     },
   },
   {
-    id: 'league-guard', sprite: 'npc-guide', name: 'Người gác cửa', map: 'leagueLobby', x: 8, y: 2, facing: 'down', fixed: true,
+    id: 'league-guard', sprite: 'npc-guide', name: 'Người gác cửa', map: 'leagueLobby', x: 8 + LEAGUE_DX, y: 2, facing: 'down', fixed: true,
     lines: [
       'Sau cánh cửa này là Tứ Thiên Vương và Nhà vô địch.',
       'Một khi đã bước vào thì không quay lại được, phải thắng liền cả năm trận. Thua là phải bắt đầu lại từ đầu!',

@@ -1,3 +1,4 @@
+import { HOME_DX, roomy } from './indoorLayout.js';
 import { CHAPTER2_MAPS } from './mapsChapter2.js';
 import { CHAPTER3_MAPS } from './mapsChapter3.js';
 import { CHAPTER4_MAPS } from './mapsChapter4.js';
@@ -86,7 +87,7 @@ const MAP_DEFS = {
 
   // Nhà của bạn, tầng 1: phòng khách (bộ sofa đối xứng hai bên bàn nước, mẹ ngồi sofa bên phải) và góc bếp.
   // Cầu thang lên tầng 2 ở góc trên bên phải.
-  home: {
+  home: roomy({
     name: 'Nhà của bạn – Tầng 1',
     indoor: true,
     theme: 'home',
@@ -118,10 +119,10 @@ const MAP_DEFS = {
     },
     entry: { x: 3, y: 7 }, // chỗ đứng khi vừa vào nhà
     exit: { to: 'route1', x: 3, y: 15 }, // bước lên thảm E thì ra chỗ này
-  },
+  }, 'home'),
 
   // Tầng 2: phòng ngủ của bạn (chơi mới thì thức dậy ở đây). Cầu thang xuống ở góc trên bên phải.
-  home2f: {
+  home2f: roomy({
     name: 'Nhà của bạn – Phòng ngủ',
     place: 'pallet',
     indoor: true,
@@ -148,10 +149,10 @@ const MAP_DEFS = {
       '2,2': ['Bàn học của bạn. Vở bài tập vẫn còn mở dở...'],
       ...Object.fromEntries([4, 5, 6].map((x) => [`${x},2`, ['Máy chơi game đang cắm vào TV.', 'Hôm nay là ngày quan trọng, chơi sau nhé!']])),
     },
-  },
+  }, 'home'),
 
   // Nhà Gary 2 tầng: tầng 1 có chị Đào (chị gái Gary, biết tin Gary đang ở đâu), tầng 2 là phòng của Gary
-  garyHome: {
+  garyHome: roomy({
     name: 'Nhà Gary – Tầng 1',
     indoor: true,
     theme: 'home',
@@ -176,10 +177,10 @@ const MAP_DEFS = {
       ...Object.fromEntries([4, 5, 6].map((x) => [`${x},2`, ['TV đang chiếu trận đấu Liên minh Pokémon.']])),
     },
     entry: { x: 3, y: 6 },
-  },
+  }, 'home'),
 
   // Tầng 2 nhà Gary: phòng riêng của Gary (Gary ở đây cho tới khi bạn nhận Pokémon). Cầu thang xuống ở góc trên bên phải
-  garyHome2f: {
+  garyHome2f: roomy({
     name: 'Nhà Gary – Phòng của Gary',
     place: 'pallet',
     indoor: true,
@@ -207,10 +208,10 @@ const MAP_DEFS = {
       '2,2': ['Bàn học của Gary. Trên bàn có tờ giấy ghi: "Mục tiêu: Nhà vô địch vùng Sơn Thủy!"'],
       ...Object.fromEntries([4, 5, 6].map((x) => [`${x},2`, ['TV đang chiếu lại trận chung kết Liên minh Pokémon.', 'Gary xem đi xem lại cả chục lần rồi.']])),
     },
-  },
+  }, 'home'),
 
   // Nhà hàng xóm: bà Tư và bé Na
-  palletHouse: {
+  palletHouse: roomy({
     name: 'Nhà bà Tư',
     indoor: true,
     theme: 'home',
@@ -234,9 +235,9 @@ const MAP_DEFS = {
       ...Object.fromEntries([4, 5, 6].map((x) => [`${x},2`, ['TV đang chiếu phim hoạt hình Pokémon. Bé Na xem say sưa.']])),
     },
     entry: { x: 3, y: 6 },
-  },
+  }, 'home'),
 
-  lab: {
+  lab: roomy({
     name: 'Phòng thí nghiệm Pokémon',
     indoor: true,
     theme: 'lab',
@@ -265,9 +266,9 @@ const MAP_DEFS = {
     ],
     entry: { x: 6, y: 9 },
     exit: { to: 'route1', x: 9, y: 15 },
-  },
+  }, 'lab'),
 
-  center: {
+  center: roomy({
     name: 'Pokémon Center',
     indoor: true,
     theme: 'center',
@@ -287,9 +288,9 @@ const MAP_DEFS = {
     entry: { x: 6, y: 7 },
     exit: { to: 'route1', x: 6, y: 7 },
     heal: { x: 6, y: 4, facing: 'up' },
-  },
+  }, 'center'),
 
-  mart: {
+  mart: roomy({
     name: 'Poké Mart',
     indoor: true,
     theme: 'mart',
@@ -309,7 +310,7 @@ const MAP_DEFS = {
     ],
     entry: { x: 3, y: 8 },
     exit: { to: 'route1', x: 12, y: 7 },
-  },
+  }, 'mart'),
 };
 
 // Pokémon Center / Poké Mart ở thị trấn khác: cùng nội thất, cửa ra dẫn về thị trấn đó
@@ -326,6 +327,11 @@ for (let n = 1; n <= 8; n++) {
 Object.assign(MAP_DEFS, CHAPTER2_MAPS, CHAPTER3_MAPS, CHAPTER4_MAPS, CHAPTER5_MAPS, VILLAGE_MAPS, VILLAGE_AREAS_A, VILLAGE_AREAS_B, GYM_MAPS, SAFARI_MAPS);
 // Nhà dân chưa có nội thất: dựng phòng và người ở (data/npcHouses.js), vài nhà vẫn khoá cửa
 furnishHouses(MAP_DEFS);
+// Bản đồ trong nhà đã nới rộng cho kín màn hình (data/widen.js, shiftX): cửa chuyển bản đồ từ nơi khác dẫn vào thì dịch
+// đích theo (toạ độ khai báo theo bố cục trước khi nới)
+for (const def of Object.values(MAP_DEFS)) {
+  for (const w of def.warps ?? []) w.tx += MAP_DEFS[w.to]?.shiftX ?? 0;
+}
 
 // Cửa ra của mọi toà nhà: thảm trong nhà dẫn về ô ngay trước cửa ngoài thị trấn
 for (const [id, def] of Object.entries(MAP_DEFS)) {
@@ -449,7 +455,7 @@ class GameMap {
 export const MAPS = Object.fromEntries(Object.entries(MAP_DEFS).map(([id, def]) => [id, new GameMap(id, def)]));
 
 // Chơi mới: thức dậy cạnh giường trong phòng ngủ trên tầng 2
-export const SPAWN = { map: 'home2f', x: 1, y: 3, facing: 'down' };
+export const SPAWN = { map: 'home2f', x: 1 + HOME_DX, y: 3, facing: 'down' };
 // Chỗ đứng khi tải bản lưu (Tiếp tục). Bản đồ trong bản lưu không còn (bản cũ): về điểm bắt đầu.
 // Bản đồ trong nhà đã sửa (nhà cũ 1 tầng thành 2 tầng) mà chỗ đứng giờ là đồ đạc: về chỗ đứng ở cửa vào.
 // Chỉ xét trong nhà: ngoài trời ô "cản" có thể là mặt nước khi đang lướt nước (WorldScene tự đặt lại khối nước / thú cưỡi)
@@ -482,4 +488,4 @@ function nearestOpen(map, { x, y }) {
 // Thua trận thì tỉnh dậy trong Pokémon Center, trước mặt Y tá Joy
 export const HEAL_RESPAWN = { map: 'center', ...MAP_DEFS.center.heal, healer: 'Y tá Joy' };
 // Chưa ghé Pokémon Center nào thì thua trận tỉnh dậy ở nhà, đứng trước sofa mẹ đang ngồi (story/chapter1.js: mom)
-export const HOME_RESPAWN = { map: 'home', x: 7, y: 3, facing: 'down', healer: 'Mẹ' };
+export const HOME_RESPAWN = { map: 'home', x: 7 + HOME_DX, y: 3, facing: 'down', healer: 'Mẹ' };

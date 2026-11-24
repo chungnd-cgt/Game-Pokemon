@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { MAPS } from '../src/data/map.js';
+import { HOME_DX } from '../src/data/indoorLayout.js';
 import { TRAINERS } from '../src/data/npcs.js';
 import { ENCOUNTERS, encountersAt, rollEncounter } from '../src/data/encounters.js';
 import { GAME_DAY_MS, PHASES, gameClock } from '../src/game/clock.js';
@@ -460,12 +461,12 @@ test('tải bản lưu: đang lướt nước thì giữ nguyên chỗ, đứng 
   const water = MAPS.route1.rows.flatMap((r, y) => [...r].flatMap((c, x) => (c === 'w' ? [{ x, y }] : [])))[0];
   const surfing = { map: 'route1', ...water, facing: 'down', vehicle: 'surf' };
   assert.deepEqual(resumePosition(surfing), surfing, 'không bị đưa về phòng ngủ');
-  // Bản lưu nhà 1 tầng cũ đứng ở chỗ giờ là sofa
-  assert.ok(MAPS.home.isSolid(3, 5));
-  const fixed = resumePosition({ map: 'home', x: 3, y: 5, facing: 'down' });
+  // Bản lưu nhà 1 tầng cũ đứng ở chỗ giờ là sofa (phòng khách nằm giữa nhà đã nới rộng: cộng HOME_DX)
+  assert.ok(MAPS.home.isSolid(3 + HOME_DX, 5));
+  const fixed = resumePosition({ map: 'home', x: 3 + HOME_DX, y: 5, facing: 'down' });
   assert.deepEqual([fixed.map, fixed.x, fixed.y], ['home', MAPS.home.entry.x, MAPS.home.entry.y]);
   assert.deepEqual(resumePosition({ map: 'banDoKhongCon', x: 1, y: 1 }), SPAWN);
-  const ok = { map: 'home', x: 5, y: 7, facing: 'up' };
+  const ok = { map: 'home', x: 5 + HOME_DX, y: 7, facing: 'up' };
   assert.deepEqual(resumePosition(ok), ok);
 });
 

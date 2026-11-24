@@ -1,5 +1,5 @@
 import { syncUid, upgradeMonster } from './monster.js';
-import { ITEMS } from '../data/items.js';
+import { GYM_TMS, ITEMS } from '../data/items.js';
 import { normalizeCustom } from '../data/playerCustom.js';
 import { MOVES } from '../data/moves.js';
 import { restUntil } from './trainers.js';
@@ -126,6 +126,7 @@ export function saveGame(position = lastPosition) {
     badges: [...state.badges],
     visited: [...state.visited],
     hallOfFame: state.hallOfFame,
+    evolved: state.evolved,
     tradesDone: [...state.tradesDone],
     playTime: state.playTime,
     startedAt: state.startedAt,
@@ -165,6 +166,7 @@ export function loadGame() {
     badges: new Set(data.badges),
     visited: new Set(data.visited),
     hallOfFame: data.hallOfFame ?? [],
+    evolved: data.evolved ?? 0,
     tradesDone: new Set(data.tradesDone),
     playTime: data.playTime ?? 0,
     startedAt: data.startedAt ?? null,
@@ -184,10 +186,19 @@ export function loadGame() {
   }
   // Bản lưu cũ chưa có IV / EV / tính cách / PP...: bổ sung
   mons.forEach((m) => upgradeMonster(m));
+  // Bản lưu cũ chưa có OT: coi người chơi là huấn luyện viên gốc
+  for (const m of mons) m.ot ??= state.player?.name || 'Bạn';
+  // Bản lưu cũ chưa ghi loại bóng: coi như Poké Ball
+  for (const m of mons) m.ball ??= 'ball';
   for (const m of mons) m.pp = Object.fromEntries(m.moves.map((id) => [id, Math.min(m.pp?.[id] ?? MOVES[id].pp, MOVES[id].pp)]));
   syncUid(mons);
   // Bản lưu cũ chưa có huy hiệu: thắng thủ lĩnh nào thì có huy hiệu đó
   for (const id of state.defeatedTrainers) if (id.startsWith('leader-')) state.badges.add(id.slice('leader-'.length));
+  // Bản lưu trước khi thủ lĩnh tặng đĩa kỹ năng: bù đĩa của các gym đã thắng (một lần)
+  if (!state.flags.has('gymTms')) {
+    for (const b of state.badges) if (GYM_TMS[b]) addItem(GYM_TMS[b]);
+    state.flags.add('gymTms');
+  }
   // Bản lưu cũ chưa có lịch đấu lại: trainer đã thua thì nghỉ 3-4 ngày kể từ lúc tải (chỉ một lần, khi bản lưu chưa có trainerRest)
   if (data.trainerRest === undefined) for (const id of state.defeatedTrainers) state.trainerRest[id] = restUntil();
   if ((data.version ?? 1) < 2) {

@@ -11,7 +11,7 @@ import { NPCS, TRAINERS } from '../src/data/npcs.js';
 import { ITEMS, MART_TIERS, martStock, sellPrice } from '../src/data/items.js';
 import { buy, itemCount, markCaught, resetState, sell, setFlag, state } from '../src/game/state.js';
 import { deleteSave, hasSave, loadGame, saveGame } from '../src/game/save.js';
-import { F, STORY_NPCS, declinedAllStarters, objectVisible, objective, questProgress } from '../src/story/chapter1.js';
+import { F, STORY_NPCS, declinedAllStarters, firstCatchThrow, objectVisible, objective, questProgress } from '../src/story/chapter1.js';
 import { MAPS, SPAWN, HEAL_RESPAWN } from '../src/data/map.js';
 const route = MAPS.route1;
 
@@ -284,6 +284,14 @@ test('cửa hàng bán đúng vật phẩm, trừ tiền khi mua', () => {
   assert.equal(itemCount('ball'), 3);
   assert.equal(buy('ultraBall', 1, ITEMS.ultraBall.price), false, 'không đủ tiền thì không mua được');
   assert.equal(state.money, 400);
+});
+
+test('nhiệm vụ bắt Pokémon đầu tiên: quả bóng đầu tiên chắc chắn bắt được, các lần sau như thường', () => {
+  resetState();
+  setFlag('starter:charmander');
+  markCaught('charmander');
+  assert.equal(firstCatchThrow(), true, 'bóng đầu tiên chắc chắn bắt được');
+  for (let i = 0; i < 5; i++) assert.equal(firstCatchThrow(), false, 'các bóng sau tính tỉ lệ thường');
 });
 
 test('cốt truyện: mục tiêu đổi theo từng mốc', () => {

@@ -251,9 +251,9 @@ test('quả mọng và thuốc: hồi HP, chữa trạng thái, hồi PP, giảm
   applyItem('sitrusBerry', m);
   assert.equal(m.hp, 11 + Math.floor(m.maxHp / 4));
 
-  assert.equal(itemProblem('rawstBerry', m), 'Không có tác dụng.');
+  assert.equal(itemProblem('rawstBerry', m), `${m.name} hiện không bị bỏng.`);
   m.status = 'brn';
-  assert.equal(itemProblem('cheriBerry', m), 'Không có tác dụng.');
+  assert.equal(itemProblem('cheriBerry', m), `${m.name} hiện không bị tê liệt.`);
   applyItem('rawstBerry', m);
   assert.equal(m.status, null);
   for (const s of ['brn', 'psn', 'par', 'slp', 'frz']) {
@@ -1071,7 +1071,7 @@ test('chiêu đổi chỉ số vô ích khi đã chạm giới hạn hoặc bị
 });
 
 test('EXP theo công thức Gen 5: chênh lệch cấp, chia cho các Pokémon đã ra sân, nhà huấn luyện x1.5, Lucky Egg x1.5', async () => {
-  const { expGain, expShares } = await import('../src/battle/formulas.js');
+  const { expGain, expRate, expShares } = await import('../src/battle/formulas.js');
   // Pidgey (EXP gốc 50) cấp 8 bị Pokémon cấp 10 hạ: 50*8/5 * (26/28)^2.5 + 1 = 67
   const pidgey = mon('pidgey', 8);
   assert.equal(expGain(pidgey, 10), 67);
@@ -1086,13 +1086,23 @@ test('EXP theo công thức Gen 5: chênh lệch cấp, chia cho các Pokémon �
   const a = mon('charmeleon', 30);
   const b = mon('pikachu', 30, { heldItem: 'luckyEgg' });
   const solo = expGain(foe, 30);
-  assert.deepEqual(expShares(foe, [a]).map((s) => s.amount), [solo]);
+  const got = (m, exp, egg = 1) => Math.floor(exp * egg * expRate(m));
+  assert.deepEqual(expShares(foe, [a]).map((s) => s.amount), [got(a, solo)]);
   const half = expGain(foe, 30, { split: 2 });
   assert.ok(Math.abs(half - solo / 2) <= 1);
-  assert.deepEqual(expShares(foe, [a, b]).map((s) => [s.mon, s.amount]), [[a, half], [b, Math.floor(half * 1.5)]]);
+  assert.deepEqual(expShares(foe, [a, b]).map((s) => [s.mon, s.amount]), [[a, got(a, half)], [b, got(b, half, 1.5)]]);
   const tHalf = expGain(foe, 30, { trainer: true, split: 2 });
-  assert.deepEqual(expShares(foe, [a, b], { trainer: true }).map((s) => s.amount), [tHalf, Math.floor(tHalf * 1.5)]);
+  assert.deepEqual(expShares(foe, [a, b], { trainer: true }).map((s) => s.amount), [got(a, tHalf), got(b, tHalf, 1.5)]);
   assert.deepEqual(expShares(foe, []), []);
+});
+
+test('EXP: cả game nhận ít hơn công thức gốc; Pokémon đã tiến hoá nhận ít hơn chưa tiến hoá', async () => {
+  const { EXP_RATE, evolutionStage, expRate } = await import('../src/battle/formulas.js');
+  assert.deepEqual(['charmander', 'charmeleon', 'charizard', 'vaporeon'].map(evolutionStage), [0, 1, 2, 1]);
+  assert.equal(expRate(mon('charmander', 10)), EXP_RATE);
+  assert.ok(EXP_RATE < 1);
+  assert.ok(expRate(mon('charmeleon', 20)) < expRate(mon('charmander', 20)));
+  assert.ok(expRate(mon('charizard', 40)) < expRate(mon('charmeleon', 40)));
 });
 
 test('tiến hoá giữ nguyên đặc tính nếu loài mới cũng có (Meowth Technician -> Persian Technician)', async () => {
@@ -1374,17 +1384,21 @@ test('đầu game: mẹ cho 2 Potion, Oak cho Pokédex + 5 Poké Ball sau trận
   assert.equal(itemCount('greatBall'), 0, 'không còn tặng Great Ball')
 });
 
-test('túi đồ chia 5 ngăn: mỗi vật phẩm thuộc đúng một ngăn, ngăn nào cũng có đồ', async () => {
+test('túi đồ chia 6 ngăn: mỗi vật phẩm thuộc đúng một ngăn, ngăn nào cũng có đồ', async () => {
   const { BAG_POCKETS, pocketOf } = await import('../src/data/items.js');
   const ids = Object.keys(ITEMS);
   const pockets = BAG_POCKETS.map((p) => p.id);
   for (const id of ids) assert.ok(pockets.includes(pocketOf(id)), `${id}: không thuộc ngăn nào`);
   for (const p of pockets) assert.ok(ids.some((id) => pocketOf(id) === p), `ngăn ${p} trống`);
-  assert.equal(pocketOf('potion'), 'heal');
+  assert.deepEqual(BAG_POCKETS.map((p) => p.name), ['Vật phẩm', 'Bóng', 'Quả mọng', 'Kỹ năng', 'Phụ kiện']);
+  assert.equal(pocketOf('potion'), 'item', 'thuốc hồi phục gộp vào ngăn Vật phẩm');
   assert.equal(pocketOf('greatBall'), 'ball');
   assert.equal(pocketOf('oranBerry'), 'berry');
   assert.equal(pocketOf('leppaBerry'), 'berry', 'quả mọng nào cũng vào ngăn quả mọng');
   assert.equal(pocketOf('rareCandy'), 'item');
-  assert.equal(pocketOf('bicycle'), 'key');
+  assert.equal(pocketOf('bicycle'), 'held');
+  assert.equal(pocketOf('leftovers'), 'held', 'đồ cầm vào ngăn Phụ kiện');
+  assert.equal(pocketOf('hmSurf'), 'tm', 'HM vào ngăn Kỹ năng');
+  assert.equal(pocketOf('tmThunderbolt'), 'tm', 'đĩa kỹ năng vào ngăn Kỹ năng');
   for (const p of BAG_POCKETS) assert.ok(ITEMS[p.item], `${p.id}: icon ngăn không có`);
 });

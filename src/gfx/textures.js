@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { BADGES } from '../data/badges.js';
+import { ITEMS } from '../data/items.js';
 import { SPECIES } from '../data/monsters.js';
 import { DEX } from '../data/pokedex.js';
 import { SHINY } from '../data/shiny.js';
@@ -10,7 +12,7 @@ import { makeGymObjects } from './gymObjects.js';
 import { makeItemIcons } from './itemIcons.js';
 import { hasMonSvg, monImage } from './monImages.js';
 import { makeMoveTextures } from './moveFx.js';
-import { PixelBuffer, addCanvasTexture, hexToHsl, recolorHues, shiftHue, spriteFromImage } from './pixel.js';
+import { PixelBuffer, addCanvasTexture, fitCanvas, hexToHsl, recolorHues, shiftHue, smoothPixelArt, spriteFromImage } from './pixel.js';
 import { makePlayerTexture } from './player.js';
 import { buildWorldTextures } from './world.js';
 
@@ -20,23 +22,40 @@ import { buildWorldTextures } from './world.js';
 // Shiny: mỗi loài có bảng màu shiny riêng (data/shiny.js, xem shinyImage). Loài chưa khai báo thì xoay sắc độ cả hình.
 const SHINY_HUE = 150;
 
-// Sprite Pokémon kiểu GBA (Gen 3): size x size pixel, tối đa 15 màu (gfx/pixel.js: spriteFromImage), tạo một lần rồi dùng lại.
-// Mặc định 64x64 như sprite trận đấu của GBA, hiển thị x3 (GBA_MON_SCALE) cho pixel to bằng pixel của bản đồ.
+// Hình Pokémon dùng trong game (trận đấu, Pokédex, đội hình, túi đồ...), tạo một lần rồi dùng lại.
+// Mặc định vẽ MỊN từ hình SVG gốc (thu nhỏ có làm mịn, lọc tuyến tính khi phóng to) để cùng kiểu với ảnh PNG Pokémon
+// người dùng thêm và giao diện, không còn pixel GBA thô. opts.pixel: sprite kiểu GBA (Gen 3) size x size pixel, tối đa 15
+// màu (gfx/pixel.js: spriteFromImage), dùng cho icon pixel nhỏ (vd icon thú cưỡi trong túi đồ).
+// size: cỡ gốc (64 như sprite trận đấu GBA); hình mịn vẽ ở độ phân giải gấp 3 (tối thiểu 96 px) cho nét khi phóng to.
+// Mọi chỗ dùng đều co bằng fitScale nên độ phân giải texture không đổi kích thước hiển thị.
 // view: '' mặt trước, '-back' lưng, '-side' nghiêng. Ảnh PNG thật do người dùng thêm vào thì giữ nguyên.
 export const GBA_MON = 64;
-export function pixelMon(scene, speciesId, view = '', size = GBA_MON, shiny = false) {
-  const wanted = `mon-${speciesId}${view}`;
-  const base = monSourceExists(scene, wanted) ? wanted : `mon-${speciesId}`;
+export function pixelMon(scene, speciesId, view = '', size = GBA_MON, shiny = false, { pixel = false } = {}) {
+  const base = monViewKey(scene, speciesId, view);
   const png = scene.registry.get('pngSprites')?.includes(base);
   if (png && !shiny) return base;
-  const key = png ? `${base}-shiny` : `px${size}-${base}${shiny ? '-shiny' : ''}`;
+  const res = Math.max(96, size * 3);
+  const key = png ? `${base}-shiny` : pixel ? `px${size}-${base}${shiny ? '-shiny' : ''}` : `hd${res}-${base}${shiny ? '-shiny' : ''}`;
   if (!scene.textures.exists(key)) {
     // Hình SVG chưa nạp xong (không xảy ra trong game: TitleScene chờ nạp hết mới vào): hình trống, không lưu lại
     if (!monSourceReady(scene, base)) return '__DEFAULT';
-    const image = shiny ? shinyImage(scene, base, speciesId) : monSource(scene, base);
-    addCanvasTexture(scene, key, png ? image : spriteFromImage(image, size));
+    const image = shiny ? shinyImage(scene, base, speciesId, png) : monSource(scene, base);
+    if (png) addCanvasTexture(scene, key, image);
+    else if (pixel) addCanvasTexture(scene, key, spriteFromImage(image, size));
+    else addCanvasTexture(scene, key, fitCanvas(image, res)).setFilter(Phaser.Textures.FilterMode.LINEAR);
   }
   return key;
+}
+
+// Key ảnh gốc dùng cho hướng view của loài. Loài có ảnh PNG người dùng thêm: chỉ dùng PNG (chỉ cần 1 ảnh mặt trước;
+// hướng khác không có PNG riêng thì dùng mặt trước, chỗ dùng tự lật ngang), không trộn với hình SVG khác kiểu.
+// Loài khác: hình SVG hướng đó nếu có, không thì mặt trước
+export function monViewKey(scene, speciesId, view = '') {
+  const front = `mon-${speciesId}`;
+  const wanted = `${front}${view}`;
+  const pngs = scene.registry.get('pngSprites') ?? [];
+  if (pngs.includes(front)) return pngs.includes(wanted) ? wanted : front;
+  return monSourceExists(scene, wanted) ? wanted : front;
 }
 
 // Ảnh gốc hình Pokémon theo key 'mon-<loài>[-back|-side]': SVG (gfx/monImages.js, không nằm trong bộ texture của Phaser),
@@ -253,7 +272,8 @@ function makeMonsters(scene) {
 // Ảnh gốc bản shiny của texture key (vd 'mon-pikachu', 'mon-pikachu-back'), theo bảng màu shiny trong data/shiny.js:
 // hình vẽ bằng code thì vẽ lại với màu shiny; hình từ file thì đổi màu theo vùng sắc độ (luật rules, hoặc suy ra từ
 // màu thân / bụng của loài). Loài chưa khai báo màu shiny thì xoay sắc độ cả hình.
-export function shinyImage(scene, key, speciesId) {
+// png: ảnh PNG người dùng thêm (src/assets/pokemon), luật đổi màu dò lại theo màu thật của ảnh (gfx/pixel.js: adaptRules)
+export function shinyImage(scene, key, speciesId, png = false) {
   const sp = SPECIES[speciesId];
   const shiny = SHINY[speciesId];
   if (DRAWN.has(key) && sp && shiny && !shiny.rules) {
@@ -263,7 +283,7 @@ export function shinyImage(scene, key, speciesId) {
   }
   const image = monSource(scene, key);
   const rules = shinyRules(speciesId);
-  return rules.length ? recolorHues(image, rules) : shiftHue(image, SHINY_HUE);
+  return rules.length ? recolorHues(image, rules, png) : shiftHue(image, SHINY_HUE);
 }
 
 export function shinyRules(speciesId) {
@@ -500,7 +520,38 @@ export function generateTextures(scene) {
   makeEffects(scene);
   makeBerryTextures(scene);
   // Icon thú cưỡi dùng hình nhỏ của chính Pokémon đó: BootScene nạp trước hình các loài này (MOUNT_SPECIES)
-  makeItemIcons(scene, (speciesId) => scene.textures.get(pixelMon(scene, speciesId, '', 28)).getSourceImage());
+  makeItemIcons(scene, (speciesId) => scene.textures.get(pixelMon(scene, speciesId, '', 28, false, { pixel: true })).getSourceImage());
   makeGymObjects(scene);
   makeFieldTextures(scene);
+  smoothIcons(scene);
 }
+
+// Icon vật phẩm / huy hiệu vẽ pixel (cạnh dài < SMOOTH_MAX): phóng x4 kiểu Scale2x (bo mịn cạnh chéo) và lọc tuyến tính,
+// cho hợp giao diện mịn (túi đồ, cửa hàng...) thay vì ô vuông GBA thô. Bóng (Poké Ball...) giữ nguyên vì cảnh ném bóng
+// dùng đúng cỡ texture. Chỗ nào phóng icon theo hệ số cố định (không qua fitScale) thì nhân thêm iconUnit()
+const SMOOTH_MAX = 48;
+const SMOOTH_K = 4;
+// Đồ vật vẽ pixel cỡ gốc trên bản đồ (WORLD_SMOOTH: cây quả mọng, đèn lồng, đá đẩy, cỏ cao...) cũng làm mịn như vậy,
+// mọi cỡ; WorldScene hiển thị chúng x WORLD_SCALE * SMOOTH_UNIT
+const WORLD_SMOOTH = /^(obj-|berry-|grass-front|item-ball$|fx-balloon$)/;
+export const SMOOTH_UNIT = 1 / SMOOTH_K;
+function smoothIcons(scene) {
+  const keys = new Set([
+    ...Object.values(ITEMS).filter((it) => it.kind !== 'ball').map((it) => it.icon),
+    ...BADGES.filter(Boolean).map((b) => `badge-${b.id}`),
+    ...scene.textures.getTextureKeys().filter((k) => WORLD_SMOOTH.test(k)),
+  ]);
+  for (const key of keys) {
+    if (!key || !scene.textures.exists(key)) continue;
+    const tex = scene.textures.get(key);
+    const src = tex.getSourceImage();
+    if (tex.customData.iconUnit || !(src instanceof HTMLCanvasElement)) continue;
+    if (!WORLD_SMOOTH.test(key) && Math.max(src.width, src.height) >= SMOOTH_MAX) continue;
+    const smooth = addCanvasTexture(scene, key, smoothPixelArt(src));
+    smooth.setFilter(Phaser.Textures.FilterMode.LINEAR);
+    smooth.customData.iconUnit = 1 / SMOOTH_K;
+  }
+}
+
+// Hệ số bù cho icon đã làm mịn (texture to gấp SMOOTH_K): setScale(k * iconUnit(scene, key)) hiện đúng cỡ như trước
+export const iconUnit = (scene, key) => scene.textures.get(key)?.customData?.iconUnit ?? 1;

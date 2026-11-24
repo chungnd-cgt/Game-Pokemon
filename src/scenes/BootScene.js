@@ -4,7 +4,7 @@ import ballUrl from '../assets/ui/pokeball.svg?url';
 import ultraBallUrl from '../assets/ui/ultraball.svg?url';
 import { ITEMS } from '../data/items.js';
 import { loadAllMonImages, loadMonImages } from '../gfx/monImages.js';
-import { addCanvasTexture, trimTransparent } from '../gfx/pixel.js';
+import { addCanvasTexture, autoBackView, trimTransparent } from '../gfx/pixel.js';
 import { generateTextures } from '../gfx/textures.js';
 import { hideLoading, setLoading } from '../ui/loading.js';
 import { TITLE_MONS } from './TitleScene.js';
@@ -49,6 +49,26 @@ export default class BootScene extends Phaser.Scene {
       const big = Math.max(img.width, img.height) > 160;
       this.textures.get(key).setFilter(big ? Phaser.Textures.FilterMode.LINEAR : Phaser.Textures.FilterMode.NEAREST);
     }
+    // Ảnh lưng / nghiêng y hệt ảnh mặt trước (chép nhầm cùng một file): bỏ qua, coi như chưa có (trong trận dùng mặt trước
+    // lật ngang, đi theo thì dùng mặt trước), không thì Pokémon quay mặt ra khi đánh
+    const print = (key) => fingerprint(this.textures.get(key).getSourceImage());
+    this.pngKeys = this.pngKeys.filter((key) => {
+      const m = /^(mon-.+)-(back|side)$/.exec(key);
+      if (!m || !this.pngKeys.includes(m[1]) || print(key) !== print(m[1])) return true;
+      console.warn(`${key}.png giống hệt ${m[1]}.png (ảnh mặt trước): bỏ qua, hãy dùng ảnh ${m[2] === 'back' ? 'mặt lưng' : 'nhìn nghiêng sang trái'}`);
+      this.textures.remove(key);
+      return false;
+    });
+    // Loài chỉ có ảnh mặt trước: tự tạo hình lưng (gfx/pixel.js: autoBackView) cho Pokémon của mình khi đánh và khi đi
+    // theo lên phía trên. Có <loài>-back.png thật thì dùng ảnh đó
+    for (const key of [...this.pngKeys]) {
+      if (/-(back|side)$/.test(key) || this.pngKeys.includes(`${key}-back`)) continue;
+      const img = this.textures.get(key).getSourceImage();
+      addCanvasTexture(this, `${key}-back`, autoBackView(img));
+      const big = Math.max(img.width, img.height) > 160;
+      this.textures.get(`${key}-back`).setFilter(big ? Phaser.Textures.FilterMode.LINEAR : Phaser.Textures.FilterMode.NEAREST);
+      this.pngKeys.push(`${key}-back`);
+    }
     // Sprite PNG thật thì không chuyển sang pixel nữa (xem pixelMon)
     this.registry.set('pngSprites', this.pngKeys);
     const first = FIRST_MONS.map((id) => `mon-${id}`).filter((k) => !this.pngKeys.includes(k));
@@ -62,4 +82,14 @@ export default class BootScene extends Phaser.Scene {
     this.scene.start('Title');
     hideLoading();
   }
+}
+
+// Dấu vân tay của ảnh (cỡ + điểm ảnh thu nhỏ 16x16) để nhận ra hai file giống hệt nhau
+function fingerprint(img) {
+  const c = document.createElement('canvas');
+  c.width = 16;
+  c.height = 16;
+  const ctx = c.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(img, 0, 0, 16, 16);
+  return `${img.width}x${img.height}:${ctx.getImageData(0, 0, 16, 16).data.join(',')}`;
 }

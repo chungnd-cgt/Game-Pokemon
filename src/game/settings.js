@@ -7,6 +7,7 @@ const DEFAULTS = {
   version: VERSION,
   lighting: true, // ánh sáng theo buổi (ngày / chiều / đêm, đèn cửa sổ, hang tối)
   weather: true, // hình ảnh thời tiết (mưa, tuyết, mưa đá, bão cát); tắt thì thời tiết vẫn có tác dụng trong trận
+  sharp: true, // vẽ theo số điểm ảnh thật của màn hình (game/hires.js): sắc nét hơn, tốn card đồ hoạ hơn
   fpsLimit: 0, // giới hạn khung hình / giây: 30 / 60, 0 = theo màn hình (game/display.js)
   uiScale: 0, // cỡ giao diện trên bản đồ (game/display.js: UI_SCALES): 0 = tự động theo cỡ màn hình, 1.15 = 115%...
   resolution: 'screen', // độ phân giải (game/display.js: RESOLUTIONS): 'screen' theo màn hình | 'WxH' vd '1920x1080'

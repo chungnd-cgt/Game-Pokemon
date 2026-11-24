@@ -262,8 +262,21 @@ export function gainExp(mon, amount) {
   while (mon.level < MAX_LEVEL && mon.exp >= expToReach(mon, mon.level + 1)) {
     mon.level++;
     recalcStats(mon);
+    // Lên cấp: thân thiết hơn (càng thân càng tăng chậm, như game gốc)
+    changeHappiness(mon, mon.happiness < 100 ? 5 : mon.happiness < 200 ? 3 : 2);
     events.push({ type: 'levelUp', level: mon.level, maxHp: mon.maxHp, hp: mon.hp });
     events.push(...learnMoves(mon, movesAtLevel(species, mon.level)));
   }
   return events;
+}
+
+// Hệ của Sức mạnh ẩn (Hidden Power) theo IV như game gốc (thế hệ 3): mỗi Pokémon một hệ "ngẫu nhiên" cố định, không có
+// hệ Thường / Tiên. Bit thấp nhất của IV HP, Tấn công, Phòng thủ, Tốc độ, Tấn công ĐB, Phòng thủ ĐB
+export const HIDDEN_POWER_TYPES = [
+  'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel',
+  'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark',
+];
+export function hiddenPowerType(mon) {
+  const bits = ['hp', 'atk', 'def', 'speed', 'spAtk', 'spDef'].reduce((sum, k, i) => sum + ((mon.ivs?.[k] ?? 0) & 1) * 2 ** i, 0);
+  return HIDDEN_POWER_TYPES[Math.floor((bits * 15) / 63)];
 }

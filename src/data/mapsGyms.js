@@ -1,4 +1,5 @@
 import { INDOOR_TILES } from './tiles.js';
+import { widen } from './widen.js';
 
 // 8 gym của vùng Sơn Thủy, mỗi gym một kiểu câu đố riêng (bố cục và lời giải đã kiểm tra bằng bộ giải trong test).
 // Ký tự ô: xem data/tiles.js. Đồ vật: gate (cổng, mở khi có cờ flag; look: hình) • switch (công tắc bật cờ) •
@@ -7,7 +8,20 @@ import { INDOOR_TILES } from './tiles.js';
 // pads: ô dịch chuyển Q { x, y, tx, ty } • boulders: tảng đá đẩy được [x, y] (lấp hố O) • dark: gym tối
 // toggleLine / switchLine / barrierLine / gateLine / trapLine: câu báo riêng của gym
 
-// Thủ lĩnh đứng ở (8, 2), lối vào giữa phía dưới (thảm E)
+// Thủ lĩnh đứng giữa hàng trên (cột 8 của phần câu đố), lối vào giữa phía dưới (thảm E).
+// Bố cục bên dưới là phần câu đố rộng 17 ô; lúc nạp được nới thêm GYM_DX ô mỗi bên thành khán đài (gymStands) cho kín
+// màn hình, mọi toạ độ dịch sang phải GYM_DX (data/widen.js). Người trong gym (data/gymPeople.js, thủ lĩnh trong
+// story/chapter2.js) khai báo toạ độ theo phần câu đố rồi cộng GYM_DX
+export const GYM_DX = 9;
+// Khán đài hai bên phần câu đố: sát phần câu đố là vách ngăn (không đi vòng qua câu đố được), rồi lối đi, các dãy ghế
+// khán giả xen lối đi ngang, chậu cây ở mép ngoài
+function gymStands(x, y, edge) {
+  const d = edge === 'left' ? GYM_DX - 1 - x : x; // 0: sát phần câu đố
+  if (d === 0) return '#';
+  if (d === 1) return '.';
+  if (d === GYM_DX - 1) return y % 4 === 3 ? 'p' : '.';
+  return y % 3 === 1 ? '.' : 'b';
+}
 const gym = (name, theme, rows, entry, extra = {}) => ({ name, indoor: true, theme, tiles: INDOOR_TILES, fallback: '#', rows, entry, objects: [], ...extra });
 
 export const GYM_MAPS = {
@@ -290,6 +304,7 @@ const AFTER_BADGE = {
   gym7: ['psychic', null],
   gym8: ['ice', 'Sân băng đã được rắc cát, đi không còn trơn trượt.'],
 };
+for (const id of Object.keys(GYM_MAPS)) GYM_MAPS[id] = widen(GYM_MAPS[id], { left: GYM_DX, side: gymStands });
 for (const [id, [badge, clearLine, extra]] of Object.entries(AFTER_BADGE)) {
   const g = GYM_MAPS[id];
   Object.assign(g, { badge, clearLine: g.clearLine ?? clearLine }, extra);

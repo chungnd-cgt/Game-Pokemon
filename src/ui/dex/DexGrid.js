@@ -3,15 +3,18 @@ import { dexNo } from '../../data/pokedex.js';
 import { dexStatus } from '../../game/state.js';
 import { fitScale, pixelMon } from '../../gfx/textures.js';
 import { textStyle } from '../helpers.js';
+import { DEX_COLORS as C } from './theme.js';
 
-export const GRID_COLS = 5;
+export const GRID_COLS = 4;
 export const GRID_ROWS = 7; // số hàng hiện cùng lúc
-const CELL = 70;
-const PITCH = 74;
+const CELL = 44;
+const PITCH = 48;
+const MON_SIZE = 28; // cạnh dài nhất của hình Pokémon trong ô
+export const GRID_H = GRID_ROWS * PITCH - (PITCH - CELL); // chiều cao lưới
 
-// Lưới ô Pokémon của Pokédex (nửa trái). Chỉ có GRID_ROWS x GRID_COLS ô dựng sẵn, cuộn thì đổi nội dung ô
-// (danh sách dài bao nhiêu cũng mở ngay). Ô: số thứ tự, hình nhỏ (chưa gặp: bóng đen), dấu Poké Ball nếu đã bắt.
-// onPick(index trong list) khi bấm vào ô.
+// Lưới ô Pokémon của Pokédex (cột trái). Chỉ có GRID_ROWS x GRID_COLS ô dựng sẵn, cuộn thì đổi nội dung ô
+// (danh sách dài bao nhiêu cũng mở ngay). Ô: số thứ tự (góc trên trái), hình nhỏ (chưa gặp: bóng đen), Poké Ball nhỏ ở góc
+// dưới phải nếu đã bắt. onPick(index trong list) khi bấm vào ô.
 export class DexGrid {
   constructor(scene, x, y, onPick) {
     Object.assign(this, { scene, x, y, onPick, list: [], selected: -1, top: 0 });
@@ -24,8 +27,8 @@ export class DexGrid {
         const cy = y + r * PITCH;
         const bg = scene.add.graphics();
         const img = scene.add.image(cx + CELL / 2, cy + CELL / 2 + 5, '__DEFAULT').setVisible(false);
-        const num = scene.add.text(cx + 6, cy + 4, '', textStyle(12, '#8a92a6', { fontStyle: 'bold' }));
-        const ball = scene.add.image(cx + CELL - 11, cy + 11, 'ball').setDisplaySize(14, 14);
+        const num = scene.add.text(cx + 4, cy + 3, '', textStyle(9, '#9fb2d6', { fontStyle: 'bold' }));
+        const ball = scene.add.image(cx + CELL - 7, cy + CELL - 7, 'ball').setDisplaySize(10, 10);
         const hit = scene.add.zone(cx + CELL / 2, cy + CELL / 2, CELL, CELL).setInteractive({ useHandCursor: true });
         const cell = { cx, cy, bg, img, num, ball, hit, slot: r * GRID_COLS + c, hover: false };
         hit.on('pointerdown', () => {
@@ -44,12 +47,14 @@ export class DexGrid {
       }
     }
     // Thanh cuộn: bấm / kéo trên rãnh để cuộn nhanh
-    this.barX = x + this.w + 8;
+    this.barX = x + this.w + 5;
     this.bar = scene.add.graphics();
-    const track = scene.add.zone(this.barX + 3, y + this.h / 2, 18, this.h).setInteractive({ useHandCursor: true });
+    const track = scene.add.zone(this.barX + 2, y + this.h / 2, 14, this.h).setInteractive({ useHandCursor: true });
+    // toLocal(p): toạ độ con trỏ trong khung thiết kế (cửa sổ nổi đã kéo dời: ui/dex/DexWindow.js)
     const dragTo = (p) => {
       const rows = this.maxTop();
-      if (rows > 0) this.scrollTo(Math.round(((p.y - y) / this.h) * rows));
+      const py = this.toLocal ? this.toLocal(p).y : p.y;
+      if (rows > 0) this.scrollTo(Math.round(((py - y) / this.h) * rows));
     };
     track.on('pointerdown', dragTo);
     track.on('pointermove', (p) => p.isDown && dragTo(p));
@@ -64,7 +69,7 @@ export class DexGrid {
   }
 
   contains(px, py) {
-    return px >= this.x && px < this.barX + 12 && py >= this.y && py < this.y + this.h;
+    return px >= this.x && px < this.barX + 10 && py >= this.y && py < this.y + this.h;
   }
 
   setList(list) {
@@ -96,13 +101,13 @@ export class DexGrid {
     for (const cell of this.cells) this.drawCell(cell);
     const g = this.bar;
     g.clear();
-    g.fillStyle(0xdde3ee);
-    g.fillRoundedRect(this.barX, this.y, 6, this.h, 3);
+    g.fillStyle(C.track);
+    g.fillRoundedRect(this.barX, this.y, 5, this.h, 2.5);
     const rows = this.rowCount;
     if (rows > GRID_ROWS) {
-      const thumbH = Math.max(28, (this.h * GRID_ROWS) / rows);
-      g.fillStyle(0x8a94b4);
-      g.fillRoundedRect(this.barX, this.y + (this.h - thumbH) * (this.top / this.maxTop()), 6, thumbH, 3);
+      const thumbH = Math.max(24, (this.h * GRID_ROWS) / rows);
+      g.fillStyle(C.thumb);
+      g.fillRoundedRect(this.barX, this.y + (this.h - thumbH) * (this.top / this.maxTop()), 5, thumbH, 2.5);
     }
   }
 
@@ -121,20 +126,15 @@ export class DexGrid {
     const status = dexStatus(p.id);
     const known = status !== 'unknown';
     const selected = i === this.selected;
-    bg.fillStyle(selected ? 0xfff3cf : known ? 0xf3f6fb : 0xe4e8f0);
-    bg.fillRoundedRect(cx, cy, CELL, CELL, 10);
-    if (selected) {
-      bg.lineStyle(3, 0xf0a020);
-      bg.strokeRoundedRect(cx + 1.5, cy + 1.5, CELL - 3, CELL - 3, 9);
-    } else {
-      bg.lineStyle(2, cell.hover ? 0x8aa0d0 : 0xd2dbea);
-      bg.strokeRoundedRect(cx + 1, cy + 1, CELL - 2, CELL - 2, 9);
-    }
+    bg.fillStyle(selected ? 0x2c5482 : known ? 0x22355a : 0x162440, selected ? 0.9 : 0.75);
+    bg.fillRoundedRect(cx, cy, CELL, CELL, 7);
+    bg.lineStyle(selected ? 2 : 1.5, selected ? C.accent : cell.hover ? 0x6a8ac0 : C.line);
+    bg.strokeRoundedRect(cx + 1, cy + 1, CELL - 2, CELL - 2, 6);
     const key = pixelMon(this.scene, p.slug);
-    img.setTexture(key).setScale(fitScale(this.scene, key, 52)).setVisible(true);
+    img.setTexture(key).setScale(fitScale(this.scene, key, MON_SIZE)).setVisible(true);
     if (known) img.clearTint().setAlpha(1);
-    else img.setTintFill(0x232836).setAlpha(0.75);
-    num.setText(dexNo(p.id)).setColor(selected ? '#b07010' : known ? '#6a7286' : '#9aa2b4');
+    else img.setTintFill(0x070b16).setAlpha(0.8);
+    num.setText(dexNo(p.id)).setColor(selected ? '#ffffff' : known ? '#9fb2d6' : '#5e7096');
     ball.setVisible(status === 'caught');
   }
 }

@@ -22,10 +22,10 @@ export function matchesQuery(name, query) {
   return q.split(' ').every((word) => key.includes(word));
 }
 
-// Vật phẩm hiện trong túi: có trong túi (count(id) > 0), qua bộ lọc `allow` (vd trong trận chỉ đồ dùng được khi đấu).
+// Vật phẩm hiện trong túi: có trong túi (count(id) > 0), không ẩn (ITEMS[id].hidden: Bản đồ vùng, Hộp huy hiệu), qua bộ lọc `allow` (vd trong trận chỉ đồ dùng được khi đấu).
 // Có chữ tìm thì tìm trên mọi ngăn, không thì chỉ ngăn `pocket` (chỉ số trong BAG_POCKETS). Giữ thứ tự như data/items.js
 export function bagItems({ count, pocket = 0, query = '', allow = null, pockets = BAG_POCKETS }) {
-  const owned = Object.keys(ITEMS).filter((id) => count(id) > 0 && (!allow || allow(id)));
+  const owned = Object.keys(ITEMS).filter((id) => count(id) > 0 && !ITEMS[id].hidden && (!allow || allow(id)));
   if (searchKey(query)) return owned.filter((id) => matchesQuery(ITEMS[id].name, query));
   const pid = pockets[pocket]?.id;
   return owned.filter((id) => pocketOf(id) === pid);
@@ -33,6 +33,6 @@ export function bagItems({ count, pocket = 0, query = '', allow = null, pockets 
 
 // Số vật phẩm (qua bộ lọc) trong từng ngăn: ngăn trống thì tab mờ đi
 export function pocketCounts({ count, allow = null, pockets = BAG_POCKETS }) {
-  const owned = Object.keys(ITEMS).filter((id) => count(id) > 0 && (!allow || allow(id)));
+  const owned = Object.keys(ITEMS).filter((id) => count(id) > 0 && !ITEMS[id].hidden && (!allow || allow(id)));
   return pockets.map((p) => owned.filter((id) => pocketOf(id) === p.id).length);
 }

@@ -6,11 +6,12 @@ const CHAR_DELAY = 18;
 
 // Hộp thoại chữ chạy. show() chờ người chơi bấm phím xác nhận / quay lại hoặc bấm chuột mới đi tiếp.
 export class MessageBox {
-  constructor(scene, router, x, y, w, h) {
+  // opts.radius: bo góc khung; opts.shadow: false thì không đổ bóng (vd nằm sát đáy khung trận đấu)
+  constructor(scene, router, x, y, w, h, opts = {}) {
     this.scene = scene;
     this.router = router;
     this.container = scene.add.container(0, 0).setDepth(10);
-    this.container.add(drawPanel(scene, x, y, w, h, 20));
+    this.container.add(drawPanel(scene, x, y, w, h, opts.radius ?? 20, false, opts.shadow ?? true));
     this.text = scene.add
       .text(x + 36, y + 30, '', textStyle(30, COLORS.text, { lineSpacing: 10 }))
       .setShadow(2, 2, COLORS.textShadow, 0);
