@@ -1,10 +1,21 @@
 // Bảng màu nội thất theo từng loại nhà / gym (gfx/interior.js).
 
 export const THEMES = {
+  // Pokémon Center: sàn gạch vàng đất có ô sáng giữa viên, tường trên ốp gỗ cam, quầy chữ U đỏ (gfx/props.js)
   center: {
-    floor: '#f8f0e0', floorAlt: '#f0e4cc', grout: '#dccbb0',
-    wall: '#f8f0e8', stripe: '#efdfd0', trim: '#d8b8a0', trimDark: '#b89880', base: '#a88868',
-    counterTop: '#f8b8c8', counterLight: '#ffdce4', counterFront: '#e06880', counterDark: '#b04860', ink: '#4a2030',
+    inset: true, uCounter: true, floor: '#dcb878', floorAlt: '#e8c890', grout: '#c09c5c',
+    wall: '#f0e2c4', stripe: '#e4d2ae', trim: '#c8783a', trimDark: '#a05a28', base: '#8a4a20',
+    counterTop: '#d83a2c', counterLight: '#f06a50', counterFront: '#ece8e2', counterDark: '#c4beb6', ink: '#4a2a14',
+    counterInk: '#5a1810',
+  },
+  // Poké Mart: sàn gạch xám nhạt, giữa phòng trải thảm xanh mòng két hoạ tiết hình thoi (map.carpet), tường kem có viền xanh
+  // phía trên và chân tường vàng đất, quầy thu ngân chữ L mặt xanh thép ốp trắng, ghế đẩu đệm xanh
+  pokeMart: {
+    floor: '#dde1e8', floorAlt: '#d4d9e2', grout: '#b8bfcc',
+    wall: '#f2ecd2', stripe: '#e8dfc0', trim: '#4a78c8', trimDark: '#3a62a8', base: '#d0a058', ink: '#3a4a6a',
+    uCounter: true, counterTop: '#4a6a98', counterLight: '#7a98c8', counterFront: '#eef0f4', counterDark: '#c0c6d0', counterInk: '#1e2a44',
+    carpet: '#3a8c9c', carpetAlt: '#4a9cac', carpetLine: '#2e7280', carpetEdge: '#c8a060',
+    stool: ['#2a3a6a', '#4a68b0', '#7a98d8'],
   },
   mart: {
     floor: '#eef2f8', floorAlt: '#e2e8f2', grout: '#c8d2e2',
@@ -86,6 +97,12 @@ export const THEMES = {
     floor: '#f8f0d8', floorAlt: '#f0e4c4', grout: '#d8c08a',
     wall: '#fff8e8', stripe: '#f4ead0', trim: '#e8b828', trimDark: '#b88a10', base: '#8a2a2a',
     counterTop: '#fff8e8', counterLight: '#ffffff', counterFront: '#e8b828', counterDark: '#b88a10', ink: '#3a2408',
+  },
+  // Phòng thí nghiệm Giáo sư Oak: tường xanh mòng két, sàn gỗ ván chéo
+  oakLab: {
+    diagonal: true, floor: '#e4bc84', floorAlt: '#dab078', grout: '#c09460',
+    wall: '#1e7c92', stripe: '#1a7086', trim: '#145a6e', trimDark: '#0e4858', base: '#0c3a48',
+    counterTop: '#e8ecf0', counterLight: '#ffffff', counterFront: '#9aa4b4', counterDark: '#7a8494', ink: '#0a2a34',
   },
   lab: {
     floor: '#f0f2f4', floorAlt: '#e6e9ee', grout: '#c8ccd4',

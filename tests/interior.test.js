@@ -76,3 +76,24 @@ test('nhà ở: TV nằm giữa trên tường sau, thẳng hàng với thảm /
     }
   }
 });
+
+test('Pokémon Center / Poké Mart: một tầng (không thang, không tầng hầm), tới quầy nói chuyện được với y tá / nhân viên', () => {
+  const shops = Object.values(MAPS).filter((m) => /^v?(center|mart)\d*$/.test(m.id));
+  assert.ok(shops.length >= 30, 'đủ Pokémon Center / Poké Mart ở các thị trấn, làng');
+  for (const m of shops) {
+    const stairs = (m.props ?? []).some((p) => /stair|escalator/i.test(p.kind));
+    assert.ok(!stairs && !(m.warps ?? []).length && !m.rows.some((r) => /[Ss]/.test(r)), `${m.id}: còn cầu thang / lối xuống tầng hầm`);
+    const seen = reachable(m);
+    if (m.heal) assert.ok(seen.has(`${m.heal.x},${m.heal.y}`), `${m.id}: không tới chỗ hồi phục được`);
+    for (const [x, y] of cells(m, 'P')) assert.ok(DIRS.some(([dx, dy]) => seen.has(`${x + dx},${y + dy}`)), `${m.id}: không tới máy PC được`);
+    const staff = PEOPLE.filter((p) => p.map === m.id && ['nurse', 'clerk'].includes(p.role));
+    assert.equal(staff.length, 1, `${m.id}: thiếu y tá / nhân viên`);
+    for (const n of staff) {
+      assert.ok(!m.isSolid(n.x, n.y), `${m.id}: ${n.id} đứng trên đồ đạc`);
+      // nói chuyện qua quầy: ô kề bên là quầy, ô bên kia quầy đi tới được
+      const across = DIRS.some(([dx, dy]) => m.info(n.x + dx, n.y + dy).counter && seen.has(`${n.x + 2 * dx},${n.y + 2 * dy}`));
+      assert.ok(across, `${m.id}: không nói chuyện qua quầy với ${n.id} được`);
+    }
+    for (const key of Object.keys(m.signs)) assert.ok(m.isSolid(...key.split(',').map(Number)), `${m.id} (${key}): lời mô tả không nằm trên đồ đạc`);
+  }
+});

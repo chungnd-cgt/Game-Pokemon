@@ -2,10 +2,12 @@ import { CELL, WORLD_SCALE } from '../config.js';
 import { followStyle } from '../data/followStyle.js';
 import { currentLook, resolveLook } from '../data/playerCustom.js';
 import { batchSteps, planSteps, stepFacing, trimQueue } from '../game/movePath.js';
+import { cleanMeta, cleanMove } from '../game/remotePlayer.js';
 import { settings } from '../game/settings.js';
 import { playerName, state } from '../game/state.js';
 import { RIDE_SEAT, rideTexture } from '../gfx/mounts.js';
-import { CHAR_HEIGHT, CHAR_SCALE, makeBikeTexture, makeCharacterTexture } from '../gfx/player.js';
+import { CHAR_HEIGHT, CHAR_SCALE, FOLLOWER_SCALE, makeBikeTexture, makeCharacterTexture } from '../gfx/player.js';
+import { displayName, loadNames } from '../online/playerNames.js';
 import { MapPresence } from '../online/presence.js';
 import { supabase } from '../online/supabase.js';
 import { textStyle, uiX } from '../ui/helpers.js';
@@ -38,7 +40,7 @@ const DEPTH = 10;
 const SHADOW = [0.18 * CHAR_SCALE, 0.2 * CHAR_SCALE];
 const SHADOW_ALPHA = 0.22;
 // Pokémon đi theo người chơi khác (giống WorldScene.animateFollower, rút gọn)
-const FOLLOWER_SHADOW = [0.16 * CHAR_SCALE, 0.18 * CHAR_SCALE];
+const FOLLOWER_SHADOW = [0.16 * CHAR_SCALE * FOLLOWER_SCALE, 0.18 * CHAR_SCALE * FOLLOWER_SCALE];
 const FOLLOWER_FLY = 9 * CHAR_SCALE;
 const FOLLOWER_FLOAT = 5 * CHAR_SCALE;
 const BACK = { up: [0, 1], down: [0, -1], left: [1, 0], right: [-1, 0] }; // ô sau lưng theo hướng nhìn
@@ -154,7 +156,11 @@ export function setupPlayers(world) {
   if (supabase && user?.id) {
     world.presence = new MapPresence(myMeta(world), {
       onPlayers: (list) => syncPlayers(world, list),
-      onMove: (id, pos) => moveOther(world, id, pos),
+      onMove: (id, pos) => {
+        // Tin bước đi tự gửi (giả / sai được): bỏ tin sai, cắt path quá dài, giới hạn nhịp (game/remotePlayer.js)
+        const clean = cleanMove(pos);
+        if (clean) moveOther(world, id, clean);
+      },
       onRequest: (req) => onTradeRequest(world, req),
     });
   }
@@ -232,8 +238,21 @@ export function updatePlayers(world) {
   world.presence.move(pos);
 }
 
-function syncPlayers(world, list) {
+// Vừa biết thêm tên thật: đổi tên trong thông tin và nhãn trên đầu
+function refreshNames(world) {
+  for (const o of world.others?.values() ?? []) {
+    const name = displayName(o.meta.id, o.meta.claimedName);
+    if (name === o.meta.name) continue;
+    o.meta = { ...o.meta, name };
+    o.label.setText(name);
+  }
+}
+
+function syncPlayers(world, raw) {
   if (!world.others) return;
+  // Thông tin người khác tự gửi (giả được): tên thật lấy từ máy chủ, giá trị lạ bị bỏ (game/remotePlayer.js)
+  const list = raw.map((meta) => cleanMeta(meta, displayName));
+  loadNames(list.map((m) => m.id)).then((got) => got && refreshNames(world));
   const seen = new Set();
   for (const meta of list) {
     seen.add(meta.id);
@@ -356,7 +375,7 @@ function applyFollower(world, o) {
     o.fol = {
       cell, tucked, facing: o.facing, ground: { x: gx, y: gy }, key: null,
       shadow: world.add.image(gx, gy - 4, 'fx-shadow').setScale(...FOLLOWER_SHADOW).setAlpha(SHADOW_ALPHA).setDepth(DEPTH - 1),
-      sprite: world.add.sprite(gx, gy, 'fx-shadow').setOrigin(0.5, 1).setScale(CHAR_SCALE).setDepth(DEPTH),
+      sprite: world.add.sprite(gx, gy, 'fx-shadow').setOrigin(0.5, 1).setScale(CHAR_SCALE * FOLLOWER_SCALE).setDepth(DEPTH),
     };
   }
   o.fol.want = true;

@@ -1,19 +1,19 @@
 import { EXTRA_NPCS, EXTRA_TRAINERS } from './extra/index.js';
 import { GYM_GUIDES, GYM_RELEARNERS, GYM_TRAINERS } from './gymPeople.js';
-import { CENTER_DX, HOME_DX, MART_DX, STORE_DX } from './indoorLayout.js';
-import { LEAGUE_DX } from './mapsChapter5.js';
 // Dân làng: đứng trước mặt và bấm Enter/Space để nói chuyện (nói được qua quầy).
 // map: bản đồ NPC đứng • wander: số ô tối đa đi lang thang (0 = đứng yên, chỉ xoay người)
 // role: 'nurse' (hồi phục) / 'clerk' (mở cửa hàng); fixed: đứng yên, không xoay
+// Nhân viên Poké Mart đứng sau quầy thu ngân bên trái (data/map.js: mart), quay sang phải: khách nói chuyện qua quầy
+const MART_CLERK = { x: 1, y: 4, facing: 'right' };
 export const NPCS = [
-  { id: 'joy', sprite: 'npc-joy', name: 'Y tá Joy', map: 'center', x: 6 + CENTER_DX, y: 2, facing: 'down', fixed: true, role: 'nurse' },
+  { id: 'joy', sprite: 'npc-joy', name: 'Y tá Joy', map: 'center', x: 7, y: 2, facing: 'down', fixed: true, role: 'nurse' },
   {
-    id: 'visitor', sprite: 'npc-boy', name: 'Cậu bé', map: 'center', x: 4 + CENTER_DX, y: 6, facing: 'up', wander: 1,
+    id: 'visitor', sprite: 'npc-boy', name: 'Cậu bé', map: 'center', x: 4, y: 6, facing: 'up', wander: 1,
     lines: ['Pokémon Center hồi phục Pokémon miễn phí đó!', 'Máy tính trong góc kia dùng để gửi, rút và thả Pokémon đó.'],
   },
-  { id: 'clerk', sprite: 'npc-clerk', name: 'Nhân viên', map: 'mart', x: 1 + MART_DX, y: 2, facing: 'down', fixed: true, role: 'clerk' },
+  { id: 'clerk', sprite: 'npc-clerk', name: 'Nhân viên', map: 'mart', ...MART_CLERK, fixed: true, role: 'clerk' },
   {
-    id: 'shopper', sprite: 'npc-woman', name: 'Khách hàng', map: 'mart', x: 7 + MART_DX, y: 4, facing: 'left', wander: 1,
+    id: 'shopper', sprite: 'npc-woman', name: 'Khách hàng', map: 'mart', x: 7, y: 4, facing: 'left', wander: 1,
     lines: ['Great Ball đắt hơn nhưng bắt Pokémon dễ hơn nhiều.', 'Đồ không dùng tới thì bán lại cho cửa hàng được nửa giá đấy.'],
   },
   {
@@ -67,7 +67,7 @@ export const NPCS = [
   },
   // Nhà bà Tư ở Pallet
   {
-    id: 'pallet-granny', sprite: 'npc-woman', name: 'Bà Tư', map: 'palletHouse', x: 2 + HOME_DX, y: 4, facing: 'right', wander: 0,
+    id: 'pallet-granny', sprite: 'npc-woman', name: 'Bà Tư', map: 'palletHouse', x: 2, y: 4, facing: 'right', wander: 0,
     lines: [
       'Cháu nhà bên được Giáo sư Oak cho Pokémon rồi à? Lớn nhanh quá!',
       'Bà làm mứt từ quả mọng hái dọc đường đấy. Quả mọng cho Pokémon cầm, lúc nguy nó tự ăn mà hồi sức.',
@@ -76,7 +76,7 @@ export const NPCS = [
     ],
   },
   {
-    id: 'pallet-kid', sprite: 'npc-girl', name: 'Bé Na', map: 'palletHouse', x: 8 + HOME_DX, y: 5, facing: 'down', wander: 1,
+    id: 'pallet-kid', sprite: 'npc-girl', name: 'Bé Na', map: 'palletHouse', x: 8, y: 5, facing: 'down', wander: 1,
     lines: ['Bụi cỏ phía bắc có Pidgey với Rattata đó!', 'Tối đến còn có Oddish nữa. Ban ngày thì không thấy đâu!'],
   },
   // Thị trấn Lục Bình
@@ -116,8 +116,8 @@ export const NPCS = [
 
 // Chương 2: Thành phố Đồi Gió và các nơi trên đường đi
 NPCS.push(
-  { id: 'joy2', sprite: 'npc-joy', name: 'Y tá Joy', map: 'center2', x: 6 + CENTER_DX, y: 2, facing: 'down', fixed: true, role: 'nurse' },
-  { id: 'clerk2', sprite: 'npc-clerk', name: 'Nhân viên', map: 'mart2', x: 1 + MART_DX, y: 2, facing: 'down', fixed: true, role: 'clerk' },
+  { id: 'joy2', sprite: 'npc-joy', name: 'Y tá Joy', map: 'center2', x: 7, y: 2, facing: 'down', fixed: true, role: 'nurse' },
+  { id: 'clerk2', sprite: 'npc-clerk', name: 'Nhân viên', map: 'mart2', ...MART_CLERK, fixed: true, role: 'clerk' },
   {
     id: 't2-granny', sprite: 'npc-woman', name: 'Bà cụ', map: 'town2', x: 10, y: 14, facing: 'down', wander: 1,
     lines: ['Gió ở Đồi Gió thổi quanh năm, phơi đồ khô nhanh lắm cháu ạ.', 'Pokémon hệ Bay ở đây khoẻ lắm đấy.'],
@@ -130,23 +130,23 @@ NPCS.push(
 
 // Gym 2-8: y tá, nhân viên cửa hàng, dân thị trấn, hướng dẫn viên gym
 for (const n of [3, 4, 5, 6, 7, 8, 9]) {
-  NPCS.push({ id: `joy${n}`, sprite: 'npc-joy', name: 'Y tá Joy', map: `center${n}`, x: 6 + CENTER_DX, y: 2, facing: 'down', fixed: true, role: 'nurse' });
-  if (n !== 5) NPCS.push({ id: `clerk${n}`, sprite: 'npc-clerk', name: 'Nhân viên', map: `mart${n}`, x: 1 + MART_DX, y: 2, facing: 'down', fixed: true, role: 'clerk' });
+  NPCS.push({ id: `joy${n}`, sprite: 'npc-joy', name: 'Y tá Joy', map: `center${n}`, x: 7, y: 2, facing: 'down', fixed: true, role: 'nurse' });
+  if (n !== 5) NPCS.push({ id: `clerk${n}`, sprite: 'npc-clerk', name: 'Nhân viên', map: `mart${n}`, ...MART_CLERK, fixed: true, role: 'clerk' });
 }
 // 8 làng nhỏ trước các thành phố có gym: mỗi làng một Pokémon Center và một Poké Mart (data/mapsVillages.js)
 for (let n = 1; n <= 8; n++) {
-  NPCS.push({ id: `vjoy${n}`, sprite: 'npc-joy', name: 'Y tá Joy', map: `vcenter${n}`, x: 6 + CENTER_DX, y: 2, facing: 'down', fixed: true, role: 'nurse' });
-  NPCS.push({ id: `vclerk${n}`, sprite: 'npc-clerk', name: 'Nhân viên', map: `vmart${n}`, x: 1 + MART_DX, y: 2, facing: 'down', fixed: true, role: 'clerk' });
+  NPCS.push({ id: `vjoy${n}`, sprite: 'npc-joy', name: 'Y tá Joy', map: `vcenter${n}`, x: 7, y: 2, facing: 'down', fixed: true, role: 'nurse' });
+  NPCS.push({ id: `vclerk${n}`, sprite: 'npc-clerk', name: 'Nhân viên', map: `vmart${n}`, ...MART_CLERK, fixed: true, role: 'clerk' });
 }
 // Trung tâm thương mại Sông Nước: mỗi quầy bán một loại hàng (stock), quầy nào cũng mua lại mọi thứ.
 // Cô gái tặng Eevee để thử đá tiến hoá (chỉ một lần).
 NPCS.push(
-  { id: 'store-clerk', sprite: 'npc-clerk', name: 'Quầy tạp hoá', map: 'store5', x: 1 + STORE_DX, y: 2, facing: 'down', fixed: true, role: 'clerk', stock: 'general' },
-  { id: 'store-stones', sprite: 'npc-woman', name: 'Quầy đá tiến hoá', map: 'store5', x: 8 + STORE_DX, y: 2, facing: 'down', fixed: true, role: 'clerk', stock: 'stones' },
+  { id: 'store-clerk', sprite: 'npc-clerk', name: 'Quầy tạp hoá', map: 'store5', x: 1, y: 2, facing: 'down', fixed: true, role: 'clerk', stock: 'general' },
+  { id: 'store-stones', sprite: 'npc-woman', name: 'Quầy đá tiến hoá', map: 'store5', x: 8, y: 2, facing: 'down', fixed: true, role: 'clerk', stock: 'stones' },
   // Quầy đĩa kỹ năng (TM) như tầng đĩa của trung tâm thương mại game gốc
-  { id: 'store-tms', sprite: 'npc-clerk', name: 'Quầy đĩa kỹ năng', map: 'store5', x: 13 + STORE_DX, y: 3, facing: 'down', fixed: true, role: 'clerk', stock: 'tms' },
+  { id: 'store-tms', sprite: 'npc-clerk', name: 'Quầy đĩa kỹ năng', map: 'store5', x: 13, y: 3, facing: 'down', fixed: true, role: 'clerk', stock: 'tms' },
   {
-    id: 'store-shopper', sprite: 'npc-boy', name: 'Khách hàng', map: 'store5', x: 3 + STORE_DX, y: 7, facing: 'right', wander: 1,
+    id: 'store-shopper', sprite: 'npc-boy', name: 'Khách hàng', map: 'store5', x: 3, y: 7, facing: 'right', wander: 1,
     lines: ['Đá tiến hoá chỉ bán ở quầy bên phải thôi.', 'Pikachu dùng Thunder Stone là thành Raichu ngay!'],
   },
 );
@@ -171,8 +171,8 @@ NPCS.push(
 
 // Liên minh: y tá, nhân viên trong sảnh, lính gác Đường Chiến Thắng
 NPCS.push(
-  { id: 'joy-league', sprite: 'npc-joy', name: 'Y tá Joy', map: 'leagueLobby', x: 2 + LEAGUE_DX, y: 2, facing: 'down', fixed: true, role: 'nurse' },
-  { id: 'clerk-league', sprite: 'npc-clerk', name: 'Nhân viên', map: 'leagueLobby', x: 10 + LEAGUE_DX, y: 2, facing: 'down', fixed: true, role: 'clerk' },
+  { id: 'joy-league', sprite: 'npc-joy', name: 'Y tá Joy', map: 'leagueLobby', x: 2, y: 2, facing: 'down', fixed: true, role: 'nurse' },
+  { id: 'clerk-league', sprite: 'npc-clerk', name: 'Nhân viên', map: 'leagueLobby', x: 10, y: 2, facing: 'down', fixed: true, role: 'clerk' },
   {
     id: 'r11-guard', sprite: 'npc-guide', name: 'Lính gác', map: 'route11', x: 6, y: 9, facing: 'left', fixed: true,
     lines: ['Đây là Đường Chiến Thắng, lối lên Liên minh.', 'Chỉ nhà huấn luyện có đủ 8 huy hiệu mới được đi qua.'],

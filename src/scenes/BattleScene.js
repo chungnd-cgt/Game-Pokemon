@@ -30,10 +30,11 @@ import { trainerBeaten } from '../game/trainers.js';
 import {
   HAPPINESS_FAINT, HAPPINESS_KO, MAX_LEVEL, calcStats, changeHappiness, createMonster, expProgress, gainEvs, gainExp, replaceMove,
 } from '../game/monster.js';
-import { addCaught, blackoutLoss, healParty, itemCount, markSeen, state, useItem } from '../game/state.js';
+import { addCaught, blackoutLoss, healParty, itemCount, markSeen, state, useItem, wildPrize } from '../game/state.js';
+import { MONEY_MAX } from '../game/trade.js';
 import { Ambience } from '../gfx/ambience.js';
 import { playMoveFx } from '../gfx/moveFx.js';
-import { attachShinySparkle, shinyBurst } from '../gfx/shinyFx.js';
+import { shinyBurst } from '../gfx/shinyFx.js';
 import { hash } from '../gfx/pixel.js';
 import { BATTLE_CHAR_SCALE } from '../gfx/player.js';
 import { GBA_MON, fitScale, monViewKey, pixelMon } from '../gfx/textures.js';
@@ -44,7 +45,7 @@ import {
   CONTENT, CommandTray, ItemList, MOVE_GRID, PARTY_GRID, drawBattleFrame, moveHint, moveTipBuilder, paintMoveRow, paintPartyCell,
   renderMoveRow, renderPartyCell, showTip,
 } from '../ui/BattlePanel.js';
-import { BLEED, battleStage, drawPanel, fitText, gradientRect, shade, textStyle, tweenAsync, wait } from '../ui/helpers.js';
+import { BATTLE_FRAME, BLEED, battleStage, drawPanel, fitText, gradientRect, shade, textStyle, tweenAsync, wait } from '../ui/helpers.js';
 import { InputRouter } from '../ui/input.js';
 import { Menu } from '../ui/Menu.js';
 import { MessageBox } from '../ui/MessageBox.js';
@@ -211,11 +212,7 @@ export default class BattleScene extends Phaser.Scene {
     drawBattleFrame(this, state.player?.name || 'Bạn', this.trainer ? this.trainer.name : `${this.enemy.name} hoang dã`);
     this.commands = new CommandTray(this, this.router, ACTIONS);
 
-    // Lấp lánh định kỳ quanh Pokémon shiny đang trên sân (bật / tắt khi đổi Pokémon, xem updateShinyFx)
-    this.shinyFx = {
-      enemy: attachShinySparkle(this, this.enemySprite, { interval: 1300, depth: 9 }).setVisible(false),
-      player: attachShinySparkle(this, this.playerSprite, { interval: 1300, depth: 9 }).setVisible(false),
-    };
+    this.shareWithWorld();
 
     // Hiện dần cả cửa sổ (không dùng fadeIn của camera: phủ đen cả khoảng trống trong suốt phía trên khung)
     const cam = this.cameras.main.setAlpha(0);
@@ -223,10 +220,42 @@ export default class BattleScene extends Phaser.Scene {
     this.runBattle().catch((err) => console.error('Lỗi trận đấu:', err));
   }
 
-  // Lấp lánh quanh Pokémon shiny đang trên sân
-  updateShinyFx() {
-    this.shinyFx.enemy.setVisible(Boolean(this.enemy && lookShiny(this.enemy) && this.enemy.hp > 0));
-    this.shinyFx.player.setVisible(Boolean(this.active && lookShiny(this.active) && this.active.hp > 0));
+  // Trận đấu nằm chung màn hình với các cửa sổ nổi của bản đồ (túi đồ, chi tiết Pokémon, Pokédex, thẻ HLV, xem nhanh...):
+  //  - Vẫn mở / dùng được các cửa sổ đó trong lúc đấu; chúng vẽ đè lên cửa sổ trận (WorldScene.renderOverBattle)
+  //  - Con trỏ đang ở trên cửa sổ của bản đồ (hoặc đang kéo cửa sổ / kéo đồ) thì trận đấu nhường chuột cho bản đồ
+  //    (WorldScene.pointerOverBattle); bấm vào chỗ trống trong khung trận thì không lọt xuống bản đồ phía sau
+  //  - Bàn phím theo chỗ vừa bấm: cửa sổ của bản đồ (gõ tìm kiếm Pokédex...) hoặc trận đấu
+  //    (WorldScene.setKeyFocus)
+  shareWithWorld() {
+    const world = this.scene.get('World');
+    // Trận trước có thể kết thúc lúc bàn phím đang ở cửa sổ của bản đồ (đã tắt bàn phím trận): trận mới nhận phím lại
+    if (this.input.keyboard) this.input.keyboard.enabled = true;
+    const F = BATTLE_FRAME;
+    this.add.zone(F.x, F.y, F.w, F.h).setOrigin(0).setDepth(-20).setInteractive();
+    const input = this.input;
+    const update = input.update;
+    const DOWN = [Phaser.Input.MOUSE_DOWN, Phaser.Input.TOUCH_START];
+    input.update = (type, pointers) => {
+      const over = Boolean(world?.pointerOverBattle?.(pointers[0]));
+      // Bấm vào cửa sổ của bản đồ: bàn phím về cửa sổ (gõ tìm kiếm...); bấm vào khung trận: bàn phím về trận
+      if (DOWN.includes(type) && world?.setKeyFocus) {
+        if (over) world.setKeyFocus('windows');
+        else if (this.insideFrame(pointers[0])) world.setKeyFocus('battle');
+      }
+      return over ? false : update.call(input, type, pointers);
+    };
+    const draw = (renderer) => world?.renderOverBattle?.(renderer);
+    this.events.on('render', draw);
+    this.events.once('shutdown', () => {
+      this.events.off('render', draw);
+      input.update = update;
+    });
+  }
+
+  // Con trỏ nằm trong khung cửa sổ trận đấu (trên màn hình)
+  insideFrame(p) {
+    const cam = this.cameras.main;
+    return Boolean(p) && p.x >= cam.x && p.x <= cam.x + cam.width && p.y >= cam.y && p.y <= cam.y + cam.height;
   }
 
   drawBackground() {
@@ -365,7 +394,7 @@ export default class BattleScene extends Phaser.Scene {
       await this.sendOutEnemy(this.enemy, false);
     } else {
       await tweenAsync(this, { targets: [this.enemySprite, this.enemyShadow], x: ENEMY_POS.x, duration: 750, ease: 'Cubic.out' });
-      if (this.enemy.shiny) await this.shinySparkle(this.enemySprite);
+      await this.shinySparkle(this.enemy, this.enemySprite);
       await this.slideIn(this.enemyInfo, -60);
       await this.msg.show(`Một ${this.enemy.name} hoang dã xuất hiện!`);
     }
@@ -404,19 +433,33 @@ export default class BattleScene extends Phaser.Scene {
   }
 
   // Chọn lệnh ở 4 nút cột phải; lệnh có danh sách (chiêu / Pokémon / túi) mở trong ô nội dung phía trên. Đang mở danh sách
-  // mà bấm nút lệnh khác thì chuyển sang lệnh đó; bấm lại nút đang mở thì đóng danh sách
+  // mà bấm nút lệnh khác thì chuyển sang lệnh đó; bấm lại nút đang mở thì không làm gì (ui/BattlePanel.js CommandTray)
   async pickAction() {
-    for (;;) {
-      this.msg.setText(`${this.active.name} sẽ làm gì?`);
-      const pending = this.commands.takePending();
-      // Mỗi lượt bắt đầu lại từ đầu: 4 nút xám, Enter / Space là Chiến đấu (không nhớ lệnh lượt trước)
-      const choice = pending ?? (await this.commands.open());
-      if (pending) this.commands.mark(pending);
-      const action = await this.runCommand(choice);
-      if (action) return action;
-      // Danh sách vừa đóng vì bấm lại chính nút đó: chỉ đóng, không mở lại
-      if (this.commands.pending === choice) this.commands.pending = null;
+    this.choosing = true;
+    try {
+      for (;;) {
+        this.msg.setText(`${this.active.name} sẽ làm gì?`);
+        const pending = this.commands.takePending();
+        // Mỗi lượt bắt đầu lại từ đầu: 4 nút xám, Enter / Space là Chiến đấu (không nhớ lệnh lượt trước)
+        const choice = pending ?? (await this.commands.open());
+        if (pending) this.commands.mark(pending.bagItem ? 'bag' : pending);
+        const action = await this.runCommand(choice);
+        if (action) return action;
+        // Phòng hờ: lệnh chờ trùng đúng lệnh vừa đóng thì bỏ (không mở lại chính nó)
+        if (this.commands.pending === choice) this.commands.pending = null;
+      }
+    } finally {
+      this.choosing = false;
     }
+  }
+
+  // Bấm vật phẩm trong cửa sổ túi đồ của bản đồ (hoặc ô phím tắt) lúc đang đấu (WorldScene.useFromBag): đang tới lượt chọn
+  // lệnh thì tính như chọn vật phẩm đó ở lệnh Túi đồ của trận (đóng danh sách đang mở; dùng được thì mất lượt như thường).
+  // Trả về câu báo nếu chưa tới lượt, null nếu đã nhận
+  pickFromBag(id) {
+    if (!this.choosing || this.finished) return 'Chưa tới lượt của bạn, đợi chọn lệnh rồi hãy dùng vật phẩm.';
+    this.commands.inject({ bagItem: id });
+    return null;
   }
 
   // Lệnh đã chọn: trả về hành động của lượt, hoặc null (huỷ / không làm được, chọn lại)
@@ -430,6 +473,9 @@ export default class BattleScene extends Phaser.Scene {
       if (move) return { type: 'move', move };
     } else if (choice === 'bag') {
       const action = await this.chooseItem();
+      if (action) return action;
+    } else if (choice?.bagItem) {
+      const action = await this.itemAction(choice.bagItem);
       if (action) return action;
     } else if (choice === 'party') {
       const index = await this.chooseMonster(false);
@@ -522,7 +568,7 @@ export default class BattleScene extends Phaser.Scene {
 
   // Trả về hành động dùng đồ, hoặc null nếu huỷ / không dùng được
   async chooseItem() {
-    const allow = (id) => BATTLE_KINDS.includes(ITEMS[id].kind) && !ITEMS[id].fieldOnly && ballAllowed(id, ITEMS[id], this.ballRule);
+    const allow = (id) => !this.itemBlocked(id);
     if (!Object.keys(ITEMS).some((id) => itemCount(id) > 0 && allow(id))) {
       await this.msg.show('Không có vật phẩm nào dùng được trong trận!');
       return null;
@@ -539,9 +585,29 @@ export default class BattleScene extends Phaser.Scene {
     this.commands.cancelSub = () => list.finish(null);
     const id = await list.open();
     if (!id) return null;
+    return this.itemAction(id);
+  }
+
+  // Lý do vật phẩm id không dùng được trong trận này (không phải đồ dùng trong trận, loại bóng không được ném ở đây), hoặc null
+  itemBlocked(id) {
+    const item = ITEMS[id];
+    if (!BATTLE_KINDS.includes(item.kind) || item.fieldOnly) return `Không thể dùng ${item.name} trong trận đấu!`;
+    if (!ballAllowed(id, item, this.ballRule)) return `Không thể dùng ${item.name} ở đây!`;
+    return null;
+  }
+
+  // Đã chọn vật phẩm id (danh sách túi của trận hoặc cửa sổ túi đồ của bản đồ): chọn Pokémon / chiêu nếu cần. Trả về hành
+  // động dùng đồ, hoặc null nếu không dùng được / huỷ (đã báo lý do)
+  async itemAction(id) {
+    const item = ITEMS[id];
+    if (!item || itemCount(id) <= 0) return null;
+    const blocked = this.itemBlocked(id);
+    if (blocked) {
+      await this.msg.show(blocked);
+      return null;
+    }
     this.bagMemory = id;
 
-    const item = ITEMS[id];
     if (item.kind === 'ball') {
       if (this.trainer) {
         await this.msg.show('Không thể bắt Pokémon của người khác!');
@@ -623,10 +689,12 @@ export default class BattleScene extends Phaser.Scene {
         break;
       case 'ball':
         useItem(action.id);
+        this.scene.get('World')?.refreshBag?.();
         if (await this.throwBall(action.id)) return;
         break;
       case 'item': {
         useItem(action.id);
+        this.scene.get('World')?.refreshBag?.();
         const mon = state.party[action.index];
         const item = ITEMS[action.id];
         await this.msg.show(item.berry ? `${mon.name} ăn ${item.name}.` : `Bạn dùng ${item.name}.`);
@@ -1469,7 +1537,6 @@ export default class BattleScene extends Phaser.Scene {
     sprite.setScale(0, scale * 1.2);
     await tweenAsync(this, { targets: sprite, scaleX: scale, scaleY: scale, duration: 300, ease: 'Back.out' });
     sprite.clearTint();
-    this.updateShinyFx();
     this.infoOf(user).refresh();
     await this.msg.show(`${this.label(user)} biến hình thành ${SPECIES[target.speciesId].name}!`);
   }
@@ -1747,10 +1814,11 @@ export default class BattleScene extends Phaser.Scene {
     sprite.clearTint();
   }
 
-  // Pokémon shiny xuất hiện: chớp sáng, vòng sao 4 cánh bung ra, sao chớp trên thân (gfx/shinyFx.js), rồi lấp lánh định kỳ
-  async shinySparkle(sprite) {
+  // Pokémon shiny được tung ra sân (vào trận, đổi ra, rút về rồi ra lại; của mình hay của đối thủ): chớp sáng, vòng sao
+  // 4 cánh bung ra, sao chớp trên thân (gfx/shinyFx.js). Chỉ lúc ra sân, đứng trên sân thì không lấp lánh định kỳ
+  async shinySparkle(mon, sprite) {
+    if (!mon.shiny) return;
     await shinyBurst(this, sprite, { depth: 9 });
-    this.updateShinyFx();
   }
 
   async throwArc(ball, from, to, height, duration) {
@@ -1817,7 +1885,11 @@ export default class BattleScene extends Phaser.Scene {
       } else if (this.trainer) {
         await this.winTrainer();
       } else {
+        // Hạ Pokémon hoang dã: vẫn nhặt được ít tiền (game/state.js wildPrize)
+        const reward = wildPrize(this.enemy.level);
+        state.money = Math.min(MONEY_MAX, state.money + reward);
         this.saveResult('win');
+        await this.msg.show(`Bạn nhặt được ${formatMoney(reward)}.`);
         await this.endBattle('win');
       }
       return true;
@@ -1896,8 +1968,7 @@ export default class BattleScene extends Phaser.Scene {
     this.tweens.add({ targets: this.enemyShadow, alpha: 0.28, duration: 300 });
     await tweenAsync(this, { targets: this.enemySprite, scale: this.enemyScale, duration: 380, ease: 'Back.out' });
     this.enemySprite.clearTint();
-    if (mon.shiny) await this.shinySparkle(this.enemySprite);
-    this.updateShinyFx();
+    await this.shinySparkle(mon, this.enemySprite);
     await this.slideIn(this.enemyInfo, -60);
     this.teamBalls?.forEach((b) => b.setVisible(true));
     if (entry) await this.entryAbility(mon);
@@ -1949,8 +2020,7 @@ export default class BattleScene extends Phaser.Scene {
     this.tweens.add({ targets: this.playerShadow, alpha: 0.28, duration: 300 });
     await tweenAsync(this, { targets: this.playerSprite, scale: fitScale(this, key, PLAYER_SIZE), duration: 380, ease: 'Back.out' });
     this.playerSprite.clearTint();
-    if (mon.shiny) await this.shinySparkle(this.playerSprite);
-    this.updateShinyFx();
+    await this.shinySparkle(mon, this.playerSprite);
     await this.slideIn(this.playerInfo, 60);
     if (entry) await this.entryAbility(mon);
   }

@@ -1,0 +1,13 @@
+<!-- Supabase Dashboard → Authentication → Emails → Templates → "Magic Link": dán nội dung này (game dùng mẫu này để gửi mã
+     xác nhận thiết bị mới: supabase/schema.sql, src/online/device.js). Chỉ có MÃ, không có link (bấm link sẽ mở game ở tab
+     khác, tab đang chờ nhập mã không biết).
+     Tiêu đề (Subject) gợi ý: Mã xác nhận đăng nhập Pokémon Aurora Online: {{ .Token }} -->
+<div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; background: #1e2a44; border-radius: 16px; color: #e6e9f2;">
+  <h2 style="margin: 0 0 8px; color: #ffe066;">Xác nhận thiết bị mới</h2>
+  <p style="margin: 0 0 16px;">Tài khoản Pokémon Aurora Online của bạn vừa đăng nhập trên một thiết bị mới. Nhập mã này vào game để tiếp tục:</p>
+  <p style="margin: 0 0 20px; text-align: center;">
+    <span style="display: inline-block; padding: 12px 22px; background: #141c30; border: 2px solid #4a88e0; border-radius: 10px; font-size: 28px; font-weight: bold; letter-spacing: 6px; color: #ffffff;">{{ .Token }}</span>
+  </p>
+  <p style="margin: 0 0 8px; font-size: 13px; color: #a8b4d0;">Mã chỉ dùng được một lần và sẽ hết hạn sau ít phút. Không đưa mã này cho ai, kể cả người tự nhận là quản lý game.</p>
+  <p style="margin: 0; font-size: 13px; color: #ffb4b4;">Nếu bạn KHÔNG đăng nhập: có người đã biết mật khẩu của bạn nhưng không vào được vì thiếu mã này. Hãy đổi mật khẩu ngay (màn đăng nhập → Quên mật khẩu).</p>
+</div>

@@ -10,8 +10,11 @@ import { DIRS, LH, PLAYER_FRAMES, bikerPixels, characterPixels } from './playerA
 
 export { PLAYER_FRAMES };
 const PIX = WORLD_SCALE; // mỗi pixel logic = PIX pixel trên texture
-// Texture đã phóng to sẵn nên trên bản đồ hiển thị x1 (nhiều chỗ nhân với hằng số này)
-export const CHAR_SCALE = 1;
+// Texture đã phóng to sẵn (48x72); trên bản đồ hiện nhỏ lại còn 0.85 (người cao ~1.3 ô) cho cân với nhà cửa, đồ đạc.
+// Mọi nhân vật (người chơi, NPC, người chơi khác, thú cưỡi) cùng nhân hằng số này
+export const CHAR_SCALE = 0.85;
+// Pokémon đi theo / đứng cạnh NPC: nhỏ hơn người chừng một nửa chiều cao (nhân thêm vào CHAR_SCALE)
+export const FOLLOWER_SCALE = 0.75;
 export const CHAR_HEIGHT = LH * PIX * CHAR_SCALE;
 // Trong trận đấu: frame 48x72 x 8/3 = 128x192 (mỗi pixel logic thành đúng 8px)
 export const BATTLE_CHAR_SCALE = 2; // 1 điểm ảnh nhân vật = 6 điểm ảnh màn hình trong trận

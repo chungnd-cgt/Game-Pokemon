@@ -1,10 +1,12 @@
 <!-- Supabase Dashboard → Authentication → Emails → Templates → "Confirm signup": dán nội dung này.
-     Tiêu đề (Subject) gợi ý: Xác nhận tài khoản Pokémon Sơn Thủy -->
+     Game gửi MÃ 6 số (không có link): người chơi nhập mã ngay trên màn đăng ký (src/ui/AuthPanel.js màn 'sent').
+     Tiêu đề (Subject) gợi ý: Mã xác nhận tài khoản Pokémon Aurora Online: {{ .Token }} -->
 <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; background: #1e2a44; border-radius: 16px; color: #e6e9f2;">
-  <h2 style="margin: 0 0 8px; color: #ffe066;">Pokémon – Hành trình vùng Sơn Thủy</h2>
-  <p style="margin: 0 0 16px;">Chào bạn! Bấm nút dưới đây để xác nhận email và bắt đầu hành trình.</p>
-  <p style="margin: 0 0 20px;">
-    <a href="{{ .ConfirmationURL }}" style="display: inline-block; padding: 12px 22px; background: #40b060; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: bold;">Xác nhận email</a>
+  <h2 style="margin: 0 0 8px; color: #ffe066;">Pokémon Aurora Online</h2>
+  <p style="margin: 0 0 16px;">Chào bạn! Nhập mã này vào game để xác nhận email và bắt đầu hành trình:</p>
+  <p style="margin: 0 0 20px; text-align: center;">
+    <span style="display: inline-block; padding: 12px 22px; background: #141c30; border: 2px solid #40b060; border-radius: 10px; font-size: 28px; font-weight: bold; letter-spacing: 6px; color: #ffffff;">{{ .Token }}</span>
   </p>
+  <p style="margin: 0 0 8px; font-size: 13px; color: #a8b4d0;">Mã chỉ dùng được một lần và sẽ hết hạn sau ít phút. Không đưa mã này cho ai, kể cả người tự nhận là quản lý game.</p>
   <p style="margin: 0; font-size: 13px; color: #a8b4d0;">Nếu bạn không đăng ký tài khoản này thì cứ bỏ qua email.</p>
 </div>

@@ -2,7 +2,7 @@ import { ITEMS } from '../data/items.js';
 import { fixToCamera, textStyle, uiX } from './helpers.js';
 
 const TIP_W = 230;
-const DARK = 0x141a2c;
+const DARK = 0x16171b; // than chì, cùng tông khung túi đồ
 const DESC_STYLE = textStyle(15, '#ffffff', { wordWrap: { width: TIP_W - 28 }, lineSpacing: 3 });
 
 // Khung mô tả vật phẩm nhỏ, hiện cạnh vật phẩm đang rê chuột / đang chọn (thay cho khung lời thoại ở đáy màn hình)
@@ -55,7 +55,7 @@ export class ItemTip {
     this.bg.fillRoundedRect(2, 3, w, h, 8);
     this.bg.fillStyle(DARK, 0.96);
     this.bg.fillRoundedRect(0, 0, w, h, 8);
-    this.bg.lineStyle(1.5, 0xffd860, 0.7);
+    this.bg.lineStyle(1, 0xffd860, 0.6);
     this.bg.strokeRoundedRect(0.5, 0.5, w - 1, h - 1, 8);
     this.container.setPosition((this.inside ? 0 : uiX(this.scene)) + x, top).setVisible(true);
   }

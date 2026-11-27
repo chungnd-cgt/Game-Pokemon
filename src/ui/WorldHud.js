@@ -6,6 +6,7 @@ import { HUD_PHASE_ICON } from '../gfx/textures.js';
 import { hudSize, textStyle } from './helpers.js';
 import { CORNER, HOTBAR_RIGHT, MONEY_W, cornerSize } from './Hotbar.js';
 import { InfoPanel } from './InfoPanel.js';
+import { CARD } from './monCard.js';
 import { drawCardIcon } from './TrainerCard.js';
 
 const DEPTH = 100;
@@ -21,11 +22,12 @@ const CLOCK_TOP = 14;
 const PHASE_R = 18; // bán kính vòng tròn đựng icon buổi
 const CLOCK_ICON = 24;
 const PHASE_RING = { day: 0xffd860, dusk: 0xff9a50, night: 0x9ab8ff };
-// Khung nền góc trái dưới (bao cột nút tròn và hàng nút ≡ / tiền / phím tắt), chỗ nối uốn cong
-const FRAME_FILL = 0x0b0e16; // nền đen đặc (không trong suốt) của khung góc trái dưới và khung giờ
-const BLACK = 0x0b0e16;
+// Khung nền góc trái dưới (bao cột nút tròn và hàng nút ≡ / tiền / phím tắt), chỗ nối uốn cong. Nền xám xanh đặc như
+// cửa sổ chi tiết Pokémon (ui/monCard.js CARD), cả khung giờ góc phải trên
+const FRAME_FILL = CARD.frame;
+const BLACK = 0x0b0e16; // nền nhãn chữ cạnh nút tròn
 const ARC = 34; // cột nút menu cong: nút dưới cùng lệch sang phải chừng này px so với nút trên cùng
-const FRAME_EDGE = 0x3d4c72;
+const FRAME_EDGE = CARD.edge;
 const NOTE_WRAP = 540; // dòng báo dài (vd gán phím tắt) xuống dòng ở chừng này px
 
 // Biểu tượng vẽ bằng code cho các nút
@@ -289,16 +291,20 @@ export class WorldHud {
   // Khung giờ góc phải trên (toạ độ ảo)
   layoutClock() {
     const { width } = hudSize(this.scene);
-    const x = width - 16 - CLOCK_W;
+    // Vòng tròn buổi nằm đè lên mép phải khung (nửa trong nửa ngoài)
+    const cx = width - 14 - PHASE_R; // tâm vòng tròn buổi
+    const boxW = CLOCK_W - 8 - PHASE_R;
+    const x = cx - boxW;
     const y = CLOCK_TOP;
-    const cx = x + CLOCK_W - 8 - PHASE_R; // tâm vòng tròn buổi
     const cy = y + CLOCK_H / 2;
     const g = this.clockBg.clear();
-    g.fillStyle(BLACK, 1);
-    g.fillRoundedRect(x, y, CLOCK_W, CLOCK_H, 10);
+    g.fillStyle(FRAME_FILL, 1);
+    g.fillRoundedRect(x, y, boxW, CLOCK_H, 10);
     g.lineStyle(2, FRAME_EDGE, 0.9);
-    g.strokeRoundedRect(x + 1, y + 1, CLOCK_W - 2, CLOCK_H - 2, 9);
-    g.fillStyle(0x0c1020, 0.9);
+    g.strokeRoundedRect(x + 1, y + 1, boxW - 2, CLOCK_H - 2, 9);
+    g.fillStyle(0x000000, 0.3);
+    g.fillCircle(cx + 1, cy + 3, PHASE_R);
+    g.fillStyle(0x0c1020, 1);
     g.fillCircle(cx, cy, PHASE_R);
     g.lineStyle(3, PHASE_RING[this.phase] ?? PHASE_RING.day);
     g.strokeCircle(cx, cy, PHASE_R);
@@ -355,10 +361,11 @@ export class WorldHud {
     g.lineStyle(2, FRAME_EDGE, 0.85);
     g.beginPath();
     if (this.expanded && this.buttons?.length) {
-      // Khung cột hẹp, chỉ ôm các nút tròn (nhãn chữ thò ra ngoài khung), mép phải cong theo cột nút
+      // Khung cột hẹp, mép phải cong theo cột nút và chạy qua tâm các nút tròn: nút nằm nửa trong nửa ngoài, đè lên
+      // đường viền (nhãn chữ thò hẳn ra ngoài khung)
       const f = 16 * s; // bán kính chỗ uốn cong giữa cột và hàng dưới
-      const top = Math.min(...this.buttons.map((b) => b.cy)) - ROUND - 10;
-      const edge = (y) => this.columnX(y) + ROUND + 9;
+      const top = Math.min(...this.buttons.map((b) => b.cy)) - ROUND - 8;
+      const edge = (y) => this.columnX(y);
       const right0 = edge(top);
       g.moveTo(L + r, top);
       g.lineTo(right0 - r, top);

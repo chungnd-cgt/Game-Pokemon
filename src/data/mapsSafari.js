@@ -1,4 +1,3 @@
-import { roomy } from './indoorLayout.js';
 import { berryRow } from './berryRows.js';
 import { INDOOR_TILES, OUTDOOR_TILES } from './tiles.js';
 
@@ -150,7 +149,7 @@ const ZONE_SIGN = {
 };
 
 export const SAFARI_MAPS = {
-  safariGate: roomy({
+  safariGate: {
     name: 'Nhà Safari',
     indoor: true,
     theme: 'mart',
@@ -165,7 +164,7 @@ export const SAFARI_MAPS = {
       '..............',
       'p............p',
       '..............',
-      '......E.......',
+      '......EE......',
     ],
     entry: { x: 6, y: 7 },
     rugs: [[2, 2, 4, 3, '#3a7a3a', '#e8d070'], [9, 2, 11, 3, '#8a5a2a', '#e8d070']],
@@ -180,7 +179,7 @@ export const SAFARI_MAPS = {
       '13,2': ['GÓI SAFARI 24 GIỜ: ₽55.000', 'Ra vào khu Safari tự do trong 24 giờ. Mỗi ngày chỉ mua được một lần.',
         'Vé Safari Effort chỉ còn ₽2.000 / 20 phút.'],
     },
-  }, 'mart'),
+  },
 
   safariZone: {
     name: 'Khu Safari',

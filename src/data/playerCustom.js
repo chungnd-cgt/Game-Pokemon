@@ -4,20 +4,21 @@ import { PLAYER_BASE_LOOKS } from './characterLooks.js';
 // Bản lưu chỉ giữ mã (id) của từng lựa chọn: state.player.look = { hairStyle, hair, skin, outfit, eyes };
 // resolveLook đổi các mã đó thành bảng màu nhân vật (như LOOKS trong data/characterLooks.js) để gfx/player.js vẽ.
 
-// Kiểu tóc (hat: có đội mũ, màu mũ lấy theo trang phục). Mỗi giới tính một thứ tự riêng, kiểu mặc định đứng đầu
+// Kiểu tóc: mỗi giới tính một danh sách riêng (nam và nữ trông khác hẳn nhau), kiểu mặc định đứng đầu.
+// Kiểu có đội mũ (mũ lưỡi trai, mũ len, nón rộng vành) không còn chọn ở đây: sau này mũ là vật phẩm mua ở cửa hàng, đội ở
+// ô trang bị trong Thẻ Huấn luyện viên (hình mũ vẫn giữ trong gfx/playerArt.js, NPC đang dùng)
 export const HAIR_STYLES = {
-  cap: { label: 'Mũ lưỡi trai', hat: true },
-  beanie: { label: 'Mũ len', hat: true },
-  sunhat: { label: 'Nón rộng vành', hat: true },
   short: { label: 'Tóc ngắn' },
   spiky: { label: 'Tóc xù' },
-  ponytail: { label: 'Tóc đuôi ngựa' },
+  buzz: { label: 'Đầu đinh' },
+  ponytail: { label: 'Đuôi ngựa' },
   long: { label: 'Tóc dài' },
   bun: { label: 'Búi tóc' },
+  twintails: { label: 'Tóc hai bên' },
 };
 const HAIR_ORDER = {
-  male: ['short', 'spiky', 'cap', 'beanie', 'ponytail', 'long', 'bun', 'sunhat'],
-  female: ['ponytail', 'long', 'bun', 'short', 'sunhat', 'beanie', 'cap', 'spiky'],
+  male: ['short', 'spiky', 'buzz'],
+  female: ['ponytail', 'long', 'bun', 'twintails'],
 };
 
 export const HAIR_COLORS = {
@@ -48,10 +49,11 @@ export const EYE_COLORS = {
   violet: { label: 'Tím', color: '#8040c0' },
 };
 
-// Bộ trang phục: mũ (+ logo / dải mũ, khi chọn kiểu tóc có mũ), áo, quần (váy với nhân vật nữ), giày, ba lô / túi đeo.
-// style 'tank': áo ba lỗ + quần short, tay và chân để trần, không mang ba lô / túi (cả nam lẫn nữ)
+// Bộ trang phục: mũ (+ logo / dải mũ, để dành cho mũ đội sau này), áo, quần (váy với nhân vật nữ), giày, ba lô / túi đeo.
+// style 'tank': áo ba lỗ, tay chân để trần, không mang ba lô / túi (nam quần short, nữ váy ngắn).
+// skirt: màu váy của nhân vật nữ (không có thì cùng màu quần)
 export const OUTFITS = {
-  tank: { label: 'Áo ba lỗ', style: 'tank', hat: '#e03838', hatAccent: '#ffffff', shirt: '#f4f4f0', pants: '#3a5a9a', shoes: '#d84838', pack: null },
+  tank: { label: 'Áo ba lỗ', style: 'tank', hat: '#e03838', hatAccent: '#ffffff', shirt: '#f4f4f0', pants: '#3a5a9a', skirt: '#d04868', shoes: '#d84838', pack: null },
   classic: { label: 'Đỏ lam', hat: '#e03838', hatAccent: '#ffffff', shirt: '#3870d8', pants: '#3a4258', shoes: '#e04040', pack: '#f0c040' },
   sunny: { label: 'Cam nắng', hat: '#f8f8f0', hatAccent: '#e84860', shirt: '#f06848', pants: '#3a4a9a', shoes: '#e04848', pack: '#f0c040' },
   forest: { label: 'Rừng xanh', hat: '#3a8a48', hatAccent: '#f0e8b0', shirt: '#5ab060', pants: '#6a5238', shoes: '#5a3a20', pack: '#c08040' },
@@ -67,18 +69,18 @@ const OUTFIT_ORDER = {
 
 export const GENDERS = { male: { label: 'Nam' }, female: { label: 'Nữ' } };
 
-// Diện mạo mặc định khi chơi mới: đơn giản, áo ba lỗ trắng + quần short, không đội mũ, không ba lô / túi
-// (nam tóc ngắn, nữ tóc đuôi ngựa)
+// Diện mạo mặc định khi chơi mới: đơn giản, áo ba lỗ trắng, không đội mũ, không ba lô / túi
+// (nam tóc ngắn + quần short, nữ tóc đuôi ngựa + váy ngắn)
 export const DEFAULT_CUSTOM = Object.freeze({
   male: Object.freeze({ hairStyle: 'short', hair: 'darkbrown', skin: 'light', outfit: 'tank', eyes: 'dark' }),
   female: Object.freeze({ hairStyle: 'ponytail', hair: 'chestnut', skin: 'light', outfit: 'tank', eyes: 'dark' }),
 });
 
-// Diện mạo cũ (trước khi có tuỳ chỉnh) = đúng nhân vật nam / nữ có sẵn (PLAYER_BASE_LOOKS: mũ lưỡi trai đỏ / nón rộng vành).
-// Bản lưu cũ chưa có diện mạo giữ nguyên hình nhân vật đã quen
+// Diện mạo cũ (trước khi có tuỳ chỉnh) = nhân vật nam / nữ có sẵn (PLAYER_BASE_LOOKS: áo khoác xanh + ba lô / áo cam + váy
+// + túi đeo), bỏ mũ: bản lưu cũ chưa có diện mạo giữ bộ đồ đã quen, nam tóc ngắn, nữ tóc dài (tóc vốn có dưới nón)
 export const LEGACY_CUSTOM = Object.freeze({
-  male: Object.freeze({ hairStyle: 'cap', hair: 'darkbrown', skin: 'light', outfit: 'classic', eyes: 'dark' }),
-  female: Object.freeze({ hairStyle: 'sunhat', hair: 'chestnut', skin: 'light', outfit: 'sunny', eyes: 'dark' }),
+  male: Object.freeze({ hairStyle: 'short', hair: 'darkbrown', skin: 'light', outfit: 'classic', eyes: 'dark' }),
+  female: Object.freeze({ hairStyle: 'long', hair: 'chestnut', skin: 'light', outfit: 'sunny', eyes: 'dark' }),
 });
 
 // Các dòng trong bảng tuỳ chỉnh, theo thứ tự hiển thị
@@ -104,13 +106,14 @@ export function optionIds(key, gender) {
 // Thông tin một lựa chọn: { label, color? }
 export const optionInfo = (key, id) => TABLES[key]?.[id] ?? null;
 
-// Bổ sung / sửa diện mạo (bản lưu cũ chưa có, mã không còn trong game): thiếu dòng nào thì lấy mặc định của giới tính
+// Bổ sung / sửa diện mạo (bản lưu cũ chưa có, mã không còn trong game, kiểu tóc có mũ ngày trước, kiểu tóc của giới tính
+// kia): dòng nào không có trong danh sách của giới tính thì lấy mặc định của giới tính
 export function normalizeCustom(gender, custom) {
   const def = DEFAULT_CUSTOM[genderOf(gender)];
   const out = {};
   for (const { key } of CUSTOM_ROWS) {
     const id = custom?.[key];
-    out[key] = typeof id === 'string' && TABLES[key][id] ? id : def[key];
+    out[key] = typeof id === 'string' && optionIds(key, gender).includes(id) ? id : def[key];
   }
   return out;
 }
@@ -122,12 +125,13 @@ export function currentLook(player) {
 }
 
 // Đổi giới tính trong bảng tuỳ chỉnh: dòng nào đang là mặc định của giới tính cũ thì đổi sang mặc định của giới tính mới,
-// dòng đã tự chọn (màu tóc, màu da, mắt, trang phục, kiểu tóc) thì giữ nguyên
+// dòng đã tự chọn (màu tóc, màu da, mắt, trang phục) thì giữ nguyên. Kiểu tóc mỗi giới tính một danh sách riêng: luôn về
+// kiểu mặc định của giới tính mới
 export function switchGender(from, to, custom) {
   const c = normalizeCustom(from, custom);
   const a = DEFAULT_CUSTOM[genderOf(from)];
   const b = DEFAULT_CUSTOM[genderOf(to)];
-  return Object.fromEntries(CUSTOM_ROWS.map(({ key }) => [key, c[key] === a[key] ? b[key] : c[key]]));
+  return normalizeCustom(to, Object.fromEntries(CUSTOM_ROWS.map(({ key }) => [key, c[key] === a[key] ? b[key] : c[key]])));
 }
 
 // Mã lựa chọn kế tiếp (delta = +1 / -1, vòng tròn)
@@ -148,7 +152,9 @@ export function randomCustom(gender, rng = Math.random) {
   return out;
 }
 
-// Bảng màu nhân vật để vẽ (cùng dạng với LOOKS['player'] / LOOKS['player-f'])
+// Bảng màu nhân vật để vẽ (cùng dạng với LOOKS['player'] / LOOKS['player-f']).
+// Nam / nữ khác nhau dù chọn giống nhau: nữ có lông mi (lashes) + má hồng, mặc váy (cả với áo ba lỗ: váy ngắn), đeo túi chéo;
+// nam không má hồng, quần dài (áo ba lỗ: quần short), đeo ba lô
 export function resolveLook(gender, custom) {
   const g = genderOf(gender);
   const c = normalizeCustom(g, custom);
@@ -166,15 +172,16 @@ export function resolveLook(gender, custom) {
     pants: o.pants,
     shoes: o.shoes,
   };
-  if (SKIN_TONES[c.skin].blush) look.blush = SKIN_TONES[c.skin].blush;
+  if (g === 'male') look.blush = look.skin; // má không hồng
+  else if (SKIN_TONES[c.skin].blush) look.blush = SKIN_TONES[c.skin].blush;
+  if (base.skirt) look.skirt = o.skirt ?? o.pants;
   if (o.style === 'tank') {
-    // áo ba lỗ + quần short (cả nam lẫn nữ): bỏ váy, ba lô / túi, thắt lưng
-    for (const k of ['dress', 'skirt', 'backpack', 'bag', 'belt']) delete look[k];
+    // áo ba lỗ: bỏ ba lô / túi, thắt lưng. Nam quần short, nữ giữ váy (váy ngắn, chân để trần)
+    for (const k of ['backpack', 'bag', 'belt']) delete look[k];
     look.tank = true;
-    look.shorts = true;
+    if (!base.dress) look.shorts = true;
     return look;
   }
-  if (base.skirt) look.skirt = o.pants;
   if (base.backpack) look.backpack = o.pack;
   if (base.bag) look.bag = o.pack;
   return look;

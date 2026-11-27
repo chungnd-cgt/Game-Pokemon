@@ -625,6 +625,78 @@ HAIR.ponytail = {
   },
 };
 
+// Đầu đinh (nam): tóc cắt sát ôm đầu, lộ trán và gáy, mái chỉ lởm chởm vài sợi
+HAIR.buzz = {
+  down: { y: 2, front: [
+    '................',
+    '.....hHHHHh.....',
+    '...hHLLHHHHHh...',
+    '..hHLHHHHHHHHh..',
+    '..HHHHHHHHHHHh..',
+    '..hHhHHhHHhHhh..',
+    '..h..........h..',
+  ] },
+  up: { y: 2, front: [
+    '................',
+    '.....hHHHHh.....',
+    '...hHLLHHHHHh...',
+    '..hHLHHHHHHHHh..',
+    '..HHHHHHHHHHHh..',
+    '..HHHHHHHHHHHh..',
+    '..HHHHHHHHHHhh..',
+    '..hHHHHHHHHhhh..',
+    '..zhhhhhhhhhhz..',
+  ] },
+  side: { y: 2, front: [
+    '................',
+    '.....hHHHHh.....',
+    '...hHLLHHHHHh...',
+    '..hHLHHHHHHHHh..',
+    '.hHHHHHHHHHHHh..',
+    '.h..hHHHHHHHhh..',
+    '.......HHHHHhh..',
+    '......z.hHHhh...',
+    '.........hh.....',
+  ] },
+};
+
+// Tóc hai bên (nữ): tóc ngắn phía trước, hai túm buộc dây đỏ (X) hai bên đầu thả xuống vai
+const TWIN_TAILS = [
+  '................', // 2
+  '................',
+  '................',
+  '................',
+  '................',
+  '.X............X.', // 7 dây buộc
+  'HHh..........HHh',
+  'HLh..........HLh',
+  'HHh..........HHh',
+  'HHh..........HHh',
+  '.Hh..........Hh.',
+  '.Hh..........Hh.',
+  '.h............h.', // 14
+];
+HAIR.twintails = {
+  down: { y: 2, front: HAIR.short.down.front, back: TWIN_TAILS },
+  up: { y: 2, front: HAIR.short.up.front, back: TWIN_TAILS },
+  // nhìn ngang: một túm sau tai thả xuống vai
+  side: {
+    y: 2,
+    front: overlay([...HAIR.short.side.front, '................', '................', '................'], [
+      '................', // 4
+      '................',
+      '................',
+      '............X...', // 7 dây buộc
+      '...........HHh..',
+      '...........HLHh.',
+      '............HHh.', // 10
+      '............HHh.',
+      '............Hh..',
+      '............h...', // 13
+    ], 2),
+  },
+};
+
 // Tóc dưới mũ lưỡi trai (chỉ lộ tóc mai và gáy)
 const UNDER_CAP = {
   down: { y: 9, front: ['..HH........hh..', '..H..........h..'] },
@@ -798,7 +870,7 @@ function drawHead(p, pal, look, dir, layer) {
     if (rows) stamp(p, rows, pal, 0, spec.y);
   };
   if (layer === 'back') {
-    if (style === 'long' || style === 'ponytail') hairPart(HAIR[style][dir]);
+    if (style === 'long' || style === 'ponytail' || style === 'twintails') hairPart(HAIR[style][dir]);
     if (style === 'sunhat') hairPart(UNDER_SUNHAT[dir]);
     return;
   }
@@ -816,6 +888,13 @@ function drawHead(p, pal, look, dir, layer) {
     hairPart(NURSE[dir]);
   } else {
     hairPart((HAIR[style] ?? HAIR.short)[dir]);
+  }
+  // Lông mi (người chơi nữ): vệt mực ở đuôi mắt, vẽ đè lên tóc mai
+  if (look.lashes) {
+    if (dir === 'down') {
+      p.set(4, 9, INK);
+      p.set(11, 9, INK);
+    } else if (dir === 'side') p.set(2, 9, INK);
   }
 }
 

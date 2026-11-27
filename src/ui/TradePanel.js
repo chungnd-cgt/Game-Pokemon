@@ -2,9 +2,9 @@ import { ITEMS, formatMoney } from '../data/items.js';
 import { NATURES } from '../data/natures.js';
 import { SPECIES } from '../data/monsters.js';
 import { tradeEvolutionTarget } from '../game/evolution.js';
-import { itemCount, state } from '../game/state.js';
+import { itemCount, playerName, state } from '../game/state.js';
 import {
-  TRADE_MAX_MONS, emptyOffer, itemTradeable, maxOfferMons, monTradeProblem, offerProblem, receiveProblem,
+  TRADE_ITEM_MAX, TRADE_MAX_MONS, TRADE_MAX_ROWS, TRADE_ROWS_FULL, emptyOffer, offerRows, itemTradeProblem, itemTradeable, maxOfferMons, monTradeProblem, offerProblem, receiveProblem,
 } from '../game/trade.js';
 import { GBA_MON, pixelMon } from '../gfx/textures.js';
 import { TradeSession } from '../online/trade.js';
@@ -53,8 +53,18 @@ const CSS = `
 .tp-add { display: flex; gap: 6px; margin-top: 6px; }
 .tp-add select, .tp-add input, .tp-money input { min-width: 0; box-sizing: border-box; border: 2px solid #3a4a6c; border-radius: 8px;
   background: #f6f8fc; color: #1e2a44; font: 700 14px Nunito, sans-serif; padding: 4px 6px; }
-.tp-add select { flex: 1; }
+.tp-add { align-items: center; }
 .tp-add input { width: 64px; }
+.tp-hint { flex: 1; font-size: 12px; font-weight: 700; color: #a8b4d0; }
+.tp-items.drop { min-height: 34px; padding: 4px; border: 2px dashed #3a4a6c; border-radius: 10px; transition: border-color .15s, background .15s; }
+.tp-items.drop.over { border-color: #ffd860; background: #2a2a1a; }
+.tp-bag { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 4px; margin-top: 6px; }
+.tp-bagitem { position: relative; display: flex; align-items: center; justify-content: center; height: 44px; border-radius: 8px;
+  background: #22304e; cursor: grab; user-select: none; -webkit-user-select: none; }
+.tp-bagitem img { width: 28px; height: 28px; image-rendering: pixelated; pointer-events: none; }
+.tp-bagitem .c { position: absolute; right: 3px; bottom: 1px; font-size: 11px; font-weight: 800; color: #ffe066; }
+.tp-bagitem.used { opacity: .5; }
+.tp-bagitem.off { opacity: .3; cursor: not-allowed; }
 .tp-money { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #a8b4d0; }
 .tp-money input { width: 140px; }
 .tp-foot { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
@@ -204,6 +214,7 @@ export class TradePanel {
     this.view = null;
     this.message = '';
     this.sending = false; // đề nghị của mình đang chờ gửi lên máy chủ
+    this.addQty = 1; // số vật phẩm thêm mỗi lần kéo / bấm từ túi đồ
     this.theirsKey = '';
   }
 
@@ -237,6 +248,15 @@ export class TradePanel {
     this.finish({ status: 'cancelled', reason: 'Đã huỷ giao dịch.' });
   }
 
+  // Mình không nhận hết được đề nghị của bên kia: huỷ giao dịch, lý do ghi kèm (bên kia thấy tên mình, mình thấy "Bạn")
+  async cancelCantReceive(view) {
+    if (this.done) return;
+    const ending = ' Giao dịch đã huỷ.';
+    this.cancelling = true;
+    await this.session.cancel(receiveProblem(this.offer, view.theirs, playerName()) + ending);
+    this.finish({ status: 'cancelled', reason: receiveProblem(this.offer, view.theirs) + ending });
+  }
+
   say(text, info = false) {
     this.message = text ?? '';
     this.msgEl.textContent = this.message;
@@ -253,7 +273,8 @@ export class TradePanel {
         el('h2', { text: `Giao dịch với ${this.partner.name || 'người chơi'}` }),
         el('button', { class: 'tp-x', text: '✕', title: 'Huỷ giao dịch', onclick: () => this.cancel() }),
       ]),
-      el('p', { class: 'tp-sub', text: `Chọn Pokémon (tối đa ${TRADE_MAX_MONS}, chừa lại ít nhất 1 con), vật phẩm và tiền muốn đưa. `
+      el('p', { class: 'tp-sub', text: `Chọn Pokémon (tối đa ${TRADE_MAX_MONS}, chừa lại ít nhất 1 con), vật phẩm (tối đa ${TRADE_ITEM_MAX} mỗi loại) và tiền muốn đưa; `
+        + `tối đa ${TRADE_MAX_ROWS} dòng mỗi lượt (mỗi Pokémon / mỗi loại vật phẩm một dòng, tiền không tính). `
         + 'Xong thì bấm Đồng ý; cả hai đã Đồng ý thì bấm Giao dịch để chốt. Đổi gì thì cả hai phải Đồng ý lại. '
         + 'Pokémon huyền thoại và vật phẩm quan trọng không giao dịch được.' }),
       el('div', { class: 'tp-cols' }, [this.mineCol, this.theirsCol]),
@@ -289,6 +310,7 @@ export class TradePanel {
   toggleMon(mon) {
     const i = this.offer.mons.findIndex((m) => m.uid === mon.uid);
     if (i >= 0) this.offer.mons.splice(i, 1);
+    else if (offerRows(this.offer) >= TRADE_MAX_ROWS) return this.say(`${TRADE_ROWS_FULL}.`);
     else if (this.offer.mons.length >= maxOfferMons()) {
       return this.say(state.party.length <= 1 ? 'Phải chừa lại ít nhất 1 Pokémon trong đội.'
         : `Đưa tối đa ${maxOfferMons()} Pokémon (chừa lại ít nhất 1 con trong đội).`);
@@ -297,8 +319,23 @@ export class TradePanel {
     this.changed();
   }
 
+  // Thêm vật phẩm id từ túi đồ (kéo vào / bấm): mỗi lần addQty cái. Không giao dịch được thì báo, không thêm
+  addItem(id) {
+    const problem = itemTradeProblem(id);
+    if (problem) return this.say(problem);
+    // Loại vật phẩm mới là thêm một dòng: đủ 6 dòng (Pokémon + loại vật phẩm) thì không thêm được
+    if (!this.offer.items[id] && offerRows(this.offer) >= TRADE_MAX_ROWS) return this.say(`${TRADE_ROWS_FULL}.`);
+    const left = Math.min(itemCount(id), TRADE_ITEM_MAX) - (this.offer.items[id] ?? 0);
+    if (left <= 0) return this.say(itemCount(id) > TRADE_ITEM_MAX ? 'Mỗi loại vật phẩm chỉ đưa tối đa 999.' : `Đã đưa hết ${ITEMS[id].name} đang có.`);
+    this.say('');
+    this.setItem(id, (this.offer.items[id] ?? 0) + Math.min(left, this.addQty));
+  }
+
   setItem(id, qty) {
-    const n = Math.max(0, Math.min(itemCount(id), Math.floor(qty)));
+    const problem = itemTradeProblem(id);
+    if (problem) return this.say(problem);
+    if (!this.offer.items[id] && qty > 0 && offerRows(this.offer) >= TRADE_MAX_ROWS) return this.say(`${TRADE_ROWS_FULL}.`);
+    const n = Math.max(0, Math.min(itemCount(id), TRADE_ITEM_MAX, Math.floor(qty)));
     if (n > 0) this.offer.items[id] = n;
     else delete this.offer.items[id];
     this.changed();
@@ -306,7 +343,7 @@ export class TradePanel {
 
   renderMine() {
     const chosen = new Set(this.offer.mons.map((m) => m.uid));
-    const full = this.offer.mons.length >= maxOfferMons();
+    const full = this.offer.mons.length >= maxOfferMons() || offerRows(this.offer) >= TRADE_MAX_ROWS;
     const mons = state.party.map((mon) => {
       const problem = monTradeProblem(mon);
       const on = chosen.has(mon.uid);
@@ -323,20 +360,53 @@ export class TradePanel {
       el('button', { text: '+', title: 'Thêm 1', onclick: () => this.setItem(id, qty + 1) }),
       el('button', { text: '✕', title: 'Bỏ', onclick: () => this.setItem(id, 0) }),
     ]));
-    const choices = Object.keys(state.bag)
-      .filter((id) => itemTradeable(id) && itemCount(id) > (this.offer.items[id] ?? 0))
-      .sort((a, b) => ITEMS[a].name.localeCompare(ITEMS[b].name, 'vi'));
-    const select = el('select', { 'aria-label': 'Vật phẩm' }, choices.map((id) => el('option', {
-      value: id, text: `${ITEMS[id].name} (có ${itemCount(id) - (this.offer.items[id] ?? 0)})`,
-    })));
-    const qty = el('input', { type: 'number', min: 1, value: 1, 'aria-label': 'Số lượng' });
-    const add = el('div', { class: 'tp-add' }, choices.length ? [
-      select, qty,
-      el('button', {
-        text: 'Thêm', style: 'padding: 0 10px',
-        onclick: () => this.setItem(select.value, (this.offer.items[select.value] ?? 0) + (Number(qty.value) || 1)),
-      }),
-    ] : [el('div', { class: 'tp-empty', text: 'Không còn vật phẩm nào đưa được.' })]);
+    // Ô "Vật phẩm" nhận vật phẩm kéo từ túi đồ bên dưới
+    const dropZone = el('div', {
+      class: 'tp-items drop',
+      ondragover: (e) => {
+        e.preventDefault();
+        dropZone.classList.add('over');
+      },
+      ondragleave: () => dropZone.classList.remove('over'),
+      ondrop: (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('over');
+        const id = e.dataTransfer?.getData('text/x-trade-item');
+        if (id && state.bag[id] !== undefined) this.addItem(id);
+      },
+    }, items.length ? items : [el('div', { class: 'tp-empty', text: 'Kéo vật phẩm từ túi đồ vào đây' })]);
+
+    // Túi đồ: mọi vật phẩm đang có. Kéo vào ô Vật phẩm (máy tính) hoặc bấm / chạm (điện thoại) để thêm, mỗi lần thêm số
+    // lượng trong ô số lượng. Vật phẩm không giao dịch được hiện mờ, kéo / bấm vào thì báo
+    const bagIds = Object.keys(state.bag)
+      .filter((id) => ITEMS[id] && itemCount(id) > 0)
+      .sort((a, b) => Number(itemTradeable(b)) - Number(itemTradeable(a)) || ITEMS[a].name.localeCompare(ITEMS[b].name, 'vi'));
+    const tiles = bagIds.map((id) => {
+      const left = itemCount(id) - (this.offer.items[id] ?? 0);
+      const problem = itemTradeProblem(id);
+      return el('div', {
+        class: `tp-bagitem${problem ? ' off' : left <= 0 ? ' used' : ''}`,
+        draggable: 'true',
+        role: 'button',
+        title: problem ?? `${ITEMS[id].name} (còn ${left}): kéo vào ô Vật phẩm hoặc bấm để thêm`,
+        ondragstart: (e) => {
+          e.dataTransfer.setData('text/x-trade-item', id);
+          e.dataTransfer.effectAllowed = 'copy';
+        },
+        onclick: () => this.addItem(id),
+      }, [el('img', { src: itemUrl(this.scene, id), alt: ITEMS[id].name }), el('span', { class: 'c', text: String(left) })]);
+    });
+    const qty = el('input', { type: 'number', min: 1, value: this.addQty, 'aria-label': 'Số lượng mỗi lần thêm' });
+    qty.addEventListener('change', () => {
+      this.addQty = Math.max(1, Math.floor(Number(qty.value) || 1));
+      qty.value = this.addQty;
+    });
+    const add = tiles.length ? [
+      el('div', { class: 'tp-add' }, [
+        el('span', { class: 'tp-hint', text: 'Túi đồ: kéo vào ô trên hoặc bấm để thêm, mỗi lần' }), qty,
+      ]),
+      el('div', { class: 'tp-bag' }, tiles),
+    ] : [el('div', { class: 'tp-empty', text: 'Túi đồ trống.' })];
 
     const money = el('input', { type: 'number', min: 0, max: state.money, step: 100, value: this.offer.money, 'aria-label': 'Số tiền' });
     money.addEventListener('change', () => {
@@ -354,8 +424,8 @@ export class TradePanel {
       el('h3', {}, [el('span', { text: 'Bạn đưa' }), status]),
       el('div', { class: 'tp-label', text: `Pokémon trong đội (${this.offer.mons.length}/${maxOfferMons()})` }),
       el('div', { class: 'tp-mons' }, mons),
-      el('div', { class: 'tp-label', text: 'Vật phẩm' }),
-      el('div', { class: 'tp-items' }, items.length ? items : [el('div', { class: 'tp-empty', text: 'Chưa có' })]),
+      el('div', { class: 'tp-label', text: `Vật phẩm · ${offerRows(this.offer)}/${TRADE_MAX_ROWS} dòng` }),
+      dropZone,
       add,
       el('div', { class: 'tp-label', text: 'Tiền' }),
       el('div', { class: 'tp-money' }, [money, el('span', { text: `₽ (có ${formatMoney(state.money)})` })]),
@@ -409,7 +479,9 @@ export class TradePanel {
     if (this.done) return;
     if (view.status === 'done') return this.finish({ status: 'done', view });
     if (view.status === 'cancelled') {
-      return this.finish({ status: 'cancelled', reason: this.cancelling ? 'Đã huỷ giao dịch.' : `${view.partnerName} đã huỷ giao dịch.` });
+      // Lý do huỷ (vd một bên không nhận thêm được vật phẩm vì túi đầy) hiện cho cả hai bên
+      const reason = view.cancelReason ?? (this.cancelling ? 'Đã huỷ giao dịch.' : `${view.partnerName} đã huỷ giao dịch.`);
+      return this.finish({ status: 'cancelled', reason });
     }
     const flags = `${view.myReady}|${view.theirReady}|${view.myConfirm}|${view.theirConfirm}`;
     const flagsChanged = flags !== this.flags;
@@ -432,14 +504,19 @@ export class TradePanel {
     const both = v.myReady && v.theirReady;
     if (!both) {
       // Bước 1: Đồng ý với đề nghị bên kia đang thấy
-      const problem = offerProblem(this.offer) ?? receiveProblem(this.offer, v.theirs);
+      const problem = offerProblem(this.offer);
       if (problem) return this.say(problem);
+      // Không nhận hết được đồ của bên kia (túi mỗi loại tối đa 999...): huỷ giao dịch, báo lý do cho cả hai bên.
+      // Chưa chốt nên không ai mất gì
+      if (receiveProblem(this.offer, v.theirs)) return this.cancelCantReceive(v);
     }
     this.busyCall = true;
     this.renderButtons();
     const res = both ? await this.session.confirm() : await this.session.ready(v.theirs);
     this.busyCall = false;
     if (this.done) return;
+    // Máy chủ huỷ vì một bên không nhận hết được đồ: đọc lại để hiện lý do
+    if (res.data === 'cancelled') return this.session.refresh();
     if (res.error) this.say(res.error);
     else if (!both) this.say(`Đã đồng ý. Chờ ${v.partnerName} đồng ý…`, true);
     else if (res.data !== 'done') this.say(`Chờ ${v.partnerName} bấm Giao dịch…`, true);

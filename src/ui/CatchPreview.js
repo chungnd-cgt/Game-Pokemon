@@ -11,16 +11,15 @@ import { releaseMon, releaseProblem } from '../game/storage.js';
 import { logSystem } from '../game/systemLog.js';
 import { GBA_MON, fitScale, pixelMon } from '../gfx/textures.js';
 import { GENDER, closeButton, cssColor, fitText, fixToCamera, hpColor, hudSize, shade, textStyle, uiX } from './helpers.js';
-import { isCancel } from './input.js';
 import { CARD, STRIP_H, section, strip } from './monCard.js';
 import { shinyGap, shinyMark } from './shinyMark.js';
 import { typeBadges } from './TypeBadge.js';
 import { FloatWindow } from './Windows.js';
 
 // Bảng xem nhanh Pokémon vừa gửi vào PC (đội đã đủ 6; bật / tắt: Cài đặt → Chung → Xem nhanh khi gửi PC). Cửa sổ nổi
-// (ui/Windows.js) như các bảng khác: kéo dải tiêu đề để dời, chỉ đóng bằng nút ✕ hoặc phím quay lại (Esc), vẫn đi lại được.
+// (ui/Windows.js) như các bảng khác: kéo dải tiêu đề để dời, chỉ đóng bằng nút ✕ (Esc không đóng), vẫn đi lại được.
 // Mở ở góc phải, ngay trên khung Hệ thống / Nhiệm vụ. Nền cửa sổ xám, mục nền đen (ui/monCard.js):
-//  - Trên: mặt cười + thanh thân thiết, số máu, thanh HP, thanh EXP (ngắn); ô đồ cầm góc phải (luôn có,
+//  - Trên: mặt cười + thanh thân thiết, số máu, thanh HP, thanh EXP (tới ngang chỗ số máu); ô đồ cầm góc phải (luôn có,
 //    Pokémon hoang dã có thể cầm đồ)
 //  - Hai cột rộng bằng nhau, cùng đỉnh cùng đáy: trái Đặc tính / Tính cách / Vùng (nơi bắt, data/regions.js) / Sức mạnh ẩn
 //    (tên hệ theo IV); phải hình trên bệ, hệ, bảng chỉ số: giá trị, IV (vàng), EV (xanh)
@@ -40,6 +39,8 @@ const H = HEAD + 8 + BARS + BODY + TRASH + 18;
 const SCALE = 0.85;
 const STAT_ORDER = ['atk', 'def', 'speed', 'spAtk', 'spDef', 'hp'];
 const HELD = 30;
+const HAPPY_W = 94; // thanh thân thiết (từ sau mặt cười)
+const EXP_W = 144; // thanh EXP (thanh HP dài COL + 20)
 
 export class CatchPreview {
   constructor(manager, mon) {
@@ -56,7 +57,7 @@ export class CatchPreview {
     const y = Math.max(8, bottom - H * SCALE);
     this.win = new FloatWindow(manager, {
       id: 'catch', rect: { x, y, w: W, h: H }, dragRect: { x, y, w: W - 40, h: HEAD },
-      onKey: (e) => isCancel(e) && (this.popup ? this.closePopup() : this.win.close()), scale: SCALE,
+      scale: SCALE, // không nhận phím: chỉ đóng bằng nút ✕
       onClose: () => this.closePopup(),
     });
     this.page = this.win.add(scene.add.container(x, y));
@@ -114,22 +115,25 @@ export class CatchPreview {
     closeButton(scene, W - 18, cy, () => this.win.close(), 20).forEach((o) => this.add(o));
 
     const top = HEAD + 8;
-    // ----- Hàng trên: thân thiết + số máu, thanh HP, thanh EXP (ngắn, chỉ hơn cột trái một chút); ô đồ cầm (góc phải) -----
+    // ----- Hàng trên: thân thiết + số máu, thanh HP, thanh EXP; ô đồ cầm (góc phải) -----
+    // Thanh thân thiết dài HAPPY_W (dừng trước số máu một khoảng), thanh EXP dài EXP_W (tới ngang chỗ số máu bắt đầu,
+    // ngắn hơn thanh HP)
     const lx = PAD;
     const rx = PAD * 2 + COL;
     const bw = COL + 20;
     const bars = this.add(scene.add.graphics());
     const happy = Math.max(0, Math.min(1, (mon.happiness ?? 0) / HAPPINESS_MAX));
     drawFace(bars, lx + 7, top + 7, happy);
-    const fw = 70;
-    bars.fillStyle(0x0a0e1a);
-    bars.fillRoundedRect(lx + 18, top + 5, fw, 4, 2);
-    if (happy > 0) {
-      bars.fillStyle(0xf09030);
-      bars.fillRoundedRect(lx + 18, top + 5, Math.max(4, fw * happy), 4, 2);
-    }
     const ratio = Math.max(0, Math.min(1, mon.hp / mon.maxHp));
     this.text(lx + bw, top + 7, `${Math.max(0, mon.hp)}/${mon.maxHp}`, 11, ratio > 0.5 ? '#78e098' : '#ffffff', { fontStyle: 'bold' }).setOrigin(1, 0.5);
+    const fx = lx + 18;
+    const fw = HAPPY_W;
+    bars.fillStyle(0x0a0e1a);
+    bars.fillRoundedRect(fx, top + 5, fw, 4, 2);
+    if (happy > 0) {
+      bars.fillStyle(0xf09030);
+      bars.fillRoundedRect(fx, top + 5, Math.max(4, fw * happy), 4, 2);
+    }
     bars.fillStyle(0x0a0e1a);
     bars.fillRoundedRect(lx, top + 16, bw, 5, 2.5);
     if (ratio > 0) {
@@ -137,7 +141,7 @@ export class CatchPreview {
       bars.fillRoundedRect(lx, top + 16, Math.max(4, bw * ratio), 5, 2.5);
     }
     const exp = Math.max(0, Math.min(1, expProgress(mon)));
-    const ew = Math.round(bw * 0.75);
+    const ew = EXP_W;
     bars.fillStyle(0x0a0e1a);
     bars.fillRoundedRect(lx, top + 25, ew, 3, 1.5);
     if (exp > 0) {
@@ -231,16 +235,13 @@ export class CatchPreview {
     if (problem) return this.note.setText(problem);
     if (state.money < RELEASE_FEE) return this.note.setText(`Cần ${formatMoney(RELEASE_FEE)} để thả.`);
     this.closePopup();
-    // Giữa màn hình, trên mọi cửa sổ; lớp mờ phủ cả màn hình (bấm ra ngoài hộp hỏi = huỷ)
+    // Giữa màn hình, trên mọi cửa sổ; lớp mờ phủ cả màn hình chặn bấm xuống dưới (bấm ra ngoài không huỷ: nút Huỷ)
     const { width, height } = scene.scale;
     const m = this.manager;
     const c = scene.add.container(width / 2, height / 2).setDepth(m.base + (m.list.length + 1) * m.step);
     this.popup = c;
     const dim = scene.add.rectangle(-width / 2, -height / 2, width, height, 0x000000, 0.45).setOrigin(0).setInteractive();
-    dim.on('pointerdown', (p, lx, ly, e) => {
-      e?.stopPropagation();
-      this.closePopup();
-    });
+    dim.on('pointerdown', (p, lx, ly, e) => e?.stopPropagation());
     const pw = 300;
     const ph = 132;
     const px = -pw / 2;

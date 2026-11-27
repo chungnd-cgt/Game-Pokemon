@@ -4,10 +4,11 @@ const SKIN = '#f8c8a0';
 // Diện mạo mặc định của người chơi (khi chưa tuỳ chỉnh). LOOKS.player / LOOKS['player-f'] là bản sao, được thay bằng
 // diện mạo người chơi tự chọn khi vào game (gfx/player.js: applyPlayerLook, data/playerCustom.js)
 export const PLAYER_BASE_LOOKS = Object.freeze({
-  // Người chơi nam: mũ lưỡi trai đỏ logo trắng, tóc nâu đen, áo khoác xanh, ba lô vàng
-  male: Object.freeze({ skin: SKIN, hair: '#3a2420', hairStyle: 'cap', hat: '#e03838', hatAccent: '#ffffff', shirt: '#3870d8', pants: '#3a4258', shoes: '#e04040', backpack: '#f0c040', belt: '#2a2a38' }),
-  // Người chơi nữ: nón rộng vành trắng dải đỏ, tóc nâu dài, áo cam đỏ, váy xanh than, túi đeo chéo vàng
-  female: Object.freeze({ skin: SKIN, hair: '#8a4a2a', hairStyle: 'sunhat', hat: '#f8f8f0', hatAccent: '#e84860', shirt: '#f06848', skirt: '#3a4a9a', pants: '#3a4a9a', shoes: '#e04848', dress: true, bag: '#f0c040' }),
+  // Người chơi nam: tóc ngắn nâu đen, má không hồng (blush = màu da), áo khoác xanh, ba lô vàng
+  // (hat / hatAccent: màu mũ để dành cho mũ đội sau này; kiểu tóc có mũ không còn cho người chơi chọn)
+  male: Object.freeze({ skin: SKIN, blush: SKIN, hair: '#3a2420', hairStyle: 'short', hat: '#e03838', hatAccent: '#ffffff', shirt: '#3870d8', pants: '#3a4258', shoes: '#e04040', backpack: '#f0c040', belt: '#2a2a38' }),
+  // Người chơi nữ: tóc nâu dài, có lông mi (lashes), áo cam đỏ, váy xanh than, túi đeo chéo vàng
+  female: Object.freeze({ skin: SKIN, lashes: true, hair: '#8a4a2a', hairStyle: 'long', hat: '#f8f8f0', hatAccent: '#e84860', shirt: '#f06848', skirt: '#3a4a9a', pants: '#3a4a9a', shoes: '#e04848', dress: true, bag: '#f0c040' }),
 });
 
 export const LOOKS = {

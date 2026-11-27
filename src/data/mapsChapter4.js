@@ -1,4 +1,3 @@
-import { roomy } from './indoorLayout.js';
 import { berryRow } from './berryRows.js';
 import { CAVE_TILES, INDOOR_TILES, OUTDOOR_TILES } from './tiles.js';
 
@@ -273,7 +272,7 @@ export const CHAPTER4_MAPS = {
 
   // Viện Hoá thạch Núi Đá (nhà phía đông nam thành phố): Tiến sĩ Thạch đứng sau bàn thí nghiệm, máy hồi sinh hoá thạch
   // kê sát tường sau lưng (story/postgame.js: reviveFossils)
-  fossilLab: roomy({
+  fossilLab: {
     name: 'Viện Hoá thạch Núi Đá',
     indoor: true,
     theme: 'lab',
@@ -295,7 +294,7 @@ export const CHAPTER4_MAPS = {
       '10,2': ['Sách "Pokémon cổ đại vùng Sơn Thủy". Có hình Omanyte, Kabuto và Aerodactyl.'],
     },
     entry: { x: 5, y: 7 },
-  }, 'lab'),
+  },
 
   // Tuyến đường 9: Rừng Tre ven suối, từ Núi Đá (bắc) xuống cửa Hang Sơn Động. Đường từ phía bắc ra khoảng trống giữa rừng
   // tre (lối cụt sang đông tới rặng tre cỏ rậm, có đồ), rồi theo đường mòn phía tây vòng vèo xuống bờ suối (đầu tây bờ bắc

@@ -1,10 +1,15 @@
 import { TILE } from '../config.js';
 import { THEMES } from '../data/interiorThemes.js';
 import { PixelBuffer, hash, px, shadeHex } from './pixel.js';
+import {
+  MACHINE_SLOTS, MACHINE_SCREEN, drawCenterCounter, drawChamfer, drawFloorEmblem, drawPedestal, drawProps, drawStool, drawYellowTable,
+} from './props.js';
+
+export { MACHINE_SLOTS, MACHINE_SCREEN };
 
 // Nội thất trong nhà, pixel art 16x16 mỗi ô
 
-const isWall = (ch) => ch === '#' || ch === 'm';
+const isWall = (ch) => ch === '#';
 // Cửa lớn nằm trong hàng tường sát sàn: ô tường phía trên nó vẫn là phần tường trên
 const wallAbove = (ch) => isWall(ch) || ch === 'D';
 
@@ -19,9 +24,37 @@ function drawWoodFloor(ctx, ox, oy, x, y, t) {
   }
 }
 
+// Sàn gỗ ván chéo (phòng thí nghiệm): các tấm ván chạy chéo, hai tông màu xen kẽ, mạch tối mảnh
+function drawDiagonalFloor(ctx, ox, oy, x, y, t) {
+  for (let j = 0; j < TILE; j++) {
+    for (let i = 0; i < TILE; i++) {
+      const d = (x * TILE + i + y * TILE + j) % 24;
+      px(ctx, d === 0 ? t.grout : d < 12 ? t.floor : t.floorAlt, ox + i, oy + j);
+    }
+  }
+}
+
+// Sàn gạch vuông có ô sáng ở giữa mỗi viên (Pokémon Center)
+function drawInsetFloor(ctx, ox, oy, x, y, t) {
+  px(ctx, t.floor, ox, oy, TILE, TILE);
+  px(ctx, t.floorAlt, ox + 3, oy + 3, 10, 10);
+  px(ctx, shadeHex(t.floorAlt, 0.12), ox + 3, oy + 3, 10, 1);
+  px(ctx, t.grout, ox, oy + 15, TILE, 1);
+  px(ctx, t.grout, ox + 15, oy, 1, TILE);
+  px(ctx, shadeHex(t.floor, 0.1), ox, oy, 15, 1);
+}
+
 function drawFloor(ctx, ox, oy, x, y, t) {
   if (t.wood) {
     drawWoodFloor(ctx, ox, oy, x, y, t);
+    return;
+  }
+  if (t.diagonal) {
+    drawDiagonalFloor(ctx, ox, oy, x, y, t);
+    return;
+  }
+  if (t.inset) {
+    drawInsetFloor(ctx, ox, oy, x, y, t);
     return;
   }
   px(ctx, (x + y) % 2 ? t.floorAlt : t.floor, ox, oy, TILE, TILE);
@@ -52,22 +85,6 @@ function drawCounter(ctx, ox, oy, joinLeft, joinRight, t) {
   px(ctx, t.counterLight, x0, oy + 2, w, 1);
   px(ctx, t.counterFront, x0, oy + 10, w, 5);
   px(ctx, t.counterDark, x0, oy + 13, w, 2);
-}
-
-// Máy hồi phục trên tường, rộng 2 ô, có 6 khe đặt Poké Ball
-export const MACHINE_SLOTS = [0, 1, 2, 3, 4, 5].map((i) => ({ x: 17 + (i % 3) * 5, y: 6 + Math.floor(i / 3) * 5 }));
-
-function drawMachine(ctx, ox, oy) {
-  px(ctx, '#3a3440', ox + 1, oy + 1, 30, 14);
-  px(ctx, '#ece4d4', ox + 2, oy + 2, 28, 12);
-  px(ctx, '#d4c8b4', ox + 2, oy + 11, 28, 3);
-  px(ctx, '#3a3440', ox + 4, oy + 3, 9, 7);
-  px(ctx, '#5ac8f0', ox + 5, oy + 4, 7, 5);
-  px(ctx, '#c8f0ff', ox + 6, oy + 5, 2, 1);
-  for (const s of MACHINE_SLOTS) {
-    px(ctx, '#7a7068', ox + s.x - 2, oy + s.y - 2, 4, 4);
-    px(ctx, '#5a5048', ox + s.x - 1, oy + s.y - 1, 2, 2);
-  }
 }
 
 // Chậu cây cảnh trong nhà: chậu có miệng loe, lá xoè từ gốc (không có thân cây).
@@ -147,13 +164,34 @@ function drawPlant(ctx, ox, oy, x, y, tall) {
   p.drawTo(ctx, ox, oy - top);
 }
 
-function drawPC(ctx, ox, oy) {
-  px(ctx, '#5a3a20', ox + 1, oy + 10, 14, 6);
-  px(ctx, '#8a6040', ox + 2, oy + 11, 12, 4);
-  px(ctx, '#3a3e48', ox + 2, oy, 12, 11);
-  px(ctx, '#8a94a4', ox + 3, oy + 1, 10, 9);
-  px(ctx, '#58a0e8', ox + 4, oy + 2, 8, 6);
-  px(ctx, '#a8d8ff', ox + 5, oy + 3, 3, 2);
+// Máy PC (chỉ có ở Pokémon Center): trụ đứng cao hơn một ô (phần màn hình nhô lên ô phía trên): màn hình xanh viền xám đậm,
+// bàn phím sáng có đèn đỏ / xanh, cổ trụ và đế tím than
+function drawPCKiosk(ctx, ox, oy) {
+  const t = oy - 12; // đỉnh màn hình
+  px(ctx, 'rgba(0,0,0,0.22)', ox + 2, oy + 14, 12, 2); // bóng dưới đế
+  // đế + cổ trụ
+  px(ctx, '#3a1830', ox + 3, t + 23, 10, 5);
+  px(ctx, '#7a3460', ox + 4, t + 23, 8, 3);
+  px(ctx, '#a24c80', ox + 5, t + 23, 4, 1);
+  px(ctx, '#2a2e38', ox + 6, t + 19, 4, 4);
+  px(ctx, '#5a6070', ox + 7, t + 19, 2, 4);
+  // thân: bàn phím / bảng điều khiển
+  px(ctx, '#2a2e38', ox + 1, t + 12, 14, 8);
+  px(ctx, '#c8ceda', ox + 2, t + 13, 12, 6);
+  px(ctx, '#eef2f8', ox + 2, t + 13, 12, 1);
+  px(ctx, '#5a6272', ox + 3, t + 15, 10, 3);
+  px(ctx, '#e84848', ox + 4, t + 16, 2, 1);
+  px(ctx, '#48a8f0', ox + 7, t + 16, 2, 1);
+  px(ctx, '#f0d048', ox + 10, t + 16, 2, 1);
+  // màn hình
+  px(ctx, '#22262e', ox, t, 16, 12);
+  px(ctx, '#4a5262', ox + 1, t + 1, 14, 10);
+  px(ctx, '#3a78c8', ox + 2, t + 2, 12, 8);
+  px(ctx, '#58a0e8', ox + 2, t + 2, 12, 3);
+  px(ctx, '#e8f4ff', ox + 3, t + 3, 5, 1);
+  px(ctx, '#a8d8ff', ox + 3, t + 6, 9, 1);
+  px(ctx, '#a8d8ff', ox + 3, t + 8, 6, 1);
+  px(ctx, '#f8f8f8', ox + 11, t + 3, 2, 2);
 }
 
 function drawBench(ctx, ox, oy) {
@@ -717,7 +755,11 @@ function drawKitchenTop(ctx, ox, oy, sink) {
 }
 
 // Thảm trải sàn hình chữ nhật: nền, viền hoa văn, hoạ tiết hình thoi ở giữa
-function drawRug(ctx, [x1, y1, x2, y2, base, edge]) {
+function drawRug(ctx, [x1, y1, x2, y2, base, edge, style]) {
+  if (style === 'round') {
+    drawRoundRug(ctx, x1, y1, x2, y2, base, edge);
+    return;
+  }
   const ox = x1 * TILE + 3;
   const oy = y1 * TILE + 3;
   const w = (x2 - x1 + 1) * TILE - 6;
@@ -740,10 +782,55 @@ function drawRug(ctx, [x1, y1, x2, y2, base, edge]) {
   }
 }
 
-function drawMat(ctx, ox, oy) {
-  px(ctx, '#7a2810', ox + 1, oy + 3, 14, 12);
-  px(ctx, '#e06030', ox + 2, oy + 4, 12, 10);
-  for (const dy of [6, 9, 12]) px(ctx, '#f08850', ox + 2, oy + dy, 12, 1);
+// Thảm trơn bo góc tròn, viền sáng (phòng thí nghiệm: thảm xanh dưới bàn Poké Ball)
+function drawRoundRug(ctx, x1, y1, x2, y2, base, edge) {
+  const ox = x1 * TILE + 2;
+  const oy = y1 * TILE + 2;
+  const w = (x2 - x1 + 1) * TILE - 4;
+  const h = (y2 - y1 + 1) * TILE - 4;
+  const r = 7;
+  for (let y = 0; y < h; y++) {
+    const dy = y < r ? r - y : y >= h - r ? y - (h - r - 1) : 0;
+    const cut = dy ? Math.round(r - Math.sqrt(Math.max(0, r * r - dy * dy))) : 0;
+    px(ctx, shadeHex(base, -0.3), ox + cut, oy + y, w - cut * 2, 1);
+    if (y > 0 && y < h - 1) px(ctx, y < 3 || y > h - 4 ? edge : base, ox + cut + 1, oy + y, w - cut * 2 - 2, 1);
+    if (y >= 3 && y <= h - 4) {
+      px(ctx, edge, ox + cut + 1, oy + y, 2, 1);
+      px(ctx, edge, ox + w - cut - 3, oy + y, 2, 1);
+    }
+  }
+}
+
+// Thảm trải kín các hàng y1-y2 từ tường này sang tường kia (Poké Mart, map.carpet): nền xanh hoạ tiết hình thoi đan nhau
+// mỗi ô một hình thoi, viền nẹp vàng đất chạy ngang ở mép trên và mép dưới. Màu theo bảng màu nội thất (carpet...)
+function drawCarpet(ctx, map, { y1, y2 }, t) {
+  for (let y = y1; y <= y2; y++) {
+    for (let x = 0; x < map.width; x++) {
+      if (isWall(map.tileAt(x, y))) continue;
+      for (let j = 0; j < TILE; j++) {
+        for (let i = 0; i < TILE; i++) {
+          const d = Math.abs(i - 7.5) + Math.abs(j - 7.5);
+          px(ctx, d > 7 && d < 8.5 ? t.carpetLine : d < 4 ? t.carpetAlt : t.carpet, x * TILE + i, y * TILE + j);
+        }
+      }
+    }
+  }
+  const w = map.width * TILE;
+  for (const [ey, lit] of [[y1 * TILE, true], [(y2 + 1) * TILE - 2, false]]) {
+    px(ctx, t.carpetEdge, 0, ey, w, 2);
+    px(ctx, shadeHex(t.carpetEdge, lit ? 0.3 : -0.25), 0, lit ? ey : ey + 1, w, 1);
+  }
+}
+
+// Thảm cửa ra. Cửa ra rộng 2 ô (hai ô E liền nhau) thì nối thành một tấm: joinL / joinR là ô bên trái / phải cũng là thảm
+function drawMat(ctx, ox, oy, joinL = false, joinR = false) {
+  const x0 = joinL ? 0 : 1; // viền ngoài
+  const x1 = joinR ? 16 : 15;
+  const i0 = joinL ? 0 : 2; // mặt thảm
+  const i1 = joinR ? 16 : 14;
+  px(ctx, '#7a2810', ox + x0, oy + 3, x1 - x0, 12);
+  px(ctx, '#e06030', ox + i0, oy + 4, i1 - i0, 10);
+  for (const dy of [6, 9, 12]) px(ctx, '#f08850', ox + i0, oy + dy, i1 - i0, 1);
 }
 
 // Đồ treo trên tường sau (map.wallDecor: { cột x: 'photo' | 'poster' | 'calendar' | 'clock' }, ):
@@ -790,8 +877,10 @@ function drawWallDecor(ctx, map) {
   }
 }
 
-export function drawInterior(map, ground, objects) {
+export function drawInterior(map, ground, objects, over = objects) {
   const t = THEMES[map.theme];
+  // Máy hồi phục (ô 'mm' sau quầy Pokémon Center) là đồ đạc lớn như map.props
+  const machines = [];
   for (let y = 0; y < map.height; y++) {
     for (let x = 0; x < map.width; x++) {
       const ch = map.tileAt(x, y);
@@ -808,14 +897,18 @@ export function drawInterior(map, ground, objects) {
       else drawFloor(ground, ox, oy, x, y, t);
       if (ch !== 'Z' && map.tileAt(x, y - 1) === 'Z') px(ground, 'rgba(8,10,20,0.45)', ox, oy, TILE, 3);
 
-      if (ch === 'c') drawCounter(objects, ox, oy, map.tileAt(x - 1, y) === 'c', map.tileAt(x + 1, y) === 'c', t);
-      else if (ch === 'm' && map.tileAt(x - 1, y) !== 'm') drawMachine(objects, ox, oy);
+      if (ch === 'c' && t.uCounter) drawCenterCounter(objects, ox, oy, map, x, y, t);
+      else if (ch === 'c') drawCounter(objects, ox, oy, map.tileAt(x - 1, y) === 'c', map.tileAt(x + 1, y) === 'c', t);
+      else if (ch === 'm' && map.tileAt(x - 1, y) !== 'm') machines.push({ kind: 'healer', x, y });
+      else if (ch === 'j') drawPedestal(objects, ox, oy);
+      else if (ch === 'q') drawStool(objects, ox, oy, t.stool);
+      else if (ch === 'n') drawYellowTable(objects, ox, oy, map, x, y);
       else if (ch === 'p') drawPlant(objects, ox, oy, x, y, isWall(map.tileAt(x, y - 1)));
-      else if (ch === 'P') drawPC(objects, ox, oy);
+      else if (ch === 'P') drawPCKiosk(objects, ox, oy);
       else if (ch === 'b') drawBench(objects, ox, oy);
       else if (ch === 'k' && map.shelfGoods === 'bikes') drawBikeStand(objects, ox, oy, x, y, isWall(map.tileAt(x, y - 1)));
       else if (ch === 'k') drawShelf(objects, ox, oy, x, y, isWall(map.tileAt(x, y - 1)));
-      else if (ch === 'E') drawMat(ground, ox, oy);
+      else if (ch === 'E') drawMat(ground, ox, oy, map.tileAt(x - 1, y) === 'E', map.tileAt(x + 1, y) === 'E');
       else if (ch === 'B') drawBed(objects, ox, oy, map.tileAt(x, y - 1) !== 'B', map.bedColor);
       else if (ch === 'V') drawTV(objects, ox, oy, map.tileAt(x - 1, y) !== 'V', map.tileAt(x + 1, y) !== 'V');
       else if (ch === 't') drawTable(objects, ox, oy, map, x, y, WOOD_TABLE);
@@ -845,6 +938,10 @@ export function drawInterior(map, ground, objects) {
     }
   }
   // Thảm vẽ trên sàn, dưới đồ đạc (đồ đạc nằm ở lớp objects phía trên)
+  if (map.carpet) drawCarpet(ground, map, map.carpet, t);
   for (const rug of map.rugs ?? []) drawRug(ground, rug);
+  if (map.emblem) drawFloorEmblem(ground, map.emblem.x * TILE, map.emblem.y * TILE);
+  if (map.chamfer) drawChamfer(ground, map, map.chamfer);
   drawWallDecor(ground, map);
+  drawProps({ ...map, info: map.info.bind(map), props: [...(map.props ?? []), ...machines] }, ground, objects, over);
 }

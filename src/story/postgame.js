@@ -1,5 +1,4 @@
 import { ITEMS } from '../data/items.js';
-import { FOSSIL_DX } from '../data/indoorLayout.js';
 import { SPECIES } from '../data/monsters.js';
 import { DEX_BY_SLUG } from '../data/pokedex.js';
 import { createMonster } from '../game/monster.js';
@@ -344,11 +343,11 @@ export const POSTGAME_NPCS = [
   ...LEGENDS.map(legendNpc),
   {
     // Viện Hoá thạch Núi Đá: đứng sau bàn thí nghiệm, nói chuyện qua bàn
-    id: 'pg-fossil-doctor', sprite: 'npc-aide', name: DOCTOR, map: 'fossilLab', x: 5 + FOSSIL_DX, y: 3, facing: 'down', fixed: true,
+    id: 'pg-fossil-doctor', sprite: 'npc-aide', name: DOCTOR, map: 'fossilLab', x: 5, y: 3, facing: 'down', fixed: true,
     onTalk: (world) => reviveFossils(world),
   },
   {
-    id: 'pg-fossil-aide', sprite: 'npc-aide', name: 'Trợ lý', map: 'fossilLab', x: 8 + FOSSIL_DX, y: 6, facing: 'left', wander: 1,
+    id: 'pg-fossil-aide', sprite: 'npc-aide', name: 'Trợ lý', map: 'fossilLab', x: 8, y: 6, facing: 'left', wander: 1,
     lines: [
       'Hoá thạch vỏ ốc là Omanyte, hoá thạch mai vòm là Kabuto. Cả hai đều là Pokémon biển cổ đại.',
       'Hổ phách cổ thì giữ được gen của Aerodactyl, chúa tể bầu trời thời tiền sử!',

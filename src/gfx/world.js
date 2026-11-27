@@ -322,8 +322,6 @@ function ovalShadow(ctx, cx, cy, rx, ry) {
 
 // Màu mái nhà
 const ROOFS = {
-  center: { ink: '#3a2020', light: '#f88878', base: '#e85448', dark: '#c03c34', mat: '#d04040' },
-  mart: { ink: '#1e2a4a', light: '#80b0f8', base: '#4a7ad8', dark: '#2f5cb8', mat: '#3a6ad0' },
   house: { ink: '#3a2414', light: '#d8a070', base: '#b8703c', dark: '#8a4c24', mat: '#a85a30' },
   lab: { ink: '#2a3040', light: '#d8e0ea', base: '#a8b4c4', dark: '#7a8698', mat: '#5a6a80' },
   gym: { ink: '#1a3040', light: '#88d8e8', base: '#3aa0b8', dark: '#287890', mat: '#3a8aa0' },
@@ -413,10 +411,11 @@ function drawWindow(ctx, x, y) {
   px(ctx, '#d8ccb0', x - 1, y + 13, 18, 1);
 }
 // Mép trái cửa (pixel, tính từ góc nhà): nhà lớn 5 ô cửa ở giữa, nhà nhỏ 4 ô cửa ở ô thứ 2
-const DOOR_X = { center: 31, lab: 31, gym: 31, mart: 15, house: 15, store: 15, bikeShop: 15, league: 47 };
+const DOOR_X = { center: 31, lab: 47, gym: 31, mart: 15, house: 15, store: 15, bikeShop: 15, league: 47 };
 
-// Ô kính của cửa trên bản đồ (pixel 16px/ô), để làm hiệu ứng cửa trượt mở khi ra vào
+// Ô kính của cửa trên bản đồ (pixel 16px/ô), để làm hiệu ứng cửa trượt mở khi ra vào (phòng thí nghiệm: cửa gỗ ô kính)
 export function doorGlass(building) {
+  if (building.type === 'lab') return { x: building.x * TILE + DOOR_X.lab + 2, y: building.y * TILE + LAB_SIZE.roof + 6, w: 14, h: 15 };
   return { x: building.x * TILE + DOOR_X[building.type] + 1, y: building.y * TILE + 42, w: 16, h: 17 };
 }
 
@@ -432,31 +431,318 @@ function drawDoor(ctx, ox, oy, dx, roof) {
   px(ctx, roof.mat, ox + dx, oy + 59, 18, 4);
 }
 
-// Nhà lớn 80x64 (5x4 ô), cửa ở giữa: Pokémon Center (biển Poké Ball), phòng thí nghiệm (biển LAB)
+// Nhà lớn 80x64 (5x4 ô), cửa ở giữa: gym (biển GYM). Pokémon Center vẽ riêng (drawPokeCenter)
 // roofKey: màu mái riêng (mặc định theo loại nhà)
 function drawBigBuilding(ctx, ox, oy, type, roofKey) {
   const roof = ROOFS[roofKey ?? type];
   drawShell(ctx, ox, oy, 80, roof);
   px(ctx, roof.ink, ox + 27, oy + 5, 26, 18);
   px(ctx, '#fff8f0', ox + 28, oy + 6, 24, 16);
-  if (type === 'center') {
-    for (let dy = -7; dy <= 7; dy++) {
-      for (let dx = -7; dx <= 7; dx++) {
-        const d = dx * dx + dy * dy;
-        if (d > 50) continue;
-        let color = dy < -1 ? '#f04040' : dy > 1 ? '#ffffff' : roof.ink;
-        if (d >= 37) color = roof.ink;
-        if (d <= 8) color = d <= 3 ? '#ffffff' : roof.ink;
-        px(ctx, color, ox + 40 + dx, oy + 14 + dy);
-      }
-    }
-  } else {
-    const word = type === 'gym' ? 'GYM' : 'LAB';
-    drawWord(ctx, word, ox + 40 - Math.floor(wordWidth(word) / 2), oy + 12, roof.ink);
-  }
+  drawWord(ctx, 'GYM', ox + 40 - Math.floor(wordWidth('GYM') / 2), oy + 12, roof.ink);
   drawWindow(ctx, ox + 9, oy + 33);
   drawWindow(ctx, ox + 55, oy + 33);
   drawDoor(ctx, ox, oy, DOOR_X[type], roof);
+}
+
+// Pokémon Center 80x64 (5x4 ô): mái bằng đỏ lợp ô vuông viền khung xám bo góc, mép mái trước đỏ sẫm, gờ mái xám;
+// tường xám nhạt ốp ván ngang, dải kính xanh hai bên phía trên; giữa mặt tiền là tháp xám bo tròn nhô lên mái mang biểu tượng
+// Poké Ball, mái hiên đỏ ngay dưới, cửa kính trượt hai cánh (ô kính khớp doorGlass), hai cột tối hai bên cửa
+const PC = {
+  frameHi: '#f2f4f8', frame: '#d4d8e0', frameMid: '#b4bac6', frameDark: '#868c9a',
+  red: '#d8402a', redTile: '#ee6248', redHi: '#f8907a', redDark: '#a82c1c', redDeep: '#7e2014',
+  wall: '#dfe3ea', wallLine: '#aeb4c0', wallDark: '#9aa0ac', pillar: '#4a505c', pillarLit: '#6a7280',
+  glass: '#3a7ec8', glassLit: '#8ccaf4', glassDark: '#285c9c', glassFrame: '#2c3444',
+};
+let pokeCenterSprite = null;
+function pokeCenterArt() {
+  if (pokeCenterSprite) return pokeCenterSprite;
+  const c = PC;
+  const p = new PixelBuffer(80, 64);
+  // Mái: khung xám bo góc bao quanh mặt mái đỏ
+  const roundRect = (x, y, w, h, r, color) => {
+    for (let j = 0; j < h; j++) {
+      const dy = j < r ? r - j : j >= h - r ? j - (h - r - 1) : 0;
+      const cut = dy ? Math.round(r - Math.sqrt(Math.max(0, r * r - dy * dy))) : 0;
+      p.rect(x + cut, y + j, w - cut * 2, 1, color);
+    }
+  };
+  roundRect(2, 1, 76, 30, 5, c.frameMid);
+  roundRect(2, 1, 76, 28, 5, c.frame);
+  roundRect(3, 1, 74, 3, 4, c.frameHi);
+  // mặt mái đỏ (phần bằng phía trên) lợp ô vuông sáng, mép mái phía trước nghiêng đỏ sẫm
+  roundRect(6, 4, 68, 19, 3, c.red);
+  for (let y = 6; y < 21; y += 4) {
+    for (let x = 8; x < 72; x += 5) {
+      p.rect(x, y, 4, 3, c.redTile);
+      p.rect(x, y, 4, 1, c.redHi);
+      p.rect(x, y + 2, 4, 1, c.red);
+    }
+  }
+  for (let j = 0; j < 5; j++) p.rect(6 + j, 22 + j, 68 - j * 2, 1, j === 0 ? c.redDark : c.redDeep);
+  p.rect(6, 22, 68, 1, c.redDark);
+  // gờ mái xám chạy ngang dưới mép mái
+  p.rect(3, 27, 74, 3, c.frame);
+  p.rect(3, 27, 74, 1, c.frameHi);
+  p.rect(3, 30, 74, 1, c.frameDark);
+  // Tường: ốp ván ngang xám nhạt, dải kính xanh phía trên hai bên, cột tối ở hai góc
+  p.rect(4, 31, 72, 27, c.wall);
+  for (let y = 43; y < 57; y += 3) p.rect(4, y, 72, 1, c.wallLine);
+  p.rect(4, 31, 72, 2, c.wallDark);
+  for (const [x0, x1] of [[7, 27], [53, 73]]) {
+    p.rect(x0, 33, x1 - x0, 9, c.glassFrame);
+    p.rect(x0 + 1, 34, x1 - x0 - 2, 7, c.glass);
+    p.rect(x0 + 1, 34, x1 - x0 - 2, 1, c.glassDark);
+    for (let k = 0; k < 3; k++) for (let i = 0; i < 5; i++) p.set(x0 + 3 + k * 6 + i, 40 - i, c.glassLit);
+    p.rect(Math.round((x0 + x1) / 2), 34, 1, 7, c.glassFrame);
+    p.rect(x0 - 1, 42, x1 - x0 + 2, 1, c.wallDark); // bậu kính
+  }
+  for (const x of [4, 73]) {
+    p.rect(x, 31, 3, 27, c.pillar);
+    p.rect(x + 1, 31, 1, 27, c.pillarLit);
+  }
+  // Chân tường và bậc thềm
+  p.rect(3, 57, 74, 2, c.pillar);
+  p.rect(3, 59, 74, 4, '#a0a6b0');
+  p.rect(3, 59, 74, 1, '#c8ccd4');
+  // Hai cột tối hai bên cửa
+  for (const x of [25, 51]) {
+    p.rect(x, 40, 4, 19, c.pillar);
+    p.rect(x + 1, 40, 1, 19, c.pillarLit);
+  }
+  // Cửa kính trượt (ô kính x 32-47, y 42-58 khớp doorGlass)
+  p.rect(29, 41, 22, 18, c.glassFrame);
+  p.rect(32, 42, 16, 17, c.glass);
+  p.rect(32, 42, 16, 2, c.glassDark);
+  p.rect(39, 42, 2, 17, c.glassFrame);
+  for (const gx of [33, 42]) {
+    for (let i = 0; i < 4; i++) p.set(gx + i, 48 - i, c.glassLit);
+    for (let i = 0; i < 2; i++) p.set(gx + i, 51 - i, c.glassLit);
+  }
+  // Mái hiên đỏ trên cửa
+  p.rect(24, 36, 32, 5, c.redDark);
+  p.rect(25, 36, 30, 3, c.red);
+  p.rect(25, 36, 30, 1, c.redHi);
+  p.rect(26, 41, 28, 1, c.redDeep);
+  // Tháp xám bo tròn nhô lên mái, ôm biểu tượng Poké Ball
+  const cx = 40;
+  const cy = 27;
+  p.ellipse(cx, cy, 11, 11, c.frameMid, (x, y) => y <= cy + 4);
+  p.ellipse(cx, cy, 10.2, 10.2, c.frame, (x, y) => y <= cy + 4);
+  p.ellipse(cx, cy - 1, 9, 9, c.frameHi, (x, y) => y < cy - 7);
+  p.rect(29, cy + 4, 22, 5, c.frame);
+  p.rect(29, cy + 8, 22, 1, c.frameDark);
+  // biểu tượng: vòng viền tối, nửa trên đỏ, nửa dưới trắng, nút tròn giữa
+  p.ellipse(cx, cy, 7.6, 7.6, '#3a2020');
+  p.ellipse(cx, cy, 6.6, 6.6, c.red, (x, y) => y < cy - 1);
+  p.ellipse(cx, cy, 6.6, 6.6, '#f8f8f8', (x, y) => y > cy);
+  p.ellipse(cx - 2, cy - 4, 2, 1.2, c.redHi);
+  p.ellipse(cx, cy, 2.8, 2.8, '#3a2020');
+  p.ellipse(cx, cy, 1.8, 1.8, '#ffffff');
+  p.outline(-0.62);
+  pokeCenterSprite = p;
+  return p;
+}
+function drawPokeCenter(ctx, ox, oy) {
+  pokeCenterArt().drawTo(ctx, ox, oy);
+}
+
+// Poké Mart 64x64 (4x4 ô): mái bằng xanh dương vát góc, lòng mái trũng tối, biển hiệu MART dựng đứng trên nóc đổ bóng
+// xuống lòng mái, viền vàng dưới mép mái; mặt tiền là dãy kính xanh lớn (cửa kính ở ô thứ 2 khớp doorGlass), cột tối xen giữa
+const MART = {
+  blue: '#3e68c4', blueHi: '#7aa2ec', blueDark: '#2a4a96', blueDeep: '#1e3672',
+  tray: '#2c3448', trayLit: '#3e485e', gold: '#d8a838', goldDark: '#a87a20',
+  wall: '#e4e8ee', wallLine: '#c4cad4', pillar: '#3a404c', pillarLit: '#5a6270',
+  glass: '#3a86c8', glassLit: '#a0d8f8', glassDark: '#2a62a0', glassFrame: '#2a3240',
+};
+let martSprite = null;
+function martArt() {
+  if (martSprite) return martSprite;
+  const c = MART;
+  const p = new PixelBuffer(64, 64);
+  // Mái: khối bát giác xanh, lòng mái tối trũng xuống, mép trước dày có viền vàng
+  const octo = (x, y, w, h, cut, color) => {
+    for (let j = 0; j < h; j++) {
+      const k = Math.max(0, cut - j, j - (h - 1 - cut));
+      p.rect(x + k, y + j, w - k * 2, 1, color);
+    }
+  };
+  octo(2, 4, 60, 26, 4, c.blue);
+  octo(3, 4, 58, 2, 3, c.blueHi);
+  octo(6, 8, 52, 14, 3, c.blueDeep);
+  octo(7, 9, 50, 12, 3, c.tray);
+  octo(11, 11, 42, 8, 2, c.trayLit);
+  p.rect(4, 23, 56, 5, c.blueDark);
+  p.rect(4, 23, 56, 1, c.blue);
+  p.rect(3, 28, 58, 2, c.gold);
+  p.rect(3, 29, 58, 1, c.goldDark);
+  // Biển hiệu dựng trên nóc: mặt trên sáng, mặt trước xanh có khung trắng (chữ MART vẽ sau), bóng đổ xuống lòng mái
+  p.rect(20, 15, 24, 3, '#20283a');
+  p.rect(18, 1, 26, 14, c.blueDark);
+  p.rect(19, 1, 24, 2, c.blueHi);
+  p.rect(19, 3, 24, 11, c.blue);
+  p.rect(20, 4, 22, 9, '#f4f8ff');
+  p.rect(21, 5, 20, 7, c.blue);
+  for (const lx of [22, 39]) p.rect(lx, 15, 1, 3, c.blueDeep); // chân biển
+  // Tường và mặt tiền kính
+  p.rect(3, 30, 58, 28, c.wall);
+  for (let y = 33; y < 57; y += 3) p.rect(3, y, 58, 1, c.wallLine);
+  p.rect(3, 30, 58, 2, '#9aa0ac');
+  p.rect(5, 34, 54, 24, c.glassFrame);
+  const pane = (x, y, w, h) => {
+    p.rect(x, y, w, h, c.glass);
+    p.rect(x, y, w, 1, c.glassDark);
+    for (let i = 0; i < Math.min(w, h) - 2; i++) {
+      p.set(x + 2 + i, y + h - 2 - i, c.glassLit);
+      if (i < Math.min(w, h) - 5) p.set(x + 5 + i, y + h - 2 - i, c.glassLit);
+    }
+  };
+  pane(7, 36, 7, 22);
+  pane(16, 36, 16, 5); // ô kính trên cửa
+  pane(35, 36, 22, 22);
+  // cửa kính hai cánh (ô kính x 16-31, y 42-58)
+  p.rect(16, 42, 16, 17, c.glass);
+  p.rect(16, 42, 16, 1, c.glassDark);
+  p.rect(23, 42, 2, 17, c.glassFrame);
+  for (const gx of [17, 26]) {
+    for (let i = 0; i < 4; i++) p.set(gx + i, 48 - i, c.glassLit);
+    for (let i = 0; i < 2; i++) p.set(gx + i, 51 - i, c.glassLit);
+  }
+  for (const x of [3, 33, 59]) {
+    p.rect(x, 32, 2, 26, c.pillar);
+    p.set(x, 32, c.pillarLit);
+    p.rect(x, 33, 1, 25, c.pillarLit);
+  }
+  // Chân tường và vỉa hè trước cửa
+  p.rect(2, 57, 60, 2, c.pillar);
+  p.rect(2, 59, 60, 4, '#a0a6b0');
+  p.rect(2, 59, 60, 1, '#c8ccd4');
+  p.outline(-0.62);
+  martSprite = p;
+  return p;
+}
+function drawPokeMart(ctx, ox, oy) {
+  martArt().drawTo(ctx, ox, oy);
+  drawWord(ctx, 'MART', ox + 31 - Math.floor(wordWidth('MART') / 2), oy + 6, '#ffffff');
+}
+
+// Phòng thí nghiệm 112x80 (7x5 ô), to hơn hẳn nhà dân: mái ngói vàng đất lợp ô vuông có mảng rêu cũ, khung kim loại
+// xám sẫm bao quanh mái, hộp cửa sổ trời trên mái, ống thông gió; tường đá xám dưới mái với hai cặp cửa sổ kính xanh,
+// cửa gỗ có ô kính (giữa ô thứ 4), đèn tường cạnh cửa và biển LAB trên mái hiên
+const LAB = {
+  frame: '#3e4048', frameLit: '#6a6e78', frameDark: '#26282e',
+  tile: ['#d2a850', '#c89c44', '#dab45c'], tileDark: '#a8803a', tileLine: '#b48a3e', moss: '#a08848', mossDark: '#8a7440',
+  stone: '#8e8a84', stoneLit: '#aaa69e', stoneDark: '#6a6660', mortar: '#5a5650',
+  glassFrame: '#2e3446', glass: '#4a6ad0', glassLit: '#9ab8f8',
+  wood: '#9a6634', woodLit: '#c08850', woodDark: '#5e3a1c',
+};
+export const LAB_SIZE = { w: 112, h: 80, roof: 52 };
+function drawLab(ctx, ox, oy) {
+  const c = LAB;
+  const { w, h, roof } = LAB_SIZE;
+  // Mái: các hàng ngói ô vuông 8x6, so le nửa viên giữa các hàng, màu lệch nhẹ theo viên; vài mảng ngói cũ sẫm màu
+  px(ctx, c.frameDark, ox, oy, w, roof + 1);
+  for (let r = 0; r * 6 < roof - 6; r++) {
+    const y = oy + 4 + r * 6;
+    const rowH = Math.min(6, oy + roof - 1 - y);
+    for (let i = -1; i * 8 < w; i++) {
+      const x = ox + 4 + i * 8 + (r % 2) * 4;
+      const x0 = Math.max(ox + 4, x);
+      const x1 = Math.min(ox + w - 4, x + 8);
+      if (x1 <= x0) continue;
+      const n = hash(i + 20, r, 401);
+      const patch = hash(Math.floor((i + (r % 2) * 0.5) / 3), Math.floor(r / 2), 402) < 0.22;
+      const base = patch ? (n < 0.5 ? c.moss : c.mossDark) : c.tile[Math.floor(n * 3)];
+      px(ctx, base, x0, y, x1 - x0, rowH);
+      px(ctx, shadeHex(base, 0.12), x0, y, x1 - x0, 1);
+      if (rowH >= 6) px(ctx, c.tileDark, x0, y + 5, x1 - x0, 1);
+      if (x >= ox + 4) px(ctx, c.tileLine, x, y + 1, 1, rowH - 2);
+    }
+  }
+  // Khung kim loại: thanh nóc trên cùng, hai cột hai bên mái, xà mái hiên phía dưới
+  px(ctx, c.frame, ox, oy, w, 4);
+  px(ctx, c.frameLit, ox + 1, oy + 1, w - 2, 1);
+  for (const fx of [0, w - 4]) {
+    px(ctx, c.frame, ox + fx, oy, 4, roof);
+    px(ctx, c.frameLit, ox + fx + 1, oy + 1, 1, roof - 2);
+    px(ctx, c.frameDark, ox + fx + 3, oy + 4, 1, roof - 4);
+    for (let y = 10; y < roof - 4; y += 12) px(ctx, '#9aa0aa', ox + fx + 1, oy + y, 2, 2); // đinh tán
+  }
+  px(ctx, c.frame, ox, oy + roof - 4, w, 5);
+  px(ctx, c.frameLit, ox + 1, oy + roof - 4, w - 2, 1);
+  px(ctx, c.frameDark, ox, oy + roof, w, 1);
+  // Hộp cửa sổ trời trên mái (góc trên trái): mặt trên sáng, mặt trước có ô kính tối phản chiếu trời
+  const sx = ox + 12;
+  const sy = oy + 7;
+  px(ctx, c.frameDark, sx - 1, sy - 1, 30, 25);
+  px(ctx, '#e6dece', sx, sy, 28, 6);
+  px(ctx, '#f6f0e4', sx, sy, 28, 1);
+  px(ctx, '#c8bca6', sx, sy + 6, 28, 17);
+  px(ctx, '#aa9e88', sx + 22, sy + 6, 6, 17);
+  px(ctx, c.glassFrame, sx + 4, sy + 9, 17, 9);
+  px(ctx, '#3a4a6a', sx + 5, sy + 10, 15, 7);
+  px(ctx, '#8aa8d8', sx + 6, sy + 11, 4, 1);
+  px(ctx, '#6a88c0', sx + 6, sy + 12, 2, 1);
+  px(ctx, 'rgba(40,24,10,0.3)', sx, sy + 23, 30, 2); // bóng đổ xuống mái
+  // Ống thông gió nhỏ bên phải mái
+  px(ctx, c.frameDark, ox + 86, oy + 10, 10, 12);
+  px(ctx, '#9aa0aa', ox + 87, oy + 11, 8, 10);
+  px(ctx, '#c8ced8', ox + 87, oy + 11, 8, 2);
+  px(ctx, '#6a707a', ox + 87, oy + 15, 8, 1);
+  px(ctx, 'rgba(40,24,10,0.3)', ox + 86, oy + 22, 11, 2);
+  // Biển LAB trên mái hiên, ngay trên cửa
+  px(ctx, c.frameDark, ox + 42, oy + roof - 13, 28, 11);
+  px(ctx, '#f6f8fa', ox + 43, oy + roof - 12, 26, 9);
+  drawWord(ctx, 'LAB', ox + 56 - Math.floor(wordWidth('LAB') / 2), oy + roof - 10, '#3a5ab8');
+
+  // Tường đá dưới mái: các viên đá xây so le, mạch vữa sẫm, mép trên khuất bóng mái
+  const wy = oy + roof + 1;
+  const wh = h - roof - 3;
+  px(ctx, c.mortar, ox + 2, wy, w - 4, wh);
+  for (let r = 0; r * 5 < wh; r++) {
+    const y = wy + r * 5;
+    const rh = Math.min(4, wy + wh - y);
+    for (let i = -1; i * 10 < w; i++) {
+      const x0 = Math.max(ox + 2, ox + 2 + i * 10 + (r % 2) * 5);
+      const x1 = Math.min(ox + w - 2, ox + 2 + i * 10 + (r % 2) * 5 + 9);
+      if (x1 <= x0) continue;
+      const n = hash(i + 40, r, 403);
+      const base = n < 0.3 ? c.stoneDark : n < 0.8 ? c.stone : c.stoneLit;
+      px(ctx, base, x0, y, x1 - x0, rh);
+      px(ctx, shadeHex(base, 0.15), x0, y, x1 - x0, 1);
+    }
+  }
+  px(ctx, 'rgba(20,16,10,0.35)', ox + 2, wy, w - 4, 3);
+  // Chân tường
+  px(ctx, c.frameDark, ox + 1, oy + h - 3, w - 2, 3);
+  px(ctx, '#7a7670', ox + 2, oy + h - 3, w - 4, 1);
+  // Hai cặp cửa sổ kính xanh hai bên cửa
+  for (const wx of [8, 26, 72, 90]) {
+    const x = ox + wx;
+    const y = wy + 4;
+    px(ctx, c.glassFrame, x, y, 14, 13);
+    px(ctx, c.glass, x + 1, y + 1, 12, 11);
+    px(ctx, c.glassLit, x + 2, y + 2, 3, 1);
+    px(ctx, c.glassLit, x + 2, y + 3, 1, 3);
+    px(ctx, c.glassFrame, x + 7, y + 1, 1, 11);
+    px(ctx, '#d8d4cc', x - 1, y + 13, 16, 2); // bậu cửa
+    px(ctx, '#f0ece4', x - 1, y + 13, 16, 1);
+  }
+  // Cửa gỗ có ô kính (giữa ô thứ 4): khung gỗ sẫm, cánh cửa, kính xanh (WorldScene.openDoor vẽ khe tối đè lên ô kính)
+  const dx = ox + DOOR_X.lab;
+  const dy = wy + 1;
+  px(ctx, c.woodDark, dx - 1, dy, 20, h - roof - 3);
+  px(ctx, c.wood, dx, dy + 1, 18, h - roof - 4);
+  px(ctx, c.woodLit, dx, dy + 1, 18, 1);
+  px(ctx, c.glassFrame, dx + 1, dy + 3, 16, 17);
+  px(ctx, c.glass, dx + 2, dy + 4, 14, 15);
+  px(ctx, c.glassLit, dx + 3, dy + 5, 3, 1);
+  px(ctx, c.glassLit, dx + 3, dy + 6, 1, 4);
+  px(ctx, c.glassFrame, dx + 8, dy + 4, 2, 15);
+  px(ctx, '#f0d070', dx + 14, dy + 12, 2, 2); // tay nắm
+  px(ctx, '#7a6a5a', dx - 3, oy + h - 2, 24, 2); // bậc thềm
+  // Đèn tường cạnh cửa
+  px(ctx, c.frameDark, dx + 22, dy + 3, 5, 6);
+  px(ctx, '#ffe890', dx + 23, dy + 4, 3, 4);
 }
 
 // Cửa sổ áp mái của nhà 2 tầng (phòng ngủ tầng trên): mái nhỏ hình tam giác, cửa sổ kính, bậu cửa
@@ -476,8 +762,8 @@ function drawDormer(ctx, ox, oy, roof) {
   px(ctx, '#d8ccb0', ox, oy + 16, 14, 1);
 }
 
-// Biển hiệu nhà nhỏ: Poké Mart, Trung tâm thương mại, tiệm xe đạp
-const SMALL_SIGNS = { mart: 'MART', store: 'SHOP', bikeShop: 'BIKE' };
+// Biển hiệu nhà nhỏ: Trung tâm thương mại, tiệm xe đạp (Poké Mart vẽ riêng: drawPokeMart)
+const SMALL_SIGNS = { store: 'SHOP', bikeShop: 'BIKE' };
 
 // Nhà nhỏ 64x64 (4x4 ô), cửa ở ô thứ 2: cửa hàng (có biển hiệu), nhà dân
 function drawSmallBuilding(ctx, ox, oy, type, roofKey, floors = 1) {
@@ -523,10 +809,10 @@ function drawLeague(ctx, ox, oy) {
 
 const BUILDING_DRAW = {
   league: (ctx, ox, oy) => drawLeague(ctx, ox, oy),
-  center: (ctx, ox, oy, roof) => drawBigBuilding(ctx, ox, oy, 'center', roof),
-  lab: (ctx, ox, oy, roof) => drawBigBuilding(ctx, ox, oy, 'lab', roof),
+  center: (ctx, ox, oy) => drawPokeCenter(ctx, ox, oy),
+  lab: (ctx, ox, oy) => drawLab(ctx, ox, oy),
   gym: (ctx, ox, oy, roof) => drawBigBuilding(ctx, ox, oy, 'gym', roof),
-  mart: (ctx, ox, oy, roof) => drawSmallBuilding(ctx, ox, oy, 'mart', roof),
+  mart: (ctx, ox, oy) => drawPokeMart(ctx, ox, oy),
   house: (ctx, ox, oy, roof, floors) => drawSmallBuilding(ctx, ox, oy, 'house', roof, floors),
   store: (ctx, ox, oy, roof) => drawSmallBuilding(ctx, ox, oy, 'store', roof),
   bikeShop: (ctx, ox, oy, roof) => drawSmallBuilding(ctx, ox, oy, 'bikeShop', roof),
@@ -1368,7 +1654,7 @@ function buildMapTextures(scene, map) {
   const objects = makeCanvas(W, H);
   const over = makeCanvas(W, H);
   const anim = Array.from({ length: ANIM_FRAMES }, () => makeCanvas(W, H));
-  if (map.indoor) drawInterior(map, ground.ctx, objects.ctx);
+  if (map.indoor) drawInterior(map, ground.ctx, objects.ctx, over.ctx);
   else if (map.cave) drawCave(map, ground.ctx, objects.ctx, anim.map((a) => a.ctx));
   else drawOutdoor(map, ground.ctx, objects.ctx, over.ctx, anim.map((a) => a.ctx));
 

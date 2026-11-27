@@ -368,7 +368,7 @@ export class DexWindow {
     if (this.grid.contains(x, y)) this.grid.scrollTo(this.grid.top + Math.sign(dy));
   }
 
-  // Phím Pokédex do bản đồ bật / tắt (WorldScene.openPokedex); ở đây phím quay lại đóng
+  // Phím Pokédex do bản đồ bật / tắt (WorldScene.openPokedex); Esc / phím quay lại không đóng (nút ✕)
   handleKey(e) {
     if (this.searching && this.searchKey(e)) return;
     const dir = directionOf(e);
@@ -384,8 +384,7 @@ export class DexWindow {
     else if (e.code === 'Tab') {
       e.preventDefault?.();
       this.detail.toggleTab();
-    } else if (isCancel(e) && !e.repeat) this.win.close();
-    else if ((e.code === 'KeyF' || e.key === '/') && !e.repeat) {
+    } else if ((e.code === 'KeyF' || e.key === '/') && !e.repeat) {
       e.preventDefault?.();
       this.setSearching(true);
     } else if (e.code === 'KeyH' && !e.repeat) this.toggleHide();

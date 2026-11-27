@@ -1,10 +1,8 @@
 import { state } from '../game/state.js';
 import { BADGES } from './badges.js';
-import { GYM_DX } from './mapsGyms.js';
 
 // Người trong 8 gym: hướng dẫn viên (đứng gần lối vào, giải thích câu đố) và học trò (nhà huấn luyện của gym).
 // Vị trí khớp bố cục trong data/mapsGyms.js (không đứng chắn lối duy nhất, đã kiểm tra bằng bộ giải trong test).
-// Toạ độ x khai báo theo phần câu đố 17 ô; bản đồ đã nới khán đài hai bên nên cộng GYM_DX
 
 const GUIDE_TIPS = {
   gym1: [6, 18, [
@@ -51,7 +49,7 @@ const GUIDE_TIPS = {
 
 // Đã có huy hiệu của gym thì câu đố đã tắt (WorldScene.setupGymPuzzle): hướng dẫn viên chúc mừng thay vì giải thích câu đố
 export const GYM_GUIDES = Object.entries(GUIDE_TIPS).map(([map, [x, y, lines]], i) => ({
-  id: `${map}-guide`, sprite: 'npc-guide', name: 'Hướng dẫn viên', map, x: x + GYM_DX, y, facing: 'right', fixed: true,
+  id: `${map}-guide`, sprite: 'npc-guide', name: 'Hướng dẫn viên', map, x, y, facing: 'right', fixed: true,
   lines: ['Chào mừng nhà vô địch tương lai!', ...lines],
   async onTalk(world) {
     const badge = BADGES[i];
@@ -67,14 +65,14 @@ export const GYM_RELEARNERS = [
   ['gym2', 12, 17, 'left', 'Bà Nhớ Chiêu'],
   ['gym6', 4, 15, 'right', 'Ông Nhớ Chiêu'],
 ].map(([map, x, y, facing, name]) => ({
-  id: `${map}-relearner`, sprite: 'npc-oldman', name, map, x: x + GYM_DX, y, facing, fixed: true,
+  id: `${map}-relearner`, sprite: 'npc-oldman', name, map, x, y, facing, fixed: true,
   async onTalk(world) {
     await world.relearnTalk(this);
   },
 }));
 
 const t = (id, sprite, name, map, x, y, facing, sight, team, intro, lose, after, prize = 24) => ({
-  id, sprite, name, map, x: x + GYM_DX, y, facing, sight, team, prize, intro, lose, after,
+  id, sprite, name, map, x, y, facing, sight, team, prize, intro, lose, after,
 });
 
 export const GYM_TRAINERS = [

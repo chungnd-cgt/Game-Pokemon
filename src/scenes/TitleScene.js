@@ -4,6 +4,7 @@ import { clearLegacySave, deleteSave, loadGame, setSaveOwner } from '../game/sav
 import { createMonster } from '../game/monster.js';
 import { currentUser, fetchUsername } from '../online/account.js';
 import { markDirty, startCloudSave } from '../online/cloudSave.js';
+import { checkDevice } from '../online/device.js';
 import { claimSession } from '../online/session.js';
 import { clearLinkError, emailLink, supabase } from '../online/supabase.js';
 import { AuthPanel } from '../ui/AuthPanel.js';
@@ -23,6 +24,11 @@ import { Menu } from '../ui/Menu.js';
 const OLD_PALLET_SHOPS = ['center', 'mart'];
 // 3 Pokémon trên màn hình chính [loài, x, lật ngang]. BootScene nạp hình các loài này trước khi hiện màn hình chính
 export const TITLE_MONS = [['charmander', 210, false], ['pikachu', 480, false], ['squirtle', 750, true]];
+// Nền khi tạo nhân vật: ảnh nền màn đăng nhập (src/assets/login/background.*, như ui/AuthPanel.js), làm tối đi.
+// Không có ảnh thì giữ nền xanh của màn hình chính
+const LOGIN_BG = Object.values(import.meta.glob('../assets/login/background.{png,jpg,jpeg,webp,gif,svg}', {
+  eager: true, query: '?url', import: 'default',
+}))[0] ?? null;
 
 export default class TitleScene extends Phaser.Scene {
   constructor() {
@@ -46,8 +52,8 @@ export default class TitleScene extends Phaser.Scene {
     // Chữ tiêu đề + 3 Pokémon (ẩn tạm khi mở Cài đặt từ màn đăng nhập: nền gọn như trong game)
     this.titleParts = [
       this.add.text(width / 2, 70, 'Pokémon', textStyle(84, '#ffe066', { fontStyle: 'bold', stroke: '#2a4a9a', strokeThickness: 14 })).setOrigin(0.5),
-      this.add.text(width / 2, 140, 'PHIÊN BẢN DEMO', textStyle(24, '#c8d8ff', { fontStyle: 'bold' })).setOrigin(0.5),
-      this.add.text(width / 2, 176, 'Hành trình vùng Sơn Thủy', textStyle(22, '#ffffff')).setOrigin(0.5),
+      this.add.text(width / 2, 140, 'AURORA ONLINE', textStyle(26, '#ffffff', { fontStyle: 'bold', stroke: '#2a4a9a', strokeThickness: 6 })).setOrigin(0.5),
+      this.add.text(width / 2, 176, 'Phiên bản demo', textStyle(20, '#c8d8ff', { fontStyle: 'bold' })).setOrigin(0.5),
     ];
     for (const [id, x, flip] of TITLE_MONS) {
       const key = pixelMon(this, id);
@@ -90,11 +96,17 @@ export default class TitleScene extends Phaser.Scene {
       fresh = true;
     }
 
+    // Thiết bị lạ (online/device.js): nhập mã gửi tới email rồi mới được dùng dữ liệu (máy chủ chặn bản lưu, giao dịch...)
+    const trusted = await this.trustDevice(user);
+    if (trusted.user !== user) fresh = true;
+    user = trusted.user;
+
     // Mỗi tài khoản chỉ chơi ở một nơi (online/session.js): nơi khác đã vào sau thì phải đăng nhập lại để giành quyền.
     // Bị nơi khác giành quyền giữa chừng: dừng hẳn game (bảng "Đăng nhập lại" che lên trên)
     const onLost = () => this.game.pause();
     if (await claimSession(user, fresh, { onLost }) === 'taken') {
       user = await this.authPanel({ error: 'Tài khoản đã được mở ở tab hoặc thiết bị khác. Đăng nhập lại để chơi ở đây.' }).open();
+      user = (await this.trustDevice(user)).user;
       await claimSession(user, true, { onLost });
     }
 
@@ -120,6 +132,22 @@ export default class TitleScene extends Phaser.Scene {
       }
       await this.newGame();
       return;
+    }
+  }
+
+  // Phiên đăng nhập của user đã được máy chủ cho dùng chưa (thiết bị tin cậy). Thiết bị lạ: màn nhập mã gửi tới email;
+  // bấm Đăng xuất thì về màn đăng nhập. Trả về { user } (user mới nếu đã nhập mã / đăng nhập lại)
+  async trustDevice(user) {
+    for (;;) {
+      const state = await checkDevice(user);
+      if (state === 'ok') return { user };
+      if (state === 'error') {
+        this.status('Không kết nối được máy chủ.', true);
+        await this.confirm('Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.', [{ label: 'Thử lại', value: true }]);
+        this.status('');
+        continue;
+      }
+      user = (await this.authPanel().openDevice(user)) ?? (await this.authPanel().open());
     }
   }
 
@@ -174,6 +202,8 @@ export default class TitleScene extends Phaser.Scene {
     }
     // Nơi hồi phục trong bản lưu không còn (bản đồ cũ đã đổi tên): về nhà khi thua / dùng Escape Rope
     if (state.lastCenter && !MAPS[state.lastCenter.map]) state.lastCenter = null;
+    // Chỗ đứng hồi phục lấy lại theo bản đồ hiện tại (Pokémon Center từng nới rộng rồi thu nhỏ lại: toạ độ cũ lệch ra ngoài)
+    else if (state.lastCenter && MAPS[state.lastCenter.map].heal) state.lastCenter = { ...state.lastCenter, ...MAPS[state.lastCenter.map].heal };
     // Bản lưu cũ: Pokémon Center / Poké Mart trước kia ở Pallet, giờ thuộc Thị trấn Lục Bình. Chưa tới Lục Bình thì
     // không tỉnh dậy / đứng ở đó (đi tắt qua cổng Pallet): thua thì về nhà, đang đứng trong cửa hàng thì ra Pallet
     if (!state.visited.has('town1')) {
@@ -204,12 +234,39 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   // Chơi mới: bảng tuỳ chỉnh nhân vật (giới tính + diện mạo, ui/CharacterCreator.js). Tên = tên đăng nhập (không có thì
-  // tên mặc định theo giới tính). Trả về { name, gender, look }, hoặc null nếu huỷ
+  // tên mặc định theo giới tính). Trả về { name, gender, look }, hoặc null nếu huỷ.
+  // Ẩn chữ tiêu đề + Pokémon của màn hình chính, nền là ảnh phong cảnh màn đăng nhập làm tối (không có nút ✕: bắt buộc chọn)
   async createCharacter() {
-    const picked = await new CharacterCreator(this, this.router, { gender: 'male' }).open();
+    for (const part of this.titleParts) part.setVisible(false);
+    await this.creatorBackdrop();
+    const picked = await new CharacterCreator(this, this.router, { gender: 'male', dim: 0.4 }).open();
     if (!picked) return null;
     const { gender, ...look } = picked;
     return { name: this.username || DEFAULT_NAMES[gender], gender, look };
+  }
+
+  // Ảnh nền phủ kín màn hình (giữ tỉ lệ, cắt bớt mép) phía sau bảng tạo nhân vật. Tải ảnh lỗi thì thôi (giữ nền xanh)
+  async creatorBackdrop() {
+    if (!LOGIN_BG || this.backdrop) return;
+    const key = 'title-creator-bg';
+    if (!this.textures.exists(key)) {
+      try {
+        const img = new Image();
+        img.src = LOGIN_BG;
+        await img.decode();
+        if (!this.textures.exists(key)) this.textures.addImage(key, img);
+      } catch (err) {
+        console.warn('Không tải được ảnh nền:', err);
+        return;
+      }
+    }
+    if (!this.sys.isActive()) return;
+    const bg = this.add.image(480, 360, key).setDepth(1);
+    const fit = () => bg.setScale(Math.max(this.scale.width / bg.width, 720 / bg.height));
+    fit();
+    this.scale.on('resize', fit);
+    this.events.once('shutdown', () => this.scale.off('resize', fit));
+    this.backdrop = bg;
   }
 
   // Hỏi Có / Không (mặc định chọn Không). items: thay hai lựa chọn mặc định

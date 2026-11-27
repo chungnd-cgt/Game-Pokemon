@@ -37,28 +37,32 @@ function sized(text) {
   return new XMLSerializer().serializeToString(xml);
 }
 
+// Chữ SVG thành <img> dùng được (null nếu hỏng). Dùng img.decode() chứ không chờ sự kiện onload: onload bị xếp hàng sau
+// từng khung hình của game đang chạy, nạp 453 ảnh mất 4-60 giây (màn "Đang tải hình Pokémon…" rất lâu); decode() xong cả
+// 453 ảnh trong chưa tới nửa giây. Trình duyệt không decode được SVG thì quay về chờ onload như cũ
+async function svgImage(svg) {
+  const img = new Image();
+  img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  try {
+    await img.decode();
+    return img;
+  } catch {
+    if (img.complete) return img.naturalWidth ? img : null;
+    return new Promise((resolve) => {
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+    });
+  }
+}
+
 function loadOne(key) {
   if (images.has(key) || !URLS[key]) return Promise.resolve();
   if (loading.has(key)) return loading.get(key);
   const job = svgPack()
-    .then((pack) => pack[key])
-    .then((text) => new Promise((resolve) => {
-      const svg = sized(text);
-      const img = new Image();
-      const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
-      img.onload = () => {
-        URL.revokeObjectURL(url);
-        images.set(key, img);
-        resolve();
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        // Safari đời cũ không mở được blob SVG: thử lại bằng data URL
-        if (img.src.startsWith('data:')) return resolve();
-        img.src = `data:image/svg+xml,${encodeURIComponent(svg)}`;
-      };
-      img.src = url;
-    }))
+    .then((pack) => svgImage(sized(pack[key])))
+    .then((img) => {
+      if (img) images.set(key, img);
+    })
     .catch((err) => console.warn('Không nạp được hình', key, err))
     .finally(() => loading.delete(key));
   loading.set(key, job);

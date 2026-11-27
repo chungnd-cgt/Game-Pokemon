@@ -1,7 +1,6 @@
 import { BADGES } from '../data/badges.js';
 import { GYM_TMS, ITEMS } from '../data/items.js';
 import { MAPS } from '../data/map.js';
-import { GYM_DX } from '../data/mapsGyms.js';
 import { state } from '../game/state.js';
 import { leagueObjective } from './league.js';
 import { VILLAGES, villageDone, villageGate, villageObjective } from './villages.js';
@@ -28,7 +27,7 @@ export const GYMS = [
 // gift: quà thêm (vd: HM) { item, line }
 function leader({ badgeId, name, sprite, map, team, intro, lose, after, reward, rewardLine, gift }) {
   return {
-    id: `leader-${badgeId}`, sprite, name, map, x: 8 + GYM_DX, y: 2, facing: 'down', fixed: true, sight: 0,
+    id: `leader-${badgeId}`, sprite, name, map, x: 8, y: 2, facing: 'down', fixed: true, sight: 0,
     team, prize: 100, noRematch: true, leader: true, intro, lose, after, gift,
     async onDefeat(world) {
       const b = badge(badgeId);

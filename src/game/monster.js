@@ -2,6 +2,7 @@ import { MOVES } from '../data/moves.js';
 import { SPECIES } from '../data/monsters.js';
 import { NATURE_IDS, natureMultiplier } from '../data/natures.js';
 import { EV_MAX_STAT, EV_MAX_TOTAL, IV_MAX, STAT_KEYS, emptyStats } from '../data/stats.js';
+import { rollWildHeld } from '../data/wildHeld.js';
 
 export const MAX_LEVEL = 100;
 export const MAX_MOVES = 4;
@@ -84,9 +85,11 @@ function rollTraits(species, opts) {
 
 const fullPp = (moves) => Object.fromEntries(moves.map((m) => [m, MOVES[m].pp]));
 
+// opts.wild: Pokémon hoang dã, có thể cầm sẵn vật phẩm theo bảng data/wildHeld.js (tung sau các đặc điểm khác)
 export function createMonster(speciesId, level, opts = {}) {
   const species = SPECIES[speciesId];
   const traits = rollTraits(species, opts);
+  if (opts.wild) traits.heldItem = rollWildHeld(speciesId, opts.rng ?? Math.random);
   const stats = calcStats(species, level, traits.ivs, traits.evs, traits.nature);
   // Như game gốc: 4 chiêu khác nhau học gần nhất ở cấp hiện tại trở xuống.
   // Chiêu học khi tiến hoá tính như học ở cấp 0 (xếp đầu, chỉ còn khi loài biết ít chiêu)

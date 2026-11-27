@@ -4,7 +4,6 @@ import { itemCount, playerName, state } from '../game/state.js';
 import { closeButton, followCenter, textStyle } from './helpers.js';
 import { FloatWindow } from './Windows.js';
 import { iconUnit } from '../gfx/textures.js';
-import { isCancel } from './input.js';
 import { matches } from '../game/keybinds.js';
 
 const W = 640;
@@ -46,7 +45,7 @@ export function drawCardIcon(g, cx, cy, s = 1) {
 
 // Thẻ Huấn luyện viên (phím T / nút Thẻ HLV): tên, thời gian chơi, ngày bắt đầu, tổng số Pokémon, số lần vô địch, xếp hạng
 // (chưa có: "-"), hình nhân vật trên bục giữa 4 ô phụ kiện (nón, áo, quần, cánh: để gán sau, xem COSMETIC_SLOTS), tiền; đã nhận Hộp huy hiệu (quà của mẹ) thì thêm số huy hiệu và 8 ô huy hiệu (chưa có thì bóng
-// đen, rê chuột xem tên). Đóng: Esc / X / T / bấm ✕ hoặc ra ngoài.
+// đen, rê chuột xem tên). Đóng: phím Thẻ HLV / bấm ✕ (Esc / bấm ra ngoài không đóng).
 // playerKey: texture nhân vật đang dùng (WorldScene.playerTexture).
 // other: thẻ của người chơi khác (meta trong online/presence.js): chỉ tên, thời gian chơi, ngày bắt đầu và hình nhân vật;
 // không có huy hiệu, tiền, Pokédex, số Pokémon (người khác xem thẻ của mình cũng vậy)
@@ -78,14 +77,8 @@ export function showTrainerCard(scene, router, playerKey, { other = null } = {})
     };
     const [btn, zone] = closeButton(scene, x0 + W - 28, y0 + 26, close, 30);
     for (const o of [btn, zone]) c.add(o.setScrollFactor(0));
-    router.set(
-      (e) => e.timeStamp >= openedAt && (isCancel(e) || matches(e, 'trainer')) && close(),
-      (p) => {
-        if (p.downTime < openedAt) return;
-        const inside = p.x >= x0 && p.x <= x0 + W && p.y >= y0 && p.y <= y0 + H;
-        if (!inside) close();
-      },
-    );
+    // Esc / bấm ra ngoài không đóng: nút ✕ hoặc phím Thẻ HLV
+    router.set((e) => e.timeStamp >= openedAt && matches(e, 'trainer') && close());
   });
 }
 
@@ -194,8 +187,7 @@ export function openTrainerCardWindow(manager, playerKey) {
   const y0 = Math.round(360 - H / 2) - 20;
   const win = new FloatWindow(manager, {
     id: 'trainer', rect: { x: x0, y: y0, w: W, h: H }, dragRect: { x: x0, y: y0, w: W - 56, h: 52 },
-    // Phím Thẻ HLV do bản đồ bật / tắt (WorldScene.openTrainerCard); ở đây chỉ nhận phím quay lại
-    onKey: (e) => isCancel(e) && win.close(),
+    // Phím Thẻ HLV do bản đồ bật / tắt (WorldScene.openTrainerCard); Esc không đóng
   });
   const add = (o) => win.add(o);
   drawCard(scene, add, x0, y0, H, playerKey, { other: null, badges });

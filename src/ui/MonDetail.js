@@ -11,7 +11,6 @@ import { takeHeldItem } from '../game/heldItems.js';
 import { playerName, state } from '../game/state.js';
 import { GBA_MON, fitScale, pixelMon } from '../gfx/textures.js';
 import { GENDER, closeButton, fitText, fixToCamera, hpColor, monTag, textStyle } from './helpers.js';
-import { isCancel } from './input.js';
 import { shinyGap, shinyMark } from './shinyMark.js';
 import { typeBadges } from './TypeBadge.js';
 import { CARD, STRIP_H, section, strip } from './monCard.js';
@@ -26,7 +25,7 @@ import { FloatWindow } from './Windows.js';
 //  - Phải: ô đồ cầm (chỉ icon), hình Pokémon trên bệ, loại bóng đã bắt (mon.ball) bên cạnh, hệ; bảng chỉ số: giá trị,
 //    IV (vàng), EV (xanh dương); chỉ số tính cách tăng tô xanh lá, giảm tô đỏ
 //  - Ô đồ cầm: kéo vật phẩm từ túi đồ thả vào là cho cầm (WorldScene); kéo món đang cầm ra ngoài ô là cất vào túi
-//  - Thao tác bằng chuột (đổi Pokémon: bấm con khác ở cột đội hình); phím quay lại đóng
+//  - Thao tác bằng chuột (đổi Pokémon: bấm con khác ở cột đội hình); đóng bằng nút ✕
 // Toạ độ theo khung thiết kế 960x720
 
 // Bố cục vẽ ở cỡ 500 x 296 rồi co cả cửa sổ lại SCALE lần (khoảng 415 x 245 trên khung thiết kế)
@@ -44,6 +43,7 @@ const DRAG_START = 6;
 
 export class MonDetail {
   // index: Pokémon thứ mấy trong đội • opts.ghostDepth: depth của icon đồ cầm đang kéo
+  // opts.heldLocked(): câu báo nếu lúc này không được lấy đồ cầm ra (đang đấu), hoặc null
   constructor(manager, index, opts = {}) {
     this.manager = manager;
     this.scene = manager.scene;
@@ -51,7 +51,7 @@ export class MonDetail {
     this.index = index;
     this.win = new FloatWindow(manager, {
       id: 'mon', rect: { x: X0, y: Y0, w: W, h: H }, dragRect: { x: X0, y: Y0, w: W - 40, h: HEAD },
-      onKey: (e) => this.onKey(e), onClose: () => this.cleanup(), scale: SCALE,
+      onClose: () => this.cleanup(), scale: SCALE,
     });
     this.page = this.win.add(this.scene.add.container(0, 0));
     this.onMove = (p) => this.dragMove(p);
@@ -78,11 +78,6 @@ export class MonDetail {
     if (this.index >= state.party.length) this.index = state.party.length - 1;
     const m = this.mon;
     if (detailKey(m) !== this.key) this.render();
-  }
-
-  // Phím quay lại: đóng (cửa sổ dùng chuột, phím hướng để đi lại trên bản đồ)
-  onKey(e) {
-    if (isCancel(e)) this.win.close();
   }
 
   cleanup() {
@@ -299,7 +294,11 @@ export class MonDetail {
       this.heldIcon = this.add(scene.add.image(hx0 + size / 2, hy0 + size / 2, held.icon).setScale(fitScale(scene, held.icon, 26)));
       this.heldIcon.setInteractive({ useHandCursor: true });
       this.heldIcon.on('pointerdown', (p) => {
-        if (!p.rightButtonDown()) this.press = { id: mon.heldItem, x: p.x, y: p.y, ghost: null };
+        if (p.rightButtonDown()) return;
+        // Lúc không được đổi đồ cầm (đang đấu): báo, không cho kéo ra
+        const locked = this.opts.heldLocked?.();
+        if (locked) return this.note(locked);
+        this.press = { id: mon.heldItem, x: p.x, y: p.y, ghost: null };
       });
     }
 

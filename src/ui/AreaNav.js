@@ -1,34 +1,47 @@
 import { SPECIES } from '../data/monsters.js';
-import { PHASE_ICONS, timeOfDay } from '../game/clock.js';
+import { canHoldWild } from '../data/wildHeld.js';
+import { timeOfDay } from '../game/clock.js';
 import { setSetting, settings } from '../game/settings.js';
 import { dexStatus, state } from '../game/state.js';
 import { fitScale, pixelMon } from '../gfx/textures.js';
 import { areaSpecies } from './areaSpecies.js';
-import { fixToCamera, hudScale, hudSize, textStyle } from './helpers.js';
+import { drawHeldMark } from './heldMark.js';
+import { fitText, fixToCamera, hudScale, hudSize, textStyle } from './helpers.js';
 
 const DEPTH = 100;
-const WIDTH = 286; // 5 ô Pokémon + cột nút thu gọn ▶ bên phải
+const PER_ROW = 5;
+const CELL_W = 54; // mỗi ô: bệ cỏ hình bầu dục + Pokémon đứng trên
+const CELL_H = 52;
+const PAD = 12;
+const WIDTH = PAD * 2 + PER_ROW * CELL_W;
+const TITLE_H = 28;
 const TOP = 92; // ngay dưới khung giờ + tên bản đồ (ui/WorldHud.js)
 const TAB_W = 20; // tab thu gọn mảnh sát mép phải (chỉ có mũi tên ◀)
 const TAB_H = 44;
-const ICON = 46;
-const GAP = 4;
-const PER_ROW = 5;
+const HANDLE_W = 16; // tai nhỏ thò ra mép trái bảng (▶ thu gọn)
 const DARK = 0x141a2c;
+const EDGE = 0x3d4c72;
+const ACCENT = 0x48b8e8;
 const SLIDE_MS = 220;
-// Màu bóng dưới chân theo nơi gặp
-const GROUND = { grass: 0x58b040, cave: 0x9a7048, surf: 0x3a88e0, fish: 0x3a88e0 };
+// Bệ dưới chân theo nơi gặp: [viền, mặt bệ, vệt sáng]
+const PLATFORM = {
+  grass: [0x4f9a3a, 0x9ad86a, 0xc8f0a0],
+  cave: [0x8a6a40, 0xd2b07a, 0xeed8aa],
+  surf: [0x2f78c0, 0x7ab8ec, 0xbfe2ff],
+  fish: [0x2f78c0, 0x7ab8ec, 0xbfe2ff],
+};
 
-// Bảng nhỏ góc phải: bản đồ đang đứng có những Pokémon hoang dã nào, một lưới chung không chia nhóm bằng chữ: nơi gặp
-// phân biệt bằng màu bóng dưới chân (cỏ: xanh lá, hang / đá: nâu, nước: xanh dương; câu cá: xanh dương + icon cần câu ở
-// góc), không phụ thuộc đang đứng gần bãi nào. Loài có ở nhiều nhóm thì chỉ hiện ở nhóm đầu.
-// Chỉ có hình Pokémon (tên bản đồ hiện dưới đồng hồ); rê chuột vào hình thì hiện tên loài (chưa gặp: "???"), cấp gặp và buổi.
-// Chưa gặp: bóng đen "?"; đã gặp: hiện hình; đã bắt: hiện hình + Poké Ball nhỏ góc dưới phải. Bấm vào Pokémon để mở đúng trang Pokédex.
-// Loài chỉ xuất hiện vào một buổi có biểu tượng buổi đó ở góc (☀ ngày, ◐ chạng vạng, ☾ đêm), ngoài buổi đó thì mờ đi.
-// Thu gọn thì trượt vào mép phải, chỉ chừa một tab nhỏ; bấm tab để mở lại.
+// Bảng nhỏ góc phải "Pokémon ở <bản đồ>": mọi Pokémon hoang dã của bản đồ đang đứng, lưới 5 ô; mỗi Pokémon đứng trên một bệ
+// hình bầu dục, màu bệ theo nơi gặp (cỏ: xanh lá, hang / đá: nâu, nước: xanh dương; câu cá: xanh dương + icon cần câu ở
+// góc). Loài có ở nhiều nhóm thì chỉ hiện ở nhóm đầu.
+// Chưa gặp: chỉ có tấm biển pixel trắng dấu "?" cắm trên bệ, không lộ gì thêm (không có icon cần câu / vật phẩm cầm).
+// Đã gặp: hiện hình, cùng icon cần câu (câu cá) và dấu vật phẩm cầm (loài có thể cầm sẵn vật phẩm khi gặp ngoài tự nhiên,
+// data/wildHeld.js: thẻ vàng vạch đỏ góc dưới phải, ui/heldMark.js); đã bắt: thêm Poké Ball nhỏ góc dưới trái.
+// Loài chỉ xuất hiện vào một buổi: ngoài buổi đó thì mờ đi (không có icon buổi).
+// Bấm vào Pokémon để mở đúng trang Pokédex. Rê chuột: sáng viền ô.
+// Thu gọn (tai ▶ mép trái) thì trượt vào mép phải, chỉ chừa một tab nhỏ; bấm tab để mở lại.
 // Cỡ giao diện (helpers.js hudScale): vẽ theo toạ độ ảo, container phóng to theo hệ số
 // info: { title, sections: [{ kind: 'grass' | 'cave' | 'surf' | 'fish', tables: [id bảng gặp] }] } hoặc null
-
 export class AreaNav {
   constructor(scene, onPick) {
     this.scene = scene;
@@ -43,10 +56,9 @@ export class AreaNav {
     return settings.areaNavOpen !== false;
   }
 
-  // Vẽ lại khi khu vực / số loài đã bắt / cần câu đang có / buổi trong ngày thay đổi
+  // Vẽ lại khi khu vực / số loài đã bắt / buổi trong ngày thay đổi
   update(info) {
     this.info = info;
-    // Vẽ lại khi Pokédex có thêm loài đã gặp / đã bắt
     const caught = `${state.dex.seen.size}/${state.dex.caught.size}`;
     const key = info ? `${this.open}|${caught}|${timeOfDay()}|${info.title}|${info.sections.map((s) => `${s.kind}:${s.tables.join('+')}`).join()}|${hudScale(this.scene)}` : 'none';
     if (key === this.key || this.sliding) return;
@@ -98,7 +110,6 @@ export class AreaNav {
   render() {
     this.container?.destroy();
     this.container = null;
-    this.tip = null;
     this.unhover = null;
     if (!this.info) return;
     const { scene } = this;
@@ -117,95 +128,123 @@ export class AreaNav {
     const g = scene.add.graphics();
     g.fillStyle(DARK, 0.85);
     g.fillRoundedRect(0, 0, TAB_W + 10, TAB_H, { tl: 9, bl: 9, tr: 0, br: 0 });
-    g.lineStyle(2, 0x3d4c72, 0.9);
+    g.lineStyle(2, EDGE, 0.9);
     g.strokeRoundedRect(1, 1, TAB_W + 10, TAB_H - 2, { tl: 8, bl: 8, tr: 0, br: 0 });
-    g.fillStyle(0xffd860);
+    g.fillStyle(ACCENT);
     g.fillRect(0, 10, 3, TAB_H - 20);
     c.add(g);
     const arrow = scene.add.text(TAB_W / 2 + 2, TAB_H / 2, '◀', textStyle(14, '#ffffff', { fontStyle: 'bold' })).setOrigin(0.5);
     c.add(arrow);
-    const hit = scene.add.zone(TAB_W / 2, TAB_H / 2, TAB_W, TAB_H).setInteractive({ useHandCursor: true });
-    hit.on('pointerover', () => arrow.setColor('#ffd860'));
-    hit.on('pointerout', () => arrow.setColor('#ffffff'));
+    this.button(c, TAB_W / 2, TAB_H / 2, TAB_W, TAB_H, arrow, '#ffffff', () => this.toggle());
+  }
+
+  // Vùng bấm có chữ đổi màu khi rê chuột
+  button(c, x, y, w, h, label, color, onClick) {
+    const hit = this.scene.add.zone(x, y, w, h).setInteractive({ useHandCursor: true });
+    hit.on('pointerover', () => label?.setColor('#ffd860'));
+    hit.on('pointerout', () => label?.setColor(color));
     hit.on('pointerdown', (p, lx, ly, e) => {
       e?.stopPropagation();
-      this.toggle();
+      onClick();
     });
     c.add(hit);
+    return hit;
   }
 
   renderPanel(c) {
     const { scene } = this;
+    const info = this.info;
     const bg = scene.add.graphics();
     c.add(bg);
-    let y = 10;
     const phase = timeOfDay();
     const shown = new Set();
     const all = [];
-    for (const section of this.info.sections) {
+    for (const section of info.sections) {
       for (const [id, found] of areaSpecies(section.tables)) {
         if (shown.has(id)) continue;
         shown.add(id);
         all.push([id, found, section.kind]);
       }
     }
+    // Tiêu đề "Pokémon ở <bản đồ>"
+    const title = scene.add.text(PAD, 8, `Pokémon ở ${info.title}`, textStyle(13, '#7fd4ff', { fontStyle: 'bold' }));
+    fitText(title, WIDTH - PAD * 2, 0.75);
+    c.add(title);
+    const gridTop = TITLE_H;
     all.forEach(([id, found, kind], i) => {
-      const cx = 12 + (i % PER_ROW) * (ICON + GAP) + ICON / 2;
-      const cy = y + Math.floor(i / PER_ROW) * (ICON + GAP) + ICON / 2;
-      this.icon(c, id, cx, cy, found, !found.time || found.time === phase, kind);
+      const x0 = PAD + (i % PER_ROW) * CELL_W;
+      const y0 = gridTop + Math.floor(i / PER_ROW) * CELL_H;
+      this.icon(c, id, x0, y0, !found.time || found.time === phase, kind);
     });
-    y += Math.ceil(all.length / PER_ROW) * (ICON + GAP) + 4;
-    // Nút thu gọn: cột bên phải
-    const arrow = scene.add.text(WIDTH - 11, 8 + ICON / 2, '▶', textStyle(13, '#c8d0e8', { fontStyle: 'bold' })).setOrigin(0.5);
+    const rows = Math.max(1, Math.ceil(all.length / PER_ROW));
+    const height = gridTop + rows * CELL_H + 8;
+    // Nền bảng + tai ▶ thu gọn thò ra mép trái
+    bg.fillStyle(0x000000, 0.25);
+    bg.fillRoundedRect(2, 3, WIDTH, height, 10);
+    bg.fillStyle(DARK, 0.86);
+    bg.fillRoundedRect(0, 0, WIDTH, height, 10);
+    bg.lineStyle(2, EDGE, 0.9);
+    bg.strokeRoundedRect(1, 1, WIDTH - 2, height - 2, 9);
+    bg.fillStyle(DARK, 0.92);
+    bg.fillRoundedRect(-HANDLE_W, 8, HANDLE_W + 4, 34, { tl: 7, bl: 7, tr: 0, br: 0 });
+    bg.lineStyle(2, EDGE, 0.9);
+    bg.strokeRoundedRect(-HANDLE_W + 1, 9, HANDLE_W + 2, 32, { tl: 6, bl: 6, tr: 0, br: 0 });
+    const arrow = scene.add.text(-HANDLE_W / 2 + 1, 25, '▶', textStyle(11, '#c8d0e8', { fontStyle: 'bold' })).setOrigin(0.5);
     c.add(arrow);
-    const hit = scene.add.zone(WIDTH - 11, (y + 2) / 2, 22, y + 2).setInteractive({ useHandCursor: true });
-    hit.on('pointerover', () => arrow.setColor('#ffd860'));
-    hit.on('pointerout', () => arrow.setColor('#c8d0e8'));
-    hit.on('pointerdown', (p, lx, ly, e) => {
-      e?.stopPropagation();
-      this.toggle();
-    });
-    c.add(hit);
-    bg.fillStyle(DARK, 0.82);
-    bg.fillRoundedRect(0, 0, WIDTH, y + 2, 10);
-    bg.fillStyle(0xffd860);
-    bg.fillRect(0, 8, 3, 18);
+    this.button(c, -HANDLE_W / 2 + 1, 25, HANDLE_W + 4, 36, arrow, '#c8d0e8', () => this.toggle());
+    // Chặn bấm xuyên bảng xuống bản đồ (bấm vào chỗ trống của bảng không làm nhân vật đi)
+    const block = scene.add.zone(WIDTH / 2, height / 2, WIDTH, height).setInteractive();
+    block.on('pointerdown', (p, lx, ly, e) => e?.stopPropagation());
+    c.addAt(block, 1);
   }
 
-  // found: { time: buổi loài này xuất hiện (null = cả ngày), min, max } • now: đang xuất hiện vào buổi hiện tại
-  icon(c, speciesId, cx, cy, found, now = true, kind = 'grass') {
+  // Một ô: bệ bầu dục + Pokémon (chưa gặp: biển "?"). (x0, y0): góc trái trên ô • now: đang xuất hiện vào buổi hiện tại (ngoài buổi thì mờ)
+  icon(c, speciesId, x0, y0, now = true, kind = 'grass') {
     const { scene } = this;
-    const { time } = found;
     const dexId = SPECIES[speciesId].dexId;
-    // Chưa gặp: bóng đen "?" • đã gặp: hiện hình • đã bắt: hiện hình + Poké Ball nhỏ góc dưới phải
     const status = dexStatus(dexId);
     const caught = status === 'caught';
     const seen = status !== 'unknown';
+    const cx = x0 + CELL_W / 2;
+    const py = y0 + CELL_H - 12; // tâm bệ
     const slot = scene.add.graphics();
     const drawSlot = (hover) => {
       slot.clear();
-      slot.fillStyle(0xffffff, hover ? 0.28 : caught ? 0.16 : 0.07);
-      slot.fillRoundedRect(cx - ICON / 2, cy - ICON / 2, ICON, ICON, 8);
-      if (hover) {
-        slot.lineStyle(2, 0xffd860, 0.9);
-        slot.strokeRoundedRect(cx - ICON / 2 + 1, cy - ICON / 2 + 1, ICON - 2, ICON - 2, 7);
-      }
+      if (!hover) return;
+      slot.fillStyle(0xffffff, 0.12);
+      slot.fillRoundedRect(x0 + 2, y0 + 1, CELL_W - 4, CELL_H - 2, 8);
+      slot.lineStyle(2, 0xffd860, 0.9);
+      slot.strokeRoundedRect(x0 + 2, y0 + 1, CELL_W - 4, CELL_H - 2, 8);
     };
     drawSlot(false);
     c.add(slot);
-    // Bóng dưới chân theo nơi gặp
-    const ground = scene.add.graphics();
-    ground.fillStyle(GROUND[kind] ?? GROUND.grass, 0.85);
-    ground.fillEllipse(cx, cy + ICON / 2 - 8, ICON - 14, 9);
-    c.add(ground);
-    const key = pixelMon(scene, speciesId, '', 28);
-    const img = scene.add.image(cx, cy - 1, key).setScale(fitScale(scene, key, ICON - 14));
-    c.add(img);
-    // Câu cá: huy hiệu tròn nhỏ có cần câu ở góc trái trên (nằm trên hình, không đè lên thân Pokémon)
-    if (kind === 'fish') {
+    // Bệ bầu dục: viền đậm, mặt bệ, vệt sáng phía trên
+    const [edge, face, light] = PLATFORM[kind] ?? PLATFORM.grass;
+    const plat = scene.add.graphics();
+    plat.fillStyle(0x000000, 0.3);
+    plat.fillEllipse(cx, py + 2, 44, 15);
+    plat.fillStyle(edge, 1);
+    plat.fillEllipse(cx, py, 44, 15);
+    plat.fillStyle(face, 1);
+    plat.fillEllipse(cx, py - 1, 40, 11);
+    plat.fillStyle(light, 0.9);
+    plat.fillEllipse(cx - 3, py - 3, 24, 4);
+    c.add(plat);
+    let img = null;
+    if (seen) {
+      const key = pixelMon(scene, speciesId, '', 28);
+      img = scene.add.image(cx, py + 2, key).setOrigin(0.5, 1).setScale(fitScale(scene, key, 36));
+      c.add(img);
+    } else {
+      // Chưa gặp: tấm biển "?" lơ lửng ngay trên bệ (không cọc)
+      img = scene.add.image(cx, py - 4, unknownSign(scene)).setOrigin(0.5, 1).setScale(SIGN_SCALE);
+      c.add(img);
+    }
+    // Câu cá: huy hiệu tròn nhỏ có cần câu ở góc trái trên (chỉ khi đã biết loài này)
+    if (kind === 'fish' && seen) {
       const rod = scene.add.graphics();
-      const bx = cx - ICON / 2 + 8;
-      const by = cy - ICON / 2 + 8;
+      const bx = x0 + 9;
+      const by = y0 + 9;
       rod.fillStyle(DARK, 0.92);
       rod.fillCircle(bx, by, 8);
       rod.lineStyle(1, 0x3a88e0, 0.9);
@@ -213,25 +252,24 @@ export class AreaNav {
       drawRod(rod, bx - 5, by - 5);
       c.add(rod);
     }
-    if (!seen) {
-      img.setTintFill(0x070a12);
-      c.add(scene.add.text(cx, cy, '?', textStyle(16, '#c8d0e8', { fontStyle: 'bold' })).setOrigin(0.5));
-    }
     let ball = null;
     if (caught && scene.textures.exists('ball')) {
-      ball = scene.add.image(cx + ICON / 2 - 7, cy + ICON / 2 - 7, 'ball').setScale(fitScale(scene, 'ball', 11));
+      ball = scene.add.image(cx - 19, py + 1, 'ball').setScale(fitScale(scene, 'ball', 11));
       c.add(ball);
     }
+    // Có thể cầm sẵn vật phẩm khi gặp ngoài tự nhiên (chỉ khi đã biết loài này)
+    let held = null;
+    if (seen && canHoldWild(speciesId)) {
+      held = drawHeldMark(scene.add.graphics(), cx + 19, py + 1, 8);
+      c.add(held);
+    }
     if (!now) {
-      slot.setAlpha(0.45);
+      plat.setAlpha(0.45);
       img.setAlpha(0.35);
       ball?.setAlpha(0.5);
+      held?.setAlpha(0.5);
     }
-    if (time) {
-      c.add(scene.add.text(cx + ICON / 2 - 2, cy - ICON / 2 + 1, PHASE_ICONS[time], textStyle(12, now ? '#ffd860' : '#8a94b0', { fontStyle: 'bold' })).setOrigin(1, 0));
-    }
-    const zone = scene.add.zone(cx, cy, ICON, ICON).setInteractive({ useHandCursor: true });
-    // Rê chuột: chỉ sáng viền ô (không hiện nhãn tên / cấp)
+    const zone = scene.add.zone(cx, y0 + CELL_H / 2, CELL_W - 2, CELL_H).setInteractive({ useHandCursor: true });
     const hover = (on) => {
       drawSlot(on);
       this.unhover = on ? () => hover(false) : null;
@@ -245,6 +283,42 @@ export class AreaNav {
     });
     c.add(zone);
   }
+}
+
+// Tấm biển pixel (loài chưa gặp): mặt biển trắng viền sẫm, dấu "?" xanh than. Vẽ một lần thành
+// texture, mỗi điểm ảnh SIGN_PX px rồi thu nhỏ (SIGN_SCALE): nét, không nhoè khi phóng to giao diện / màn hình lớn
+const SIGN = [
+  '..KKKKKKKKK..',
+  '.KWWWWWWWWWK.',
+  'KWWWWDDDWWWWK',
+  'KWWWDDWDDWWWK',
+  'KWWWWWWDDWWWK',
+  'KWWWWWDDWWWWK',
+  'KWWWWDDWWWWWK',
+  'KWWWWDDWWWWWK',
+  'KWWWWWWWWWWWK',
+  'KWWWWDDWWWWWK',
+  'KLLLLLLLLLLLK',
+  '.KKKKKKKKKKK.',
+];
+const SIGN_COLORS = { K: '#3a4258', W: '#f6f8fc', L: '#c4cad8', D: '#2a3450' };
+const SIGN_PX = 4;
+const SIGN_SCALE = 2 / SIGN_PX; // 2 px giao diện mỗi điểm ảnh: biển 26 x 24
+const SIGN_KEY = 'area-unknown-sign';
+
+function unknownSign(scene) {
+  if (scene.textures.exists(SIGN_KEY)) return SIGN_KEY;
+  const tex = scene.textures.createCanvas(SIGN_KEY, SIGN[0].length * SIGN_PX, SIGN.length * SIGN_PX);
+  const ctx = tex.getContext();
+  SIGN.forEach((row, y) => {
+    [...row].forEach((ch, x) => {
+      if (!SIGN_COLORS[ch]) return;
+      ctx.fillStyle = SIGN_COLORS[ch];
+      ctx.fillRect(x * SIGN_PX, y * SIGN_PX, SIGN_PX, SIGN_PX);
+    });
+  });
+  tex.refresh();
+  return SIGN_KEY;
 }
 
 // Cần câu nhỏ (cán nâu chéo, dây trắng, phao đỏ): góc (x, y) là đầu cán

@@ -28,8 +28,8 @@ import { addItem, blackoutLoss, hasFlag, healParty, itemCount, setFlag, state, s
 import { settings } from '../game/settings.js';
 import { Ambience } from '../gfx/ambience.js';
 import { mapWeather } from '../game/weather.js';
-import { MACHINE_SLOTS } from '../gfx/interior.js';
-import { CHAR_HEIGHT, CHAR_SCALE, applyPlayerLook } from '../gfx/player.js';
+import { MACHINE_SCREEN, MACHINE_SLOTS } from '../gfx/interior.js';
+import { CHAR_HEIGHT, CHAR_SCALE, FOLLOWER_SCALE, applyPlayerLook } from '../gfx/player.js';
 import { CharacterCreator } from '../ui/CharacterCreator.js';
 import { openTrainerCardWindow } from '../ui/TrainerCard.js';
 import { WindowManager } from '../ui/Windows.js';
@@ -43,7 +43,7 @@ import { MOUNT_SHADOW, RIDE_SEAT, hasRideArt, puffTextures, rideTexture } from '
 import {
   STORY_NPCS, WALKABLE_OBJECTS, clerkTalk, hasPokedex, intro, objective, objectVisible, stepBlocker, stepTrigger, useObject,
 } from '../story/chapter1.js';
-import { resetLeague } from '../story/league.js';
+import { F_CHAMPION, resetLeague } from '../story/league.js';
 import { houseKnock } from '../story/villages.js';
 import { hudScaleFor } from '../game/display.js';
 import { COLORS, battleRect, closeButton, cssColor, drawHpBar, drawPanel, fitText, fixToCamera, followCenter, hpColor, hudSize, textStyle, tweenAsync, uiX, wait } from '../ui/helpers.js';
@@ -54,6 +54,7 @@ import { SettingsPanel } from '../ui/SettingsPanel.js';
 import { MessageBox } from '../ui/MessageBox.js';
 import { typeBadges } from '../ui/TypeBadge.js';
 import { AreaNav } from '../ui/AreaNav.js';
+import { mapAreaInfo } from '../ui/areaSpecies.js';
 import { PartyPanel } from '../ui/PartyPanel.js';
 import { Hotbar } from '../ui/Hotbar.js';
 import { PcBox } from '../ui/PcBox.js';
@@ -92,7 +93,6 @@ const WATER_ENCOUNTER_RATE = 0.08;
 // Câu cá: tỉ lệ có Pokémon cắn câu và thời gian (ms) để bấm Enter kịp
 const ROD_BITE = { oldRod: 0.75, goodRod: 0.85, superRod: 0.95 };
 const BITE_WINDOW_MS = 1000;
-const RODS = ['superRod', 'goodRod', 'oldRod'];
 // Cây quả mọng nhấc lên chừng ấy pixel (pixel art) để gốc cây nằm giữa luống đất
 const BERRY_LIFT = 4;
 // Gym đã có huy hiệu và có bản vẽ nền "đã thắng" (gfx/world.js: buildWorldTextures)
@@ -119,7 +119,7 @@ const FOLLOWER_FLY = 9 * CHAR_SCALE; // Pokémon có cánh bay cao hơn mặt đ
 const FOLLOWER_FLOAT = 5 * CHAR_SCALE; // Pokémon lơ lửng (ma, khí độc, nam châm)
 const ITEM_SCALE = 0.65; // vật phẩm rơi trên bản đồ nhỏ hơn một ô
 const SHADOW = [0.18 * CHAR_SCALE, 0.2 * CHAR_SCALE]; // bóng dưới chân nhân vật (fx-shadow 128x32)
-const FOLLOWER_SHADOW = [0.16 * CHAR_SCALE, 0.18 * CHAR_SCALE];
+const FOLLOWER_SHADOW = [0.16 * CHAR_SCALE * FOLLOWER_SCALE, 0.18 * CHAR_SCALE * FOLLOWER_SCALE];
 const SHADOW_ALPHA = 0.22;
 const HOTBAR_SLOT = 46; // cỡ ô thanh phím tắt (ui/Hotbar.js), để đặt D-Pad ngay trên
 const PASS_TWINKLE_MS = 650; // mỗi chừng này ms, mỗi chỗ đi qua được (đang thấy trên màn hình) có thể lóe một ngôi sao
@@ -209,10 +209,8 @@ export default class WorldScene extends Phaser.Scene {
       ground: null, // điểm chạm đất (pixel) • stepT: đang bước (0 → 1) hay đứng yên (null)
       stepT: null,
       shadow: this.add.image(0, 0, 'fx-shadow').setScale(...FOLLOWER_SHADOW).setAlpha(SHADOW_ALPHA).setDepth(9),
-      sprite: this.add.image(0, 0, 'fx-leaf').setOrigin(0.5, 1).setScale(CHAR_SCALE).setDepth(10),
+      sprite: this.add.image(0, 0, 'fx-leaf').setOrigin(0.5, 1).setScale(CHAR_SCALE * FOLLOWER_SCALE).setDepth(10),
     };
-    // Pokémon đi theo là shiny: lấp lánh định kỳ (gfx/shinyFx.js), bật / tắt trong refreshFollower
-    this.followerSparkle = attachShinySparkle(this, this.follower.sprite).setVisible(false);
 
     let animFrame = 0;
     this.time.addEvent({
@@ -234,6 +232,9 @@ export default class WorldScene extends Phaser.Scene {
     // Cửa sổ nổi (túi đồ, thẻ HLV, hộp PC, chi tiết Pokémon): mở song song, đè lên nhau, kéo dời được (ui/Windows.js).
     // Nằm trên cột đội hình / thanh phím tắt, dưới khung lời thoại và các bảng chọn
     this.windows = new WindowManager(this, this.router, { base: HUD_DEPTH + 0.5, step: 0.5 });
+    // Đang đấu: lớp cửa sổ nổi không vẽ dưới trận đấu mà vẽ đè lên (renderOverBattle)
+    this.events.on('prerender', () => this.liftOverBattle(true));
+    this.events.on('render', () => this.liftOverBattle(false));
     this.msg = new MessageBox(this, this.router, 24, 578, 912, 130);
     // Khung lời thoại vẽ theo khung 960x720: dời vào giữa màn hình rộng (đổi cỡ màn hình: onScreenResize)
     fixToCamera(this.msg.container).setDepth(HUD_DEPTH + 5).setVisible(false).setX(uiX(this));
@@ -249,9 +250,10 @@ export default class WorldScene extends Phaser.Scene {
     // Cột đội hình góc trái trên; bảng Pokémon hoang dã ở góc phải dưới đồng hồ
     // Bấm vào ô: mở / đóng cửa sổ chi tiết Pokémon; kéo thả ô này lên ô khác: đổi chỗ trong đội
     this.partyPanel = new PartyPanel(this, 16, (index) => {
-      if (this.busy || this.moving || this.partyMenu || this.overlay) return;
+      if (this.windowsLocked()) return;
       this.openSummary(index);
     }, (a, b) => {
+      if (this.inBattleWindow) return this.hud.showSaveNote('Không đổi thứ tự đội hình khi đang đấu.', true);
       if (this.busy || this.moving || this.partyMenu || this.overlay) return;
       swapParty(a, b);
       this.refreshFollower();
@@ -323,11 +325,12 @@ export default class WorldScene extends Phaser.Scene {
       ride: () => this.toggleRide(),
       map: () => this.openRegionMap(),
       trainer: () => this.openTrainerCard(),
-      settings: () => this.toggleSettings(),
+      // Phím Cài đặt (mặc định có Esc) chỉ mở bảng; bảng đóng bằng Huỷ / OK
+      settings: () => !this.settingsMenu && this.toggleSettings(),
     };
     this.input.keyboard.on('keydown', (e) => {
       if (e.repeat) return;
-      // Đang mở cửa sổ nổi: phím quay lại dùng để đóng cửa sổ trên cùng (ui/Windows.js), không mở Cài đặt
+      // Đang mở cửa sổ nổi: phím quay lại thuộc về cửa sổ trên cùng (ui/Windows.js), không mở Cài đặt
       if (this.windows.lastKey === e && (isCancel(e) || this.windows.top()?.typing)) return;
       for (const id of actionsForCode(e.code)) shortcuts[id]?.();
     });
@@ -404,7 +407,8 @@ export default class WorldScene extends Phaser.Scene {
     const free = !talking && !this.partyMenu && !this.settingsMenu && !this.overlay && !this.busy;
     // Cửa sổ nổi (túi đồ, hộp PC, thẻ HLV, chi tiết Pokémon) không ẩn cột nút / đội hình / đồng hồ (kéo đồ thả vào Pokémon /
     // ô phím tắt, kéo Pokémon giữa hộp và cột đội hình) (cả lúc giao dịch với người chơi khác: bảng giao dịch nổi lên trên)
-    const floating = this.windows.count > 0 || Boolean(this.trade?.active) || Boolean(this.inBattleWindow);
+    // (transition: đang mở cửa sổ trận đấu, trước khi trận hiện ra: giao diện không ẩn rồi hiện lại)
+    const floating = this.windows.count > 0 || Boolean(this.trade?.active) || Boolean(this.inBattleWindow) || Boolean(this.transition);
     const shown = free || (floating && !talking && !this.partyMenu && !this.settingsMenu && !this.overlay);
     this.hud.setVisible(shown);
     this.hotbar.setVisible(shown);
@@ -416,6 +420,7 @@ export default class WorldScene extends Phaser.Scene {
     this.areaNav.update(this.areaInfo());
     this.placeDpad(free && !this.moveLocked);
     this.windows.update();
+    if (this.inBattleWindow && this.keyFocus === 'windows' && !this.windows.count) this.setKeyFocus('battle');
     if (this.windows.get('mon')) this.monDetail?.update();
     this.advanceWalk(this.playerMover, delta);
     for (const npc of [...this.npcs]) this.advanceWalk(npc, delta);
@@ -442,7 +447,8 @@ export default class WorldScene extends Phaser.Scene {
         npc.label?.setVisible(false);
         continue;
       }
-      npc.label ??= this.add.text(0, 0, npc.def.name, textStyle(12, '#ffffff', {
+      // Tên NPC màu vàng, phân biệt với tên người chơi thật
+      npc.label ??= this.add.text(0, 0, npc.def.name, textStyle(12, '#ffd860', {
         fontStyle: 'bold', backgroundColor: 'rgba(20,26,44,0.7)', padding: { x: 5, y: 1 },
       })).setOrigin(0.5, 1).setDepth(12);
       // Đỉnh hình (kể cả khi bị cắt bớt: bơi, ngồi)
@@ -517,7 +523,7 @@ export default class WorldScene extends Phaser.Scene {
   openTrainerCard() {
     const open = this.windows.get('trainer');
     if (open) return open.close();
-    if (this.busy || this.moving || this.partyMenu || this.overlay) return;
+    if (this.windowsLocked()) return;
     this.setFrame('stand');
     openTrainerCardWindow(this.windows, this.playerTexture(false));
   }
@@ -635,16 +641,16 @@ export default class WorldScene extends Phaser.Scene {
     for (const s of this.passSpots) {
       if (Math.random() > PASS_TWINKLE_CHANCE) continue;
       if (s.x > view.right || s.x + s.w < view.x || s.y > view.bottom || s.y + s.h < view.y) continue;
-      // Thỉnh thoảng hai ngôi sao lóe gần như cùng lúc. Sao vàng ấm có quầng sáng mờ phía sau (nổi trên kính cửa xanh nhạt)
+      // Thỉnh thoảng hai ngôi sao lóe gần như cùng lúc. Sao vàng ấm nho nhỏ có quầng sáng mờ phía sau (nổi trên kính cửa xanh nhạt)
       for (let i = Math.random() < 0.3 ? 2 : 1; i > 0; i--) {
-        const size = (CELL * (0.38 + Math.random() * 0.17)) / 16; // fx-spark 16px: sao rộng 38-55% ô
+        const size = (CELL * (0.18 + Math.random() * 0.1)) / 16; // fx-spark 16px: sao rộng 18-28% ô
         const x = s.x + Math.random() * s.w;
         const y = s.y + Math.random() * s.h;
         const angle = Math.random() * 45;
         const glow = this.add.image(x, y, 'fx-spark').setScale(0).setTint(0xffd040).setAlpha(0.45).setAngle(angle + 45).setDepth(9.49);
         const star = this.add.image(x, y, 'fx-spark').setScale(0).setTint(Math.random() < 0.6 ? 0xfff0a0 : 0xffffff).setAngle(angle).setDepth(9.5);
         const delay = i > 1 ? 180 : 0;
-        this.tweens.add({ targets: glow, scale: size * 1.7, duration: 450, delay, yoyo: true, ease: 'Sine.out', onComplete: () => glow.destroy() });
+        this.tweens.add({ targets: glow, scale: size * 1.5, duration: 450, delay, yoyo: true, ease: 'Sine.out', onComplete: () => glow.destroy() });
         this.tweens.add({
           targets: star, scale: size, angle: angle + 70, duration: 450, delay, yoyo: true, ease: 'Sine.out',
           onComplete: () => star.destroy(),
@@ -898,7 +904,16 @@ export default class WorldScene extends Phaser.Scene {
         const lit = this.litLanterns?.has(o.id) || this.map.cleared;
         return [this.add.image(x, (o.y + 1) * CELL, `obj-lantern${lit ? '-lit' : ''}`).setOrigin(0.5, 1).setScale(WORLD_SCALE * SMOOTH_UNIT).setDepth(10 + ((o.y + 1) * CELL) / 10000)];
       }
-      if (o.kind !== 'berry') return [this.add.image(x, o.y * CELL + CELL / 2, 'ball').setScale(0.3 * ZOOM).setDepth(2)];
+      // Vật trang trí (vd Pokédex trong tủ kính phòng thí nghiệm): dy px (16px/ô) nâng / hạ so với tâm ô
+      if (o.kind === 'decor') {
+        return [this.add.image(x, o.y * CELL + CELL / 2 + (o.dy ?? 0) * WORLD_SCALE, `obj-${o.look}`).setScale(WORLD_SCALE * SMOOTH_UNIT).setDepth(2)];
+      }
+      if (o.kind !== 'berry') {
+        const ball = this.add.image(x, o.y * CELL + CELL / 2, 'ball').setScale(0.3 * ZOOM).setDepth(2);
+        // Dấu nhỏ dán trên bóng (bóng Pikachu: sấm sét), nằm giữa nửa đỏ phía trên của bóng
+        if (!o.mark) return [ball];
+        return [ball, this.add.image(x, o.y * CELL + CELL / 2 - 2 * WORLD_SCALE, `obj-${o.mark}`).setScale(WORLD_SCALE * SMOOTH_UNIT * 0.32).setDepth(2.01)];
+      }
       // Cây cao hơn 1 ô: xếp lớp theo hàng như nhân vật, đứng phía trên cây thì bị cây che
       const y = (o.y + 1) * CELL;
       const depth = 10 + y / 10000;
@@ -933,7 +948,7 @@ export default class WorldScene extends Phaser.Scene {
   async warpTo(warp) {
     const target = MAPS[warp.to];
     // Bước vào phòng Thiên Vương đầu tiên: thử thách Liên minh bắt đầu lại từ đầu
-    if (warp.resetLeague) resetLeague();
+    if (warp.resetLeague && !hasFlag(F_CHAMPION)) resetLeague();
     // Đang đi xe / cưỡi thì sang bản đồ ngoài trời vẫn giữ nguyên
     const keep = !target.indoor && ['bike', 'ride'].includes(this.vehicle) ? [this.vehicle, this.mount] : null;
     // Đang lướt nước qua dòng sông nối hai bản đồ (Sông Lục Bình): sang bên kia vẫn ở dưới nước
@@ -1648,7 +1663,7 @@ export default class WorldScene extends Phaser.Scene {
       this.player.setCrop(0, 0, this.player.frame.width, this.player.frame.height - hide * WORLD_SCALE);
       this.updateGrassFront(this.pos);
       const shadow = MOUNT_SHADOW[this.rideArt]?.[view];
-      if (shadow) this.shadow.setScale((shadow[0] * 2 * WORLD_SCALE) / 128, (shadow[1] * 2 * WORLD_SCALE) / 32);
+      if (shadow) this.shadow.setScale((shadow[0] * 2 * WORLD_SCALE * CHAR_SCALE) / 128, (shadow[1] * 2 * WORLD_SCALE * CHAR_SCALE) / 32);
     }
     this.riderLift = (seat - hide) * WORLD_SCALE * CHAR_SCALE - bob;
     this.player.setOrigin(0.5, 1 + this.riderLift / CHAR_HEIGHT);
@@ -1911,7 +1926,7 @@ export default class WorldScene extends Phaser.Scene {
     }
     await this.say(null, ['Câu được rồi!']);
     const { speciesId, level } = rollEncounter(this.map.water[rod], Math.random, state.party[0]);
-    await this.startBattle({ enemy: createMonster(speciesId, level), zone: this.waterZone(), persist: true });
+    await this.startBattle({ enemy: createMonster(speciesId, level, { wild: true }), zone: this.waterZone(), persist: true });
   }
 
   // Nền trận đấu với Pokémon dưới nước: trong hang là mặt nước ngầm dưới trần đá (BattleScene: 'caveWater')
@@ -1924,15 +1939,7 @@ export default class WorldScene extends Phaser.Scene {
   // bằng màu bóng dưới chân): 'grass' bãi cỏ, 'cave' trong hang, 'surf' lướt nước, 'fish' cần câu. Không phụ thuộc đứng
   // gần bãi nào. Pokémon trong hang chỉ hiện khi đã vào hang (mỗi hang là một bản đồ riêng)
   areaInfo() {
-    if (this.map.indoor || (!this.map.areas.length && !this.map.water)) return null;
-    const land = [...new Set(this.map.areas.map((a) => a.table))];
-    const water = this.map.water;
-    const rods = water ? RODS.slice().reverse().map((r) => water[r]).filter(Boolean) : [];
-    const sections = [];
-    if (land.length) sections.push({ kind: this.map.cave ? 'cave' : 'grass', tables: land });
-    if (water?.surf) sections.push({ kind: 'surf', tables: [water.surf] });
-    if (rods.length) sections.push({ kind: 'fish', tables: [...new Set(rods)] });
-    return { title: this.map.name, sections };
+    return mapAreaInfo(this.map);
   }
 
   // ---------- Đi bộ theo từng frame ----------
@@ -2091,7 +2098,7 @@ export default class WorldScene extends Phaser.Scene {
     }
     const { speciesId, level } = rollEncounter(table, Math.random, state.party[0]);
     if (repelBlocks(level)) return null;
-    return { enemy: createMonster(speciesId, level), zone, persist: true };
+    return { enemy: createMonster(speciesId, level, { wild: true }), zone, persist: true };
   }
 
   rustle() {
@@ -2173,7 +2180,6 @@ export default class WorldScene extends Phaser.Scene {
     }
     sprite.setVisible(show);
     shadow.setVisible(show);
-    this.followerSparkle?.setVisible(show && Boolean(mon?.shiny));
   }
 
   // Đặt Pokémon đi theo đứng ở ô (x, y); dáng đứng / bay vẽ mỗi khung hình trong animateFollower
@@ -2285,7 +2291,7 @@ export default class WorldScene extends Phaser.Scene {
     if (f.cheerAt !== undefined && time - f.cheerAt < 480) lift += Math.abs(Math.sin(((time - f.cheerAt) / 240) * Math.PI)) * 7 * CHAR_SCALE;
     lift += f.jumpLift ?? 0; // đang nhảy theo qua gờ đất
     const alpha = f.alpha ?? 1; // mờ dần khi vừa ra khỏi nhà
-    f.sprite.setPosition(x, y - 2 - lift).setScale(CHAR_SCALE * sx, CHAR_SCALE * sy).setAngle(angle).setAlpha(alpha)
+    f.sprite.setPosition(x, y - 2 - lift).setScale(CHAR_SCALE * FOLLOWER_SCALE * sx, CHAR_SCALE * FOLLOWER_SCALE * sy).setAngle(angle).setAlpha(alpha)
       .setDepth(10 + y / 10000 - 0.00001);
     // Bóng nằm dưới đất: bay càng cao thì bóng càng nhỏ và mờ
     const far = Math.min(1, lift / (FOLLOWER_FLY * 1.5));
@@ -2337,7 +2343,7 @@ export default class WorldScene extends Phaser.Scene {
     const [x, y] = cellCenter(npc.pos);
     npc.shadow = this.add.image(x, y - 2, 'fx-shadow').setScale(...SHADOW).setAlpha(SHADOW_ALPHA).setDepth(9);
     npc.sprite = def.mon
-      ? this.add.sprite(x, y, this.followerTexture(def.mon, false, NPC_MON_LOGICAL), 'down').setOrigin(0.5, 1).setScale(CHAR_SCALE).setDepth(10)
+      ? this.add.sprite(x, y, this.followerTexture(def.mon, false, NPC_MON_LOGICAL), 'down').setOrigin(0.5, 1).setScale(CHAR_SCALE * FOLLOWER_SCALE).setDepth(10)
       : this.add.sprite(x, y, def.sprite, 'down-stand').setOrigin(0.5, 1).setScale(CHAR_SCALE).setDepth(10);
     npc.setStep('stand');
     if (def.seated) this.seatNpc(npc);
@@ -2814,8 +2820,8 @@ export default class WorldScene extends Phaser.Scene {
   }
 
   // Thanh chọn Pokémon nằm ngang giữa màn hình (dùng / cho cầm vật phẩm, dạy HM): chỉ có các thẻ Pokémon trong đội (hình,
-  // tên, cấp, thanh máu + số máu), không có tiêu đề. Bấm / chạm thẻ là chọn; ← → và phím xác nhận; phím quay lại, ✕ (góc
-  // trên phải khung) hoặc bấm ra ngoài là thôi. Trả về vị trí trong đội hoặc null
+  // tên, cấp, thanh máu + số máu), không có tiêu đề. Bấm / chạm thẻ là chọn; ← → và phím xác nhận; chỉ nút ✕ (góc
+  // trên phải khung) là thôi. Trả về vị trí trong đội hoặc null
   pickMonBar() {
     const party = state.party;
     if (!party.length) return Promise.resolve(null);
@@ -2899,10 +2905,7 @@ export default class WorldScene extends Phaser.Scene {
           index = (index + (dir === 'left' ? -1 : 1) + cards.length) % cards.length;
           draw();
         } else if (isConfirm(e)) done(index);
-        else if (isCancel(e)) done(null);
-      }, (p) => {
-        if (p.downTime < openedAt) return;
-        if (p.rightButtonDown() || p.x < x0 || p.x > x0 + w || p.y < y0 || p.y > y0 + h) done(null);
+        // Esc / chuột phải / bấm ra ngoài không đóng: chỉ nút ✕
       });
     });
   }
@@ -2949,7 +2952,7 @@ export default class WorldScene extends Phaser.Scene {
 
     const panel = this.showHealPanel();
     const screen = this.add
-      .rectangle((machine.x + 5) * WORLD_SCALE, (machine.y + 4) * WORLD_SCALE, 7 * WORLD_SCALE, 5 * WORLD_SCALE, 0xffffff)
+      .rectangle((machine.x + MACHINE_SCREEN.x) * WORLD_SCALE, (machine.y + MACHINE_SCREEN.y) * WORLD_SCALE, MACHINE_SCREEN.w * WORLD_SCALE, MACHINE_SCREEN.h * WORLD_SCALE, 0xffffff)
       .setOrigin(0)
       .setDepth(5)
       .setAlpha(0);
@@ -3054,7 +3057,8 @@ export default class WorldScene extends Phaser.Scene {
   // persist: lưu game lúc vào trận và sau mỗi lượt (trận gặp Pokémon hoang dã, trainer bình thường). Trận nằm giữa
   // cảnh cắt cốt truyện thì không: tắt game giữa chừng thì tải lại từ trước cảnh cắt, xem lại từ đầu
   startBattle(data) {
-    this.windows.closeAll();
+    // Cửa sổ nổi đang mở (túi đồ, chi tiết Pokémon, xem nhanh...) vẫn giữ trong lúc đấu; riêng hộp PC (đổi đội hình) thì đóng
+    this.windows.get('pc')?.close();
     this.battleTrainer = data.trainer ?? null;
     setBattleStatus(this, true); // người chơi khác thấy tag "Đang đấu" trên đầu mình
     if (data.persist) {
@@ -3069,11 +3073,14 @@ export default class WorldScene extends Phaser.Scene {
     cam.flash(140, 255, 255, 255);
     this.time.delayedCall(260, () => cam.flash(140, 255, 255, 255));
 
-    // Trận đấu là cửa sổ nổi giữa màn hình (ui/helpers.js: battleRect): khung cửa sổ (viền, bóng) mở rộng từ giữa ra, rồi
-    // trận đấu vẽ bên trong khung. Như các cửa sổ nổi khác: bản đồ vẫn chạy phía sau (người chơi khác đi lại, NPC, giao
-    // diện đội hình / nhiệm vụ / đồng hồ vẫn hiện), chỉ khoá thao tác trên bản đồ cho tới khi đánh xong (endBattleWindow)
-    const backdrop = this.add.graphics().setScrollFactor(0).setDepth(200);
-    const p = { t: 0 };
+    // Trận đấu là cửa sổ nổi giữa màn hình (ui/helpers.js: battleRect): khung cửa sổ mở rộng từ giữa ra tới đúng chỗ, đúng
+    // cỡ, đúng màu khung trận (ui/BattlePanel.js: drawBattleFrame), rồi trận đấu hiện dần đè lên khung này; trận hiện hẳn
+    // thì mới bỏ khung (lớp tối phủ bản đồ cũng nhạt dần cùng lúc), không chớp / nhảy hình. Như các cửa sổ nổi khác: bản đồ
+    // vẫn chạy phía sau (người chơi khác đi lại, NPC, giao diện đội hình / nhiệm vụ / đồng hồ vẫn hiện cả lúc chuyển cảnh),
+    // chỉ khoá thao tác trên bản đồ cho tới khi đánh xong (endBattleWindow).
+    // Lớp vẽ ngay dưới lớp cửa sổ nổi: cửa sổ đang mở vẫn nằm trên, và không bị nhấc lên vẽ đè trận đấu (liftOverBattle)
+    const backdrop = this.add.graphics().setScrollFactor(0).setDepth(this.windows.base - 0.05);
+    const p = { t: 0, dim: 1 };
     this.transition = backdrop;
     const drawBackdrop = () => {
       const { width, height } = this.scale;
@@ -3085,19 +3092,14 @@ export default class WorldScene extends Phaser.Scene {
       const x = r.x + (r.w - w) / 2;
       const y = r.y + (r.h - h) / 2;
       backdrop.clear();
-      backdrop.fillStyle(0x060a16, 0.55 * p.t);
+      // Trận đã hiện hẳn: cửa sổ trận tự vẽ khung (kéo dời được), bản đồ không phủ tối
+      if (p.done) return;
+      backdrop.fillStyle(0x060a16, 0.55 * p.t * p.dim);
       backdrop.fillRect(0, 0, width, height);
-      // Trận đã mở: cửa sổ trận tự vẽ khung (kéo dời được), bản đồ không phủ tối
-      if (p.dimOnly) {
-        backdrop.clear();
-        return;
-      }
-      backdrop.fillStyle(0x000000, 0.4 * p.t);
-      backdrop.fillRoundedRect(x - 4, y + 2, w + 14, h + 14, 16);
       backdrop.fillStyle(0x10151f, p.t);
-      backdrop.fillRoundedRect(x - 8, y - 8, w + 16, h + 16, 14);
+      backdrop.fillRect(x, y, w, h);
       backdrop.lineStyle(2, 0x3d4c72, p.t);
-      backdrop.strokeRoundedRect(x - 7, y - 7, w + 14, h + 14, 13);
+      backdrop.strokeRect(x + 1, y + 1, w - 2, h - 2);
     };
     this.battleBackdrop = drawBackdrop;
     this.tweens.add({
@@ -3108,7 +3110,7 @@ export default class WorldScene extends Phaser.Scene {
       ease: 'Cubic.out',
       onUpdate: drawBackdrop,
       onComplete: () => {
-        this.windows.closeAll();
+        this.windows.get('pc')?.close();
         // Đánh ngoài trời thì trận đấu cũng tối / mưa theo bản đồ
         // weather: thời tiết đang có ở bản đồ (theo vùng khí hậu), mang vào trận đấu kể cả khi tắt hiệu ứng hình ảnh
         // balls: khu Safari Effort không bắt được Pokémon (game/safari.js: ballRule)
@@ -3116,12 +3118,21 @@ export default class WorldScene extends Phaser.Scene {
           ...data, ambience: this.ambience.state.outdoor, weather: mapWeather(this.map),
           balls: data.trainer ? 'normal' : ballRule(this.map.id),
         });
-        // Bản đồ vẫn chạy nhưng không nhận chuột / phím (cửa sổ trận đấu nhận); trận xong BattleScene gọi endBattleWindow
+        // Bản đồ vẫn chạy nhưng không nhận phím (cửa sổ trận đấu nhận); chuột chỉ dùng cho cột đội hình, nút mở cửa sổ và
+        // các cửa sổ nổi (đi lại / nói chuyện bị khoá vì busy). Trận xong BattleScene gọi endBattleWindow
         this.inBattleWindow = true;
-        this.input.enabled = false;
-        if (this.input.keyboard) this.input.keyboard.enabled = false;
-        p.dimOnly = true;
-        drawBackdrop();
+        this.setKeyFocus('battle');
+        // Trận hiện dần (BattleScene.create, 350 ms) đè lên khung; lớp tối nhạt dần cùng lúc, xong thì bỏ khung
+        this.tweens.add({
+          targets: p,
+          dim: 0,
+          duration: 350,
+          onUpdate: drawBackdrop,
+          onComplete: () => {
+            p.done = true;
+            drawBackdrop();
+          },
+        });
       },
     });
     return new Promise((resolve) => {
@@ -3132,9 +3143,93 @@ export default class WorldScene extends Phaser.Scene {
   // Trận đấu (cửa sổ nổi) vừa kết thúc: bản đồ nhận lại chuột / phím, xử lý kết quả
   endBattleWindow(data) {
     this.inBattleWindow = false;
-    this.input.enabled = true;
+    this.keyFocus = null;
     if (this.input.keyboard) this.input.keyboard.enabled = true;
     return this.onWake(data);
+  }
+
+  // ----- Cửa sổ nổi trong lúc đấu (trận đấu là scene Battle nằm trên bản đồ) -----
+
+  // Bàn phím lúc đang đấu: 'battle' (trận đấu nhận phím) hoặc 'windows' (cửa sổ nổi của bản đồ nhận phím: gõ ô tìm kiếm
+  // Pokédex...). Bấm vào cửa sổ nổi thì phím về cửa sổ, bấm vào khung trận thì phím về trận; đóng hết
+  // cửa sổ thì phím về trận (update). Đi lại / nói chuyện trên bản đồ vẫn bị khoá (busy)
+  setKeyFocus(focus) {
+    if (this.keyFocus === focus) return;
+    this.keyFocus = focus;
+    const onWindows = focus === 'windows';
+    if (this.input.keyboard) this.input.keyboard.enabled = onWindows;
+    const battle = this.scene.isActive('Battle') ? this.scene.get('Battle') : null;
+    if (battle?.input.keyboard) battle.input.keyboard.enabled = !onWindows;
+    this.resetHeldKeys();
+  }
+
+  // Không mở được cửa sổ nổi lúc này (đang hội thoại / sự kiện / đi). Đang đấu thì vẫn mở được
+  windowsLocked() {
+    if (this.inBattleWindow) return false;
+    return this.busy || this.moving || Boolean(this.partyMenu) || Boolean(this.overlay);
+  }
+
+  // Báo ngắn: đang đấu thì hiện dòng báo cạnh thanh phím tắt (hộp thoại bản đồ nằm dưới trận đấu), không thì nói như thường
+  notice(text) {
+    if (this.inBattleWindow) this.hud.showSaveNote(text, true);
+    else this.runEvent(() => this.say(null, [text]));
+  }
+
+  // Đang đấu thì không cho / lấy đồ cầm (trả về true và báo)
+  heldLockedInBattle() {
+    if (!this.inBattleWindow) return false;
+    this.hud.showSaveNote('Không đổi đồ cầm khi đang đấu.', true);
+    return true;
+  }
+
+  // Dùng vật phẩm (túi đồ / ô phím tắt) lúc đang đấu: giao cho trận đấu, chưa tới lượt thì báo
+  useInBattle(id) {
+    if (!itemCount(id)) return this.hud.showSaveNote(`Bạn đã hết ${ITEMS[id].name}.`, true);
+    const battle = this.scene.isActive('Battle') ? this.scene.get('Battle') : null;
+    const why = battle ? battle.pickFromBag(id) : 'Trận đấu chưa sẵn sàng.';
+    if (why) this.hud.showSaveNote(why, true);
+  }
+
+  // Trận đấu vừa dùng vật phẩm: cập nhật số lượng trong cửa sổ túi đồ (nếu đang mở)
+  refreshBag() {
+    if (this.windows.get('bag')) this.bag?.refresh();
+  }
+
+  // Trước khi bản đồ vẽ (on = true): đang đấu thì ẩn lớp từ cửa sổ nổi trở lên (cửa sổ, hộp hỏi, icon đang kéo, dòng báo)
+  // để bản đồ không vẽ nó dưới trận đấu; vẽ xong (on = false) hiện lại (vẫn bấm được) rồi trận đấu vẽ nó đè lên mình
+  // (renderOverBattle)
+  liftOverBattle(on) {
+    if (!on) {
+      this.lifted?.forEach((o) => o.active && o.setVisible(true));
+      return;
+    }
+    this.lifted = null;
+    if (!this.inBattleWindow || !this.scene.isActive('Battle')) return;
+    const base = this.windows.base;
+    this.lifted = this.children.list.filter((o) => o.depth >= base && o.visible);
+    this.lifted.forEach((o) => o.setVisible(false));
+  }
+
+  // Gọi từ BattleScene sau khi trận đấu vẽ xong: vẽ lớp cửa sổ nổi của bản đồ lên trên cùng
+  renderOverBattle(renderer) {
+    const list = this.lifted;
+    if (!list?.length) return;
+    const cam = this.cameras.main;
+    const shown = list.filter((o) => o.active && o.willRender(cam));
+    if (shown.length) renderer.render(this, shown, cam);
+  }
+
+  // Con trỏ p đang ở trên lớp cửa sổ nổi của bản đồ (hoặc đang kéo cửa sổ / kéo đồ): trận đấu nhường chuột cho bản đồ
+  pointerOverBattle(p) {
+    if (!this.inBattleWindow || !p) return false;
+    if (this.windows.drag || this.bag?.drag || this.monDetail?.press) return true;
+    const base = this.windows.base;
+    const top = (o) => {
+      let t = o;
+      while (t.parentContainer) t = t.parentContainer;
+      return t;
+    };
+    return this.input.hitTestPointer(p).some((o) => top(o).depth >= base);
   }
 
   async onWake(data) {
@@ -3158,7 +3253,7 @@ export default class WorldScene extends Phaser.Scene {
       // Kết quả trận đã lưu trước khi tiến hoá: lưu lại để đóng tab ngay sau đó không mất lần tiến hoá
       if (data?.persist && data.leveled?.length && !this.battleTrainer?.onDefeat) this.save();
       // Bắt được mà đội đã đủ 6 (gửi vào PC): cửa sổ xem nhanh bên phải, trên khung nhiệm vụ (không chặn: vẫn đi lại được,
-      // đóng bằng ✕ / Esc)
+      // đóng bằng ✕)
       if (data?.preview) new CatchPreview(this.windows, data.preview);
     }
     const done = this.battleDone;
@@ -3412,9 +3507,9 @@ Cho ${mon.name} tiến hoá không?`);
       this.windows.front(open);
       return;
     }
-    if (this.busy || this.moving || this.partyMenu) return;
+    if (this.windowsLocked()) return;
     if (!hasPokedex()) {
-      this.runEvent(() => this.say(null, ['Bạn chưa có Pokédex.']));
+      this.notice('Bạn chưa có Pokédex.');
       return;
     }
     this.setFrame('stand');
@@ -3423,7 +3518,7 @@ Cho ${mon.name} tiến hoá không?`);
 
   // Bảng Cài đặt (ui/SettingsPanel.js): Đồ hoạ (toàn màn hình, giới hạn FPS, ánh sáng, thời tiết), Chung (xem nhanh khi
   // gửi vào PC, đổi diện mạo), Điều khiển (cách điều khiển, phím tắt). Game luôn tự động lưu.
-  // Đóng bằng Huỷ / OK, phím quay lại / cài đặt hoặc bấm ra ngoài khung. Nút mở màn hình khác (phím tắt, đổi diện mạo)
+  // Chỉ đóng bằng Huỷ / OK (Esc, chuột phải, bấm ra ngoài khung không đóng). Nút mở màn hình khác (phím tắt, đổi diện mạo)
   // thì đóng bảng, mở màn đó, xong mở lại bảng đúng thẻ cũ (giữ cả phần chưa áp dụng)
   async toggleSettings() {
     if (this.settingsMenu) {
@@ -3451,10 +3546,10 @@ Cho ${mon.name} tiến hoá không?`);
       const { action } = result;
 
       if (action === 'look') {
-        // currentLook: bản lưu cũ chưa có diện mạo thì là diện mạo cũ (mũ lưỡi trai đỏ / nón rộng vành)
+        // currentLook: bản lưu cũ chưa có diện mạo thì là diện mạo cũ (bộ đồ cũ, không mũ). Ở đây được thôi (✕ / Esc)
         const { gender, ...look } = currentLook(state.player);
         const picked = await new CharacterCreator(this, this.router, {
-          gender, look, depth: HUD_DEPTH + 20, fixed: true, title: 'Đổi diện mạo', okLabel: 'Xong',
+          gender, look, depth: HUD_DEPTH + 20, fixed: true, cancelable: true, title: 'Đổi diện mạo', okLabel: 'Xong',
         }).open();
         if (picked) {
           const { gender: newGender, ...newLook } = picked;
@@ -3534,7 +3629,10 @@ Cho ${mon.name} tiến hoá không?`);
       return;
     }
     this.setFrame('stand');
-    this.monDetail = new MonDetail(this.windows, index, { ghostDepth: HUD_DEPTH + 11 });
+    this.monDetail = new MonDetail(this.windows, index, {
+      ghostDepth: HUD_DEPTH + 11,
+      heldLocked: () => (this.inBattleWindow ? 'Không đổi đồ cầm khi đang đấu.' : null),
+    });
   }
 
   // ---------- Túi đồ ----------
@@ -3548,9 +3646,9 @@ Cho ${mon.name} tiến hoá không?`);
   openBag() {
     const open = this.windows.get('bag');
     if (open) return open.close();
-    if (this.busy || this.moving || this.partyMenu || this.overlay) return;
+    if (this.windowsLocked()) return;
     if (!Object.keys(ITEMS).some((id) => itemCount(id) > 0 && !ITEMS[id].hidden)) {
-      this.runEvent(() => this.say(null, ['Túi đồ trống trơn!']));
+      this.notice('Túi đồ trống trơn!');
       return;
     }
     this.setFrame('stand');
@@ -3568,7 +3666,7 @@ Cho ${mon.name} tiến hoá không?`);
         this.hotbar.flash(slot);
       },
       onPick: (id) => this.useFromBag(id),
-      onGive: (index, id) => state.party[index] && this.runEvent(async () => {
+      onGive: (index, id) => state.party[index] && !this.heldLockedInBattle() && this.runEvent(async () => {
         await this.giveHeld(state.party[index], id);
         this.bag?.refresh();
       }),
@@ -3576,6 +3674,7 @@ Cho ${mon.name} tiến hoá không?`);
       dropItem: (p, id) => {
         const index = this.heldDropAt(p);
         if (index === null) return false;
+        if (this.heldLockedInBattle()) return true;
         this.runEvent(async () => {
           await this.giveHeld(state.party[index], id);
           this.bag?.refresh();
@@ -3592,8 +3691,10 @@ Cho ${mon.name} tiến hoá không?`);
     return this.monDetail.overHeld(p) && state.party[this.monDetail.index] ? this.monDetail.index : null;
   }
 
-  // Bấm vật phẩm trong túi: dùng (túi vẫn mở, cập nhật số lượng); dùng xong phải rời chỗ thì đóng hết cửa sổ
+  // Bấm vật phẩm trong túi: dùng (túi vẫn mở, cập nhật số lượng); dùng xong phải rời chỗ thì đóng hết cửa sổ.
+  // Đang đấu: tới lượt chọn lệnh thì như dùng vật phẩm đó từ lệnh Túi đồ của trận (BattleScene.pickFromBag)
   useFromBag(id) {
+    if (this.inBattleWindow) return this.useInBattle(id);
     if (this.busy || this.moving) return;
     this.runEvent(async () => {
       let close = false;
@@ -3719,8 +3820,10 @@ Cho ${mon.name} tiến hoá không?`);
 
   // Ô phím tắt slot (0-5): dùng vật phẩm đã gán như chọn trong túi đồ
   useHotbar(slot) {
-    if (this.busy || this.moving || this.partyMenu || this.settingsMenu || this.overlay) return;
     // Túi ở trên cùng: phím 1-6 gán vật phẩm đang chọn vào ô; Pokédex ở trên cùng: gõ số để tìm theo số thứ tự
+    if (this.keyFocus === 'windows' && ['bag', 'dex'].includes(this.windows.top()?.id)) return;
+    if (this.inBattleWindow) return state.hotbar[slot] && this.useInBattle(state.hotbar[slot]);
+    if (this.busy || this.moving || this.partyMenu || this.settingsMenu || this.overlay) return;
     if (['bag', 'dex'].includes(this.windows.top()?.id)) return;
     const id = state.hotbar[slot];
     if (!id) return; // ô trống: không làm gì (gán đồ bằng cách kéo từ túi đồ)

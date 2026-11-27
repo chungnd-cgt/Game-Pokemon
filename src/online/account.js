@@ -22,7 +22,7 @@ const MESSAGES = {
   // Chưa cài SMTP riêng: Supabase chỉ gửi tới email thành viên của dự án
   email_address_not_authorized: 'Máy chủ chưa gửi được email tới địa chỉ này. Hãy báo người quản lý game.',
   over_request_rate_limit: 'Thao tác quá nhanh. Hãy đợi một lúc rồi thử lại.',
-  otp_expired: 'Link trong email đã hết hạn hoặc đã dùng rồi.',
+  otp_expired: 'Mã hoặc link trong email đã hết hạn hoặc đã dùng rồi.',
 };
 
 export function messageOf(error) {
@@ -64,7 +64,9 @@ async function rpc(fn, args) {
     if (error.code === 'PGRST202' || error.code === '42883') {
       return { error: 'Máy chủ chưa cài tên đăng nhập (người làm game chạy supabase/usernames.sql).' };
     }
-    if (/^LOGIN_LOCKED/.test(msg)) return { error: 'Sai quá nhiều lần. Hãy thử lại sau 15 phút, hoặc bấm Quên mật khẩu.' };
+    if (/^LOGIN_LOCKED/.test(msg)) {
+      return { error: 'Tên này bị nhập sai mật khẩu quá nhiều lần. Hãy thử lại sau ít phút, gõ email thay cho tên đăng nhập, hoặc bấm Quên mật khẩu.' };
+    }
     if (/^LOGIN_BUSY/.test(msg)) return { error: 'Máy chủ đang bận. Hãy thử lại sau ít phút.' };
     if (!error.code || /fetch|network/i.test(msg)) return { error: 'Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.' };
     return { error: `Có lỗi xảy ra: ${msg}` };
@@ -97,14 +99,35 @@ export async function signInWithUsername(name, password) {
   return { ...(await signIn(found.data, password)), email: found.data };
 }
 
+// Đăng nhập bằng email + mật khẩu (gõ email vào ô tên đăng nhập). Đi thẳng qua Supabase Auth, có giới hạn riêng theo IP
+// thật của người gửi, nên vẫn đăng nhập được khi tên đăng nhập đang bị khoá vì người khác dò mật khẩu (usernames.sql)
+export async function signInWithEmail(email, password) {
+  return { ...(await signIn(email, password)), email };
+}
+
 // Đăng ký (kèm tên đăng nhập, máy chủ lưu vào bảng profiles). Bật "Confirm email" thì chưa có phiên: người chơi phải bấm
 // link trong email. Email đã đăng ký và xác nhận rồi thì Supabase không báo lỗi (để người lạ không dò được email nào có
 // tài khoản) mà trả về user không có identities
+export const EMAIL_BLOCKED = 'Email không hợp lệ.';
+
+// Email có dùng để đăng ký được không (không thuộc danh sách email rác trên máy chủ: usernames.sql blocked_email_domains).
+// Lỗi mạng / máy chủ chưa có hàm: coi như được (máy chủ vẫn chặn lúc tạo tài khoản)
+export async function emailAllowed(email) {
+  try {
+    const { data, error } = await supabase.rpc('email_allowed', { p_email: email });
+    return error ? true : data !== false;
+  } catch {
+    return true;
+  }
+}
+
 export async function signUp(email, password, username) {
   const res = await emailCall(supabase.auth.signUp({
     email, password, options: { emailRedirectTo: backHere(), data: { username } },
   }));
   if (res.data?.user && res.data.user.identities?.length === 0) return { error: MESSAGES.user_already_exists };
+  // Lỗi 500 vì email rác (máy chủ chặn khi tạo tài khoản, vd danh sách vừa đổi sau lúc game hỏi)
+  if (res.status >= 500 && !(await emailAllowed(email))) return { error: EMAIL_BLOCKED };
   // Lỗi 500: supabase-js không cho biết lý do. Có thể người khác vừa lấy mất tên (kiểm tra lại), hoặc lỗi gửi email
   if (res.status >= 500 && (await usernameAvailable(username)).data === 'taken') {
     return { error: 'Tên đăng nhập vừa có người dùng. Hãy chọn tên khác.' };
@@ -124,6 +147,27 @@ export const resendConfirmation = (email) => emailCall(supabase.auth.resend({ ty
 export const sendPasswordReset = (email) => emailCall(supabase.auth.resetPasswordForEmail(email, { redirectTo: backHere() }));
 
 export const setNewPassword = (password) => call(supabase.auth.updateUser({ password }));
+
+// Mã 6 số trong email (mẫu email có {{ .Token }}: supabase/email-templates/). Loại mã theo việc đã làm trước đó:
+//  'signup'   xác nhận đăng ký (sau signUp / resendConfirmation): Supabase khuyên dùng type 'email', bản cũ dùng 'signup'
+//  'recovery' quên mật khẩu (sau sendPasswordReset): đúng mã thì có phiên tạm để đặt mật khẩu mới (setNewPassword)
+//  'device'   xác nhận thiết bị mới (sau signInWithOtp: online/device.js)
+// Đúng mã: Supabase đăng nhập luôn (phiên mới đã xác nhận email). Trả về { user } hoặc { error }
+const OTP_TYPES = { signup: ['email', 'signup'], recovery: ['recovery'], device: ['email'] };
+export async function verifyEmailCode(email, code, kind) {
+  let last = null;
+  for (const type of OTP_TYPES[kind] ?? ['email']) {
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({ email, token: code, type });
+      if (!error) return { user: data.user };
+      last = error;
+    } catch (err) {
+      return { error: messageOf(err) };
+    }
+  }
+  if (last?.code === 'otp_expired' || /expired|invalid/i.test(last?.message ?? '')) return { error: 'Mã không đúng hoặc đã hết hạn.' };
+  return { error: messageOf(last) };
+}
 
 export const signOut = () => call(supabase.auth.signOut());
 

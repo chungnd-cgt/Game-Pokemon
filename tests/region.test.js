@@ -4,7 +4,6 @@ import { BADGES } from '../src/data/badges.js';
 import { ENCOUNTERS } from '../src/data/encounters.js';
 import { ITEMS } from '../src/data/items.js';
 import { MAPS } from '../src/data/map.js';
-import { GYM_DX } from '../src/data/mapsGyms.js';
 import { NPCS, TRAINERS } from '../src/data/npcs.js';
 import { PLACES, placeOf } from '../src/data/region.js';
 import { STORY_NPCS } from '../src/story/chapter1.js';
@@ -203,8 +202,7 @@ test('mọi gym: đi được từ cửa tới trước mặt thủ lĩnh (ô gi
   // Gym Đèn Lồng tối, có đèn lồng để thắp; Gym Sương Mù có hai sân băng
   assert.equal(MAPS.gym3.dark, true);
   assert.ok(MAPS.gym3.objects.filter((o) => o.kind === 'lantern').length >= 4);
-  // (bỏ phần khán đài hai bên phần câu đố, data/mapsGyms.js: GYM_DX)
-  assert.ok(MAPS.gym8.rows.map((r) => r.slice(GYM_DX, -GYM_DX)).filter((r) => /^i+$/.test(r.replace(/o/g, ''))).length >= 10);
+  assert.ok(MAPS.gym8.rows.filter((r) => /^i+$/.test(r.replace(/o/g, ''))).length >= 10);
   // 8 gym không còn chung một khuôn: kích thước / cơ chế khác nhau, người trong gym đứng trên ô đi được
   for (const leader of leaders) {
     const gym = MAPS[leader.map];
@@ -297,4 +295,22 @@ test('Liên minh: cổng 8 huy hiệu, chuỗi phòng Tứ Thiên Vương một 
   resetLeague();
   assert.ok(!state.flags.has('league:e2') && !state.defeatedTrainers.has('elite-lan'));
   assert.ok(state.defeatedTrainers.has('r11-ace1'), 'không xoá nhà huấn luyện ngoài Liên minh');
+});
+
+test('Liên minh: thua thì đánh lại từ đầu; đã vô địch thì không thách đấu lại được', async () => {
+  const { F_CHAMPION, leagueBlocker } = await import('../src/story/league.js');
+  const { stepBlocker } = await import('../src/story/chapter1.js');
+  const { state } = await import('../src/game/state.js');
+  const start = MAPS.leagueLobby.warps.find((w) => w.resetLeague);
+  const said = [];
+  const world = { map: MAPS.leagueLobby, say: async (who, lines) => said.push(...lines) };
+  state.flags.delete(F_CHAMPION);
+  assert.equal(leagueBlocker(world, start.x, start.y), null, 'chưa vô địch: vào thử thách được');
+  state.flags.add(F_CHAMPION);
+  const ev = stepBlocker(world, start.x, start.y);
+  assert.ok(ev, 'đã vô địch: bị chặn ở cửa');
+  await ev();
+  assert.match(said.join(' '), /không thể thách đấu lại/i);
+  assert.equal(leagueBlocker(world, start.x, start.y + 1), null, 'chỉ chặn đúng ô cửa');
+  state.flags.delete(F_CHAMPION);
 });

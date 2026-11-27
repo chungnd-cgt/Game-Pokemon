@@ -1,4 +1,3 @@
-import { roomy } from './indoorLayout.js';
 import { berryRow } from './berryRows.js';
 import { INDOOR_TILES, OUTDOOR_TILES } from './tiles.js';
 
@@ -388,7 +387,7 @@ export const CHAPTER3_MAPS = {
   },
 
   // Tiệm xe đạp Đèn Lồng: xe bày trên kệ, ông chủ đứng sau quầy
-  bikeShop: roomy({
+  bikeShop: {
     name: 'Tiệm xe đạp',
     indoor: true,
     theme: 'mart',
@@ -402,14 +401,14 @@ export const CHAPTER3_MAPS = {
       '...........',
       '.kk.....kk.',
       '...........',
-      'p..E......p',
+      'p..EE.....p',
     ],
     shelfGoods: 'bikes', // kệ 'k' trưng bày xe đạp (gfx/interior.js)
     entry: { x: 3, y: 6 },
-  }, 'mart'),
+  },
 
   // Trung tâm thương mại Sông Nước: quầy tạp hoá (trái), quầy đá tiến hoá (phải), bán và mua lại mọi thứ
-  store5: roomy({
+  store5: {
     name: 'Trung tâm thương mại',
     indoor: true,
     theme: 'mart',
@@ -428,7 +427,7 @@ export const CHAPTER3_MAPS = {
       '.......E.......',
     ],
     entry: { x: 7, y: 8 },
-  }, 'mart'),
+  },
 
 
 

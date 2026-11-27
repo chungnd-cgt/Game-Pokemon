@@ -36,6 +36,7 @@ function drawAll(look) {
 test('bảng tuỳ chỉnh: mỗi dòng đủ lựa chọn, có tên tiếng Việt, màu hợp lệ; kiểu tóc nào cũng vẽ được', () => {
   assert.deepEqual(CUSTOM_ROWS.map((r) => r.key), ['hairStyle', 'hair', 'skin', 'outfit', 'eyes']);
   assert.ok(Object.keys(HAIR_STYLES).length >= 6);
+  for (const g of GENDERS) assert.ok(optionIds('hairStyle', g).length >= 3, `${g}: ít nhất 3 kiểu tóc`);
   assert.ok(Object.keys(HAIR_COLORS).length >= 8);
   assert.ok(Object.keys(SKIN_TONES).length >= 5);
   assert.ok(Object.keys(OUTFITS).length >= 6);
@@ -53,33 +54,45 @@ test('bảng tuỳ chỉnh: mỗi dòng đủ lựa chọn, có tên tiếng Vi�
   }
 });
 
-test('diện mạo cũ (bản lưu chưa có diện mạo) vẽ ra đúng nhân vật nam / nữ có sẵn', () => {
+test('diện mạo cũ (bản lưu chưa có diện mạo) vẽ ra đúng nhân vật nam / nữ có sẵn, không đội mũ', () => {
   for (const g of GENDERS) {
     const look = resolveLook(g, LEGACY_CUSTOM[g]);
     assert.deepEqual(resolveLook(g, currentLook({ gender: g })), look, 'chưa có look = diện mạo cũ');
     const { eyes, ...rest } = look;
     assert.deepEqual(rest, PLAYER_BASE_LOOKS[g]);
     assert.equal(eyes, EYE_COLORS.dark.color);
+    assert.ok(!['cap', 'beanie', 'sunhat'].includes(look.hairStyle), 'không còn mũ lưỡi trai / mũ len / nón');
   }
   assert.deepEqual(LOOKS.player, PLAYER_BASE_LOOKS.male, 'LOOKS.player ban đầu là diện mạo mặc định');
   assert.notEqual(LOOKS.player, PLAYER_BASE_LOOKS.male, 'là bản sao, không phải chính bảng mặc định');
 });
 
-test('mặc định khi chơi mới: áo ba lỗ trắng + quần short, tay chân để trần, không mũ, không ba lô / túi', () => {
+test('mặc định khi chơi mới: áo ba lỗ trắng, tay chân để trần, không mũ, không ba lô / túi; nam quần short, nữ váy ngắn', () => {
   for (const g of GENDERS) {
     assert.equal(optionIds('outfit', g)[0], 'tank', 'áo ba lỗ là bộ đồ đầu tiên');
-    assert.equal(HAIR_STYLES[DEFAULT_CUSTOM[g].hairStyle].hat, undefined, 'kiểu tóc mặc định không đội mũ');
     const look = resolveLook(g, DEFAULT_CUSTOM[g]);
     assert.equal(look.shirt, '#f4f4f0');
-    assert.ok(look.tank && look.shorts);
-    for (const k of ['dress', 'skirt', 'backpack', 'bag', 'belt']) assert.equal(look[k], undefined, `${g}: còn ${k}`);
+    assert.ok(look.tank);
+    for (const k of ['backpack', 'bag', 'belt']) assert.equal(look[k], undefined, `${g}: còn ${k}`);
     const f = drawAll(look);
-    // nhìn thẳng: cánh tay (cột 2, hàng 15) và cẳng chân (hàng 20) màu da, đùi (hàng 19) màu quần short
+    // nhìn thẳng: cánh tay (cột 2, hàng 15) và cẳng chân (hàng 20) màu da
     assert.equal(f['down-stand'].get(2, 15), look.skin);
     assert.equal(f['down-stand'].get(5, 20), look.skin);
-    assert.equal(f['down-stand'].get(6, 19), look.pants);
     assert.equal(f['up-stand'].get(5, 20), look.skin);
-    assert.ok(colorsOf(f['side-stand']).has(look.pants));
+    if (g === 'male') {
+      // quần short: đùi (hàng 19) màu quần
+      assert.ok(look.shorts);
+      for (const k of ['dress', 'skirt']) assert.equal(look[k], undefined, `nam: còn ${k}`);
+      assert.equal(f['down-stand'].get(6, 19), look.pants);
+      assert.ok(colorsOf(f['side-stand']).has(look.pants));
+    } else {
+      // váy ngắn (màu váy riêng của bộ áo ba lỗ), không phải quần short
+      assert.equal(look.shorts, undefined);
+      assert.ok(look.dress);
+      assert.equal(look.skirt, OUTFITS.tank.skirt);
+      assert.equal(f['down-stand'].get(6, 18), look.skirt);
+      assert.ok(colorsOf(f['side-stand']).has(look.skirt));
+    }
     for (const p of Object.values(f)) assert.ok(!colorsOf(p).has(OUTFITS.tank.hat), 'không có mũ');
     // đạp xe: cẳng chân để trần
     const bike = bikerPixels(look, 'down', 'stand', '#d83838');
@@ -90,12 +103,53 @@ test('mặc định khi chơi mới: áo ba lỗ trắng + quần short, tay ch�
   assert.equal(resolveLook('female', { outfit: 'classic' }).dress, true);
 });
 
-test('đổi giới tính trong bảng: lựa chọn mặc định đổi theo giới tính mới, lựa chọn đã tự chọn thì giữ', () => {
+test('đổi giới tính trong bảng: lựa chọn mặc định đổi theo giới tính mới, lựa chọn đã tự chọn thì giữ (trừ kiểu tóc)', () => {
   assert.deepEqual(switchGender('male', 'female', DEFAULT_CUSTOM.male), { ...DEFAULT_CUSTOM.female });
   const mine = { hairStyle: 'spiky', hair: 'blue', skin: 'deep', outfit: 'night', eyes: 'green' };
-  assert.deepEqual(switchGender('male', 'female', mine), mine);
+  // kiểu tóc mỗi giới tính một danh sách riêng: sang nữ thì về kiểu mặc định của nữ
+  assert.deepEqual(switchGender('male', 'female', mine), { ...mine, hairStyle: DEFAULT_CUSTOM.female.hairStyle });
   assert.deepEqual(switchGender('female', 'male', { ...DEFAULT_CUSTOM.female, skin: 'tan' }), { ...DEFAULT_CUSTOM.male, skin: 'tan' });
-  assert.deepEqual(currentLook({ gender: 'female', look: mine }), { gender: 'female', ...mine });
+  assert.deepEqual(switchGender('female', 'male', { ...mine, hairStyle: 'bun' }), { ...mine, hairStyle: DEFAULT_CUSTOM.male.hairStyle });
+  const hers = { ...mine, hairStyle: 'twintails' };
+  assert.deepEqual(currentLook({ gender: 'female', look: hers }), { gender: 'female', ...hers });
+  assert.deepEqual(currentLook({ gender: 'female', look: mine }), { gender: 'female', ...mine, hairStyle: DEFAULT_CUSTOM.female.hairStyle });
+});
+
+test('không chọn được kiểu tóc có mũ; bản lưu có mũ (mũ lưỡi trai / mũ len / nón) về kiểu tóc mặc định', () => {
+  for (const g of GENDERS) {
+    for (const hat of ['cap', 'beanie', 'sunhat']) {
+      assert.ok(HAIR_STYLE_IDS.includes(hat), `${hat}: vẫn vẽ được (NPC, mũ đội sau này)`);
+      assert.ok(!optionIds('hairStyle', g).includes(hat), `${g}: không chọn được ${hat}`);
+      assert.equal(normalizeCustom(g, { hairStyle: hat }).hairStyle, DEFAULT_CUSTOM[g].hairStyle);
+      assert.equal(currentLook({ gender: g, look: { ...DEFAULT_CUSTOM[g], hairStyle: hat } }).hairStyle, DEFAULT_CUSTOM[g].hairStyle);
+    }
+    for (let i = 0; i < 30; i++) assert.ok(!['cap', 'beanie', 'sunhat'].includes(randomCustom(g).hairStyle));
+  }
+  // NPC vẫn đội mũ như cũ
+  const cap = characterPixels(LOOKS['npc-youngster'], 'down', 'stand');
+  assert.ok(colorsOf(cap).has(LOOKS['npc-youngster'].hat));
+});
+
+test('nam và nữ trông khác nhau dù chọn giống nhau: kiểu tóc riêng, nữ có lông mi + má hồng + váy, nam không', () => {
+  const male = new Set(optionIds('hairStyle', 'male'));
+  for (const id of optionIds('hairStyle', 'female')) assert.ok(!male.has(id), `${id}: cả nam lẫn nữ đều có`);
+  for (const outfit of optionIds('outfit', 'male')) {
+    const same = { hair: 'black', skin: 'tan', outfit, eyes: 'blue' };
+    const m = resolveLook('male', same);
+    const f = resolveLook('female', same);
+    assert.ok(f.lashes && !m.lashes);
+    assert.ok(f.dress && !m.dress, `${outfit}: nữ mặc váy, nam không`);
+    assert.equal(m.blush, m.skin, 'nam không má hồng');
+    assert.notEqual(f.blush, f.skin);
+    for (const [dir, step] of [['down', 'stand'], ['side', 'left'], ['up', 'right']]) {
+      assert.notDeepEqual(characterPixels(m, dir, step).data, characterPixels(f, dir, step).data, `${outfit} ${dir}-${step}`);
+    }
+    // lông mi: vệt mực ở đuôi mắt (nhìn thẳng / nhìn ngang)
+    const fd = characterPixels(f, 'down', 'stand');
+    const md = characterPixels(m, 'down', 'stand');
+    assert.notEqual(fd.get(4, 9), md.get(4, 9));
+    assert.equal(fd.get(4, 9), fd.get(11, 9));
+  }
 });
 
 test('mọi kiểu tóc x 3 hướng x 3 bước (đi bộ + đạp xe) cho cả nam lẫn nữ, đổi từng dòng một', () => {
@@ -180,7 +234,7 @@ test('lưu / tải giữ nguyên diện mạo; bản lưu cũ chưa có diện m
     resetState();
     assert.doesNotThrow(() => loadGame());
     assert.deepEqual(state.player, { name: 'Khang', gender: 'male' });
-    assert.deepEqual(resolveLook('male', currentLook(state.player)), resolveLook('male', LEGACY_CUSTOM.male), 'vẽ diện mạo cũ (mũ lưỡi trai đỏ)');
+    assert.deepEqual(resolveLook('male', currentLook(state.player)), resolveLook('male', LEGACY_CUSTOM.male), 'vẽ diện mạo cũ (áo khoác xanh, không mũ)');
 
     // Bản lưu rất cũ: chưa có cả player; mã diện mạo không còn trong game
     delete raw.player;

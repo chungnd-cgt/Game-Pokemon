@@ -1,5 +1,4 @@
 import { ITEMS, formatMoney } from '../data/items.js';
-import { CENTER_DX, MART_DX, STORE_DX } from '../data/indoorLayout.js';
 import { SPECIES } from '../data/monsters.js';
 import { TYPES } from '../data/types.js';
 import { createMonster, evTotal } from '../game/monster.js';
@@ -84,7 +83,7 @@ export const BIKE_PRICE = 999999999;
 export const BIKE_PARTS = { bikeChain: 1, bikeWheel: 1, bikeSeat: 1 };
 
 const bikeQuest = questNpc({
-  id: 'q-bike', sprite: 'npc-oldman', name: 'Ông chủ tiệm xe', map: 'bikeShop', x: 0 + MART_DX, y: 2, facing: 'down', fixed: true,
+  id: 'q-bike', sprite: 'npc-oldman', name: 'Ông chủ tiệm xe', map: 'bikeShop', x: 0, y: 2, facing: 'down', fixed: true,
   quest: {
     id: 'bike',
     ask: [
@@ -127,7 +126,7 @@ const bikeOwner = {
 
 // Trung tâm thương mại: tặng một Eevee để thử đá tiến hoá (Water / Thunder / Fire Stone)
 const eeveeGift = {
-  id: 'store-eevee', sprite: 'npc-girl', name: 'Cô gái', map: 'store5', x: 13 + STORE_DX, y: 7, facing: 'left', fixed: true,
+  id: 'store-eevee', sprite: 'npc-girl', name: 'Cô gái', map: 'store5', x: 13, y: 7, facing: 'left', fixed: true,
   async onTalk(world) {
     if (hasFlag('gift:eevee')) {
       await world.say(this.name, ['Eevee lớn nhanh không? Thử cho nó dùng đá tiến hoá xem, mỗi loại đá một dạng khác nhau đó!']);
@@ -150,7 +149,7 @@ export const QUEST_NPCS = [
   eeveeGift,
   // Exp. Share: trợ lý Giáo sư Oak ở Pokémon Center Lò Gốm, tặng khi Pokédex đã bắt đủ 30 loài
   questNpc({
-    id: 'q-expshare', sprite: 'npc-aide', name: 'Trợ lý Giáo sư', map: 'center6', x: 11 + CENTER_DX, y: 7, facing: 'left', fixed: true,
+    id: 'q-expshare', sprite: 'npc-aide', name: 'Trợ lý Giáo sư', map: 'center6', x: 11, y: 7, facing: 'left', fixed: true,
     quest: {
       id: 'expShare',
       ask: ['Chào bạn! Tôi là trợ lý của Giáo sư Oak, đi khắp vùng thu thập dữ liệu Pokédex.',

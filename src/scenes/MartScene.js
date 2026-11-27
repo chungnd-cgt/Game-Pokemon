@@ -3,7 +3,7 @@ import { ITEMS, STORE_STOCK, formatMoney, martStock, sellPrice } from '../data/i
 import { ITEM_MAX, buy, itemCount, sell, state } from '../game/state.js';
 import { fitScale } from '../gfx/textures.js';
 import { BLEED, COLORS, backToWorld, centerStage, closeButton, drawPanel, hideWorldHud, textStyle } from '../ui/helpers.js';
-import { InputRouter, directionOf, isCancel, isConfirm } from '../ui/input.js';
+import { InputRouter, directionOf, isConfirm } from '../ui/input.js';
 import { saveGame } from '../game/save.js';
 import { progressTier } from '../story/chapter1.js';
 import { Menu } from '../ui/Menu.js';
@@ -190,9 +190,8 @@ export default class MartScene extends Phaser.Scene {
           change(step);
         } else if (isConfirm(e)) {
           done(qty);
-        } else if (isCancel(e)) {
-          done(0);
         }
+        // Esc / phím quay lại không đóng bảng số lượng: chỉ nút ✕
       });
     });
   }

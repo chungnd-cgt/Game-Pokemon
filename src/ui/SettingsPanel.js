@@ -7,8 +7,8 @@ import { BLEED, fixToCamera, localX, textStyle, uiX } from './helpers.js';
 import { directionOf, isCancel, isConfirm, isTouchDevice } from './input.js';
 
 // Bảng Cài đặt kiểu game PC: cột thẻ bên trái (Đồ hoạ / Chung / Điều khiển), nội dung bên phải (nút chọn, ô tích, thanh
-// trượt), đáy là Huỷ / Áp dụng / OK. Đổi gì cũng chỉ là nháp, bấm Áp dụng / OK mới có tác dụng; Huỷ, phím quay lại hoặc
-// bấm ra ngoài khung là bỏ nháp.
+// trượt), đáy là Huỷ / Áp dụng / OK. Đổi gì cũng chỉ là nháp, bấm Áp dụng / OK mới có tác dụng; chỉ Huỷ là bỏ nháp
+// (Esc / phím quay lại / chuột phải / bấm ra ngoài khung không đóng bảng).
 //  Chuột / cảm ứng: bấm thẻ, bấm nút, kéo thanh trượt (hoặc bấm thẳng vào rãnh). Nút kích hoạt lúc THẢ tay (trình duyệt
 //  chỉ cho bật toàn màn hình trong lúc người chơi vừa thả tay / bấm phím).
 //  Bàn phím: ↑ / ↓ chọn dòng, ← / → đổi giá trị (dòng không có giá trị: sang cột thẻ), xác nhận để bật / tắt / bấm,
@@ -230,9 +230,8 @@ export class SettingsPanel {
         (e) => e.timeStamp >= openedAt && this.handleKey(e),
         (p) => {
           if (p.downTime < openedAt) return;
-          // Đang chờ phím mà bấm ra chỗ khác: thôi chờ
-          if (this.capturing) return this.stopCapture();
-          if (p.rightButtonDown() || !this.bounds.contains(localX(this.scene, p), p.y)) this.finish(null);
+          // Đang chờ phím mà bấm ra chỗ khác: thôi chờ. Chuột phải / bấm ra ngoài không đóng bảng (chỉ Huỷ / OK)
+          if (this.capturing) this.stopCapture();
         },
       );
     });
@@ -257,7 +256,6 @@ export class SettingsPanel {
       if (!e.repeat) this.selectTab((this.tab + (e.shiftKey ? -1 : 1) + this.tabs.length) % this.tabs.length);
       return;
     }
-    if (isCancel(e)) return this.finish(null);
     const dir = directionOf(e);
     const confirm = isConfirm(e);
     if (this.area === 'side') {

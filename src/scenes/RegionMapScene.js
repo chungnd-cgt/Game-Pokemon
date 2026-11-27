@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { PLACES, REGION_NAME, placeOf, placePoint } from '../data/region.js';
 import { state } from '../game/state.js';
 import { BLEED, backToWorld, centerStage, closeButton, gradientRect, textStyle } from '../ui/helpers.js';
-import { InputRouter, isCancel, isConfirm } from '../ui/input.js';
+import { InputRouter } from '../ui/input.js';
 import { matches } from '../game/keybinds.js';
 
 const LAND = 0x8cc870;
@@ -40,7 +40,8 @@ export default class RegionMapScene extends Phaser.Scene {
     // Huy hiệu xem ở Thẻ Huấn luyện viên (ui/TrainerCard.js), bản đồ vùng chỉ còn bản đồ
 
     this.router = new InputRouter(this);
-    this.router.set((e) => (isCancel(e) || isConfirm(e) || matches(e, 'map')) && !e.repeat && this.close(), (p) => p.rightButtonDown() && this.close());
+    // Đóng bằng nút ✕ hoặc phím Bản đồ vùng; Esc / phím quay lại / chuột phải không đóng
+    this.router.set((e) => matches(e, 'map') && !e.repeat && this.close());
     closeButton(this, width - 34, 34, () => this.close(), 36);
     this.cameras.main.fadeIn(200);
   }

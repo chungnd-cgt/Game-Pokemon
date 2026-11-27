@@ -140,4 +140,31 @@ export function makeGymObjects(scene) {
   addCanvasTexture(scene, 'obj-barrier', drawBarrier());
   addCanvasTexture(scene, 'obj-switch', drawSwitch(false));
   addCanvasTexture(scene, 'obj-switch-on', drawSwitch(true));
+  addCanvasTexture(scene, 'obj-pokedex', drawPokedex());
+  addCanvasTexture(scene, 'obj-bolt', drawBolt());
+}
+
+// Pokédex đỏ dựng đứng trong tủ kính phòng thí nghiệm (đặt ở tâm ô, WorldScene nâng lên cho khớp giá đỡ trong tủ)
+function drawPokedex() {
+  const p = new PixelBuffer(16, 16);
+  p.rect(3, 1, 10, 13, '#a01818');
+  p.rect(4, 2, 8, 11, '#d83030');
+  p.rect(5, 3, 3, 1, '#f87070');
+  p.rect(5, 6, 6, 4, '#dff4ff');
+  p.rect(6, 7, 4, 2, '#58a8e0');
+  p.ellipse(10.5, 3.5, 1.4, 1.4, '#58c8f8');
+  p.rect(4, 11, 8, 1, '#a01818');
+  p.outline(-0.6);
+  return p.toCanvas();
+}
+
+// Dấu sấm sét nhỏ dán trên Poké Ball đựng Pikachu
+function drawBolt() {
+  const p = new PixelBuffer(16, 16);
+  const bolt = ['....###', '...###.', '..###..', '.######', '...###.', '..###..', '.##....', '##.....'];
+  bolt.forEach((row, y) => [...row].forEach((c, x) => c === '#' && p.set(x + 4, y + 4, '#ffd820')));
+  p.set(9, 4, '#fff6a0');
+  p.set(8, 5, '#fff6a0');
+  p.outline(-0.65);
+  return p.toCanvas();
 }

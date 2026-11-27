@@ -1,6 +1,8 @@
 import {
-  onSignedIn, PASSWORD_MIN, resendConfirmation, sendPasswordReset, setNewPassword, signInWithUsername, signUp, usernameAvailable,
+  EMAIL_BLOCKED, emailAllowed, onSignedIn, PASSWORD_MIN, resendConfirmation, sendPasswordReset, setNewPassword,
+  signInWithEmail, signInWithUsername, signOut, signUp, usernameAvailable, verifyEmailCode,
 } from '../online/account.js';
+import { maskEmail, sendDeviceCode, verifyDeviceCode } from '../online/device.js';
 import PKG from '../../package.json' with { type: 'json' };
 import { lastLogin, setLastLogin } from '../online/supabase.js';
 import { capitalizeFirst, checkUsername, stripPictographs } from '../online/username.js';
@@ -13,9 +15,10 @@ import { capitalizeFirst, checkUsername, stripPictographs } from '../online/user
 //  open(): trả về user khi đã đăng nhập xong • openNewPassword(): tab mở ra từ link "đặt lại mật khẩu" trong email
 // Đăng ký: tên đăng nhập + email + mật khẩu (2 lần). Đăng nhập: tên đăng nhập + mật khẩu. Quên mật khẩu: email.
 // Quy tắc tên đăng nhập: online/username.js (máy chủ kiểm tra lại và chống trùng: supabase/usernames.sql)
-// Đăng ký và Quên mật khẩu dùng LINK trong email: bấm link thì game mở ở tab mới (tự đăng nhập / hỏi mật khẩu mới).
-//  Tab cũ ở màn 'sent' / 'resetSent' (báo đã gửi email, nút Gửi lại email); tab mới đăng nhập xong thì tab cũ chỉ báo
-//  "đã đăng nhập ở tab khác" chứ không vào game theo (phiên nằm trong tab mới, mỗi tài khoản chỉ chơi ở một nơi).
+// Đăng ký, Quên mật khẩu và thiết bị lạ dùng MÃ 6 số trong email (mẫu email: supabase/email-templates/), nhập ngay trong
+//  tab đang chơi: 'sent' (xác nhận đăng ký, đúng mã thì vào game), 'resetSent' (đúng mã thì sang 'newPassword'), 'device'.
+//  Link trong email kiểu cũ (email gửi trước khi đổi mẫu) vẫn chạy: mở game ở tab mới, tab cũ chỉ báo "đã đăng nhập ở tab
+//  khác" (openNewPassword: tab mở ra từ link đặt lại mật khẩu).
 
 // Ảnh riêng cho màn này: src/assets/login/logo.*, background.* (png / jpg / webp / gif / svg). Thiếu ảnh nào thì
 // dùng mặc định: logo chữ, nền xanh như màn hình chính
@@ -30,19 +33,23 @@ const CSS = `
     radial-gradient(circle at 90% 18%, rgba(255,255,255,.06) 0 11%, transparent 11.5%), linear-gradient(180deg, #1d2b53, #3b6ea5);
   -webkit-user-select: text; user-select: text; }
 #auth.has-bg { background: #1d2b53 var(--bg) center / cover no-repeat; }
-#auth .page { min-height: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; padding: 40px 16px 70px; }
+#auth .page { height: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center;
+  padding: clamp(14px, 4vh, 40px) 16px clamp(52px, 8vh, 70px); }
+/* Vừa một màn hình, không cuộn: thiếu chỗ (màn Đăng ký nhiều ô, màn hình thấp) thì logo tự thu nhỏ lại (hero co, ảnh cao
+   tối đa bằng hero). Margin auto: canh giữa theo chiều dọc, nhưng màn quá thấp thì vẫn cuộn được từ trên cùng */
+#auth .page > .hero { margin-top: auto; }
+#auth .page > form { margin-bottom: auto; flex: 0 0 auto; }
 #auth .ver { position: fixed; top: 8px; left: 12px; font-size: 13px; font-weight: 800; color: #c8d8ff; text-shadow: 0 1px 3px #000a; }
 #auth .hero { display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 14px;
-  pointer-events: none; }
+  flex: 0 1 auto; min-height: 64px; pointer-events: none; }
 #auth .hero img { display: block; filter: drop-shadow(0 8px 16px rgba(0,0,0,.35)); }
-#auth .logo { position: relative; z-index: 1; max-width: min(420px, 46vw); max-height: 230px; }
+#auth .logo { position: relative; z-index: 1; max-width: min(420px, 46vw); max-height: min(230px, 100%); object-fit: contain; }
 #auth .logo-text { margin-bottom: 26px; text-align: center; }
 #auth .logo-text .t { font-size: 76px; font-weight: 800; line-height: 1; color: #ffe066; -webkit-text-stroke: 10px #2a4a9a;
   paint-order: stroke fill; filter: drop-shadow(0 6px 10px rgba(0,0,0,.45)); }
 #auth .logo-text .s { margin-top: 8px; font-size: 20px; font-weight: 700; color: #fff; text-shadow: 0 2px 4px #0009; }
 #auth form { position: relative; z-index: 2; width: min(360px, 100%); }
-#auth .card { box-sizing: border-box; padding: 18px 20px 14px; background: rgba(20, 30, 56, .22); border: 2px solid rgba(120, 170, 240, .5);
+#auth .card { box-sizing: border-box; padding: 18px 20px 14px; background: rgba(14, 22, 44, .84); border: 2px solid rgba(120, 170, 240, .6);
   border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.3); -webkit-backdrop-filter: blur(10px) saturate(1.2);
   backdrop-filter: blur(10px) saturate(1.2); }
 #auth .card h3 { margin: 0 0 12px; font-size: 19px; font-weight: 800; color: #ffe066; text-align: center; }
@@ -51,6 +58,13 @@ const CSS = `
   background: #f6f8fc; color: #1e2a44; font: 700 17px Nunito, sans-serif; outline: none; }
 #auth input::placeholder { color: #8a96b0; font-weight: 700; }
 #auth input:focus { border-color: #ffd860; }
+#auth input.bad { border-color: #e05a5a; }
+#auth input.good { border-color: #40b060; }
+#auth .hint { margin: 5px 4px 0; font-size: 13px; font-weight: 700; line-height: 1.4; }
+#auth .hint:empty { display: none; }
+#auth .hint.wait { color: #dfe6f4; }
+#auth .hint.ok { color: #9af0b8; }
+#auth .hint.err { color: #ffb4b4; }
 #auth .actions { display: flex; justify-content: center; gap: 10px; margin-top: 14px; }
 #auth .btn { flex: 1; max-width: 172px; padding: 11px 10px; border: 0; border-radius: 10px; color: #fff; cursor: pointer;
   font: 800 18px Nunito, sans-serif; }
@@ -58,16 +72,26 @@ const CSS = `
 #auth .btn.second { background: #4a88e0; box-shadow: 0 3px 0 #2a5aa8; }
 #auth .btn:hover { filter: brightness(1.08); }
 #auth .btn:disabled { opacity: .6; cursor: wait; }
-#auth .link { display: inline; padding: 0; border: 0; background: none; color: #8fb4ff; font: 700 14px Nunito, sans-serif;
-  cursor: pointer; text-decoration: underline; }
-#auth .link:disabled { color: #6a7896; cursor: default; text-decoration: none; }
-#auth .row { margin-top: 10px; text-align: center; font-size: 14px; color: #a8b4d0; font-weight: 700; }
+#auth .link { display: inline; padding: 0; border: 0; background: none; color: #ffffff; font: 800 14px Nunito, sans-serif;
+  cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+#auth .link:hover, #auth .link:focus-visible { color: #ffe066; outline: none; }
+#auth .link:disabled { color: #b8c4dc; cursor: default; text-decoration: none; }
+#auth .row { margin-top: 10px; text-align: center; font-size: 14px; color: #dfe6f4; font-weight: 700; }
 #auth .msg { margin-top: 12px; padding: 9px 11px; border-radius: 10px; font-size: 14px; font-weight: 700; line-height: 1.45; }
 #auth .msg.err { background: #4a1e26; color: #ffb4b4; }
 #auth .msg.ok { background: #1e4a32; color: #b4f0c8; }
 #auth .msg:empty { display: none; }
-#auth .info { margin: 0 0 6px; font-size: 14px; font-weight: 700; line-height: 1.45; color: #c8d2ea; text-align: center; }
+#auth .info { margin: 0 0 6px; font-size: 14px; font-weight: 700; line-height: 1.45; color: #eef2fa; text-align: center; }
 #auth .info b { color: #ffe066; word-break: break-all; }
+#auth .otp { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+#auth .otp input { width: 44px; height: 54px; padding: 0; flex: 0 0 auto; text-align: center; font: 800 26px Nunito, sans-serif;
+  border: 2px solid #5a6a90; border-radius: 10px; background: #f6f8fc; color: #1e2a44; caret-color: #2a5aa8;
+  transition: border-color .12s, box-shadow .12s; }
+#auth .otp input.filled { border-color: #4a88e0; }
+#auth .otp input:focus { border-color: #ffd860; box-shadow: 0 0 0 3px rgba(255, 216, 96, .45); }
+#auth .otp input:disabled { opacity: .7; }
+#auth .otp.bad input { border-color: #e05a5a; }
+@media (max-width: 380px) { #auth .otp { gap: 6px; } #auth .otp input { width: 38px; height: 48px; font-size: 22px; } }
 #auth .pw { position: relative; }
 #auth .pw input { padding-right: 46px; }
 #auth .pw input::-ms-reveal, #auth .pw input::-ms-clear { display: none; }
@@ -119,24 +143,42 @@ const passwordField = (id, attrs) => `<div class="field pw">
 </div>`;
 
 // Các màn của khung nhập. title: tiêu đề trong khung (màn đăng nhập không có) • button: nút chính (gửi form) •
-// second: nút thứ hai cạnh nút chính [màn, chữ] • info: màn báo đã gửi email (không có ô nhập)
+// second: nút thứ hai cạnh nút chính [màn, chữ] • info: màn báo đã gửi mã qua email (kèm ô nhập mã)
 const VIEWS = {
   login: { button: 'Đăng nhập', second: ['register', 'Đăng ký'] },
   register: { title: 'Tạo tài khoản', button: 'Tạo tài khoản', second: ['login', 'Quay lại'] },
-  forgot: { title: 'Quên mật khẩu', button: 'Gửi link', second: ['login', 'Quay lại'] },
-  sent: { title: 'Xác nhận email', info: 'Đã gửi link xác nhận tới', second: ['login', 'Về đăng nhập'] },
-  resetSent: { title: 'Quên mật khẩu', info: 'Nếu email này đã đăng ký, link đặt lại mật khẩu đã được gửi tới', second: ['login', 'Về đăng nhập'] },
+  forgot: { title: 'Quên mật khẩu', button: 'Gửi mã', second: ['login', 'Quay lại'] },
+  // Đăng ký xong: nhập mã trong email để xác nhận (đúng mã thì vào game luôn)
+  sent: { title: 'Xác nhận email', info: 'Đã gửi mã xác nhận tới', button: 'Xác nhận', second: ['login', 'Về đăng nhập'] },
+  // Quên mật khẩu: nhập mã trong email, đúng thì sang màn đặt mật khẩu mới
+  resetSent: {
+    title: 'Quên mật khẩu', info: 'Nếu email này đã đăng ký, mã đặt lại mật khẩu đã được gửi tới', button: 'Tiếp tục',
+    second: ['login', 'Về đăng nhập'],
+  },
   newPassword: { title: 'Đặt mật khẩu mới', button: 'Lưu mật khẩu' },
+  // Thiết bị lạ (online/device.js): nhập mã gửi tới email. Nút thứ hai đăng xuất (không phải chuyển màn)
+  device: { title: 'Xác nhận thiết bị', button: 'Xác nhận', second: ['logout', 'Đăng xuất'] },
 };
 // Các màn có ô tên đăng nhập / email / mật khẩu / nhập lại mật khẩu / nút Gửi lại email
 const HAS_USER = ['login', 'register'];
 const HAS_EMAIL = ['register', 'forgot'];
 const HAS_PASS = ['login', 'register', 'newPassword'];
 const HAS_PASS2 = ['register', 'newPassword'];
-const HAS_RESEND = ['sent', 'resetSent'];
+const HAS_RESEND = ['sent', 'resetSent', 'device'];
+// Các màn nhập mã 6 số trong email, và loại mã (account.js verifyEmailCode)
+const HAS_CODE = { sent: 'signup', resetSent: 'recovery', device: 'device' };
 const RESEND_GAP = 60; // giây: Supabase chỉ cho gửi lại email cho cùng địa chỉ sau chừng này
 
+// Mã xác nhận thiết bị: CODE_LEN ô vuông, mỗi ô một chữ số. Ô nào cũng nhận được cả mã (dán / điện thoại tự điền), số dư
+// tràn sang các ô sau; ô đầu có autocomplete="one-time-code" để điện thoại gợi ý mã từ email / tin nhắn
+const CODE_LEN = 6;
+const otpBoxes = () => Array.from({ length: CODE_LEN }, (_, i) => `<input data-otp="${i}" type="text" inputmode="numeric"
+  pattern="[0-9]*" maxlength="${CODE_LEN}" aria-label="Chữ số ${i + 1}"
+  ${i === 0 ? 'id="auth-code" name="code" autocomplete="one-time-code"' : 'autocomplete="off"'}>`).join('');
+
 const validEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+const NAME_CHECK_DELAY = 600; // ms: ngừng gõ chừng này thì kiểm tra trùng tên (màn Đăng ký)
+const takenText = (name) => `Tên đăng nhập đã tồn tại.`;
 
 export class AuthPanel {
   // opts: { error } câu báo lỗi hiện sẵn (vd link trong email đã hết hạn); onSettings: mở bảng Cài đặt, trả về khi đóng
@@ -154,6 +196,8 @@ export class AuthPanel {
     this.email = '';
     this.resendAt = 0; // lúc (ms) được bấm Gửi lại email
     this.pending = false; // đang chờ máy chủ (tab này tự đăng nhập: không coi là tab khác)
+    this.nameStatus = new Map(); // tên (chữ thường) -> 'ok' | 'taken' | 'invalid': kết quả kiểm tra trùng đã hỏi máy chủ
+    this.nameSeq = 0; // lần kiểm tra mới nhất (kết quả về muộn của lần cũ thì bỏ)
   }
 
   open() {
@@ -167,6 +211,25 @@ export class AuthPanel {
     return this.show('newPassword', (resolve) => {
       this.resolve = resolve;
     });
+  }
+
+  // Thiết bị lạ: gửi mã tới email của user rồi chờ nhập. Trả về user (phiên mới đã xác nhận email) hoặc null (bấm Đăng xuất)
+  openDevice(user) {
+    return this.show('device', (resolve) => {
+      this.resolve = resolve;
+      this.email = user.email ?? '';
+      queueMicrotask(() => this.sendCode()); // sau khi vẽ xong màn (để hiện được câu báo)
+    });
+  }
+
+  async sendCode() {
+    if (!this.root) return;
+    this.say('Đang gửi mã…', false);
+    const res = await sendDeviceCode(this.email);
+    if (!this.root) return;
+    if (res.error) return this.say(res.error);
+    this.sent();
+    this.say('Đã gửi mã. Hãy xem email (cả thư mục Spam).', false);
   }
 
   show(view, setup) {
@@ -211,7 +274,7 @@ export class AuthPanel {
     if (IMAGES.logo) img(IMAGES.logo, 'logo');
     else {
       hero.insertAdjacentHTML('beforeend', `<div class="logo-text"><div class="t">Pokémon</div>
-        <div class="s">Hành trình vùng Sơn Thủy</div></div>`);
+        <div class="s">Aurora Online</div></div>`);
     }
     if (IMAGES.background) {
       this.root.classList.add('has-bg');
@@ -231,6 +294,7 @@ export class AuthPanel {
   finish(value) {
     if (!this.root) return;
     clearInterval(this.tick);
+    clearTimeout(this.nameTimer);
     this.stopListening?.();
     this.root.remove();
     this.root = null;
@@ -246,12 +310,16 @@ export class AuthPanel {
       <div class="card">
         ${v.title ? `<h3>${v.title}</h3>` : ''}
         ${v.info ? `<p class="info">${v.info} <b class="to"></b>.</p>
-          <p class="info">Mở email và bấm link: game sẽ mở ở tab mới, tab này đóng được. Không thấy email thì xem thư mục
-            Spam / Quảng cáo.</p>` : ''}
+          <p class="info">Nhập mã ${CODE_LEN} chữ số trong email vào ô dưới. Không thấy email thì xem thư mục Spam / Quảng cáo.</p>` : ''}
         ${HAS_USER.includes(view) ? `<div class="field">
           <input id="auth-user" name="username" type="text" autocomplete="username" autocapitalize="none" autocorrect="off"
-            spellcheck="false" placeholder="Tên đăng nhập" aria-label="Tên đăng nhập">
+            spellcheck="false" placeholder="${view === 'login' ? 'Tên đăng nhập hoặc email' : 'Tên đăng nhập'}" aria-label="Tên đăng nhập">
+          ${view === 'register' ? '<div class="hint" aria-live="polite"></div>' : ''}
         </div>` : ''}
+        ${view === 'device' ? `<p class="info">Lần đầu đăng nhập trên thiết bị này. Mã xác nhận đã gửi tới <b class="to"></b>:
+            nhập mã để tiếp tục. Lần sau trên thiết bị này không phải nhập nữa.</p>
+          <p class="info">Bạn không đăng nhập mà vẫn nhận được mã? Có người đã biết mật khẩu của bạn: hãy đổi mật khẩu.</p>` : ''}
+        ${HAS_CODE[view] ? `<div class="field otp" role="group" aria-label="Mã xác nhận ${CODE_LEN} chữ số">${otpBoxes()}</div>` : ''}
         ${HAS_EMAIL.includes(view) ? `<div class="field">
           <input id="auth-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254"
             placeholder="Email" aria-label="Email"></div>` : ''}
@@ -284,13 +352,28 @@ export class AuthPanel {
         input.value = fixed;
         input.setSelectionRange(at, at);
       });
+      // Màn Đăng ký: gõ xong (ngừng gõ một lúc / rời ô) thì kiểm tra quy tắc và trùng tên ngay, báo dưới ô
+      if (view === 'register') {
+        this.userInput.addEventListener('input', () => this.queueNameCheck());
+        this.userInput.addEventListener('blur', () => this.checkName());
+        if (this.userInput.value) this.checkName();
+      }
     }
     const to = $('.to');
-    if (to) to.textContent = this.email; // email người chơi gõ: gán bằng textContent, không chèn HTML
+    // email: luôn che bớt (người đứng cạnh / người biết mật khẩu mà không phải chủ tài khoản không đọc được email), gán
+    // bằng textContent, không chèn HTML
+    if (to) to.textContent = maskEmail(this.email);
     // Chuyển màn (Đăng nhập <-> Đăng ký, Quên mật khẩu, Quay lại...): làm mới form, không giữ chữ đã gõ ở màn trước.
     // Màn đăng nhập điền sẵn tên đăng nhập lần trước như lúc mới mở
     for (const b of this.form.querySelectorAll('[data-go]')) {
-      b.addEventListener('click', () => {
+      b.addEventListener('click', async () => {
+        // Màn xác nhận thiết bị: Đăng xuất (về màn đăng nhập, TitleScene mở lại)
+        if (b.dataset.go === 'logout') {
+          b.disabled = true;
+          await signOut();
+          this.finish(null);
+          return;
+        }
         this.email = '';
         this.username = b.dataset.go === 'login' ? lastLogin() : '';
         this.render(b.dataset.go);
@@ -311,6 +394,7 @@ export class AuthPanel {
         if (document.activeElement !== input) input.focus();
       });
     }
+    if (HAS_CODE[view]) this.setupOtp();
     const resend = $('.resend');
     if (resend) {
       resend.addEventListener('click', () => this.resend());
@@ -319,8 +403,121 @@ export class AuthPanel {
     }
     if (msg) this.say(msg.text, msg.err, msg.action);
     const first = this.userInput && !this.username ? this.userInput
-      : this.emailInput && !this.email ? this.emailInput : $('#auth-pass') ?? this.emailInput;
+      : this.emailInput && !this.email ? this.emailInput : $('#auth-pass') ?? this.emailInput ?? $('#auth-code');
     first?.focus();
+  }
+
+  // ---------- Ô nhập mã xác nhận thiết bị ----------
+
+  otpInputs() {
+    return [...(this.form?.querySelectorAll('[data-otp]') ?? [])];
+  }
+
+  otpCode() {
+    return this.otpInputs().map((b) => b.value).join('');
+  }
+
+  // Điền các chữ số từ ô thứ `from` trở đi (gõ, dán, điện thoại tự điền mã); đủ CODE_LEN số thì tự gửi như bấm Xác nhận
+  fillOtp(from, digits) {
+    const boxes = this.otpInputs();
+    let i = from;
+    for (const d of digits) {
+      if (i >= boxes.length) break;
+      boxes[i].value = d;
+      i++;
+    }
+    for (const b of boxes) b.classList.toggle('filled', Boolean(b.value));
+    this.form.querySelector('.otp')?.classList.remove('bad');
+    boxes[Math.min(i, boxes.length - 1)].focus();
+    if (/^\d+$/.test(this.otpCode()) && this.otpCode().length === CODE_LEN) this.submit();
+  }
+
+  clearOtp() {
+    const boxes = this.otpInputs();
+    for (const b of boxes) {
+      b.value = '';
+      b.classList.remove('filled');
+    }
+    boxes[0]?.focus();
+  }
+
+  // Chỉ nhận chữ số, gõ xong tự sang ô sau, Backspace ở ô trống thì lùi về ô trước, ← → để di chuyển, dán mã thì điền hết
+  setupOtp() {
+    const boxes = this.otpInputs();
+    boxes.forEach((box, i) => {
+      box.addEventListener('focus', () => box.select());
+      box.addEventListener('input', () => {
+        const digits = box.value.replace(/\D/g, '');
+        box.value = '';
+        if (digits) this.fillOtp(i, digits);
+        else box.classList.remove('filled');
+      });
+      box.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const digits = (e.clipboardData?.getData('text') ?? '').replace(/\D/g, '');
+        if (digits) this.fillOtp(digits.length >= CODE_LEN ? 0 : i, digits);
+      });
+      box.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !box.value && i > 0) {
+          e.preventDefault();
+          boxes[i - 1].value = '';
+          boxes[i - 1].classList.remove('filled');
+          boxes[i - 1].focus();
+        } else if (e.key === 'ArrowLeft' && i > 0) {
+          e.preventDefault();
+          boxes[i - 1].focus();
+        } else if (e.key === 'ArrowRight' && i < boxes.length - 1) {
+          e.preventDefault();
+          boxes[i + 1].focus();
+        }
+      });
+    });
+  }
+
+  // ---------- Kiểm tra tên đăng nhập lúc gõ (màn Đăng ký) ----------
+
+  // Dòng báo dưới ô tên đăng nhập. kind: 'wait' | 'ok' | 'err' | null (xoá)
+  nameHint(text, kind) {
+    const hint = this.form?.querySelector('.hint');
+    if (!hint || !this.userInput) return;
+    hint.className = `hint${kind ? ` ${kind}` : ''}`;
+    hint.textContent = text ?? '';
+    this.userInput.classList.toggle('bad', kind === 'err');
+    this.userInput.classList.toggle('good', kind === 'ok');
+  }
+
+  // Đang gõ: xoá báo cũ, chờ ngừng gõ rồi kiểm tra
+  queueNameCheck() {
+    clearTimeout(this.nameTimer);
+    this.nameSeq++;
+    this.nameHint('', null);
+    this.nameTimer = setTimeout(() => this.checkName(), NAME_CHECK_DELAY);
+  }
+
+  // Kiểm tra tên đang gõ: sai quy tắc báo ngay; đúng thì hỏi máy chủ có trùng không (nhớ kết quả từng tên)
+  async checkName() {
+    clearTimeout(this.nameTimer);
+    if (this.view !== 'register' || !this.userInput) return;
+    const raw = this.userInput.value;
+    if (!raw.trim()) return this.nameHint('', null);
+    const check = checkUsername(raw);
+    if (check.error) return this.nameHint(check.error, 'err');
+    const name = check.name;
+    const key = name.toLowerCase();
+    const seq = ++this.nameSeq;
+    let status = this.nameStatus.get(key);
+    if (!status) {
+      this.nameHint('Đang kiểm tra tên…', 'wait');
+      const res = await usernameAvailable(name);
+      if (!this.root || seq !== this.nameSeq || this.view !== 'register') return; // đã gõ tiếp / đổi màn
+      if (res.error) return this.nameHint(res.error, 'err');
+      status = res.data;
+      this.nameStatus.set(key, status);
+    }
+    if (seq !== this.nameSeq) return;
+    if (status === 'taken') this.nameHint(takenText(name), 'err');
+    else if (status === 'invalid') this.nameHint('Tên đăng nhập không hợp lệ.', 'err');
+    else this.nameHint(`Tên "${name}" hợp lệ.`, 'ok');
   }
 
   // Nút Gửi lại email: chờ RESEND_GAP giây giữa hai lần gửi
@@ -329,7 +526,8 @@ export class AuthPanel {
     if (!btn) return;
     const wait = Math.ceil((this.resendAt - Date.now()) / 1000);
     btn.disabled = wait > 0;
-    btn.textContent = wait > 0 ? `Gửi lại email (${wait} giây)` : 'Gửi lại email';
+    const label = HAS_CODE[this.view] ? 'Gửi lại mã' : 'Gửi lại email';
+    btn.textContent = wait > 0 ? `${label} (${wait} giây)` : label;
   }
 
   // Vừa gửi email (đăng ký / gửi lại / quên mật khẩu): đếm ngược trước khi cho gửi lại
@@ -339,12 +537,14 @@ export class AuthPanel {
   }
 
   async resend() {
+    if (this.view === 'device') return this.sendCode();
     const email = this.email;
     const res = this.view === 'resetSent' ? await sendPasswordReset(email) : await resendConfirmation(email);
     if (!this.root) return;
     if (res.error) return this.say(res.error);
     this.sent();
-    this.say('Đã gửi lại email. Hãy bấm link trong email mới nhất.', false);
+    this.clearOtp();
+    this.say('Đã gửi lại mã. Hãy dùng mã trong email mới nhất.', false);
   }
 
   // Câu báo trong khung. action: { label, run } thêm một link bấm được (vd Gửi lại email xác nhận)
@@ -372,6 +572,8 @@ export class AuthPanel {
     }
     const second = this.form.querySelector('.btn.second');
     if (second) second.disabled = on;
+    for (const box of this.otpInputs()) box.disabled = on;
+    this.working = on;
   }
 
   async submit() {
@@ -382,10 +584,47 @@ export class AuthPanel {
     const password = $('#auth-pass')?.value ?? '';
     const again = $('#auth-pass2')?.value ?? '';
     this.email = email || this.email;
+    // Mã 6 số trong email (xác nhận đăng ký / quên mật khẩu / thiết bị lạ). Đúng mã thì Supabase đăng nhập luôn (phiên đã
+    // xác nhận email, máy chủ cũng nhớ luôn thiết bị này: schema.sql device_check)
+    if (HAS_CODE[view]) {
+      if (this.working) return; // đang kiểm tra (vừa tự gửi khi điền đủ số)
+      const code = this.otpCode();
+      if (code.length !== CODE_LEN || !/^\d+$/.test(code)) {
+        this.form.querySelector('.otp')?.classList.add('bad');
+        this.otpInputs().find((b) => !b.value)?.focus();
+        return this.say(`Hãy nhập đủ ${CODE_LEN} chữ số trong email.`);
+      }
+      this.busy(true);
+      this.say('');
+      // Đúng mã thì tab này đăng nhập: supabase-js báo SIGNED_IN, không được coi là "tab khác vừa đăng nhập" (pending giữ
+      // nguyên tới khi xong, kể cả lúc đang ở màn đặt mật khẩu mới)
+      this.pending = true;
+      const res = view === 'device' ? await verifyDeviceCode(this.email, code) : await verifyEmailCode(this.email, code, HAS_CODE[view]);
+      if (!this.root) return;
+      this.busy(false);
+      if (res.error) {
+        this.pending = false;
+        // Sai / hết hạn: xoá các ô, viền đỏ, con trỏ về ô đầu để nhập lại
+        this.clearOtp();
+        this.form.querySelector('.otp')?.classList.add('bad');
+        return this.say(res.error);
+      }
+      // Quên mật khẩu: mã đúng (đã có phiên tạm) -> đặt mật khẩu mới rồi mới vào game
+      if (view === 'resetSent') return this.render('newPassword', { text: 'Mã đúng. Hãy đặt mật khẩu mới.', err: false });
+      const name = res.user?.user_metadata?.username;
+      if (view === 'sent' && name) setLastLogin(name);
+      return this.finish(res.user);
+    }
     let username = null;
-    if (HAS_USER.includes(view)) {
+    // Màn đăng nhập: gõ email thay cho tên đăng nhập cũng được (tên đang bị khoá vì người khác dò mật khẩu...)
+    const loginEmail = view === 'login' && this.userInput.value.includes('@') ? this.userInput.value.trim() : null;
+    if (loginEmail && !validEmail(loginEmail)) return this.say('Hãy nhập tên đăng nhập, hoặc email hợp lệ.');
+    if (HAS_USER.includes(view) && !loginEmail) {
       const check = checkUsername(this.userInput.value);
-      if (check.error) return this.say(check.error);
+      if (check.error) {
+        if (view === 'register') this.nameHint(check.error, 'err');
+        return this.say(check.error);
+      }
       username = check.name;
       this.username = username;
       this.userInput.value = username; // hiện đúng tên sẽ dùng (đã bỏ khoảng trắng 2 đầu, viết hoa chữ đầu)
@@ -406,26 +645,34 @@ export class AuthPanel {
     };
 
     if (view === 'login') {
-      const res = await signInWithUsername(username, password);
+      const res = loginEmail ? await signInWithEmail(loginEmail, password) : await signInWithUsername(username, password);
       this.pending = false;
       if (!this.root) return;
       this.busy(false);
-      // Đã đăng ký mà chưa bấm link xác nhận
+      // Đã đăng ký mà chưa nhập mã xác nhận email
       if (res.code === 'email_not_confirmed') {
-        return this.say('Email chưa được xác nhận: hãy bấm link trong email.', true,
-          { label: 'Gửi lại email xác nhận', run: () => this.confirmLater(res.email) });
+        return this.say('Email chưa được xác nhận.', true,
+          { label: 'Gửi mã xác nhận', run: () => this.confirmLater(res.email) });
       }
       if (res.error) return this.say(res.error);
-      setLastLogin(username);
+      // Đăng nhập bằng email: lần sau vẫn điền sẵn tên đăng nhập (không nhớ email trên máy)
+      setLastLogin(username ?? res.data.user?.user_metadata?.username ?? null);
       this.finish(res.data.user);
     } else if (view === 'register') {
-      // Kiểm tra tên trước (máy chủ cũng chặn trùng khi tạo tài khoản, nhưng khi đó Supabase chỉ báo lỗi chung chung)
+      // Kiểm tra tên lại lúc gửi (có thể vừa có người lấy mất; máy chủ cũng chặn trùng khi tạo tài khoản, nhưng khi đó
+      // Supabase chỉ báo lỗi chung chung)
+      clearTimeout(this.nameTimer);
+      this.nameSeq++; // bỏ kết quả kiểm tra lúc gõ còn đang chờ
       const free = await usernameAvailable(username);
-      if (free.data === 'taken') free.error = `Tên đăng nhập "${username}" đã có người dùng. Hãy chọn tên khác.`;
+      if (free.data) this.nameStatus.set(username.toLowerCase(), free.data);
+      if (free.data === 'taken') free.error = takenText(username);
       else if (free.data === 'invalid') free.error = 'Tên đăng nhập không hợp lệ.';
+      if (this.root && free.data) this.nameHint(free.error ?? `Tên "${username}" dùng được.`, free.error ? 'err' : 'ok');
       if (!done(free)) return;
+      // Email rác (tên miền trong danh sách chặn trên máy chủ): báo ngay, không tạo tài khoản
       this.busy(true);
       this.pending = true;
+      if (!(await emailAllowed(email))) return done({ error: EMAIL_BLOCKED });
       const res = await signUp(email, password, username);
       if (!done(res)) return;
       setLastLogin(username);
@@ -448,8 +695,8 @@ export class AuthPanel {
     }
   }
 
-  // Đăng nhập mà email chưa xác nhận: gửi lại email xác nhận rồi sang màn 'sent' (gửi lỗi, vd vừa gửi xong: vẫn sang,
-  // dùng link trong email đã có)
+  // Đăng nhập mà email chưa xác nhận: gửi lại mã xác nhận rồi sang màn 'sent' nhập mã (gửi lỗi, vd vừa gửi xong: vẫn sang,
+  // dùng mã trong email đã có)
   async confirmLater(email) {
     const res = await resendConfirmation(email);
     if (!this.root) return;

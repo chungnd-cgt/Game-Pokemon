@@ -4,7 +4,7 @@ import { createMonster } from '../src/game/monster.js';
 import { evolutionTarget, tradeEvolutionTarget } from '../src/game/evolution.js';
 import { ITEM_MAX, resetState, state } from '../src/game/state.js';
 import {
-  TRADE_MAX_MONS, applyTrade, canTrade, emptyOffer, maxOfferMons, monTradeProblem, offerProblem, receiveProblem,
+  MONEY_MAX, TRADE_MAX_MONS, TRADE_MAX_ROWS, TRADE_ROWS_FULL, offerRows, TRADE_MIN_BADGES, applyTrade, itemTradeProblem, canTrade, emptyOffer, maxOfferMons, monTradeProblem, offerProblem, receiveProblem,
 } from '../src/game/trade.js';
 import { rematchDef } from '../src/game/trainers.js';
 
@@ -16,6 +16,7 @@ function setup(partySpecies = ['pikachu', 'abra', 'geodude']) {
 }
 
 test('giao dịch: cần đủ 4 huy hiệu', () => {
+  assert.equal(TRADE_MIN_BADGES, 4);
   setup();
   assert.equal(canTrade(), false);
   for (const b of ['rock', 'water', 'electric', 'grass']) state.badges.add(b);
@@ -37,7 +38,21 @@ test('giao dịch: không đưa được huyền thoại, vật phẩm quan tr�
   setup(['pikachu', 'mewtwo']);
   assert.ok(monTradeProblem(state.party[1]));
   assert.ok(offerProblem({ ...emptyOffer(), mons: [state.party[1]] }));
-  assert.ok(offerProblem({ ...emptyOffer(), items: { bicycle: 1 } }));
+  // Đồ đang cầm không hợp lệ (vật phẩm quan trọng / TM / mã lạ): không đưa được, câu báo giống máy chủ
+  const holder = state.party[0];
+  for (const bad of ['bicycle', 'tmBodySlam', 'fakeItem']) {
+    holder.heldItem = bad;
+    assert.equal(monTradeProblem(holder), `${holder.name}: đồ đang cầm không được phép giao dịch.`);
+  }
+  holder.heldItem = 'leftovers';
+  assert.equal(monTradeProblem(holder), null);
+  holder.heldItem = null;
+  // Vật phẩm quan trọng / game không có: báo "không được phép giao dịch" (giống câu máy chủ báo)
+  assert.equal(offerProblem({ ...emptyOffer(), items: { bicycle: 1 } }), 'Xe đạp: vật phẩm không được phép giao dịch.');
+  assert.equal(itemTradeProblem('bicycle'), 'Xe đạp: vật phẩm không được phép giao dịch.');
+  assert.equal(itemTradeProblem('khongCo'), 'khongCo: vật phẩm không được phép giao dịch.');
+  assert.equal(itemTradeProblem('potion'), null);
+  for (const id of ['laprasMount', 'arcanineMount', 'oldRod', 'hmSurf']) assert.ok(itemTradeProblem(id), id);
   assert.ok(offerProblem({ ...emptyOffer(), items: { potion: 6 } }));
   assert.equal(offerProblem({ ...emptyOffer(), items: { potion: 5, oranBerry: 3 } }), null);
   assert.ok(offerProblem({ ...emptyOffer(), money: 1001 }));
@@ -48,6 +63,14 @@ test('giao dịch: nhận đồ không vượt quá 999 mỗi loại', () => {
   state.bag.potion = ITEM_MAX - 2;
   assert.ok(receiveProblem(emptyOffer(), { ...emptyOffer(), items: { potion: 5 } }));
   assert.equal(receiveProblem({ ...emptyOffer(), items: { potion: 3 } }, { ...emptyOffer(), items: { potion: 5 } }), null);
+  // Có 999 Oran Berry, nhận thêm 20: không nhận được, câu báo khớp với máy chủ (trades.sql: trade_receive_problem)
+  state.bag.oranBerry = ITEM_MAX;
+  assert.equal(receiveProblem(emptyOffer(), { ...emptyOffer(), items: { oranBerry: 20 } }, 'An'),
+    'An không nhận thêm được 20 Oran Berry: túi chỉ chứa tối đa 999 mỗi loại (đang có 999).');
+  // Tiền quá tối đa
+  state.money = MONEY_MAX - 10;
+  assert.match(receiveProblem(emptyOffer(), { ...emptyOffer(), money: 11 }), /không nhận thêm được tiền/);
+  assert.equal(receiveProblem(emptyOffer(), { ...emptyOffer(), money: 10 }), null);
 });
 
 test('giao dịch: áp dụng đổi Pokémon, đồ, tiền; Pokémon nhận được có uid mới', () => {
@@ -114,4 +137,27 @@ test('độ thân thiết: Pokémon mới 70, +1 khi hạ gục, -5 khi bị g�
   delete old.happiness;
   upgradeMonster(old);
   assert.equal(old.happiness, HAPPINESS_START);
+});
+
+test('giao dịch: tối đa 6 dòng mỗi lượt (Pokémon + loại vật phẩm), 999 mỗi loại; chỉ tiền / không đưa gì vẫn hợp lệ', () => {
+  setup(['pikachu', 'abra', 'geodude', 'rattata', 'pidgey', 'oddish']);
+  state.bag = { potion: 999, oranBerry: 50, antidote: 9, superPotion: 9, ultraBall: 9, greatBall: 9, repel: 9 };
+  assert.equal(TRADE_MAX_ROWS, 6);
+  const five = state.party.slice(0, 5);
+  // 5 Pokémon + 1 loại vật phẩm = 6 dòng: được
+  assert.equal(offerProblem({ ...emptyOffer(), mons: five, items: { potion: 1 } }), null);
+  assert.equal(offerRows({ ...emptyOffer(), mons: five, items: { potion: 1 } }), 6);
+  // 5 Pokémon + 2 loại = 7 dòng; 7 loại vật phẩm: không được
+  assert.equal(offerProblem({ ...emptyOffer(), mons: five, items: { potion: 1, oranBerry: 1 } }), TRADE_ROWS_FULL);
+  const seven = { potion: 1, oranBerry: 1, antidote: 1, superPotion: 1, ultraBall: 1, greatBall: 1, repel: 1 };
+  assert.equal(offerProblem({ ...emptyOffer(), items: seven }), TRADE_ROWS_FULL);
+  const { repel, ...six } = seven;
+  assert.equal(offerProblem({ ...emptyOffer(), items: six }), null);
+  // 999 mỗi loại
+  assert.equal(offerProblem({ ...emptyOffer(), items: { potion: 999 } }), null);
+  assert.match(offerProblem({ ...emptyOffer(), items: { potion: 1000 } }), /tối đa 999/);
+  // Chỉ tiền / không đưa gì: hợp lệ (tiền không tính dòng)
+  assert.equal(offerProblem({ ...emptyOffer(), money: 500 }), null);
+  assert.equal(offerProblem(emptyOffer()), null);
+  assert.equal(offerProblem({ ...emptyOffer(), mons: five, items: { potion: 1 }, money: 500 }), null);
 });

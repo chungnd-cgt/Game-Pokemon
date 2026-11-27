@@ -1,4 +1,3 @@
-import { HOME_DX, roomy } from './indoorLayout.js';
 import { CHAPTER2_MAPS } from './mapsChapter2.js';
 import { CHAPTER3_MAPS } from './mapsChapter3.js';
 import { CHAPTER4_MAPS } from './mapsChapter4.js';
@@ -42,8 +41,8 @@ const MAP_DEFS = {
       'TT......eeee.=Q.............TT',
       'TT......ffff.=...........OO.TT',
       'TT......ffff.=...........OO.TT',
-      'TT......h..h.=....s.........TT',
-      'TT.a=aEEu....=.....aa=aa.f.kTT',
+      'TT......h..h.=..............TT',
+      'TT.a=aEEu....=...s.......f.kTT',
       'TT.========================.TT',
       'TT....wwwwwwwwwwwwwwwwww....TT',
       'TT...wwwwwwwwwwwwwwwwwwww...TT',
@@ -69,7 +68,8 @@ const MAP_DEFS = {
       { type: 'house', x: 3, y: 7, w: 4, h: 4, door: { x: 4, y: 10 }, to: 'home', floors: 2 },
       { type: 'house', x: 20, y: 7, w: 4, h: 4, door: { x: 21, y: 10 }, to: 'garyHome', roof: 'houseRed', floors: 2 },
       { type: 'house', x: 3, y: 12, w: 4, h: 4, door: { x: 4, y: 15 }, to: 'palletHouse', roof: 'houseGreen' },
-      { type: 'lab', x: 19, y: 12, w: 5, h: 4, door: { x: 21, y: 15 }, to: 'lab' },
+      // Phòng thí nghiệm to hơn nhà dân (7x5 ô), cửa ở giữa nhìn thẳng ra đường
+      { type: 'lab', x: 18, y: 12, w: 7, h: 5, door: { x: 21, y: 16 }, to: 'lab' },
     ],
     // Vật phẩm rơi trên đường: đi tới bấm Enter để nhặt (mỗi món chỉ nhặt được một lần)
     objects: [
@@ -81,13 +81,13 @@ const MAP_DEFS = {
       '7,10': ['NHÀ CỦA BẠN', 'Về nhà nghỉ một lát là mẹ chăm Pokémon cho khoẻ lại.'],
       '19,10': ['NHÀ GARY'],
       '11,6': ['THỊ TRẤN PALLET', '↑ Bụi cỏ phía bắc, Tuyến đường 2 và Thị trấn Lục Bình', '↓ Hồ nước chảy ra Sông Lục Bình'],
-      '18,15': ['PHÒNG THÍ NGHIỆM POKéMON', 'Giáo sư Oak, chuyên gia hàng đầu về Pokémon.'],
+      '17,16': ['PHÒNG THÍ NGHIỆM POKéMON', 'Giáo sư Oak, chuyên gia hàng đầu về Pokémon.'],
     },
   },
 
   // Nhà của bạn, tầng 1: phòng khách (bộ sofa đối xứng hai bên bàn nước, mẹ ngồi sofa bên phải) và góc bếp.
   // Cầu thang lên tầng 2 ở góc trên bên phải.
-  home: roomy({
+  home: {
     name: 'Nhà của bạn – Tầng 1',
     indoor: true,
     theme: 'home',
@@ -102,7 +102,7 @@ const MAP_DEFS = {
       '...[ttt]...',
       '...........',
       '...........',
-      'p..E......p',
+      'p..EE.....p',
     ],
     // Thảm trải sàn dưới bộ sofa: [x1, y1, x2, y2, màu nền, màu viền] (tính cả hai đầu)
     rugs: [[2, 3, 8, 6, '#c8604a', '#f0d8a8']],
@@ -119,10 +119,10 @@ const MAP_DEFS = {
     },
     entry: { x: 3, y: 7 }, // chỗ đứng khi vừa vào nhà
     exit: { to: 'route1', x: 3, y: 15 }, // bước lên thảm E thì ra chỗ này
-  }, 'home'),
+  },
 
   // Tầng 2: phòng ngủ của bạn (chơi mới thì thức dậy ở đây). Cầu thang xuống ở góc trên bên phải.
-  home2f: roomy({
+  home2f: {
     name: 'Nhà của bạn – Phòng ngủ',
     place: 'pallet',
     indoor: true,
@@ -149,10 +149,10 @@ const MAP_DEFS = {
       '2,2': ['Bàn học của bạn. Vở bài tập vẫn còn mở dở...'],
       ...Object.fromEntries([4, 5, 6].map((x) => [`${x},2`, ['Máy chơi game đang cắm vào TV.', 'Hôm nay là ngày quan trọng, chơi sau nhé!']])),
     },
-  }, 'home'),
+  },
 
   // Nhà Gary 2 tầng: tầng 1 có chị Đào (chị gái Gary, biết tin Gary đang ở đâu), tầng 2 là phòng của Gary
-  garyHome: roomy({
+  garyHome: {
     name: 'Nhà Gary – Tầng 1',
     indoor: true,
     theme: 'home',
@@ -166,7 +166,7 @@ const MAP_DEFS = {
       '...[ttt]...',
       '...[ttt]...',
       '...........',
-      'p..E......p',
+      'p..EE.....p',
     ],
     rugs: [[2, 3, 8, 6, '#6a8ac8', '#f0e0b0']],
     wallDecor: { 7: 'photo' },
@@ -177,10 +177,10 @@ const MAP_DEFS = {
       ...Object.fromEntries([4, 5, 6].map((x) => [`${x},2`, ['TV đang chiếu trận đấu Liên minh Pokémon.']])),
     },
     entry: { x: 3, y: 6 },
-  }, 'home'),
+  },
 
   // Tầng 2 nhà Gary: phòng riêng của Gary (Gary ở đây cho tới khi bạn nhận Pokémon). Cầu thang xuống ở góc trên bên phải
-  garyHome2f: roomy({
+  garyHome2f: {
     name: 'Nhà Gary – Phòng của Gary',
     place: 'pallet',
     indoor: true,
@@ -208,10 +208,10 @@ const MAP_DEFS = {
       '2,2': ['Bàn học của Gary. Trên bàn có tờ giấy ghi: "Mục tiêu: Nhà vô địch vùng Sơn Thủy!"'],
       ...Object.fromEntries([4, 5, 6].map((x) => [`${x},2`, ['TV đang chiếu lại trận chung kết Liên minh Pokémon.', 'Gary xem đi xem lại cả chục lần rồi.']])),
     },
-  }, 'home'),
+  },
 
   // Nhà hàng xóm: bà Tư và bé Na
-  palletHouse: roomy({
+  palletHouse: {
     name: 'Nhà bà Tư',
     indoor: true,
     theme: 'home',
@@ -225,7 +225,7 @@ const MAP_DEFS = {
       '....ttt....',
       '....ttt....',
       '...........',
-      'p..E......p',
+      'p..EE.....p',
     ],
     rugs: [[3, 3, 7, 6, '#c8a04a', '#f8e8c0']],
     wallDecor: { 2: 'clock' },
@@ -235,82 +235,155 @@ const MAP_DEFS = {
       ...Object.fromEntries([4, 5, 6].map((x) => [`${x},2`, ['TV đang chiếu phim hoạt hình Pokémon. Bé Na xem say sưa.']])),
     },
     entry: { x: 3, y: 6 },
-  }, 'home'),
+  },
 
-  lab: roomy({
+  // Phòng thí nghiệm của Giáo sư Oak (14x12): sát tường sau là kệ sách, tủ máy in, máy chủ, bàn máy tính, tủ kính trưng bày,
+  // bục nhỏ đặt quả bóng Pikachu, máy tính lớn và tủ mẫu vật. Máy hồi phục lục giác lớn bên trái, bàn gỗ mặt vàng đặt ba
+  // Poké Ball khởi đầu trên thảm xanh bên phải, bốn buồng chăm sóc ở cuối phòng, thảm cửa ra ở giữa.
+  // Đồ đạc lớn vẽ theo props (gfx/props.js), ô 'g' là chân đồ đạc
+  lab: {
     name: 'Phòng thí nghiệm Pokémon',
     indoor: true,
-    theme: 'lab',
+    theme: 'oakLab',
     tiles: INDOOR_TILES,
     fallback: '#',
     rows: [
-      '#############',
-      '#############',
-      'kkkk...d.kkkk',
-      '.............',
-      '....ddddd....',
-      '.............',
-      'MM.........MM',
-      '.............',
-      'kk.........kk',
-      '.............',
-      'p.....E.....p',
+      '##############',
+      '##############',
+      'kgggggggjggkgg',
+      '.gggq....q....',
+      '.ggg..........',
+      '.ggg.....nnn..',
+      '..............',
+      '..............',
+      'gggg......gggg',
+      'gggg......gggg',
+      '..............',
+      '......EE......',
     ],
-    // Ba Poké Ball đựng Pokémon khởi đầu trên bàn. Quả thứ tư đựng Pikachu nằm trên bàn nhỏ
+    props: [
+      { kind: 'cabinet', x: 1, y: 2 },
+      { kind: 'server', x: 2, y: 2 },
+      { kind: 'desk', x: 3, y: 2 },
+      { kind: 'displayCase', x: 5, y: 2 },
+      { kind: 'bigComputer', x: 9, y: 2 },
+      { kind: 'locker', x: 12, y: 2 },
+      { kind: 'locker', x: 13, y: 2, alt: true },
+      { kind: 'healPod', x: 1, y: 3 },
+      { kind: 'scanBed', x: 0, y: 8 },
+      { kind: 'scanBed', x: 2, y: 8 },
+      { kind: 'scanBed', x: 10, y: 8 },
+      { kind: 'scanBed', x: 12, y: 8 },
+    ],
+    rugs: [[8, 4, 12, 6, '#4a9a40', '#7ac868', 'round']],
+    // Ba Poké Ball đựng Pokémon khởi đầu trên bàn. Quả thứ tư đựng Pikachu nằm trên bục nhỏ
     // sau lưng Giáo sư Oak, bên phải (chỉ chọn được sau khi đã xem và từ chối cả ba con kia)
     objects: [
-      { x: 5, y: 4, kind: 'starter', species: 'bulbasaur' },
-      { x: 6, y: 4, kind: 'starter', species: 'charmander' },
-      { x: 7, y: 4, kind: 'starter', species: 'squirtle' },
-      { x: 7, y: 2, kind: 'starter', species: 'pikachu' },
+      { x: 9, y: 5, kind: 'starter', species: 'bulbasaur' },
+      { x: 10, y: 5, kind: 'starter', species: 'charmander' },
+      { x: 11, y: 5, kind: 'starter', species: 'squirtle' },
+      { x: 8, y: 2, kind: 'starter', species: 'pikachu', mark: 'bolt' },
+      // Pokédex Giáo sư Oak để trong tủ kính, trao cho người chơi rồi thì không còn
+      { x: 6, y: 2, kind: 'decor', look: 'pokedex', dy: -9, until: 'gotPokedex', lines: ['Trong tủ kính là một chiếc Pokédex đời mới. Giáo sư Oak đang chuẩn bị nó cho ai đó.'] },
     ],
-    entry: { x: 6, y: 9 },
-    exit: { to: 'route1', x: 9, y: 15 },
-  }, 'lab'),
+    signs: {
+      '0,2': ['Kệ đầy sách nghiên cứu về Pokémon. Cuốn nào cũng dày cộp.'],
+      '11,2': ['"Sự tiến hoá của Pokémon" — tác giả: Giáo sư Oak.'],
+      '1,2': ['Máy in đang in dở một xấp dữ liệu Pokédex.'],
+      '2,2': ['Máy chủ lưu dữ liệu Pokédex. Đèn xanh nhấp nháy liên tục.'],
+      ...Object.fromEntries([3, 4].map((x) => [`${x},2`, ['Màn hình máy tính hiện bảng chỉ số của rất nhiều Pokémon.']])),
+      ...Object.fromEntries([5, 6, 7].map((x) => [`${x},2`, ['Tủ kính trưng bày, giá đỡ ở giữa dành cho những thiết bị quý của Giáo sư Oak.']])),
+      ...Object.fromEntries([9, 10].map((x) => [`${x},2`, ['Máy tính lớn đang phân tích sóng năng lượng của Pokémon.']])),
+      ...Object.fromEntries([12, 13].map((x) => [`${x},2`, ['Tủ bảo quản mẫu vật. Lạnh buốt!']])),
+      ...Object.fromEntries([1, 2, 3].map((x) => [`${x},5`, ['Máy hồi phục của phòng thí nghiệm. Buồng kính phát sáng xanh dịu.']])),
+      ...Object.fromEntries([0, 1, 2, 3, 10, 11, 12, 13].map((x) => [`${x},9`, ['Buồng chăm sóc Pokémon. Bên trong ấm áp và yên tĩnh.']])),
+    },
+    entry: { x: 6, y: 10 },
+  },
 
-  center: roomy({
+  // Pokémon Center (16x12): quầy chữ U đỏ ở giữa, bên trong có máy hồi phục, Y tá Joy (x 7) và Chansey (x 8, data/npcs.js),
+  // tủ phụ; TV treo trên tường sau quầy, bản đồ vùng treo bên trái. Máy PC dạng trụ cạnh góc quầy bên phải, logo tròn trên sàn
+  // trước quầy, hai góc sau có chậu cây, hai bộ bàn tròn kèm ghế đẩu hai bên phía dưới (chỗ ngồi chờ), hai góc dưới vát chéo,
+  // thảm cửa ra 2 ô ở giữa. Một tầng duy nhất: không có thang cuốn hay tầng hầm. Đồ đạc lớn vẽ theo props (gfx/props.js)
+  center: {
     name: 'Pokémon Center',
     indoor: true,
     theme: 'center',
     tiles: INDOOR_TILES,
     fallback: '#',
     rows: [
-      '#############',
-      '#######mm####',
-      '.............',
-      'pcccccccccccp',
-      '............P',
-      '.bb.......bb.',
-      '.............',
-      '.............',
-      '......E......',
+      '################',
+      '################',
+      'p...cmm..ggc...p',
+      '....cccccccc....',
+      '............P...',
+      '................',
+      '................',
+      '................',
+      '.qggq......qggq.',
+      '................',
+      'g..............g',
+      'gg.....EE.....gg',
     ],
-    entry: { x: 6, y: 7 },
-    exit: { to: 'route1', x: 6, y: 7 },
-    heal: { x: 6, y: 4, facing: 'up' },
-  }, 'center'),
+    props: [
+      { kind: 'mapPoster', x: 2, y: 1 },
+      { kind: 'tv', x: 7, y: 1 },
+      { kind: 'sideDesk', x: 9, y: 2 },
+      { kind: 'roundTable', x: 2, y: 8 },
+      { kind: 'roundTable', x: 12, y: 8 },
+    ],
+    emblem: { x: 8, y: 6 },
+    chamfer: 2,
+    signs: {
+      ...Object.fromEntries([2, 3, 12, 13].map((x) => [`${x},8`, ['Bàn kính tròn. Có ai bỏ quên tờ tạp chí Pokémon trên bàn.']])),
+    },
+    entry: { x: 7, y: 10 },
+    heal: { x: 7, y: 4, facing: 'up' },
+  },
 
-  mart: roomy({
+  // Poké Mart (14x10): quầy thu ngân chữ L bên trái có máy tính tiền, nhân viên đứng sau quầy (x 1, y 4, data/npcs.js),
+  // thùng hàng chất trong góc; dọc tường sau là kệ hàng và tủ mát cửa kính, giữa phòng trải thảm xanh có hai quầy kệ trưng bày,
+  // phía dưới bàn kính vuông kèm bốn ghế đẩu, chậu cây ở các góc, thảm cửa ra bên trái. Đồ đạc lớn vẽ theo props (gfx/props.js)
+  mart: {
     name: 'Poké Mart',
     indoor: true,
-    theme: 'mart',
+    theme: 'pokeMart',
     tiles: INDOOR_TILES,
     fallback: '#',
     rows: [
-      '###########',
-      '###########',
-      '..kkk.kk.kk',
-      'cck........',
-      '...........',
-      '.....kk.kk.',
-      '.....kk.kk.',
-      '...........',
-      '.....kk.kk.',
-      '...E......p',
+      '##############',
+      '##############',
+      'gg..gggg.ggggp',
+      '..c...........',
+      '..c...........',
+      'ccc...gg..gg..',
+      '..............',
+      '.......qggq...',
+      '.......qggq...',
+      'p..EE........p',
     ],
+    props: [
+      { kind: 'crates', x: 0, y: 2 },
+      { kind: 'goodsShelf', x: 4, y: 2 },
+      { kind: 'goodsShelf', x: 6, y: 2, alt: true },
+      { kind: 'cooler', x: 9, y: 2 },
+      { kind: 'cooler', x: 11, y: 2, alt: true },
+      { kind: 'register', x: 2, y: 3 },
+      { kind: 'displayRack', x: 6, y: 5 },
+      { kind: 'displayRack', x: 10, y: 5, alt: true },
+      { kind: 'glassTable', x: 8, y: 7 },
+    ],
+    carpet: { y1: 3, y2: 6 },
+    signs: {
+      ...Object.fromEntries([0, 1].map((x) => [`${x},2`, ['Thùng hàng mới nhập, chưa kịp xếp lên kệ.']])),
+      ...Object.fromEntries([4, 5, 6, 7].map((x) => [`${x},2`, ['Kệ bày Poké Ball, thuốc hồi phục và đủ thứ đồ dùng cho chuyến đi.']])),
+      ...Object.fromEntries([9, 10, 11, 12].map((x) => [`${x},2`, ['Tủ mát đầy nước uống: nước lọc, soda, nước chanh...']])),
+      ...Object.fromEntries([6, 7, 10, 11].map((x) => [`${x},5`, ['Quầy trưng bày hàng mới về. Món nào cũng được bọc gọn gàng.']])),
+      ...Object.fromEntries([7, 8].flatMap((y) => [8, 9].map((x) => [`${x},${y}`, ['Bàn kính cho khách ngồi nghỉ chân.']]))),
+    },
     entry: { x: 3, y: 8 },
     exit: { to: 'route1', x: 12, y: 7 },
-  }, 'mart'),
+  },
 };
 
 // Pokémon Center / Poké Mart ở thị trấn khác: cùng nội thất, cửa ra dẫn về thị trấn đó
@@ -327,11 +400,6 @@ for (let n = 1; n <= 8; n++) {
 Object.assign(MAP_DEFS, CHAPTER2_MAPS, CHAPTER3_MAPS, CHAPTER4_MAPS, CHAPTER5_MAPS, VILLAGE_MAPS, VILLAGE_AREAS_A, VILLAGE_AREAS_B, GYM_MAPS, SAFARI_MAPS);
 // Nhà dân chưa có nội thất: dựng phòng và người ở (data/npcHouses.js), vài nhà vẫn khoá cửa
 furnishHouses(MAP_DEFS);
-// Bản đồ trong nhà đã nới rộng cho kín màn hình (data/widen.js, shiftX): cửa chuyển bản đồ từ nơi khác dẫn vào thì dịch
-// đích theo (toạ độ khai báo theo bố cục trước khi nới)
-for (const def of Object.values(MAP_DEFS)) {
-  for (const w of def.warps ?? []) w.tx += MAP_DEFS[w.to]?.shiftX ?? 0;
-}
 
 // Cửa ra của mọi toà nhà: thảm trong nhà dẫn về ô ngay trước cửa ngoài thị trấn
 for (const [id, def] of Object.entries(MAP_DEFS)) {
@@ -455,7 +523,7 @@ class GameMap {
 export const MAPS = Object.fromEntries(Object.entries(MAP_DEFS).map(([id, def]) => [id, new GameMap(id, def)]));
 
 // Chơi mới: thức dậy cạnh giường trong phòng ngủ trên tầng 2
-export const SPAWN = { map: 'home2f', x: 1 + HOME_DX, y: 3, facing: 'down' };
+export const SPAWN = { map: 'home2f', x: 1, y: 3, facing: 'down' };
 // Chỗ đứng khi tải bản lưu (Tiếp tục). Bản đồ trong bản lưu không còn (bản cũ): về điểm bắt đầu.
 // Bản đồ trong nhà đã sửa (nhà cũ 1 tầng thành 2 tầng) mà chỗ đứng giờ là đồ đạc: về chỗ đứng ở cửa vào.
 // Chỉ xét trong nhà: ngoài trời ô "cản" có thể là mặt nước khi đang lướt nước (WorldScene tự đặt lại khối nước / thú cưỡi)
@@ -488,4 +556,4 @@ function nearestOpen(map, { x, y }) {
 // Thua trận thì tỉnh dậy trong Pokémon Center, trước mặt Y tá Joy
 export const HEAL_RESPAWN = { map: 'center', ...MAP_DEFS.center.heal, healer: 'Y tá Joy' };
 // Chưa ghé Pokémon Center nào thì thua trận tỉnh dậy ở nhà, đứng trước sofa mẹ đang ngồi (story/chapter1.js: mom)
-export const HOME_RESPAWN = { map: 'home', x: 7 + HOME_DX, y: 3, facing: 'down', healer: 'Mẹ' };
+export const HOME_RESPAWN = { map: 'home', x: 7, y: 3, facing: 'down', healer: 'Mẹ' };

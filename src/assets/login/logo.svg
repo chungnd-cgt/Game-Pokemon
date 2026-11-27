@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" width="760" height="400">
+  <!-- Logo màn đăng nhập: Pokémon Aurora Online (huy hiệu cực quang trên núi, chữ AURORA vàng viền xanh, dải ruy băng ONLINE) -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#14244e"/>
+      <stop offset="1" stop-color="#2c5aa0"/>
+    </linearGradient>
+    <linearGradient id="aurora" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5af0b0"/>
+      <stop offset=".5" stop-color="#7ad8ff"/>
+      <stop offset="1" stop-color="#c890ff"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff2a0"/>
+      <stop offset=".55" stop-color="#ffd23c"/>
+      <stop offset="1" stop-color="#f0a020"/>
+    </linearGradient>
+    <linearGradient id="ribbon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff6a5a"/>
+      <stop offset="1" stop-color="#c8302a"/>
+    </linearGradient>
+    <clipPath id="badge"><circle cx="380" cy="78" r="58"/></clipPath>
+  </defs>
+
+  <!-- Huy hiệu tròn: trời đêm, dải cực quang, núi tuyết, mặt hồ -->
+  <circle cx="380" cy="78" r="66" fill="#ffd23c"/>
+  <circle cx="380" cy="78" r="62" fill="#1a2c5c"/>
+  <g clip-path="url(#badge)">
+    <rect x="320" y="18" width="120" height="120" fill="url(#sky)"/>
+    <path d="M318 62 C345 34 365 70 392 46 S428 40 444 30 L444 50 C420 62 405 58 390 70 S350 66 318 86 Z" fill="url(#aurora)" opacity=".85"/>
+    <path d="M318 78 C348 58 370 84 398 64 S430 60 444 52 L444 62 C424 72 404 78 390 86 S348 84 318 96 Z" fill="url(#aurora)" opacity=".45"/>
+    <circle cx="347" cy="40" r="2" fill="#fff"/><circle cx="420" cy="34" r="1.6" fill="#fff"/><circle cx="404" cy="24" r="1.2" fill="#fff"/>
+    <path d="M318 118 L352 74 L372 96 L392 66 L444 118 Z" fill="#5a6ab0"/>
+    <path d="M352 74 L362 87 L356 86 L350 92 L344 84 Z M392 66 L405 82 L398 80 L392 87 L384 77 Z" fill="#fff"/>
+    <rect x="318" y="112" width="130" height="30" fill="#2a8ad8"/>
+    <path d="M330 120 q8 -4 16 0 t16 0 M376 126 q8 -4 16 0 t16 0 M352 132 q8 -4 16 0 t16 0" stroke="#bfe8ff" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- "Pokémon" nhỏ phía trên chữ chính -->
+  <text x="380" y="176" text-anchor="middle" font-family="'Segoe UI', 'Arial Rounded MT Bold', Arial, sans-serif" font-weight="900"
+    font-size="34" letter-spacing="3" fill="#ffffff" stroke="#1a2c6a" stroke-width="8" paint-order="stroke fill" stroke-linejoin="round">Pokémon</text>
+
+  <!-- AURORA: bóng đổ, viền xanh đậm, chữ vàng -->
+  <text x="384" y="276" text-anchor="middle" font-family="'Arial Black', 'Segoe UI Black', Impact, sans-serif" font-weight="900"
+    font-size="104" letter-spacing="4" fill="#0c1430" opacity=".45">AURORA</text>
+  <text x="380" y="270" text-anchor="middle" font-family="'Arial Black', 'Segoe UI Black', Impact, sans-serif" font-weight="900"
+    font-size="104" letter-spacing="4" fill="url(#gold)" stroke="#1e3a8a" stroke-width="16" paint-order="stroke fill" stroke-linejoin="round">AURORA</text>
+
+  <!-- Ruy băng ONLINE -->
+  <path d="M232 300 L200 312 L216 330 L200 348 L248 340 Z" fill="#8a1c18"/>
+  <path d="M528 300 L560 312 L544 330 L560 348 L512 340 Z" fill="#8a1c18"/>
+  <rect x="240" y="292" width="280" height="50" rx="10" fill="url(#ribbon)" stroke="#5a1210" stroke-width="4"/>
+  <text x="380" y="330" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-weight="900" font-size="30" letter-spacing="10"
+    fill="#ffffff">ONLINE</text>
+</svg>

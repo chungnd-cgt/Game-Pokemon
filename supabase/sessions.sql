@@ -31,6 +31,8 @@ declare
   me uuid := auth.uid();
 begin
   if me is null then raise exception 'SESSION: Chưa đăng nhập'; end if;
+  -- Phiên chưa xác nhận thiết bị (schema.sql) không được giành quyền chơi (không đá được người đang chơi ra)
+  if not public.session_trusted() then raise exception 'SESSION: DEVICE: Thiết bị này chưa được xác nhận'; end if;
   if p_session is null then raise exception 'SESSION: Thiếu mã phiên'; end if;
   perform pg_advisory_xact_lock(hashtext('claim_session:' || me::text));
   if p_previous is not null and exists (

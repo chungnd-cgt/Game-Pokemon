@@ -54,6 +54,10 @@ export function resetState() {
 
 export const blackoutLoss = (money) => Math.min(BLACKOUT_MAX, Math.floor(money * BLACKOUT_RATE));
 
+// Tiền nhặt được khi hạ Pokémon hoang dã (không bắt): WILD_PRIZE x cấp, thấp hơn hẳn thắng nhà huấn luyện (prize x cấp)
+export const WILD_PRIZE = 5;
+export const wildPrize = (level) => WILD_PRIZE * Math.max(1, Math.floor(level || 1));
+
 export const hasFlag = (flag) => state.flags.has(flag);
 
 // Tên người chơi trong lời thoại (bản lưu cũ chưa đặt tên thì gọi chung là "bạn")

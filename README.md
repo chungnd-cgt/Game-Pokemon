@@ -1,4 +1,4 @@
-# Pokémon Demo
+# Pokémon Aurora Online
 
 Bản demo game Pokémon 2D chạy trên trình duyệt (chạy local), lấy cảm hứng từ Pokémon Revolution Online.
 Viết bằng [Phaser 3](https://phaser.io) + [Vite](https://vite.dev).
@@ -21,8 +21,8 @@ trình duyệt vẫn chơi tiếp được.
 
 **Cài đặt lần đầu** (người làm game, một lần cho mỗi project Supabase):
 
-1. Tạo project Supabase. Authentication → Sign In / Providers → **Email**: bật. "Confirm email" bật thì người chơi phải bấm
-   link trong email mới đăng nhập được. Dịch vụ gửi mail có sẵn của Supabase chỉ gửi được rất ít mail (và chỉ tới email thành
+1. Tạo project Supabase. Authentication → Sign In / Providers → **Email**: bật. "Confirm email" bật thì người chơi phải nhập
+   mã 6 số trong email mới đăng nhập được. Dịch vụ gửi mail có sẵn của Supabase chỉ gửi được rất ít mail (và chỉ tới email thành
    viên project); cho người khác chơi thì cấu hình **SMTP riêng** (xem mục *Gửi email (SMTP)* bên dưới).
 2. Authentication → URL Configuration: **Site URL** = địa chỉ game (chạy dev: `http://localhost:5173`); thêm địa chỉ thật vào
    **Redirect URLs** khi deploy. Link trong email (xác nhận, đặt lại mật khẩu) mở lại đúng địa chỉ này.
@@ -44,12 +44,13 @@ trình duyệt vẫn chơi tiếp được.
 **Luồng chơi:** mở game → **màn đăng nhập riêng** (`src/ui/AuthPanel.js`, HTML che kín game): logo + ảnh minh hoạ +
 nền lấy từ [`src/assets/login/`](src/assets/login/README.md) (thiếu ảnh thì dùng mặc định), khung nhập, nút Đăng nhập /
 Đăng ký ngay dưới, nút Cài đặt ở góc (mở đúng bảng Cài đặt trong game, bỏ nút Đổi diện mạo vì chưa có nhân vật). Đăng ký
-nhập **tên đăng nhập + email + mật khẩu** (2 lần); đăng nhập bằng **tên đăng nhập + mật khẩu**; quên mật khẩu thì nhập email.
+nhập **tên đăng nhập + email + mật khẩu** (2 lần); đăng nhập bằng **tên đăng nhập + mật khẩu** (gõ email thay cho tên cũng được); quên mật khẩu thì nhập email.
 Đăng nhập xong vào game luôn: tài khoản có bản lưu thì chơi tiếp, chưa có thì chọn diện mạo nhân vật rồi chơi mới (không còn menu Tiếp tục / Chơi
-mới / Xoá dữ liệu). **Đăng ký** khi bật "Confirm email": bấm link trong email thì game mở ở **tab mới** và tự đăng nhập; tab
-cũ chỉ báo "đã xác nhận ở tab mới", đóng đi là được (phiên đăng nhập nằm trong tab mới, mỗi tài khoản chỉ chơi ở một nơi).
-**Quên mật khẩu**: bấm link trong email → tab mới hỏi mật khẩu mới → vào game. Nút "Gửi lại email" chờ 60 giây giữa hai lần
-gửi (giới hạn của Supabase). Đăng nhập mà email chưa xác nhận thì có nút gửi lại email xác nhận. Bản lưu cũ trên máy từ
+mới / Xoá dữ liệu). **Đăng ký** khi bật "Confirm email": email gửi **mã 6 số**, nhập ngay trên màn đăng ký (ô tự sang ô sau, dán / điện thoại tự
+điền mã được, đủ 6 số tự gửi) → vào game luôn. **Quên mật khẩu**: nhập email → nhập mã 6 số trong email → đặt mật khẩu mới → vào
+game. Tất cả trong cùng tab, không mở tab mới. Nút "Gửi lại mã" chờ 60 giây giữa hai lần gửi (giới hạn của Supabase). Đăng
+nhập mà email chưa xác nhận thì có nút gửi mã xác nhận. (Email kiểu cũ có link, gửi trước khi đổi mẫu, vẫn dùng được: bấm
+link thì game mở ở tab mới.) Bản lưu cũ trên máy từ
 trước khi có tài khoản (khoá chung `pokemon-demo-save-v1`) không dùng nữa: đăng nhập xong là tự xoá. **Đăng xuất**: Cài đặt → Chung.
 Mỗi lần mở game (đóng tab / trình duyệt rồi mở lại) đều phải **đăng nhập lại**; tên đăng nhập lần trước được điền sẵn. Phiên
 đăng nhập chỉ cất trong sessionStorage (`src/online/supabase.js`) nên tải lại trang trong cùng tab (vd văng game bấm F5) thì
@@ -63,7 +64,10 @@ email cũng không trùng (Supabase chặn). Tên lưu ở bảng `profiles` khi
 quy tắc thì huỷ đăng ký); tài khoản không xác nhận email sau 1 ngày thì tên được nhả ra. Supabase chỉ đăng nhập được bằng
 email, nên game gọi `login_email(tên, mật khẩu)`: hàm kiểm tra mật khẩu ngay trong database, đúng thì trả về email để đăng nhập
 Supabase như thường, sai tên hay sai mật khẩu đều chỉ báo chung "sai tên đăng nhập hoặc mật khẩu" (người lạ không lấy được email
-từ tên). Sai quá 10 lần / 15 phút thì khoá tên đó 15 phút. Tên đăng nhập cũng là **tên nhân vật** trong game (không có màn đặt tên;
+từ tên). Chống dò mật khẩu mà người lạ không khoá được tài khoản người khác: sai 10 lần / 15 phút với một tên từ một IP thì
+khoá tên đó với IP đó (kẻ dò tự khoá mình); một IP sai 30 lần / 15 phút (nhiều tên) thì khoá IP đó; một tên bị sai 30 lần / giờ
+từ mọi IP thì khoá tên đó (lưới cuối, vì IP trong header `x-forwarded-for` giả được). Khi tên bị khoá, chủ tài khoản vẫn vào được
+bằng **email + mật khẩu** (đi thẳng qua Supabase Auth, giới hạn theo IP thật) hoặc Quên mật khẩu. Tên đăng nhập cũng là **tên nhân vật** trong game (không có màn đặt tên;
 đọc từ bảng `profiles` nên người chơi không tự đổi được; bản lưu có tên khác thì đổi theo tên đăng nhập).
 Tài khoản tạo trước khi có tên đăng nhập (hoặc tạo trong Dashboard) không có tên nên không đăng nhập được: xoá đi rồi đăng ký lại.
 
@@ -93,25 +97,77 @@ Authentication → Emails → **SMTP Settings** → Enable custom SMTP:
   `noreply@<tên miền>`.
 
 Sau đó: Authentication → **Rate Limits** → tăng "Rate limit for sending emails" (mặc định 30 mail/giờ khi dùng SMTP riêng).
-Mẫu email tiếng Việt: Authentication → Emails → Templates, dán [`confirm-signup.html`](supabase/email-templates/confirm-signup.html)
-(Confirm signup) và [`reset-password.html`](supabase/email-templates/reset-password.html) (Reset Password). Chỉ sửa được mẫu
-khi đã bật SMTP riêng; chưa có thì dùng mẫu mặc định (tiếng Anh, cũng là link) vẫn chạy được.
+Mẫu email tiếng Việt (gửi **mã 6 số** `{{ .Token }}`, không có link): Authentication → Emails → Templates, dán
+[`confirm-signup.html`](supabase/email-templates/confirm-signup.html) (Confirm signup),
+[`reset-password.html`](supabase/email-templates/reset-password.html) (Reset Password) và
+[`device-code.html`](supabase/email-templates/device-code.html) (Magic Link). **Bắt buộc**: mẫu mặc định của Supabase chỉ có
+link, không có mã, game không có ô nào để dùng link đó. Chỉ sửa được mẫu khi đã bật SMTP riêng. Độ dài mã: Authentication →
+Providers → Email → "Email OTP Length" phải là **6** (game có 6 ô).
+
+### Chặn email rác
+
+Đăng ký bằng email tạm thời / dùng một lần (mailinator, 10minutemail, yopmail, temp-mail...) thì game báo **"Email không hợp
+lệ."** Danh sách tên miền nằm trong bảng `blocked_email_domains` (`supabase/usernames.sql`, có sẵn khoảng 100 tên miền phổ
+biến), chặn cả tên miền con. Máy chủ chặn ngay khi tạo tài khoản (trigger trên `auth.users`, gọi thẳng Supabase Auth cũng không
+lách được); game hỏi trước (`email_allowed`) để báo đúng câu. Tài khoản đã có từ trước không bị ảnh hưởng. Thêm / bỏ trong SQL
+Editor, không cần build lại game:
+
+```sql
+insert into public.blocked_email_domains (domain) values ('ten-mien-rac.com') on conflict do nothing;
+delete from public.blocked_email_domains where domain = 'ten-mien-rac.com';
+```
+
+### Xác nhận thiết bị mới (mã qua email)
+
+Lần đầu đăng nhập trên một thiết bị (trình duyệt), game gửi **mã 6 số** tới email của tài khoản; nhập đúng thì thiết bị đó
+được nhớ, lần sau không hỏi nữa. Máy chủ chặn theo phiên đăng nhập (`supabase/schema.sql`: `session_trusted`): phiên chưa xác
+nhận thì không đọc / ghi bản lưu, không giao dịch, không giành quyền chơi, không vào kênh Realtime. Nên người biết mật khẩu
+(kể cả biết email) mà không vào được hộp thư thì cũng không làm gì được; chủ tài khoản nhận mã lạ là biết có người dò được mật
+khẩu. Nhập mã xác nhận đăng ký / đặt lại mật khẩu cũng tính là đã xác nhận thiết bị (không phải nhập mã thêm).
+
+**Mặc định TẮT.** Cần gửi được mail tới mọi người chơi (dịch vụ có sẵn của Supabase chỉ gửi tới thành viên project), nên bật
+theo thứ tự:
+1. SMTP riêng: **Gmail là đủ, không cần tên miền** (mục *Gửi email (SMTP)* ở trên).
+2. Authentication → Emails → Templates → **Magic Link**: dán [`device-code.html`](supabase/email-templates/device-code.html)
+   (mẫu có mã `{{ .Token }}`; mẫu mặc định chỉ có link, game không dùng được).
+3. Authentication → URL Configuration: **Site URL** = `https://pokemonaurora.vercel.app`, thêm vào **Redirect URLs**.
+4. Thử: đăng ký một tài khoản bằng email ngoài project, nhận được mail.
+5. SQL Editor: `update public.app_settings set value = 'true' where key = 'require_device_verification';`
+   (SMTP hỏng, người chơi không nhận được mã thì đổi lại `'false'` để mở cho mọi người vào tạm).
+
+Xem thiết bị đã nhớ: bảng `trusted_devices` (chỉ giữ SHA-256 của mã thiết bị). Xoá dòng của một tài khoản = bắt xác nhận lại
+trên mọi thiết bị (vd sau khi đổi mật khẩu vì bị lộ). Xoá dữ liệu trình duyệt thì thiết bị đó phải xác nhận lại.
 
 ### Bảo mật, chống gian lận, giữ project hoạt động
 
 - **Khoá:** khoá anon / publishable nằm trong code game là bình thường (ai mở trang cũng thấy), an toàn nhờ RLS: mỗi người chỉ
   đọc / ghi được dữ liệu của mình, mọi thay đổi giao dịch đi qua hàm SQL tự kiểm tra. Mật khẩu do Supabase băm (bcrypt), game
   không giữ. Khoá secret / service_role không bao giờ có trong game; `.env.local` không lên git.
+- **Content-Security-Policy** (bản build, thẻ meta do `vite.config.js` chèn): chỉ chạy script của game, chỉ kết nối tới
+  Supabase của dự án. Lỡ có chỗ chèn được HTML / script lạ thì cũng không chạy được script ngoài, không gửi phiên đăng nhập đi
+  nơi khác. Bản dev không gắn; thử khi chạy dev: `CSP_DEV=1 npm run dev` (vi phạm hiện trong Console của trình duyệt).
 - **Chống gian lận** (`supabase/anticheat.sql`): mỗi lần bản lưu được gửi lên, máy chủ kiểm tra. Dữ liệu không thể có (loài lạ,
-  cấp ngoài 1–100, IV / EV quá giới hạn, đồ quá 999, đội quá 6...) thì **không ghi** (giữ bản cũ trên mạng). Đáng ngờ (chỉ số
-  không khớp công thức của game, tiền / số Pokémon / cấp / shiny tăng vọt so với thời gian chơi thêm; tiền và Pokémon nhận qua
-  giao dịch được trừ ra) thì vẫn ghi nhưng **khoá giao dịch** tài khoản. Nhật ký: bảng `save_flags`; mở khoá:
+  cấp ngoài 1–100, thiếu IV / IV / EV quá giới hạn, thiếu HP, đồ quá 999, đội quá 6, Pokémon cầm đồ game không có / vật phẩm
+  quan trọng / TM...) thì **không ghi** (giữ bản cũ trên mạng). Đáng ngờ (chỉ số thiếu / không khớp công thức của game, tài sản —
+  tiền + giá mua của đồ trong túi và đồ Pokémon đang cầm — / số Pokémon / cấp
+  / shiny / Master Ball tăng vọt so với thời gian chơi thêm; đã nhận giao dịch mà vẫn giữ Pokémon / tiền / đồ đã đưa đi) thì
+  vẫn ghi nhưng **khoá giao dịch** tài khoản. Tiền và đồ tính chung nên mua / bán ở Poké Mart không bị tính là tăng vọt.
+  "Tăng vọt" so với một mốc giữ 10 phút (bảng
+  `save_baseline`), thời gian chơi thêm tính theo đồng hồ máy chủ. Thêm **mốc ngày** dời mỗi 24 giờ: tài sản tăng quá **1.000.000₽ trong
+  một mốc ngày** cũng là đáng ngờ (`wealth_day`), nên cộng lén từng chút mỗi 10 phút không lọt quá 1 triệu một ngày (người chơi thật
+  kiếm nhiều nhất khoảng 660.000₽ / ngày; tiền nhận qua giao dịch không tính); người chơi không xoá được bản lưu, bản lưu đầu tiên so với
+  bản rỗng. Nhật ký: bảng `save_flags`; mở khoá:
   `update public.player_status set trade_blocked = false where user_id = '<uuid>';`. Tài khoản dùng cheat "Chung" sẽ bị khoá giao dịch.
   Không chặn được 100%: muốn chặn hẳn thì trận đấu / bắt Pokémon phải chạy trên máy chủ.
 - **Realtime riêng tư** (`supabase/realtime.sql`): chỉ người đã đăng nhập vào được kênh bản đồ, chỉ hai người trong giao dịch
   vào được kênh giao dịch. Tin nhắn Realtime được gom: đứng một mình trên bản đồ thì không gửi tin bước đi, có người khác thì
   mỗi người đang đi gửi tối đa ~2 tin / giây, mỗi tin kèm các ô vừa đi qua để bên nhận đi lại đúng đường (người khác thấy mình
   đi chậm hơn thực tế khoảng nửa giây). Gói miễn phí giới hạn số tin mỗi tháng / mỗi giây, và mỗi người nhận tính một tin.
+  Supabase Realtime không cho máy chủ kiểm tra từng tin, nên những gì người khác gửi đều coi là giả được: **tên** người khác
+  lấy từ máy chủ (`player_names`, `src/online/playerNames.js`), **lời mời giao dịch** chỉ hiện khi đối chiếu đúng dòng giao
+  dịch trên máy chủ (`verifyInvite`), tin bước đi / Pokémon đi theo được làm sạch trước khi dùng (`src/game/remotePlayer.js`).
+  Còn lại: người gian lận vẫn làm nhân vật của người khác "nhảy chỗ" trên màn hình người thứ ba (chỉ là hình, không ảnh hưởng
+  dữ liệu); chặn hẳn phải chuyển tin bước đi sang gửi qua máy chủ.
 - **Giữ project không bị tạm dừng** (gói miễn phí tạm dừng sau 7 ngày không hoạt động): GitHub Action
   [`.github/workflows/supabase-keepalive.yml`](.github/workflows/supabase-keepalive.yml) cứ 3 ngày gọi Supabase một lần. Cần thêm
   2 secret trong GitHub (Settings → Secrets and variables → Actions): `SUPABASE_URL`, `SUPABASE_ANON_KEY`.
@@ -126,8 +182,9 @@ trên đường dẫn bị xoá khỏi nội dung trước khi gửi.
 - **Xem lỗi:** Dashboard → Table Editor → `client_errors`, hoặc SQL Editor: `select * from public.client_errors_summary;`
   (gộp theo nội dung: số lần, số người gặp, lần cuối, stack). Người chơi chỉ gửi được, không ai đọc được qua API.
 - **Chống spam:** mỗi phiên chơi gửi tối đa 10 lỗi khác nhau; máy chủ gộp lỗi lặp lại (cùng người, cùng nội dung trong 1 giờ chỉ
-  tăng số lần), mỗi người tối đa 30 dòng / giờ, người chưa đăng nhập chung nhau 200 dòng / giờ, cả bảng 2.000 dòng / giờ; lỗi
-  cũ hơn 30 ngày tự xoá.
+  tăng số lần), mỗi người tối đa 30 dòng / giờ, người đã đăng nhập chung nhau 2.000 dòng / giờ; người chưa đăng nhập mỗi IP 10
+  dòng / giờ, chung nhau 200 dòng / giờ (tính riêng nên khách spam không chặn được lỗi của người đang chơi; IP chỉ lưu dạng băm,
+  chỉ cho khách); lỗi cũ hơn 30 ngày tự xoá.
 
 ### Kiểm thử
 
@@ -165,14 +222,24 @@ Trao đổi **Pokémon, vật phẩm (kể cả quả mọng) và tiền** với
   `trade_open`, game báo còn chờ bao nhiêu giây).
 - **Bảng giao dịch** (`src/ui/TradePanel.js`, HTML nổi lên trên game, không phủ tối màn hình: cột đội hình, cột nút, đồng hồ,
   bảng Pokémon trong khu, thanh phím tắt vẫn hiện): cột trái là đồ mình đưa, cột phải là đồ bên kia đưa.
+  **Mỗi bên tối đa 6 dòng mỗi lượt**: mỗi Pokémon một dòng, mỗi loại vật phẩm một dòng, tiền không tính dòng (vd 5 Pokémon + 1 loại
+  vật phẩm, hoặc 6 loại vật phẩm); mỗi loại vật phẩm đưa tối đa 999. Chỉ đưa tiền (mua đồ / Pokémon của người khác), một bên không
+  đưa gì, hay cả hai cùng đưa tiền đều hợp lệ; **cả hai không đưa gì** mà bấm Giao dịch thì không có giao dịch nào (báo "Hai bên
+  đều không đưa gì nên không có giao dịch."). Máy chủ chặn y như vậy (`supabase/trades.sql`).
   Bấm Pokémon trong đội để đưa / bỏ: **tối đa 5 con mỗi lần, luôn chừa lại ít nhất 1 con trong đội**; Pokémon huyền thoại /
-  huyền ảo (Articuno, Zapdos, Moltres, Mewtwo, Mew) và vật phẩm quan trọng không đưa được. Vật phẩm chọn trong danh sách
-  kèm số lượng, tiền gõ số. Thấy được tên, cấp, loài, tính cách, đồ cầm của Pokémon bên kia đưa, và báo nếu nó sẽ tiến hoá.
+  huyền ảo (Articuno, Zapdos, Moltres, Mewtwo, Mew) và vật phẩm quan trọng không đưa được; Pokémon cầm đồ không hợp lệ (đồ game không có / vật phẩm quan trọng / TM, chỉ có
+  khi bản lưu bị sửa) cũng không đưa được, báo "…: đồ đang cầm không được phép giao dịch." (máy chủ chặn theo bản lưu). Vật phẩm: **kéo từ ô Túi đồ
+  vào ô Vật phẩm** (máy tính) hoặc bấm / chạm để thêm (mỗi lần thêm số lượng trong ô bên cạnh); vật phẩm quan trọng hiện mờ, kéo /
+  bấm vào thì báo "…: vật phẩm không được phép giao dịch." (máy chủ cũng chặn, cùng câu báo). Tiền gõ số. Thấy được tên, cấp, loài, tính cách, đồ cầm của Pokémon bên kia đưa, và báo nếu nó sẽ tiến hoá.
 - **Chốt hai bước:** mỗi bên bấm **Đồng ý** → cột của bên đó chuyển **xanh lá**; cả hai đã Đồng ý thì nút đổi thành
   **Giao dịch**; cả hai bấm Giao dịch thì giao dịch thành công. Ai đổi đề nghị thì cả hai phải Đồng ý lại; Đồng ý luôn kèm
   đúng đề nghị của bên kia đang thấy (không bị lừa đổi đồ phút cuối). **Huỷ giữa chừng không ai mất gì.** Máy chủ kiểm tra
   lại cả hai bên theo bản lưu trên mạng (huy hiệu, Pokémon còn trong đội, đủ đồ, đủ tiền) rồi mới chốt; Pokémon nhận được
   lấy đúng từ bản lưu bên kia.
+- **Không nhận hết được thì tự huỷ:** túi mỗi loại chỉ chứa 999 (tiền tối đa 999.999.999₽). Một bên mà nhận thêm sẽ vượt
+  (vd đang có 999 Oran Berry, bên kia đưa 20 Oran Berry) thì lúc bấm Đồng ý giao dịch **tự huỷ**, cả hai bên thấy lý do
+  ("An không nhận thêm được 20 Oran Berry: túi chỉ chứa tối đa 999 mỗi loại (đang có 999). Giao dịch đã huỷ, không ai mất
+  gì."). Máy chủ cũng kiểm tra lúc Đồng ý và lúc chốt (`trade_receive_problem`), nên không bao giờ chốt một giao dịch làm mất đồ.
 - **Nhận đồ:** Pokémon nhận được vào đội (đầy thì vào hộp PC), ghi vào Pokédex. Văng game / mất mạng sau khi đã chốt: lần sau
   vào game nhận nốt; mỗi giao dịch chỉ nhận một lần (`tradesDone` trong bản lưu).
 - **Tiến hoá khi trao đổi:** Kadabra → Alakazam, Machoke → Machamp, Graveler → Golem, Haunter → Gengar: nhận được qua giao
@@ -513,7 +580,7 @@ Trong sảnh Liên minh có Y tá Joy và cửa hàng. Qua cánh cửa lớn là
 | 5 | Nhà vô địch Khôi | Nhiều hệ, 6 Pokémon |
 
 Thắng mỗi trận thì cửa phong ấn phía sau mở ra. Thua là tỉnh dậy ở sảnh và phải đấu lại từ phòng đầu.
-Thắng Nhà vô địch thì đội hình được ghi vào **Điện vinh danh**; sau đó vẫn thách đấu lại được.
+Thắng Nhà vô địch thì đội hình được ghi vào **Điện vinh danh**. **Đã vô địch thì không thách đấu lại được nữa**: bước vào cửa ở sảnh thì người gác cửa chặn lại (`leagueBlocker`).
 Bản đồ ở `src/data/mapsChapter5.js`, nhân vật và mục tiêu ở `src/story/league.js`.
 
 ## Hậu truyện: sau khi thành Nhà vô địch
@@ -689,13 +756,16 @@ Quay lại / huỷ, Đội hình, Túi đồ, Pokédex, Thẻ HLV, Bản đồ v
 Bố cục màn hình trên bản đồ:
 - **Góc trái trên:** **cột đội hình** kiểu game MMO: mỗi Pokémon một hàng dạng viên thuốc tối, chân dung tròn bên trái có **vòng HP
   bọc quanh** (xanh / vàng / đỏ, tụt dần theo máu), ký hiệu giới tính + cấp dưới chân dung; bên phải là tên (chữ **S** vàng nếu
-  shiny), thanh HP và thanh EXP mảnh, icon đồ đang cầm ở góc, viên trạng thái xấu cạnh tên; kiệt sức thì cả hàng xám. Rê chuột hiện
+  shiny), thanh HP và thanh EXP mảnh, **dấu đồ cầm** (ô vàng có vạch đỏ ở giữa, `src/ui/heldMark.js`) ở góc trên phải nếu
+  Pokémon đang cầm đồ, viên trạng thái xấu cạnh tên; kiệt sức thì cả hàng xám. Rê chuột hiện
   % HP và đồ đang cầm; **bấm vào là mở thẳng màn chi tiết** Pokémon đó; **kéo thả** một hàng lên hàng khác để đổi chỗ trong đội
   (`src/ui/PartyPanel.js`).
-- **Góc phải trên:** giờ, buổi trong ngày, tên bản đồ; ngay dưới là bảng **mọi Pokémon hoang dã của bản đồ**, chia hai nhóm
-  **Trên cạn** (mọi bãi cỏ; trong hang là Pokémon của hang đó, chỉ hiện khi đã vào hang) và **Dưới nước** (lướt nước + mọi loại
-  cần câu). Chưa gặp thì bóng đen "?", đã gặp thì hiện hình, đã bắt thì hiện hình kèm Poké Ball nhỏ ở góc dưới phải. Rê chuột
-  vào một Pokémon thì hiện tên, khoảng cấp và buổi xuất hiện ("???" nếu chưa gặp). Thu gọn được (▶).
+- **Góc phải trên:** giờ, buổi trong ngày, tên bản đồ; ngay dưới là bảng **"Pokémon ở <bản đồ>"** (`src/ui/AreaNav.js`): mọi
+  Pokémon hoang dã của bản đồ, 5 con một hàng, mỗi con đứng trên một bục bầu dục (xanh lá: bãi cỏ, nâu: hang, xanh dương: lướt
+  nước / câu cá). Chưa gặp thì biển "?" xám, đã gặp thì hiện hình, đã bắt thì thêm Poké Ball nhỏ ở góc dưới trái bục; loài có
+  thể **cầm đồ khi gặp ngoài tự nhiên** thì có dấu đồ cầm ở góc dưới phải. Rê chuột vào một Pokémon thì hiện tên, khoảng cấp
+  và buổi xuất hiện ("???" nếu chưa gặp). Ô **Tên bản đồ** ở đáy bảng: gõ tên (không cần dấu) để xem trước Pokémon của bản đồ
+  khác, ✕ để quay lại bản đồ đang đứng. Thu gọn bằng nút ▶ ở mép trái.
 - **Bên trái, trên thanh phím tắt:** cột nút tròn có nhãn Túi đồ / Pokédex / **Thẻ HLV** / Cài đặt (Đội hình mở bằng cột
   Pokémon góc trái trên hoặc phím M; Bản đồ vùng và Phím tắt nằm trong Cài đặt). Nút **≡** ở góc dưới trái ẩn / hiện cột nút
   (nhớ cho lần sau).
@@ -749,11 +819,21 @@ vượt đội:
 | Cần câu tốt | Ông Câu Suối, bờ suối Tuyến đường 9 | Tặng người đi được tới rừng tre |
 | Cần câu siêu | Lão Ngư Hồ Lạnh, bờ tây Hồ Lạnh (Tuyến đường 10) | Có cần câu tốt thì lão kể chuyện Gyarados chúa giật đứt dây, kéo lão ngã xuống hồ băng; nhờ hạ nó (Gyarados Lv 46, bắt được). Thắng hoặc bắt được thì lão tặng cần câu siêu; thua / bỏ chạy thì thử lại sau |
 
-- **Túi đồ** (B) chia 5 ngăn như game gốc: **Hồi phục / Bóng / Quả mọng / Vật phẩm / Quan trọng** (tab phía trên, bấm tab hoặc ← →
-  để đổi ngăn), danh sách dài thì **cuộn bằng con lăn chuột**. Mô tả vật phẩm chỉ hiện khi rê chuột (hoặc di phím) tới vật phẩm,
-  trong khung nhỏ bên phải túi.
+- **Túi đồ** (B, `src/ui/BagPanel.js`): khung màu than chì, đầu khung có icon ba lô + tên ngăn đang mở, ô tìm kiếm nhỏ (nút ✕
+  xoá chữ) và nút ✕ đóng túi. Dải tab dọc **bên trái chỉ có icon** (rê chuột hiện tên ngăn, Tab / PageUp / PageDown để đổi ngăn),
+  vật phẩm xếp thành lưới ô nhỏ (icon, tên, "x5"), danh sách dài thì **cuộn bằng con lăn chuột**. Mô tả vật phẩm chỉ hiện khi rê
+  chuột (hoặc di phím) tới vật phẩm.
+- **Pokémon hoang dã cầm đồ** (`src/data/wildHeld.js`): một số loài khi gặp ngoài tự nhiên (bãi cỏ, lướt nước, câu cá) có tỉ lệ
+  đang cầm sẵn một món đồ (vd Snorlax 50% Leftovers, Farfetch'd 20% Sharp Beak, nhiều loài 5% đồ tăng sức hệ). Bắt được thì
+  Pokémon giữ nguyên món đồ đó.
 
-- **Pokémon đầu đội đi theo bạn** trên bản đồ, quay mặt trước / lưng / nghiêng theo hướng đi.
+- **Pokémon đầu đội đi theo bạn** trên bản đồ, quay mặt trước / lưng / nghiêng theo hướng đi. Nhân vật hiện ở cỡ 0.85 (cao ~1.3 ô) và Pokémon đi theo nhỏ
+  bằng 3/4 cỡ cũ (`src/gfx/player.js`: `CHAR_SCALE`, `FOLLOWER_SCALE`).
+- **Phòng thí nghiệm Pallet** to hơn nhà dân (7x5 ô, mái ngói vàng đất khung kim loại, tường đá, cửa gỗ ô kính; `gfx/world.js`:
+  `drawLab`). Bên trong (14x12): máy hồi phục lục giác lớn, kệ máy móc sát tường, bàn mặt vàng đặt 3 Poké Ball trên thảm xanh,
+  bục nhỏ đặt bóng Pikachu sau lưng Giáo sư Oak, 4 buồng chăm sóc ở cuối phòng.
+- **Pokémon Center** (16x12): quầy chữ U đỏ, máy hồi phục đứng sau quầy, TV, thang cuốn hai bên (trang trí), máy PC, logo tròn
+  trên sàn, hai góc dưới vát chéo. Đồ đạc lớn nhiều ô vẽ theo `props` của bản đồ (`src/gfx/props.js`, ô chân đồ đạc là `g`).
 - **Đội hình** (M): bấm (hoặc Enter) vào một Pokémon là mở thẳng **màn chi tiết**. **Kéo thả** một Pokémon lên Pokémon khác
   (chuột / cảm ứng; con được kéo nổi theo con trỏ, con sắp bị đổi sáng viền xanh) là đổi chỗ. Con đứng đầu là con đi theo bạn
   và ra trận trước (nếu đã gục thì con còn đứng đầu tiên ra trận). Đóng màn chi tiết / đổi chỗ xong thì bảng mở lại ở đúng con đó.

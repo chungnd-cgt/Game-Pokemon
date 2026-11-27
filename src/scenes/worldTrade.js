@@ -6,7 +6,7 @@ import { TRADE_MIN_BADGES, applyTrade, canTrade } from '../game/trade.js';
 import { upload } from '../online/cloudSave.js';
 import { supabase } from '../online/supabase.js';
 import {
-  INVITE_TIMEOUT, acceptTrade, cancelTrade, markApplied, openTrade, pendingTrades, waitAccepted,
+  INVITE_TIMEOUT, acceptTrade, cancelTrade, markApplied, openTrade, pendingTrades, verifyInvite, waitAccepted,
 } from '../online/trade.js';
 import { TradePanel, TradeRequests } from '../ui/TradePanel.js';
 
@@ -68,9 +68,14 @@ export async function requestTrade(world, other) {
 }
 
 // Có người mời mình (online/presence.js): popup Đồng ý / Từ chối
-export function onTradeRequest(world, req) {
+export async function onTradeRequest(world, raw) {
   const t = world.trade;
   if (!t?.requests) return;
+  // Lời mời đến qua kênh bản đồ do máy người mời tự gửi (giả được: mạo danh người khác). Chỉ hiện khi đúng là có giao dịch
+  // đó trên máy chủ, người mời đúng là người gửi, mình là người được mời; tên lấy từ máy chủ (online/trade.js verifyInvite)
+  const verified = await verifyInvite(raw.id, raw.from?.id, userId(world));
+  if (!verified || !world.trade?.requests) return;
+  const req = { ...raw, from: { ...raw.from, name: verified.name } };
   t.requests.add(req.from, {
     timeout: INVITE_TIMEOUT,
     onDecline: () => cancelTrade(req.id),

@@ -13,8 +13,8 @@ import { typeBadge } from './TypeBadge.js';
 //    đội hình (lưới hình 2 cột x 3, gục thì xám, không có ô chi tiết), túi đồ (một cột, thanh cuộn, rê vào không hiện chữ)
 //  - Phải dưới (COMMANDS): 4 nút lệnh, mặc định xám; nút đang trỏ / đang chọn sáng màu riêng
 //  Thanh tiêu đề "Người chơi VS. Đối thủ" kéo để dời cửa sổ.
-// Đang mở danh sách mà bấm nút lệnh khác thì chuyển sang danh sách đó; bấm lại nút đang mở thì đóng danh sách.
-// Bấm ra ngoài, Esc, chuột phải đều không đóng danh sách: chỉ đóng bằng cách bấm lại nút lệnh đó.
+// Đang mở danh sách mà bấm nút lệnh khác thì chuyển sang danh sách đó; bấm lại nút đang mở (vd bấm 2 lần) thì không làm gì,
+// danh sách vẫn mở. Bấm ra ngoài, Esc, chuột phải cũng không đóng danh sách: chỉ đổi sang lệnh khác.
 
 export const CONTENT = { x: 972, y: 0, w: 300, h: 476 };
 export const COMMANDS = { x: 972, y: 488, width: 300, height: 224 };
@@ -235,7 +235,8 @@ export class CommandTray {
           this.select(i);
           this.confirm();
         } else if (this.mode === 'sub') {
-          // Đang mở danh sách: đóng nó rồi mở lệnh vừa bấm (bấm lại chính nút đó thì chỉ đóng)
+          // Đang mở danh sách: đóng nó rồi mở lệnh vừa bấm. Bấm lại chính nút đang mở (bấm 2 lần): giữ nguyên, không đóng
+          if (this.items[this.index]?.value === item.value) return;
           this.pending = item.value;
           this.cancelSub?.();
         }
@@ -328,6 +329,22 @@ export class CommandTray {
     const resolve = this.resolve;
     this.resolve = null;
     resolve?.(this.items[this.index].value);
+  }
+
+  // Lệnh từ ngoài khung trận (dùng vật phẩm từ cửa sổ túi đồ của bản đồ: value = { bagItem }), nút Túi đồ sáng lên:
+  // đang chờ chọn lệnh thì chọn luôn; đang mở danh sách / đang báo lỗi thì đóng danh sách rồi chạy lệnh này (pickAction)
+  inject(value) {
+    if (this.mode === 'choose') {
+      this.index = this.items.findIndex((it) => it.value === 'bag');
+      this.router.clear();
+      this.setMode('sub');
+      const resolve = this.resolve;
+      this.resolve = null;
+      resolve?.(value);
+      return;
+    }
+    this.pending = value;
+    this.cancelSub?.();
   }
 
   idle() {

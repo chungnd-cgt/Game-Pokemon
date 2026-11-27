@@ -22,8 +22,8 @@ import { FloatWindow } from './Windows.js';
 // đội hình riêng: dùng luôn cột đội hình góc trái trên của bản đồ (ui/PartyPanel.js, opts.party).
 //  - Kéo thả Pokémon giữa hộp và cột đội hình: thả lên con khác là đổi chỗ, thả vào ô trống là chuyển sang
 //  - Kéo vào thùng rác là thả Pokémon (hỏi lại, mặc định "Không"); báo ở tab Hệ thống (kèm đồ đang cầm được trả vào túi)
-//  - Bàn phím: mũi tên di con trỏ (← ở cột đầu sang cột đội hình), Enter nhấc / đặt Pokémon, Esc huỷ nhấc / đóng máy
-//  - ✕ / phím quay lại (không đang nhấc Pokémon) là đóng
+//  - Bàn phím: mũi tên di con trỏ (← ở cột đầu sang cột đội hình), Enter nhấc / đặt Pokémon, Esc huỷ nhấc
+//  - Chỉ đóng bằng nút ✕ (Esc không đóng)
 // Logic đổi chỗ / thả nằm trong game/storage.js
 
 const HEAD = 40; // dải tiêu đề (kéo để dời cửa sổ)
@@ -468,12 +468,11 @@ export class PcBox {
 
   onKey(e) {
     if (this.locked || this.press) return;
+    // Phím quay lại chỉ thả Pokémon đang cầm; hộp PC chỉ đóng bằng nút ✕
     if (isCancel(e)) {
       if (this.held) {
         this.held = null;
         this.render();
-      } else {
-        this.close();
       }
       return;
     }

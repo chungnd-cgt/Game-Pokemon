@@ -1,11 +1,11 @@
-import { LEAGUE_DX } from '../data/mapsChapter5.js';
 import { SPECIES } from '../data/monsters.js';
 import { DEX_BY_SLUG } from '../data/pokedex.js';
 import { hasFlag, playerName, setFlag, state } from '../game/state.js';
 
 // Liên minh vùng Sơn Thủy: Tứ Thiên Vương (Lan hệ Độc, Võ hệ Giác đấu, Huyền hệ Ma, Long hệ Rồng) và Nhà vô địch Khôi.
 // Đánh lần lượt từng phòng, thắng thì cửa phong ấn mở sang phòng sau (cờ league:e1..e4).
-// Mỗi lần bước vào phòng đầu tiên là bắt đầu lại từ đầu (resetLeague).
+// Mỗi lần bước vào phòng đầu tiên là bắt đầu lại từ đầu (resetLeague): thua trận nào cũng phải đánh lại từ Thiên Vương đầu.
+// Đã vô địch thì không thách đấu lại được nữa (leagueBlocker chặn cửa vào ở sảnh).
 
 export const F_CHAMPION = 'champion';
 export const F_STARTER_GIFT = 'postgameStarters'; // đã nhận các Pokémon khởi đầu còn lại từ Giáo sư Oak (story/postgame.js)
@@ -77,7 +77,7 @@ export function resetLeague() {
 }
 
 const eliteNpc = ({ n, id, name, sprite, map, team, intro, lose, after }) => ({
-  id, sprite, name, map, x: 6 + LEAGUE_DX, y: 3, facing: 'down', fixed: true, sight: 0,
+  id, sprite, name, map, x: 6, y: 3, facing: 'down', fixed: true, sight: 0,
   team, prize: 120, noRematch: true, elite: true, intro, lose, after,
   async onDefeat(world) {
     setFlag(`league:e${n}`);
@@ -90,7 +90,7 @@ const eliteNpc = ({ n, id, name, sprite, map, team, intro, lose, after }) => ({
 export const LEAGUE_NPCS = [
   ...ELITES.map(eliteNpc),
   {
-    ...CHAMPION, x: 6 + LEAGUE_DX, y: 3, facing: 'down', fixed: true, sight: 0, prize: 200, noRematch: true, elite: true,
+    ...CHAMPION, x: 6, y: 3, facing: 'down', fixed: true, sight: 0, prize: 200, noRematch: true, elite: true,
     intro: 'Cuối cùng cũng có người tới được đây. Tôi là Khôi, Nhà vô địch vùng Sơn Thủy. Tôi đã đi khắp vùng này, từ ruộng lúa tới đỉnh tuyết. Cho tôi xem hành trình của cậu đã tạo nên điều gì!',
     lose: 'Thì ra là vậy... Cậu mạnh thật. Từ hôm nay, cậu là Nhà vô địch mới!',
     after: 'Hãy luôn giữ trái tim của một nhà huấn luyện, Nhà vô địch ạ.',
@@ -106,14 +106,25 @@ export const LEAGUE_NPCS = [
     },
   },
   {
-    id: 'league-guard', sprite: 'npc-guide', name: 'Người gác cửa', map: 'leagueLobby', x: 8 + LEAGUE_DX, y: 2, facing: 'down', fixed: true,
-    lines: [
-      'Sau cánh cửa này là Tứ Thiên Vương và Nhà vô địch.',
-      'Một khi đã bước vào thì không quay lại được, phải thắng liền cả năm trận. Thua là phải bắt đầu lại từ đầu!',
-      'Hãy hồi phục Pokémon và chuẩn bị thật kỹ.',
-    ],
+    id: 'league-guard', sprite: 'npc-guide', name: 'Người gác cửa', map: 'leagueLobby', x: 8, y: 2, facing: 'down', fixed: true,
+    async onTalk(world) {
+      await world.say('Người gác cửa', hasFlag(F_CHAMPION) ? LEAGUE_CLOSED_LINES : [
+        'Sau cánh cửa này là Tứ Thiên Vương và Nhà vô địch.',
+        'Một khi đã bước vào thì không quay lại được, phải thắng liền cả năm trận. Thua là phải bắt đầu lại từ đầu!',
+        'Hãy hồi phục Pokémon và chuẩn bị thật kỹ.',
+      ]);
+    },
   },
 ];
+
+const LEAGUE_CLOSED_LINES = ['Bạn đã là Nhà vô địch vùng Sơn Thủy rồi!', 'Không thể thách đấu lại nữa.'];
+
+// Bước vào cửa thử thách ở sảnh (ô chuyển bản đồ có resetLeague) khi đã vô địch: người gác cửa chặn lại.
+// Trả về sự kiện (hàm async) để chặn bước đi, hoặc null
+export function leagueBlocker(world, x, y) {
+  if (!hasFlag(F_CHAMPION) || !world.map.warpAt?.(x, y)?.resetLeague) return null;
+  return () => world.say('Người gác cửa', LEAGUE_CLOSED_LINES);
+}
 
 // Mục tiêu sau khi đủ 8 huy hiệu
 export function leagueObjective() {

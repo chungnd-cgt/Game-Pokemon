@@ -4,6 +4,7 @@ import { expProgress } from '../game/monster.js';
 import { PARTY_SIZE, state } from '../game/state.js';
 import { fitScale, pixelMon } from '../gfx/textures.js';
 import { GENDER, cssColor, fitText, fixToCamera, hpColor, hudScale, textStyle } from './helpers.js';
+import { heldMark } from './heldMark.js';
 import { withShinyMark } from './shinyMark.js';
 
 const DEPTH = 100;
@@ -18,7 +19,7 @@ const DRAG_START = 8; // kéo quá chừng này px mới tính là kéo thả (�
 
 // Cột đội hình góc trái trên (kiểu game MMO): mỗi Pokémon một hàng dạng viên thuốc tối: chân dung tròn bên trái có **vòng HP
 // bọc quanh** (xanh / vàng / đỏ, tụt dần theo máu), ký hiệu giới tính + cấp dưới chân dung; bên phải là tên (chữ S vàng nếu
-// shiny), thanh HP và thanh EXP mảnh; đồ đang cầm hiện icon nhỏ góc phải, trạng thái xấu là viên màu cạnh tên; kiệt sức thì
+// shiny), thanh HP và thanh EXP mảnh; đang cầm đồ thì có dấu thẻ vàng vạch đỏ nhỏ góc phải (ui/heldMark.js), trạng thái xấu là viên màu cạnh tên; kiệt sức thì
 // cả hàng xám đi. Rê chuột: sáng viền, hiện % HP. Bấm: mở thẳng màn chi tiết Pokémon. Kéo thả hàng này lên hàng khác: đổi chỗ.
 // Cỡ giao diện (helpers.js hudScale): vẽ theo toạ độ ảo, container phóng to theo hệ số
 // Màn khác mượn cột (hộp PC: kéo thả giữa hộp và đội hình): đặt hooks = { hover(i), down(i, p) } thì rê chuột / nhấn vào
@@ -206,10 +207,10 @@ export class PartyPanel {
     const name = scene.add.text(nx, top + 5, mon.name, textStyle(14, fainted ? '#9aa0ae' : '#ffffff', { fontStyle: 'bold' }));
     c.add(name);
     let right = left + ROW_W - 14;
+    // Đang cầm đồ: dấu thẻ vàng vạch đỏ (ui/heldMark.js) ở góc phải trên; tên món hiện khi rê chuột / trong màn chi tiết
     if (mon.heldItem && ITEMS[mon.heldItem]) {
-      const ic = ITEMS[mon.heldItem].icon;
-      c.add(scene.add.image(right - 6, top + 12, ic).setScale(fitScale(scene, ic, 14)));
-      right -= 16;
+      c.add(heldMark(scene, right - 4, top + 12, 9));
+      right -= 14;
     }
     const info = fainted ? null : STATUS_INFO[mon.status];
     if (info) {

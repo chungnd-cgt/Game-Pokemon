@@ -41,7 +41,22 @@ export const openTrade = (partnerId, myName) => rpc('trade_open', { p_partner: p
 // Người được mời đồng ý. Lời mời khác đang chờ mình (và giao dịch đang mở khác của mình) bị huỷ
 export const acceptTrade = (id, myName) => rpc('trade_accept', { p_id: id, p_name: myName });
 
-export const cancelTrade = (id) => rpc('trade_cancel', { p_id: id });
+// reason: lý do hiện cho bên kia (vd túi không chứa hết đồ), hoặc bỏ trống
+export const cancelTrade = (id, reason = null) => rpc('trade_cancel', { p_id: id, p_reason: reason });
+
+// Lời mời đến qua Realtime do máy người mời tự gửi (giả được). Đối chiếu với dòng trades trên máy chủ (chỉ hai người trong
+// cuộc đọc được): hợp lệ khi mình là người được mời, người mời đúng là fromId, giao dịch còn mở và chưa ai nhận.
+// Trả về { name } (tên người mời do máy chủ ghi: supabase/trades.sql trade_player_name), hoặc null
+export async function verifyInvite(id, fromId, meId) {
+  if (!id || !fromId || !meId) return null;
+  try {
+    const row = await readRow(id);
+    if (!row || row.a !== fromId || row.b !== meId || row.status !== 'open' || row.accepted) return null;
+    return { name: row.a_name || 'Người chơi' };
+  } catch {
+    return null;
+  }
+}
 
 // Người mời chờ trả lời: 'accepted' | 'cancelled' (bị từ chối / người kia đã nhận lời người khác) | 'timeout' | 'aborted'.
 // aborted(): người mời tự huỷ (bấm Huỷ lời mời)
@@ -75,6 +90,7 @@ export function sideOf(row, meId) {
   return {
     id: row.id,
     status: row.status,
+    cancelReason: row.cancel_reason ?? null, // lý do huỷ (máy chủ hoặc bên huỷ ghi), hiện cho cả hai bên
     partnerName: (isA ? row.b_name : row.a_name) || 'Người chơi',
     mine: isA ? row.offer_a : row.offer_b,
     theirs: isA ? row.offer_b : row.offer_a,
@@ -124,7 +140,8 @@ export class TradeSession {
     return this.call('trade_set_offer', { p_offer: offer });
   }
 
-  // Bước 1: Đồng ý với đề nghị của bên kia đúng như đang thấy
+  // Bước 1: Đồng ý với đề nghị của bên kia đúng như đang thấy. data: 'ok', hoặc 'cancelled' (máy chủ huỷ vì mình không
+  // nhận hết được đồ của bên kia, lý do trong cancelReason)
   ready(seen) {
     return this.call('trade_ready', { p_seen: seen });
   }
@@ -135,8 +152,8 @@ export class TradeSession {
     return this.call('trade_confirm', {});
   }
 
-  cancel() {
-    return this.call('trade_cancel', {});
+  cancel(reason = null) {
+    return this.call('trade_cancel', { p_reason: reason });
   }
 
   close() {

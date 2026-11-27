@@ -18,6 +18,7 @@
 //              D cửa lớn giữa các phòng Liên minh
 //              S cầu thang lên • s cầu thang xuống (nhà 2 tầng: bước lên là sang tầng kia, xem warps của bản đồ)
 //              [ ] ghế sofa (lưng tựa bên trái / bên phải, ngồi quay mặt vào giữa) • F tủ lạnh • w bàn học
+//              g chân đồ đạc lớn (vẽ theo map.props) • j bục đặt Poké Ball • n bàn gỗ mặt vàng • q ghế đẩu
 //  Trong hang: # vách hang • . nền hang (có Pokémon hoang dã) • o tảng đá • C cửa hang
 //              w nước ngầm (hồ / suối trong hang): đi bộ thì cản, lướt nước (Surf / Lapras) và câu cá được như ngoài trời
 //              (bảng Pokémon dưới nước: `water` của bản đồ hang)
@@ -168,6 +169,10 @@ export const INDOOR_TILES = {
   ']': { solid: true, sofa: 'left' },
   F: { solid: true },
   w: { solid: true },
+  g: { solid: true }, // chân đồ đạc lớn (map.props, gfx/props.js): cản đường, hình do props vẽ
+  j: { solid: true, counter: true }, // bục nhỏ đặt Poké Ball
+  n: { solid: true, counter: true }, // bàn gỗ mặt vàng
+  q: { solid: true }, // ghế đẩu
 };
 
 export const CAVE_TILES = {

@@ -1,5 +1,4 @@
 import { SPECIES } from './monsters.js';
-import { HOME_DX, roomy } from './indoorLayout.js';
 import { INDOOR_TILES } from './tiles.js';
 
 // Nhà dân vào được: mọi nhà trên bản đồ ngoài trời chưa có nội thất (type 'house', to: null) được dựng sẵn một căn phòng
@@ -22,21 +21,21 @@ const STORY_DOORS = new Set([
   'village1:19,15', 'village2:11,7', 'field2:4,5', 'village4:4,16', 'village5:4,16', 'village7:13,5',
 ]);
 
-// Ba kiểu phòng một tầng (theme 'home', gfx/interior.js): cửa ra (E) ở hàng dưới cùng, chỗ đứng của người ở.
-// Phòng 11 ô này là khu giữa, lúc dựng được nới thành nhà 35 x 15 (data/indoorLayout.js: roomy), chỗ đứng cộng HOME_DX
+// Ba kiểu phòng một tầng (theme 'home', gfx/interior.js): cửa ra (E, rộng 2 ô) ở hàng dưới cùng, chỗ đứng của người ở.
+// Phòng nhỏ nằm giữa màn hình, nền đen xung quanh (không nới rộng như phòng thí nghiệm / trung tâm thương mại)
 const TEMPLATES = [
   {
-    rows: ['###########', '###########', 'kk..VVVpFcc', '...........', '....ttt....', '....ttt....', '...........', 'p..E......p'],
+    rows: ['###########', '###########', 'kk..VVVpFcc', '...........', '....ttt....', '....ttt....', '...........', 'p..EE.....p'],
     rug: [3, 3, 7, 6], wallDecor: { 2: 'clock' }, tv: [4, 5, 6], spot: { x: 8, y: 4, facing: 'left' },
     extras: [{ x: 2, y: 4, facing: 'right' }, { x: 7, y: 6, facing: 'up' }], pet: { x: 7, y: 3 },
   },
   {
-    rows: ['###########', '###########', 'FcckVVV..pp', '...........', '...[ttt]...', '...[ttt]...', '...........', 'p..E......p'],
+    rows: ['###########', '###########', 'FcckVVV..pp', '...........', '...[ttt]...', '...[ttt]...', '...........', 'p..EE.....p'],
     rug: [2, 3, 8, 6], wallDecor: { 5: 'photo', 8: 'clock' }, tv: [4, 5, 6], spot: { x: 8, y: 3, facing: 'down' },
     extras: [{ x: 2, y: 4, facing: 'right' }, { x: 8, y: 5, facing: 'left' }], pet: { x: 6, y: 6 },
   },
   {
-    rows: ['###########', '###########', 'Bkw.VVV..pk', 'B..........', '...........', '...........', '...........', 'p..E......p'],
+    rows: ['###########', '###########', 'Bkw.VVV..pk', 'B..........', '...........', '...........', '...........', 'p..EE.....p'],
     rug: [3, 3, 7, 5], wallDecor: { 3: 'poster', 7: 'calendar' }, tv: [4, 5, 6], spot: { x: 6, y: 4, facing: 'down' },
     extras: [{ x: 8, y: 3, facing: 'down' }, { x: 2, y: 5, facing: 'right' }], pet: { x: 8, y: 6 },
   },
@@ -135,7 +134,7 @@ export function furnishHouses(MAP_DEFS) {
       const name = special?.name ?? freshName(sprite, houseHash(key, 5));
       if (special) usedNames.add(name);
       const [rug, edge] = pick(RUG_COLORS, houseHash(key, 6));
-      MAP_DEFS[id] = roomy({
+      MAP_DEFS[id] = {
         name: `Nhà ${name}`,
         indoor: true,
         theme: 'home',
@@ -147,10 +146,10 @@ export function furnishHouses(MAP_DEFS) {
         bedColor: pick(BED_COLORS, houseHash(key, 7)),
         signs: Object.fromEntries(tpl.tv.map((x) => [`${x},2`, [pick(TV_LINES, houseHash(key, 8))]])),
         entry: { x: 3, y: tpl.rows.length - 2 },
-      }, 'home');
+      };
       b.to = id;
       HOUSE_RESIDENTS.push({
-        id: `res-${id}`, sprite, name, map: id, ...tpl.spot, x: tpl.spot.x + HOME_DX, fixed: true,
+        id: `res-${id}`, sprite, name, map: id, ...tpl.spot, fixed: true,
         resident: special?.resident ?? { kind, seed: houseHash(key, 9), seed2: houseHash(key, 10) },
       });
       // Người nhà / Pokémon nuôi
@@ -163,7 +162,7 @@ export function furnishHouses(MAP_DEFS) {
         const n = freshName(s, houseHash(key, 25 + i));
         used.add(n);
         HOUSE_RESIDENTS.push({
-          id: `res-${id}-${i + 2}`, sprite: s, name: n, map: id, ...tpl.extras[i], x: tpl.extras[i].x + HOME_DX, fixed: true,
+          id: `res-${id}-${i + 2}`, sprite: s, name: n, map: id, ...tpl.extras[i], fixed: true,
           lines: pick(FAMILY_LINES, houseHash(key, 30 + i)),
         });
       }
@@ -171,7 +170,7 @@ export function furnishHouses(MAP_DEFS) {
         const mon = pick(PETS.filter((p) => SPECIES[p]), houseHash(key, 40));
         const petName = SPECIES[mon].name;
         HOUSE_RESIDENTS.push({
-          id: `res-${id}-pet`, mon, name: petName, map: id, ...tpl.pet, x: tpl.pet.x + HOME_DX, facing: 'down', wander: 2,
+          id: `res-${id}-pet`, mon, name: petName, map: id, ...tpl.pet, facing: 'down', wander: 2,
           lines: pick(PET_LINES, houseHash(key, 41))(petName),
         });
       }
